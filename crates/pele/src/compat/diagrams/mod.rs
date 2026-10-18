@@ -1,8 +1,10 @@
+pub mod agentflow;
 pub mod architecture;
 pub mod block;
 pub mod c4;
 pub mod class_diagram;
 mod common;
+pub mod cynefin;
 pub mod er;
 pub mod flowchart;
 pub mod gantt;
@@ -21,5 +23,6 @@ pub mod sankey;
 pub mod sequence;
 pub mod state;
 pub mod timeline;
+pub mod tree_view;
 pub mod treemap;
 pub mod xychart;

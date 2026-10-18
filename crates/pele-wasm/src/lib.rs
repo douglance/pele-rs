@@ -27,6 +27,25 @@ pub struct ParsedDocument {
 }
 #[wasm_bindgen]
 impl ParsedDocument {
+    pub fn query(&self, operation: &str, arguments_json: &str) -> String {
+        let run = || -> Result<pele::compat::Value, pele::compat::PeleError> {
+            use pele::compat::{ErrorCode, PeleError};
+            if operation.len() > 4096 || arguments_json.len() > 1024 * 1024 {
+                return Err(PeleError::new(
+                    "Model query input exceeds budget",
+                    ErrorCode::Limit,
+                ));
+            }
+            let arguments = serde_json::from_str(arguments_json).map_err(|_| {
+                PeleError::new("Invalid model query arguments", ErrorCode::Semantic)
+            })?;
+            self.inner.query(operation, &arguments)
+        };
+        match run() {
+            Ok(value) => pele::compat::success_envelope(&value),
+            Err(error) => pele::compat::error_envelope(&error),
+        }
+    }
     pub fn model(&self) -> String {
         match pele::compat::document_envelope(&self.inner) {
             Ok(s) => s,

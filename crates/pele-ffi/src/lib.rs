@@ -479,3 +479,38 @@ pub unsafe extern "C" fn pele_render_document_with_resources_v2(
         })
     })
 }
+
+/// Query a live retained document. All buffers are borrowed for this call.
+/// # Safety
+/// Document must remain live; non-null buffers must cover their declared lengths.
+#[no_mangle]
+pub unsafe extern "C" fn pele_document_query_v2(
+    document: *const PeleResult,
+    operation: *const u8,
+    operation_len: usize,
+    arguments: *const u8,
+    arguments_len: usize,
+) -> *mut PeleResult {
+    compatibility_call(|| {
+        use pele::compat::{ErrorCode, PeleError, Value};
+        let document = unsafe { document.as_ref() }
+            .and_then(|r| r.document.as_ref())
+            .ok_or_else(|| {
+                PeleError::new("Query requires a live parsed document", ErrorCode::Semantic)
+            })?;
+        let operation = unsafe { compatibility_input(operation, operation_len, 4096) }?;
+        let arguments = unsafe { compatibility_input(arguments, arguments_len, 1024 * 1024) }?;
+        let arguments: Value = if arguments.trim().is_empty() {
+            Value::Null
+        } else {
+            serde_json::from_str(arguments)
+                .map_err(|_| PeleError::new("Invalid model query arguments", ErrorCode::Semantic))?
+        };
+        let result = document.query(operation, &arguments)?;
+        Ok(PeleResult {
+            status: 0,
+            data: pele::compat::success_envelope(&result).into_bytes(),
+            document: None,
+        })
+    })
+}

@@ -1,18 +1,19 @@
 import {test,expect} from '@playwright/test';
 
-for(const family of ['packet','radar','quadrant','timeline','journey','flowchart','kanban','mindmap','class','er','xychart','state','gantt','sequence','git-graph','architecture','sankey','treemap','c4','info','requirement','block','railroad']) {
+for(const family of ['packet','radar','quadrant','timeline','journey','flowchart','kanban','mindmap','class','er','xychart','state','gantt','sequence','git-graph','architecture','sankey','treemap','c4','info','requirement','block','railroad','cynefin','treeview','agentflow']) {
   test(`${family} pinned corpus through WASM source and owned model APIs`, async({page})=>{
     test.setTimeout(120_000);
     await page.goto('/examples/web/');
     const report=await page.evaluate(async family=>{
       const {loadRenderer,metricsMeasurer}=await import('/dist/package-web/package/full.js');
       const engine=await loadRenderer(), fixture=await(await fetch(`/fixtures/pele/${family}.json`)).json();
+      const publicType=family==='treeview'?'treeView':family==='git-graph'?'gitGraph':family;
       const canonical=value=>JSON.stringify(value,(_,v)=>v instanceof Map?[...v]:v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.entries(v).sort(([a],[b])=>a.localeCompare(b))):v);
       const mismatches=[];
       const oracle=family==='gantt'?await import('/dist/evidence/pele-oracle.js'):null;
       let runtimeDateCases=0;
       for(const c of fixture.cases) {
-        let actual,model;
+        let actual,model,semanticModel;
         const host=c.host??{},options={...c.options,measurer:host.measure==='fixed'?{width:(text,size,style)=>text.length*size*(style&1?.71:.6)}:metricsMeasurer,...(host.allIcons?{icons:()=>'<path d="M0,0"/>'}:host.icons?{icons:n=>Object.hasOwn(host.icons,n)&&typeof host.icons[n]==='string'?host.icons[n]:undefined}:{})};
         let expected={...c.expected};
         // Diagnostic provenance is not part of the public parse/render envelope.
@@ -33,22 +34,23 @@ for(const family of ['packet','radar','quadrant','timeline','journey','flowchart
         try {
           if((host.modelProjection==='excluded'||expected.modelProjectionLimit)) {
             let bounded=false;
-            try {const projected=engine.parse(c.source,c.options);engine.dispose(projected)} catch(e){bounded=e.code==='limit'&&e.type===family}
+            try {const projected=engine.parse(c.source,c.options);engine.dispose(projected)} catch(e){bounded=e.code==='limit'&&e.type===publicType}
             if(!bounded)mismatches.push(`${c.id}: projection was not bounded`);
             actual={...(expected.modelProjectionLimit?{modelProjectionLimit:true}:{}),result:engine.render(c.source,options)};
           } else {
             model=engine.parse(c.source,c.options);
-            actual={model,result:engine.render(model,options)};
+            semanticModel=expected.semanticModel?engine.query(model,"semanticModel"):undefined;
+            actual={model,...(semanticModel!==undefined?{semanticModel}:{}),result:engine.render(model,options)};
           }
           if(!(host.modelProjection==='excluded'||expected.modelProjectionLimit)&&canonical(actual.result)!==canonical(engine.render(c.source,options)))mismatches.push(`${c.id}: source/model differ`);
           if(expected.result?.svgSha256){const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(actual.result.svg));delete actual.result.svg;actual.result.svgSha256=[...new Uint8Array(hash)].map(v=>v.toString(16).padStart(2,'0')).join('');}
-        } catch(e) { actual={...(expected.model&&model?{model}:{}),error:{name:e.name,message:e.message,code:e.code,type:e.type,line:e.line,column:e.column,snippet:e.snippet}}; }
+        } catch(e) { actual={...(expected.model&&model?{model}:{}),...(semanticModel!==undefined?{semanticModel}:{}),error:{name:e.name,message:e.message,code:e.code,type:e.type,line:e.line,column:e.column,snippet:e.snippet}}; }
         finally { if(model)engine.dispose(model); }
         if(canonical(actual)!==canonical(expected))mismatches.push(c.id);
       }
       // Rust checks the typed shared-string model without a 400 MB JSON projection.
       for(const c of [...(fixture.stress??[]),...(fixture.typedCases??[])]) {
-        let bounded=false;try {const model=engine.parse(c.source,c.options);engine.dispose(model)}catch(e){bounded=e.code==='limit'&&e.type===family}
+        let bounded=false;try {const model=engine.parse(c.source,c.options);engine.dispose(model)}catch(e){bounded=e.code==='limit'&&e.type===publicType}
         if(!bounded)mismatches.push(`stress/${c.id}: model projection was not bounded`);
         const actual=engine.render(c.source,{...c.options,measurer:metricsMeasurer});
         const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(actual.svg));delete actual.svg;actual.svgSha256=[...new Uint8Array(hash)].map(v=>v.toString(16).padStart(2,'0')).join('');
@@ -73,6 +75,9 @@ test('new families paint resolved SVG through real browser decoders',async({page
   const report=await page.evaluate(async()=>{
     const {loadRenderer}=await import('/dist/package-web/package/full.js'),engine=await loadRenderer(),proof=[];
     for(const [type,source] of [
+      ['cynefin','cynefin-beta\n  complex\n    "Emergent practice"\n  clear\n    "Best practice"'],
+      ['treeView','treeView-beta\nroot/\n    src/\n        index.js\n        App.tsx\n    tests/\n        RendererTests.swift\n    Package.swift\n    README.md'],
+      ['agentflow','agentflow-beta LR\nbrief["Brief"]@{ shape: input }\ndraft["Draft"]@{ shape: task }\ncheck["Check"]@{ shape: tool }\nbrief --> draft --> check'],
       ['requirement','requirementDiagram\nrequirement core {\n id: 1\n text: Shared renderer\n risk: high\n verifymethod: test\n}\nelement app {\n type: service\n}\napp - satisfies -> core'],
       ['block','block-beta\ncolumns 2\napp["Swift"] core["Rust"]\napp --> core'],
       ['railroad','railroad-abnf-beta\nrule = "test" / "more" ;'],

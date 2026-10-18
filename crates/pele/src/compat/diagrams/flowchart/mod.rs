@@ -5,7 +5,7 @@ mod lexer;
 mod model;
 mod parser;
 pub(crate) mod render;
-mod shapes;
+pub(crate) mod shapes;
 mod tokens;
 use crate::compat::{Engine, ParseContext, ParseOptions, PeleError};
 pub use model::{FlowClassDef, FlowEdge, FlowNode, FlowSubgraph, FlowchartModel, LabelType};

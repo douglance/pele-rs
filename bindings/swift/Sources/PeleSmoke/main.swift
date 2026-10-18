@@ -62,6 +62,9 @@ try piePNG.write(to: output.appendingPathComponent("swift-pie.png"))
 print("Swift owned pie + AppKit: \(pieWidth)x\(pieHeight), \(colored) colored pixels")
 
 for (type, source) in [
+    ("cynefin", "---\ntitle: Decision domains\n---\ncynefin-beta\n  complex\n    \"Emergent practice\"\n  clear\n    \"Best practice\""),
+    ("treeView", "---\ntitle: Source tree\n---\ntreeView-beta\nroot/\n    src/\n        index.js\n        App.tsx\n    tests/\n        RendererTests.swift\n    Package.swift\n    README.md"),
+    ("agentflow", "---\ntitle: Writing workflow\n---\nagentflow-beta LR\nbrief[\"Brief\"]@{ shape: input }\ndraft[\"Draft\"]@{ shape: task }\ncheck[\"Check\"]@{ shape: tool }\nbrief --> draft --> check"),
     ("requirement", "---\ntitle: Shared requirements\n---\nrequirementDiagram\nrequirement core {\n id: 1\n text: Shared renderer\n risk: high\n verifymethod: test\n}\nelement app {\n type: service\n}\napp - satisfies -> core"),
     ("block", "block-beta\ncolumns 2\napp[\"Swift\"] core[\"Rust\"]\napp --> core"),
     ("railroad", "railroad-abnf-beta\nrule = \"test\" / \"more\" ;"),

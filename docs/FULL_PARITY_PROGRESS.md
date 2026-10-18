@@ -6,7 +6,7 @@ release or new GIF has been published from this branch.
 
 ## Implemented renderers
 
-`Engine::with_builtins()` currently registers twenty-four actual Rust diagram modules.
+`Engine::with_builtins()` currently registers twenty-seven actual Rust diagram modules.
 `Engine::empty()` and typed `DiagramModule<Model>` remain extension interfaces.
 Registration never certifies a global parity flag; all public API gates remain open.
 
@@ -36,9 +36,12 @@ Registration never certifies a global parity flag; all public API gates remain o
 | requirement | 10,358 | 3,714 | 6,644 |
 | block | 12,294 | 4,584 | 7,710 |
 | railroad | 12,288 | 4,424 | 7,864 |
-| Total | 324,295 | 124,158 | 200,137 |
+| cynefin | 7,209 | 3,011 | 4,198 |
+| treeView | 6,800 | 4,301 | 2,499 |
+| agentflow | 14,990 | 5,372 | 9,618 |
+| Total | 353,294 | 136,842 | 216,452 |
 
-There are 128,922 complete model comparisons. Parsed models are retained when a
+There are 141,608 complete model comparisons. Parsed models are retained when a
 subsequent render fails. Six class stress cases explicitly exceed the JSON
 projection depth/size budget; their typed models and exact source renders/errors
 remain covered. These transport exceptions do not earn full public API parity.
@@ -113,6 +116,9 @@ only to raster evidence, while exported diagrams retain SVG transparency.
 
 | Diagram | Native pixels | Additional text proof |
 | --- | --- | --- |
+| cynefin | 656 x 492; 77,124 painted | Five domains and 496 title pixels |
+| treeView | 199 x 276; 4,477 painted | Files, nesting guides and 301 title pixels |
+| agentflow | 620 x 100; 11,164 painted | Semantic workflow and 488 title pixels |
 | requirement | 228 x 414; 7,895 painted | Tables, markers and 604 title pixels |
 | block | 170 x 64; 1,390 painted | Grid nodes and routed arrow |
 | railroad | 154 x 116; 1,271 painted | Alternatives, tracks and labels |
@@ -215,6 +221,28 @@ implements IR, EBNF, ABNF and PEG as one family. Its cached unclosed-comment
 scanner avoids repeatedly searching the same suffix. No projection exclusion
 counts as completed mutable/lossless public API parity.
 
+## Cynefin, TreeView and AgentFlow checkpoint
+
+Ten new release Rust feature tests and four extension-contract checks pass.
+The complete three-family corpora pass through Swift/C; the selected corpus
+method passed again after adding per-case and per-family autorelease scopes.
+Sampling the earlier run showed Foundation temporaries accumulating until test
+exit. The fixture reader now releases that temporary work as each case completes;
+no cases or assertions were dropped. Native AppKit exports paint all three.
+
+The browser checkpoint passes twelve cumulative checks across Chrome, Firefox
+and WebKit. A retained read-only query interface verifies every AgentFlow semantic
+model through Rust erasure, C/Swift and WASM; custom modules keep their query
+handler after registry replacement. Query names/arguments are bounded, and the
+builtin semantic projection uses the existing model-output budget. This is an
+additive development query interface, not completion of AgentFlow's mutable
+`semanticModel()` prototype contract.
+
+TreeView preserves per-row icon callback order. Its three deep JSON projections
+and twenty-seven isolated UTF-16 input mutations remain explicit ledger entries.
+AgentFlow records four metadata surrogate exceptions; Cynefin has none. These
+exceptions are not counted as completed public string/API cases.
+
 ## Calendar and deep models
 
 Gantt uses the translated V8 date parser for native fallback strings, attributed
@@ -242,7 +270,7 @@ architecture is [LLD_PUBLIC_MODELS.md](LLD_PUBLIC_MODELS.md).
 
 ## Remaining acceptance work
 
-- Nine family renderers, remaining shared behavior and the complete
+- Six family integrations, remaining shared behavior and the complete
   registration/lazy/mount/zoom/public model interface remain required.
 - JavaScript model projections currently do not apply mutations back into the
   retained Rust document. Prototype methods/private enumerable state also need

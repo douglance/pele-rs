@@ -15,6 +15,7 @@ trait ErasedModule: Send + Sync {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError>;
     fn model_view(&self, model: &Model) -> Result<Value, PeleError>;
+    fn query(&self, model: &Model, operation: &str, arguments: &Value) -> Result<Value, PeleError>;
 }
 struct Module<D>(D);
 struct ModelWriter {
@@ -33,6 +34,34 @@ impl std::io::Write for ModelWriter {
     fn flush(&mut self) -> std::io::Result<()> {
         Ok(())
     }
+}
+pub(crate) fn project_model(model: &impl Serialize) -> Result<Value, PeleError> {
+    let mut writer = ModelWriter {
+        bytes: Vec::new(),
+        exceeded: false,
+    };
+    let result = serde_json::to_writer(&mut writer, model);
+    if writer.exceeded {
+        return Err(PeleError::new(
+            format!(
+                "Parsed model JSON exceeds {} bytes",
+                super::MAX_MODEL_JSON_BYTES
+            ),
+            ErrorCode::Limit,
+        ));
+    }
+    result
+        .and_then(|_| {
+            super::value::parse_model_json(
+                std::str::from_utf8(&writer.bytes).expect("JSON serializer emits UTF-8"),
+            )
+        })
+        .map_err(|e| {
+            PeleError::new(
+                format!("Module model cannot be serialized: {e}"),
+                ErrorCode::Semantic,
+            )
+        })
 }
 impl<D: DiagramModule> ErasedModule for Module<D> {
     fn parse(&self, context: ParseContext<'_>) -> Result<Model, PeleError> {
@@ -57,32 +86,14 @@ impl<D: DiagramModule> ErasedModule for Module<D> {
             .downcast_ref::<D::Model>()
             .expect("private module/model pairing");
         self.0.validate_model_projection(model)?;
-        let mut writer = ModelWriter {
-            bytes: Vec::new(),
-            exceeded: false,
-        };
-        let result = serde_json::to_writer(&mut writer, model);
-        if writer.exceeded {
-            return Err(PeleError::new(
-                format!(
-                    "Parsed model JSON exceeds {} bytes",
-                    super::MAX_MODEL_JSON_BYTES
-                ),
-                ErrorCode::Limit,
-            ));
-        }
-        result
-            .and_then(|_| {
-                super::value::parse_model_json(
-                    std::str::from_utf8(&writer.bytes).expect("JSON serializer emits UTF-8"),
-                )
-            })
-            .map_err(|e| {
-                PeleError::new(
-                    format!("Module model cannot be serialized: {e}"),
-                    ErrorCode::Semantic,
-                )
-            })
+        project_model(model)
+    }
+    fn query(&self, model: &Model, operation: &str, arguments: &Value) -> Result<Value, PeleError> {
+        self.0.query(
+            model.downcast_ref().expect("private module/model pairing"),
+            operation,
+            arguments,
+        )
     }
 }
 struct Registration {
@@ -113,6 +124,18 @@ impl ParsedDocument {
                 error
             })
     }
+    /// Query the retained typed model without re-parsing or retargeting registration.
+    pub fn query(&self, operation: &str, arguments: &Value) -> Result<Value, PeleError> {
+        self.registration
+            .module
+            .query(&self.model, operation, arguments)
+            .map_err(|mut error| {
+                if error.diagram_type.is_none() {
+                    error.diagram_type = Some(self.diagram_type().as_str().to_owned());
+                }
+                error
+            })
+    }
     pub fn config(&self) -> &Object {
         &self.config
     }
@@ -126,6 +149,9 @@ impl Engine {
     /// Registers implemented built-ins only; consult capabilities for parity status.
     pub fn with_builtins() -> Self {
         let mut engine = Self::empty();
+        engine.register(super::diagrams::cynefin::Cynefin);
+        engine.register(super::diagrams::tree_view::TreeView);
+        engine.register(super::diagrams::agentflow::AgentFlow);
         engine.register(super::diagrams::requirement::RequirementDiagram);
         engine.register(super::diagrams::block::Block);
         engine.register(super::diagrams::railroad::Railroad);

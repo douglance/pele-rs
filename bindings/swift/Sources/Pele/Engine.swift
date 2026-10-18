@@ -49,6 +49,15 @@ extension Pele {
             self.handle = handle; self.type = projection.type; self.model = projection.model
         }
         deinit { pele_result_free(handle) }
+        /// Read-only operation on the exact retained Rust model.
+        public func query(_ operation: String, arguments: ConfigValue = .null) throws -> ConfigValue {
+            let name = Data(operation.utf8), arguments = try JSONEncoder().encode(arguments)
+            return try name.withUnsafeBytes { name in try arguments.withUnsafeBytes { arguments in
+                try Pele.compatibilityResult(pele_document_query_v2(handle,
+                    name.bindMemory(to: UInt8.self).baseAddress, name.count,
+                    arguments.bindMemory(to: UInt8.self).baseAddress, arguments.count), as: ConfigValue.self)
+            }}
+        }
         public func decodeModel<T: Decodable>(as: T.Type) throws -> T {
             try JSONDecoder().decode(T.self, from: JSONEncoder().encode(model))
         }

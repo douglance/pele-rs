@@ -85,12 +85,19 @@ export interface BlockNode { id?: string; type?: string; label?: string; childre
 export interface BlockModel { type: 'block'; title?: string; root: BlockNode; blocks: BlockNode[]; edges: BlockNode[]; classes: ReadonlyMap<string, {id:string;styles:string[];textStyles:string[]}>; byId: ReadonlyMap<string, BlockNode> }
 export type RailroadNode = {type:'terminal';value:string} | {type:'nonterminal';name:string} | {type:'special';text:string} | {type:'sequence';elements:RailroadNode[]} | {type:'choice';alternatives:RailroadNode[]} | {type:'optional';element:RailroadNode} | {type:'repetition';element:RailroadNode;min:number;max:number|null};
 export interface RailroadModel extends AccessibleModel { type:'railroad';notation:string;rules:{name:string;definition:RailroadNode}[] }
-export type DiagramModel = PieModel | PacketModel | RadarModel | QuadrantModel | TimelineModel | JourneyModel | FlowchartModel | KanbanModel | MindmapModel | ClassModel | ErModel | XyChartModel | StateModel | GanttModel | SequenceModel | GitModel | ArchitectureModel | SankeyModel | TreemapModel | C4Model | InfoModel | RequirementModel | BlockModel | RailroadModel;
+export type CynefinDomainName = 'complex'|'complicated'|'clear'|'chaotic'|'confusion';
+export interface CynefinModel extends AccessibleModel { type:'cynefin';domains:ReadonlyMap<CynefinDomainName,{name:CynefinDomainName;items:{label:string}[]}>;transitions:{from:CynefinDomainName;to:CynefinDomainName;label?:string}[] }
+export interface TreeViewNode { id:number;level:number;name:string;nodeType:'file'|'directory';icon?:string;cssClass?:string;description?:string;children:TreeViewNode[] }
+export interface TreeViewModel extends AccessibleModel { type:'treeView';root:TreeViewNode;count:number }
+export interface AgentNode extends FlowNode { metadata?:{[key:string]:ConfigValue} }
+export interface AgentflowModel extends AccessibleModel { type:'agentflow';direction?:string;nodes:ReadonlyMap<string,AgentNode>;connectors:ReadonlyMap<string,AgentNode>;edges:FlowEdge[];subgraphs:{id:string;type:string;nodes:string[];title:string;classes:string[];dir?:string;labelType:string;metadata?:{[key:string]:ConfigValue}}[];classes:ReadonlyMap<string,{id:string;styles:string[];textStyles:string[]}>;tooltips:ReadonlyMap<string,string>;mappings:ConfigValue[];diagnostics:ConfigValue[];lineOffset:number;defaultEdgeStyle?:string[];defaultInterpolate?:ConfigValue }
+export type DiagramModel = PieModel | PacketModel | RadarModel | QuadrantModel | TimelineModel | JourneyModel | FlowchartModel | KanbanModel | MindmapModel | ClassModel | ErModel | XyChartModel | StateModel | GanttModel | SequenceModel | GitModel | ArchitectureModel | SankeyModel | TreemapModel | C4Model | InfoModel | RequirementModel | BlockModel | RailroadModel | CynefinModel | TreeViewModel | AgentflowModel;
 export interface Rendered { type: DiagramId; svg: string; width: number; height: number; links: { id: string; href: string; internal: boolean }[] }
 export interface Renderer {
   capabilities(): Capability[];
   parse(source: string, options?: ParseOptions): DiagramModel;
   render(input: string | DiagramModel, options?: RenderOptions): Rendered;
+  query(model: DiagramModel, operation: string, argumentsValue?: ConfigValue): ConfigValue;
   dispose(model: DiagramModel): void;
 }
 export function loadRenderer(moduleOrPath?: string | URL | Response | BufferSource | WebAssembly.Module): Promise<Renderer>;

@@ -38,6 +38,8 @@ export async function loadRenderer(moduleOrPath) {
         if (projection.type === 'sankey') for(const link of model.links) {
           link.source=model.nodes[link.source.index];link.target=model.nodes[link.target.index];
         }
+        if (projection.type === 'cynefin') model.domains = new Map(model.domains);
+        if (projection.type === 'agentflow') for(const key of ['nodes','connectors','classes','tooltips'])model[key]=new Map(model[key]);
         if (projection.type === 'requirement') for(const key of ['requirements','elements','classes'])model[key]=new Map(model[key]);
         if (projection.type === 'block') for(const key of ['classes','byId'])model[key]=new Map(model[key]);
         if (projection.type === 'treemap') model.classes = new Map(model.classes);
@@ -94,6 +96,12 @@ export async function loadRenderer(moduleOrPath) {
         throw callbackError;
       }
       return result(json);
+    },
+    query(model, operation, argumentsValue = null) {
+      const document = documents.get(model);
+      if (!document) throw new TypeError('query() takes a model that parse() returned.');
+      if (document.bridge) throw new TypeError('This mutable model does not expose read-only queries.');
+      return result((document.handle ?? document).query(operation, JSON.stringify(argumentsValue)));
     },
     dispose(model) {
       const document = documents.get(model);

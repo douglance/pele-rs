@@ -1,0 +1,54 @@
+//! AgentFlow, complete Pele agentflow/* 458322a5 translation (MIT, kepano).
+mod graph;
+mod lexer;
+mod model;
+mod parser;
+mod render;
+mod shapes;
+mod tokens;
+use crate::compat::{
+    DiagramModule, DiagramType, ModuleDescriptor, Object, ParseContext, PeleError, RenderResources,
+    RenderSettings, Rendered,
+};
+pub use model::{
+    AgentClassDef, AgentEdge, AgentNode, AgentSubgraph, AgentflowModel, Diagnostic, DiagnosticId,
+    ElementMapping, ElementPosition, LabelType, SemanticConnector, SemanticEdge, SemanticModel,
+    SemanticSubgraph, SemanticVertex,
+};
+#[derive(Default)]
+pub struct AgentFlow;
+impl DiagramModule for AgentFlow {
+    type Model = AgentflowModel;
+    fn descriptor(&self) -> ModuleDescriptor {
+        let mut d = ModuleDescriptor::new(DiagramType::Agentflow);
+        d.keep_comments = true;
+        d
+    }
+    fn parse(&self, c: ParseContext<'_>) -> Result<Self::Model, PeleError> {
+        parser::parse(c)
+    }
+    fn query(
+        &self,
+        model: &Self::Model,
+        operation: &str,
+        _arguments: &crate::compat::Value,
+    ) -> Result<crate::compat::Value, PeleError> {
+        if operation == "semanticModel" {
+            crate::compat::engine::project_model(&model.semantic_model())
+        } else {
+            Err(PeleError::new(
+                format!("Unknown model query: {operation}"),
+                crate::compat::ErrorCode::Semantic,
+            ))
+        }
+    }
+    fn render(
+        &self,
+        m: &Self::Model,
+        c: &Object,
+        o: &RenderSettings,
+        r: &mut dyn RenderResources,
+    ) -> Result<Rendered, PeleError> {
+        render::render(m, c, o, r)
+    }
+}

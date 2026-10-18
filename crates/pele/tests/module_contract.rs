@@ -18,6 +18,21 @@ impl DiagramModule for ConsumerModule {
             keep_comments: true,
         }
     }
+    fn query(
+        &self,
+        _model: &Document,
+        operation: &str,
+        arguments: &Value,
+    ) -> Result<Value, PeleError> {
+        match operation {
+            "tag" => Ok(Value::String(self.0.into())),
+            "echo" => Ok(arguments.clone()),
+            _ => Err(PeleError::new(
+                "Unknown consumer query",
+                ErrorCode::Semantic,
+            )),
+        }
+    }
     fn parse(&self, c: ParseContext<'_>) -> Result<Document, PeleError> {
         Ok(Document {
             source: c.source.into(),
@@ -86,7 +101,25 @@ fn consumer_module_keeps_its_parse_contract_after_replacement() {
         .render_document(&document, &options, &mut Host)
         .unwrap();
     assert!(first.rendered.svg.starts_with("original:🙂 title:false"));
+    assert_eq!(
+        document.query("tag", &Value::Null).unwrap(),
+        Value::String("original".into())
+    );
+    let argument = Value::Array(vec![Value::Bool(true), Value::Number(17.0)]);
+    assert_eq!(document.query("echo", &argument).unwrap(), argument);
+    assert_eq!(
+        document
+            .query("missing", &Value::Null)
+            .unwrap_err()
+            .diagram_type
+            .as_deref(),
+        Some("info")
+    );
     engine.register(ConsumerModule("replacement"));
+    assert_eq!(
+        document.query("tag", &Value::Null).unwrap(),
+        Value::String("original".into())
+    );
     assert_eq!(
         engine
             .render_document(&document, &options, &mut Host)

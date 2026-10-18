@@ -179,6 +179,18 @@ pub trait DiagramModule: Send + Sync + 'static {
     fn validate_model_projection(&self, _model: &Self::Model) -> Result<(), PeleError> {
         Ok(())
     }
+    /// Read-only model operation. Existing documents retain their exact handler.
+    fn query(
+        &self,
+        _model: &Self::Model,
+        operation: &str,
+        _arguments: &super::Value,
+    ) -> Result<super::Value, PeleError> {
+        Err(PeleError::new(
+            format!("Unknown model query: {operation}"),
+            super::ErrorCode::Semantic,
+        ))
+    }
     fn descriptor(&self) -> ModuleDescriptor;
     fn parse(&self, context: ParseContext<'_>) -> Result<Self::Model, PeleError>;
     fn render(

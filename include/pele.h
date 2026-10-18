@@ -27,6 +27,8 @@ PeleResult *pele_parse_v2(const uint8_t *source, size_t source_len, const uint8_
 PeleResult *pele_render_v2(const uint8_t *source, size_t source_len, const uint8_t *options, size_t options_len);
 PeleResult *pele_render_document_v2(const PeleResult *document, const uint8_t *options, size_t options_len);
 PeleResult *pele_builtin_capabilities(void);
+/* Read-only retained model operation, UTF-8 name <=4096 bytes and JSON args <=1 MiB. */
+PeleResult *pele_document_query_v2(const PeleResult *, const uint8_t *, size_t, const uint8_t *, size_t);
 /* Per-render resources. Callback status: 0 success, nonzero failure.
  * Icons are trusted host SVG, never source strings. Returned bytes are borrowed
  * until the next callback; Rust copies them immediately. All callbacks/context

@@ -6,8 +6,14 @@ import Pele
 final class AdditionalDiagramTests: XCTestCase {
     private struct ModelExpectations: Decodable {
         struct Case: Decodable {
-            struct Expected: Decodable { let model: ConfigValue? }
+            struct Expected: Decodable { let model: ConfigValue?; let semanticModel: ConfigValue? }
             let expected: Expected
+            private enum CodingKeys: CodingKey { case expected }
+            init(from decoder: any Decoder) throws {
+                expected = try autoreleasepool {
+                    try decoder.container(keyedBy: CodingKeys.self).decode(Expected.self, forKey: .expected)
+                }
+            }
         }
         let cases: [Case]
     }
@@ -26,14 +32,18 @@ final class AdditionalDiagramTests: XCTestCase {
     func testPinnedDiagramsThroughNativeDocuments() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent("../../../..").standardizedFileURL
         let decoder = JSONDecoder(), encoder = JSONEncoder(), engine = Pele.Engine()
-        for family in ["packet", "radar", "quadrant", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence", "git-graph", "architecture", "sankey", "treemap", "c4", "info", "requirement", "block", "railroad"] {
+        for family in ["packet", "radar", "quadrant", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence", "git-graph", "architecture", "sankey", "treemap", "c4", "info", "requirement", "block", "railroad", "cynefin", "treeview", "agentflow"] {
             if let families = ProcessInfo.processInfo.environment["PELE_FAMILIES"], !families.split(separator: ",").contains(Substring(family)) { continue }
+            try autoreleasepool {
+            FileHandle.standardError.write(Data("Swift corpus: \(family)\n".utf8))
+            let publicType = family == "treeview" ? "treeView" : family == "git-graph" ? "gitGraph" : family
             let bytes = try fixtureData(root.appendingPathComponent("fixtures/pele/\(family).json"))
             let fixture = try JSONSerialization.jsonObject(with: bytes) as! [String: Any]
             let modelExpectations = try decoder.decode(ModelExpectations.self, from: bytes)
             let cases = fixture["cases"] as! [[String: Any]]
             XCTAssertFalse(cases.isEmpty, family)
             for (index, item) in cases.enumerated() {
+                try autoreleasepool {
                 let id = "\(family)/\(item["id"]!)", source = item["source"] as! String
                 let settings = ["config": [String: Any]()].merging(item["options"] as? [String: Any] ?? [:]) { _, value in value }
                 let options = try decoder.decode(Pele.Engine.Options.self, from: JSONSerialization.data(withJSONObject: settings))
@@ -58,7 +68,7 @@ final class AdditionalDiagramTests: XCTestCase {
                     if host["modelProjection"] as? String == "excluded" || expected["modelProjectionLimit"] as? Bool == true {
                         XCTAssertThrowsError(try engine.parse(source, options: parseOptions)) { error in
                             XCTAssertEqual((error as? CompatibilityError)?.code, "limit", id)
-                            XCTAssertEqual((error as? CompatibilityError)?.type, family, id)
+                            XCTAssertEqual((error as? CompatibilityError)?.type, publicType, id)
                         }
                         let rendered = try engine.render(source, options: options, resources: resources)
                         let result = (try JSONSerialization.jsonObject(with: encoder.encode(rendered)) as! NSDictionary).mutableCopy() as! NSMutableDictionary
@@ -68,13 +78,16 @@ final class AdditionalDiagramTests: XCTestCase {
                             result["svgSha256"] = SHA256.hash(data: Data(rendered.svg.utf8)).map { String(format: "%02x", $0) }.joined()
                         }
                         XCTAssertTrue(result.isEqual(expected["result"] as? NSDictionary), id)
-                        continue
+                        return
                     }
                     let document = try engine.parse(source, options: parseOptions)
                     // Decode directly from oracle bytes: Foundation's Any projection
                     // can retain decimal storage or strip leading U+FEFF from strings.
                     if let expectedModel = modelExpectations.cases[index].expected.model {
                         XCTAssertEqual(document.model, expectedModel, id)
+                    }
+                    if let expectedSemantic = modelExpectations.cases[index].expected.semanticModel {
+                        XCTAssertEqual(try document.query("semanticModel"), expectedSemantic, id)
                     }
                     projected = true
                     let rendered = try engine.render(document, options: options, resources: resources)
@@ -95,6 +108,7 @@ final class AdditionalDiagramTests: XCTestCase {
                     if normalized["type"] == nil { normalized["type"] = NSNull() }
                     XCTAssertEqual(normalized, expected["error"] as? NSDictionary, id)
                 }
+                }
             }
             // Keep this pathological model in Rust: projecting its shared labels to JSON
             // would duplicate 400 MB. Exercise the foreign render-source path instead.
@@ -106,7 +120,7 @@ final class AdditionalDiagramTests: XCTestCase {
                 parseOptions.config = options.config
                 XCTAssertThrowsError(try engine.parse(item["source"] as! String, options: parseOptions)) { error in
                     XCTAssertEqual((error as? CompatibilityError)?.code, "limit")
-                    XCTAssertEqual((error as? CompatibilityError)?.type, family)
+                    XCTAssertEqual((error as? CompatibilityError)?.type, publicType)
                 }
                 let rendered = try engine.render(item["source"] as! String, options: options)
                 let result = (try JSONSerialization.jsonObject(with: encoder.encode(rendered)) as! NSDictionary).mutableCopy() as! NSMutableDictionary
@@ -125,9 +139,10 @@ final class AdditionalDiagramTests: XCTestCase {
                 XCTAssertEqual(edges.count, expected["edges"] as? Int)
                 XCTAssertEqual(edges.first?["type"] as? String, expected["firstEdgeType"] as? String)
             }
+            }
         }
         let capabilities = try engine.capabilities()
-        XCTAssertEqual(Set(capabilities.filter { $0.registered }.map(\.type)), Set(["pie", "packet", "radar", "quadrantChart", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence", "gitGraph", "architecture", "sankey", "treemap", "c4", "info", "requirement", "block", "railroad"]))
+        XCTAssertEqual(Set(capabilities.filter { $0.registered }.map(\.type)), Set(["pie", "packet", "radar", "quadrantChart", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence", "gitGraph", "architecture", "sankey", "treemap", "c4", "info", "requirement", "block", "railroad", "cynefin", "treeView", "agentflow"]))
     }
 }
 

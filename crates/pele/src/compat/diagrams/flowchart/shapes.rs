@@ -178,10 +178,10 @@ const SHAPES: &[(&str, &str)] = &[
     ("usecaseEllipse", "usecaseEllipse"),
     ("usecaseJsonTable", "usecaseJsonTable"),
 ];
-pub(super) fn valid(name: &str) -> bool {
+pub(crate) fn valid(name: &str) -> bool {
     SHAPES.iter().any(|(n, _)| *n == name)
 }
-pub(super) fn canonical(name: Option<&str>) -> &str {
+pub(crate) fn canonical(name: Option<&str>) -> &str {
     let Some(name) = name else { return "rect" };
     match name {
         "square" => "rect",
