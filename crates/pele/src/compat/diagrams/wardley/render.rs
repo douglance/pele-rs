@@ -1,5 +1,6 @@
 //! Actual Wardley map projection, pipelines, links and responsive sizing, Pele 458322a5 (MIT).
 use super::model::*;
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     svg::{
         self,
@@ -158,7 +159,7 @@ impl Drawing<'_> {
     ) -> Result<Label, PeleError> {
         let width = width.unwrap_or_else(|| {
             if self.tight {
-                64f64.max(120f64.min(self.plot_w / 2.))
+                64f64.js_max(120f64.js_min(self.plot_w / 2.))
             } else {
                 4000.
             }
@@ -191,7 +192,7 @@ fn reach(
                 &node.label,
                 d.small,
                 Some(if d.tight {
-                    64f64.max(d.plot_w / 2.)
+                    64f64.js_max(d.plot_w / 2.)
                 } else {
                     4000.
                 }),
@@ -243,14 +244,14 @@ pub(super) fn render(
     if result.width <= available {
         return Ok(result);
     }
-    let floor = 160f64.min(natural);
+    let floor = 160f64.js_min(natural);
     let mut plot = natural;
     result = draw(model, c, o, r, plot, natural, true)?;
     for _ in 0..3 {
-        if result.width <= available || plot <= floor {
+        if !(result.width > available && plot > floor) {
             break;
         }
-        plot = floor.max(plot - (result.width - available));
+        plot = floor.js_max(plot - (result.width - available));
         result = draw(model, c, o, r, plot, natural, true)?;
     }
     Ok(result)
@@ -265,11 +266,11 @@ fn draw(
     tight: bool,
 ) -> Result<Rendered, PeleError> {
     let size = o.font_size.unwrap_or(16.);
-    let small = (size * 0.8125 + 0.5).floor();
-    let tiny = (size * 0.6875 + 0.5).floor();
+    let small = round(size * 0.8125);
+    let tiny = round(size * 0.6875);
     let pad = o.padding.unwrap_or(8.);
     let plot_h = dimension(c, model.size.as_ref().map(|s| s.height), "height", 600.)
-        * 0.75f64.max(plot_w / natural_w);
+        * 0.75f64.js_max(plot_w / natural_w);
     let show_grid = matches!(
         c.get("wardley-beta")
             .and_then(Value::as_object)
@@ -324,7 +325,7 @@ fn draw(
         let label = d.text(
             stage,
             small,
-            Some(48f64.max((end - start).abs() * plot_w - 12.)),
+            Some(48f64.js_max((end - start).abs() * plot_w - 12.)),
             0,
         )?;
         stage_labels += &d.centered(
@@ -336,7 +337,7 @@ fn draw(
                 svg::js_num(small)
             ),
         )?;
-        stage_bottom = stage_bottom.max(plot_h + 8. + label.height);
+        stage_bottom = stage_bottom.js_max(plot_h + 8. + label.height);
     }
     if show_grid {
         for i in 1..4 {
@@ -605,7 +606,11 @@ fn draw(
                 d.text(
                     &node.label,
                     small,
-                    Some(if tight { 64f64.max(plot_w / 2.) } else { 4000. }),
+                    Some(if tight {
+                        64f64.js_max(plot_w / 2.)
+                    } else {
+                        4000.
+                    }),
                     1,
                 )?
             };
@@ -684,7 +689,7 @@ fn draw(
         for p in &a.coordinates {
             let x = d.x(p.x);
             let y = d.y(p.y);
-            let radius = 10f64.max(label.width / 2. + 4.);
+            let radius = 10f64.js_max(label.width / 2. + 4.);
             d.grow(x - radius, y - radius, x + radius, y + radius);
             marks += &format!(
                 "<circle cx=\"{}\" cy=\"{}\" r=\"{}\" fill=\"var(--_bg)\" stroke=\"{LINE}\"/>{}",
@@ -724,10 +729,14 @@ fn draw(
             let line = d.text(
                 &format!("{}. {}", svg::js_num(a.number), a.text.as_ref().unwrap()),
                 small,
-                Some(if tight { 80f64.max(plot_w - 20.) } else { 320. }),
+                Some(if tight {
+                    80f64.js_max(plot_w - 20.)
+                } else {
+                    320.
+                }),
                 0,
             )?;
-            width = width.max(line.width);
+            width = width.js_max(line.width);
             height += line.height;
             lines.push(line)
         }
@@ -735,8 +744,8 @@ fn draw(
         height += 14.;
         let (bx, by) = if let Some(b) = &model.annotations_box {
             (
-                clamp(d.x(b.x), 0., 0f64.max(plot_w - width)),
-                clamp(d.y(b.y), 0., 0f64.max(plot_h - height)),
+                clamp(d.x(b.x), 0., 0f64.js_max(plot_w - width)),
+                clamp(d.y(b.y), 0., 0f64.js_max(plot_h - height)),
             )
         } else {
             (0., legend_top)
@@ -757,7 +766,7 @@ fn draw(
     }
     let mut notes = String::new();
     for n in &model.notes {
-        let label = d.text(&n.text, small, Some(360f64.min(plot_w * 0.6)), 1)?;
+        let label = d.text(&n.text, small, Some(360f64.js_min(plot_w * 0.6)), 1)?;
         notes += &d.starting(
             &label,
             d.x(n.x),
@@ -800,7 +809,7 @@ fn draw(
         d.r,
         o,
         size,
-        if tight { 80f64.max(plot_w) } else { 4000. },
+        if tight { 80f64.js_max(plot_w) } else { 4000. },
         1,
     )?;
     let title_height = if title.height > 0. {
@@ -808,8 +817,8 @@ fn draw(
     } else {
         0.
     };
-    let left = d.min_x.min(plot_w / 2. - title.width / 2.);
-    let right = d.max_x.max(plot_w / 2. + title.width / 2.);
+    let left = d.min_x.js_min(plot_w / 2. - title.width / 2.);
+    let right = d.max_x.js_max(plot_w / 2. + title.width / 2.);
     let tx = pad - left;
     let ty = pad + title_height - d.min_y;
     let total_width = (right - left + 2. * pad).ceil();

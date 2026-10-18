@@ -1,6 +1,7 @@
 //! Pele timeline/render.ts and common/{fit,fit-width}.ts, 458322a5 (MIT, kepano).
 use super::TimelineModel;
 use crate::compat::{
+    number_math::{round, NumberMath},
     source::space,
     svg::{document, esc_text, label_svg, num, series_color},
     text::{layout_label, measure, Label, SPACE},
@@ -56,9 +57,12 @@ fn fit(
     base: u8,
 ) -> Result<Label, PeleError> {
     let label = plain(raw, r, o, size, max, base)?;
-    let Some(raw) = raw.filter(|_| label.width > max) else {
+    let Some(raw) = raw else {
         return Ok(label);
     };
+    if label.width <= max {
+        return Ok(label);
+    }
     static UNIT: OnceLock<Regex> = OnceLock::new();
     let unit = UNIT.get_or_init(|| {
         Regex::new(&format!(
@@ -136,7 +140,7 @@ fn draw(
     vertical: bool,
 ) -> Result<Rendered, PeleError> {
     let size = o.font_size.unwrap_or(16.);
-    let small = (size * 0.875 + 0.5).floor();
+    let small = round(size * 0.875);
     let pad = o.padding.unwrap_or(8.);
     let multicolor = c
         .get("timeline")
@@ -179,13 +183,15 @@ fn draw(
         f64::INFINITY
     };
     let taken = AXIS + SPINE * 2. + 4. * PAD_X;
-    let period_text = 152f64.min(80f64.max(((room - taken) * 0.38 + 0.5).floor()));
-    let event_text = 264f64.min(110f64.max(room - taken - period_text));
+    let period_text = 152f64.js_min(80f64.js_max(round((room - taken) * 0.38)));
+    let event_text = 264f64.js_min(110f64.js_max(room - taken - period_text));
     let mut text_w = period_text;
     let mut period_labels = Vec::new();
     let mut event_labels = Vec::new();
     for p in periods {
         period_labels.push(plain(Some(&p.text), r, o, size, text_w, 0)?);
+    }
+    for p in periods {
         let mut labels = Vec::new();
         for e in &p.events {
             labels.push(plain(
@@ -199,21 +205,21 @@ fn draw(
         }
         event_labels.push(labels)
     }
-    let mut widest = period_labels.iter().map(|l| l.width).fold(0., f64::max);
+    let mut widest = period_labels.iter().map(|l| l.width).fold(0., f64::js_max);
     if !vertical {
         widest = event_labels
             .iter()
             .flatten()
             .map(|l| l.width)
-            .fold(widest, f64::max)
+            .fold(widest, f64::js_max)
     }
     let overflow = widest > text_w
         || (vertical && event_labels.iter().flatten().any(|l| l.width > event_text));
     if overflow {
         text_w = widest
             .ceil()
-            .max(period_text)
-            .min(if room == f64::INFINITY {
+            .js_max(period_text)
+            .js_min(if room == f64::INFINITY {
                 216.
             } else {
                 period_text
@@ -222,6 +228,8 @@ fn draw(
         event_labels.clear();
         for p in periods {
             period_labels.push(fit(Some(&p.text), r, o, size, text_w, 0)?);
+        }
+        for p in periods {
             let mut labels = Vec::new();
             for e in &p.events {
                 labels.push(fit(
@@ -236,11 +244,11 @@ fn draw(
             event_labels.push(labels)
         }
     }
-    let line_height = (size * 1.5 + 0.5).floor();
+    let line_height = round(size * 1.5);
     let col_w = text_w + 2. * PAD_X;
     let event_w = if vertical { event_text } else { text_w } + 2. * PAD_X;
-    let chip_height = |l: &Label| l.height.max(line_height) + 2. * PAD_Y;
-    let event_height = |l: &Label| l.height.max((small * 1.5 + 0.5).floor()) + 2. * PAD_Y;
+    let chip_height = |l: &Label| l.height.js_max(line_height) + 2. * PAD_Y;
+    let event_height = |l: &Label| l.height.js_max(round(small * 1.5)) + 2. * PAD_Y;
     let color_of = |g: &Group, i: usize| {
         if let Some(section) = g.section {
             series_color(section)
@@ -268,13 +276,13 @@ fn draw(
     } else {
         0.
     };
-    let title = fit(m.title.as_deref(), r, o, size, body_w.max(320.), 1)?;
+    let title = fit(m.title.as_deref(), r, o, size, body_w.js_max(320.), 1)?;
     let title_h = if title.height > 0. {
         title.height + 16.
     } else {
         0.
     };
-    let width = body_w.max(title.width);
+    let width = body_w.js_max(title.width);
     let left = pad + (width - body_w) / 2.;
     let top = pad + title_h;
     let section_label = |g: &Group, w: f64, r: &mut dyn RenderResources| {
@@ -392,7 +400,7 @@ fn draw(
                     period(i, &color, left, y, h),
                     dot(axis_x, cy, &color)
                 ));
-                y = (y + h).max(ey - EVENT_GAP) + GAP
+                y = (y + h).js_max(ey - EVENT_GAP) + GAP
             }
             if g.periods.is_empty() {
                 y += GAP - SECTION_GAP - 4.
@@ -418,11 +426,11 @@ fn draw(
                 section_labels.push(None)
             } else {
                 let label = section_label(g, g.periods.len().max(1) as f64 * pitch - GAP, r)?;
-                header_h = header_h.max(chip_height(&label));
+                header_h = header_h.js_max(chip_height(&label));
                 section_labels.push(Some(label))
             }
         }
-        let chip_h = period_labels.iter().map(chip_height).fold(0., f64::max);
+        let chip_h = period_labels.iter().map(chip_height).fold(0., f64::js_max);
         let periods_y = top
             + if has_sections {
                 header_h + SECTION_GAP
@@ -471,7 +479,7 @@ fn draw(
                     cards.push_str(&event(label, &color, x, ey, eh));
                     ey += eh + EVENT_GAP
                 }
-                bottom = bottom.max(ey - EVENT_GAP);
+                bottom = bottom.js_max(ey - EVENT_GAP);
                 body.push_str(&format!(
                     "{}{}<path class=\"pele-edge\" d=\"{d}\"{LINE}/>{}{cards}</g>",
                     open_period(i)?,
@@ -491,7 +499,7 @@ fn draw(
         height = bottom + pad
     }
     let total_w = (width + 2. * pad).ceil();
-    let total_h = height.max(pad * 2.).ceil();
+    let total_h = height.js_max(pad * 2.).ceil();
     let content = label_svg(
         &title,
         total_w / 2.,

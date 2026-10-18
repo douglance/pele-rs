@@ -4,6 +4,7 @@ use super::{
     graph::{self, Node},
     model::UsecaseModel,
 };
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     layout::{
         compound::{compound_layout, direction, shift_layout, CEdge, CNode},
@@ -52,7 +53,7 @@ fn number(c: &Object, key: &str, fallback: f64) -> f64 {
         .and_then(Value::as_object)
         .and_then(|c| c.get(key))
     {
-        Some(Value::Number(n)) if *n > 0. => n.min(2000.),
+        Some(Value::Number(n)) if *n > 0. => n.js_min(2000.),
         _ => fallback,
     }
 }
@@ -101,7 +102,7 @@ fn anchor(v: &View, c: &CNode, side: usize, along: f64) -> (f64, f64) {
         }
     } else if v.kind == Kind::Ellipse {
         let span = if upright { v.h } else { v.w } / 2.;
-        reach *= (1. - (along / span).powi(2)).max(0.).sqrt()
+        reach *= (1. - (along / span).powi(2)).js_max(0.).sqrt()
     }
     if upright {
         (c.x + sign * reach, c.y + middle + along)
@@ -166,7 +167,7 @@ fn attach(edges: &mut [CEdge], nodes: &[CNode], views: &[View]) {
         let i = key >> 2;
         let side = key & 3;
         let step = if ends.len() > 1 {
-            14_f64.min(side_length(&views[i], side) / (ends.len() - 1) as f64)
+            14_f64.js_min(side_length(&views[i], side) / (ends.len() - 1) as f64)
         } else {
             0.
         };
@@ -256,8 +257,8 @@ fn draw(
 ) -> Result<Rendered, PeleError> {
     let (graph_nodes, graph_edges) = graph::build(m);
     let size = o.font_size.unwrap_or(16.);
-    let small = (size * 0.875 + 0.5).floor();
-    let tiny = (size * 0.8125 + 0.5).floor();
+    let small = round(size * 0.875);
+    let tiny = round(size * 0.8125);
     let pad = o.padding.unwrap_or(8.);
     let root = if turned {
         direction(Some("TB"))
@@ -322,27 +323,27 @@ fn draw(
                 for row in rows {
                     let key = text(Some(&row.key), false, r, o, small, 4000., base)?;
                     let value = text(Some(&row.value), false, r, o, small, 260., base)?;
-                    v.key_w = v.key_w.max(key.width);
-                    value_w = value_w.max(value.width);
-                    v.h += value.height.max((small * 1.5 + 0.5).floor()) + 8.;
+                    v.key_w = v.key_w.js_max(key.width);
+                    value_w = value_w.js_max(value.width);
+                    v.h += value.height.js_max(round(small * 1.5)) + 8.;
                     v.rows.push((key, value));
                 }
                 if v.key_w > 0. {
                     v.key_w += 20.
                 }
-                v.head_h = v.label.height.max((font_size * 1.5 + 0.5).floor()) + 8.;
+                v.head_h = v.label.height.js_max(round(font_size * 1.5)) + 8.;
                 v.w = (v.label.width + 20.)
-                    .max(if v.rows.is_empty() {
+                    .js_max(if v.rows.is_empty() {
                         0.
                     } else {
                         v.key_w + value_w + 20.
                     })
-                    .max(72.);
+                    .js_max(72.);
                 v.h += v.head_h;
             } else if v.node.actor_type.is_some() {
                 v.kind = Kind::Actor;
                 v.label = text(Some(&v.node.label), markdown, r, o, font_size, 140., base)?;
-                v.w = 40_f64.max(v.label.width).max(v.stereotype.width);
+                v.w = 40_f64.js_max(v.label.width).js_max(v.stereotype.width);
                 v.h = 66. + v.stereotype.height + v.label.height;
             } else {
                 v.label = text(
@@ -358,19 +359,19 @@ fn draw(
                     180.,
                     base,
                 )?;
-                let tw = v.label.width.max(v.stereotype.width);
+                let tw = v.label.width.js_max(v.stereotype.width);
                 let th = v.label.height + v.stereotype.height;
                 if v.node.shape == "usecaseEllipse" || v.node.shape == "usecaseBusiness" {
                     v.kind = Kind::Ellipse;
                     v.w = (tw + 2. * v.node.padding + if v.node.business { 16. } else { 4. })
-                        .max(88.);
-                    v.h = (th + 28.).max(48.)
+                        .js_max(88.);
+                    v.h = (th + 28.).js_max(48.)
                 } else if v.node.shape == "note" {
                     v.w = tw + 2. * v.node.padding + 6.;
                     v.h = th + 18.
                 } else {
-                    v.w = (tw + 2. * v.node.padding + 12.).max(80.);
-                    v.h = (th + 24.).max(44.)
+                    v.w = (tw + 2. * v.node.padding + 12.).js_max(80.);
+                    v.h = (th + 24.).js_max(44.)
                 }
             }
             cn = CNode::new(v.w, v.h, -1)
@@ -471,7 +472,7 @@ fn draw(
     } else {
         0.
     };
-    let inner = layout.width.max(title.width);
+    let inner = layout.width.js_max(title.width);
     shift_layout(
         &mut nodes,
         &mut edges,
@@ -501,7 +502,7 @@ fn draw(
             let b = format!(" fill=\"var(--_a)\" fill-opacity=\"0.5\" stroke=\"var(--_b)\"{shape}");
             let ta = format!(" class=\"pele-cluster-label\" fill=\"var(--_m)\"{attrs}");
             let body = if n.boundary_type.as_deref() == Some("package") {
-                let tw = (v.label.width + 20.).min(c.w);
+                let tw = (v.label.width + 20.).js_min(c.w);
                 let th = v.label.height + 12.;
                 format!("<rect class=\"pele-boundary-tab\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\"{b}/><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\"{b}/>{}",num(x),num(y),num(tw),num(th),num(x),num(y+th),num(c.w),num(c.h-th),label_svg_with_resources(&v.label,x+tw/2.,y+th/2.,&ta,r)?)
             } else {
@@ -566,7 +567,7 @@ fn draw(
                 ))
             }
             for (key, value) in &v.rows {
-                let rh = value.height.max((small * 1.5 + 0.5).floor()) + 8.;
+                let rh = value.height.js_max(round(small * 1.5)) + 8.;
                 cells.push_str(&label_svg_with_resources(
                     key,
                     x0 + 10. + key.width / 2.,
@@ -656,7 +657,7 @@ fn draw(
             let v = &views[ce.src];
             let k = loops.entry(ce.src).or_insert(0);
             let side = if sideways { 2 } else { 1 };
-            let spread = (side_length(v, side) / 2.).min(8. + *k as f64 * 6.);
+            let spread = (side_length(v, side) / 2.).js_min(8. + *k as f64 * 6.);
             let reach = 26. + *k as f64 * 8.;
             *k += 1;
             let (ax, ay) = anchor(v, c, side, -spread);
@@ -688,9 +689,9 @@ fn draw(
             let ey = by + uy * et;
             if sideways {
                 ce.label_x = c.x;
-                ce.label_y = ay.max(by) + reach * 0.75 + 6. + label.height / 2.
+                ce.label_y = ay.js_max(by) + reach * 0.75 + 6. + label.height / 2.
             } else {
-                ce.label_x = ax.max(bx) + reach * 0.75 + 8. + label.width / 2.;
+                ce.label_x = ax.js_max(bx) + reach * 0.75 + 8. + label.width / 2.;
                 ce.label_y = c.y
             }
             EdgePath {
@@ -837,7 +838,7 @@ fn strip_relationship(s: &str) -> &str {
     }
 }
 fn title_x(c: &CNode, width: f64, crossings: &Crossings) -> f64 {
-    let y = (c.y - c.h / 2. + 0.5).floor();
+    let y = round(c.y - c.h / 2.);
     let key = if y == 0. {
         0_f64.to_bits()
     } else {
@@ -865,7 +866,7 @@ fn title_x(c: &CNode, width: f64, crossings: &Crossings) -> f64 {
     let mut from = left;
     for cut in cuts {
         if cut - from >= 2. * need {
-            let x = c.x.max(from + need).min(cut - need);
+            let x = c.x.js_max(from + need).js_min(cut - need);
             if (x - c.x).abs() < best_off {
                 best_off = (x - c.x).abs();
                 best = x

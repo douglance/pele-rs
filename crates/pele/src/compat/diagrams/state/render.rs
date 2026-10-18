@@ -1,5 +1,6 @@
 //! Pele state/render.ts compound state renderer, 458322a5 (MIT, kepano).
 use super::{graph::StateNode, model::StateModel};
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     layout::{
         compound::{compound_layout, direction, CEdge, CNode, Dir},
@@ -76,13 +77,24 @@ impl<'a> View<'a> {
         }
     }
 }
+// The upstream clamp uses comparisons, not Math.min/max: NaN bounds leave
+// the incoming coordinate alone, and NaN values remain NaN without a panic.
+fn clamp(value: f64, min: f64, max: f64) -> f64 {
+    if value < min {
+        min
+    } else if value > max {
+        max
+    } else {
+        value
+    }
+}
 fn number_option(config: &Object, key: &str, fallback: f64) -> f64 {
     match config
         .get("state")
         .and_then(Value::as_object)
         .and_then(|v| v.get(key))
     {
-        Some(Value::Number(v)) if *v > 0. => v.min(2000.),
+        Some(Value::Number(v)) if *v > 0. => v.js_min(2000.),
         _ => fallback,
     }
 }
@@ -133,7 +145,7 @@ fn title_x(c: &CNode, width: f64, crossings: &Crossings) -> f64 {
     if width == 0. {
         return c.x;
     }
-    let y = (c.y - c.h / 2. + 0.5).floor();
+    let y = round(c.y - c.h / 2.);
     let key = if y == 0. { 0. } else { y }.to_bits();
     let Some(xs) = crossings.get(&key) else {
         return c.x;
@@ -146,7 +158,7 @@ fn title_x(c: &CNode, width: f64, crossings: &Crossings) -> f64 {
         let mut gap = f64::INFINITY;
         for &cx in xs {
             if cx > left && cx < left + c.w {
-                gap = gap.min((cx - x).abs() - half)
+                gap = gap.js_min((cx - x).abs() - half)
             }
         }
         if gap >= 6. {
@@ -281,8 +293,11 @@ fn attach(route: &mut [f64], at: usize, i: usize, nodes: &[CNode], views: &[View
         let sign = if delta == 0. { delta } else { delta.signum() };
         route[at + axis] -= sign * (extent - drawn_extent) / 2.;
         if bar && breadth > drawn_extent {
-            route[at + 1 - axis] =
-                route[other + 1 - axis].clamp(cross - breadth / 2. + 6., cross + breadth / 2. - 6.)
+            route[at + 1 - axis] = clamp(
+                route[other + 1 - axis],
+                cross - breadth / 2. + 6.,
+                cross + breadth / 2. - 6.,
+            )
         }
         return;
     }
@@ -326,7 +341,7 @@ fn draw(
 ) -> Result<Rendered, PeleError> {
     let graph = &db.graph;
     let size = options.font_size.unwrap_or(16.);
-    let small = (size * 0.875 + 0.5).floor();
+    let small = round(size * 0.875);
     let wrap = number_option(config, "wrappingWidth", 200.);
     let pad = options.padding.unwrap_or(8.);
     let root_dir = if turned {
@@ -504,7 +519,7 @@ fn draw(
                 view.h = 30.
             }
             K::Fork | K::Join => {
-                let length = (40. * degree[i] as f64 + 16.).clamp(72., 320.);
+                let length = clamp(40. * degree[i] as f64 + 16., 72., 320.);
                 view.w = if side { length } else { 8. };
                 view.h = if side { 8. } else { length }
             }
@@ -516,7 +531,7 @@ fn draw(
                     resources,
                     options,
                     small,
-                    wrap.max(320.),
+                    wrap.js_max(320.),
                     0,
                 )?;
                 view.w = view.label.width + 24.;
@@ -546,12 +561,14 @@ fn draw(
                             wrap,
                             bits,
                         )?;
-                        width = width.max(label.width);
+                        if label.width > width {
+                            width = label.width;
+                        }
                         height += label.height;
                         view.lines.push(label)
                     }
                 }
-                view.w = (width + 32.).max(56.);
+                view.w = (width + 32.).js_max(56.);
                 view.h = height
             }
         }
@@ -583,7 +600,7 @@ fn draw(
         };
         if src == dst {
             loop_count[src] += 1;
-            loop_width[src] = loop_width[src].max(label_w);
+            loop_width[src] = loop_width[src].js_max(label_w);
             loop_height[src] += label.height
         } else {
             let anchor = if encloses(src, dst, &logical, &nodes) {
@@ -640,10 +657,10 @@ fn draw(
             if !item.is_group {
                 if side {
                     item.w += 2. * room;
-                    item.h = item.h.max(loop_height[i])
+                    item.h = item.h.js_max(loop_height[i])
                 } else {
                     item.h += 2. * room;
-                    item.w = item.w.max(loop_width[i])
+                    item.w = item.w.js_max(loop_width[i])
                 }
                 room = 0.
             }
@@ -761,7 +778,7 @@ fn draw(
         let c = &nodes[i];
         let (x, y, w, h) = (c.x + pad, c.y + pad, view.w, view.h);
         let attrs = format!(" class=\"pele-label\"{}", style.text);
-        let mut body=match view.kind{K::Composite=>{let(left,top)=(x-c.w/2.,y-c.h/2.);let mut body=rect(left,top,c.w,c.h,&format!(" rx=\"10\" fill=\"var(--_a)\" fill-opacity=\"0.5\" stroke=\"var(--_b)\"{}",style.shape));if view.title_h>0.{body+=&format!("<path d=\"M{},{}H{}\"{RULE}{}/>",num(left),num(top+view.title_h),num(left+c.w),style.line);body+=&label_svg(&view.label,title_x(c,view.label.width,&crossings)+pad,top+view.title_h/2.,&format!(" class=\"pele-cluster-label\"{}",style.text),resources)?}dividers+=&divide(&children[i],&views,&nodes,pad,left,top+view.title_h,left+c.w,top+c.h);body},K::Start=>format!("<circle r=\"7\" fill=\"var(--_l)\"{}/>",style.shape),K::End=>format!("<circle r=\"8.5\" fill=\"var(--_bg)\" stroke=\"var(--_l)\"{}/><circle r=\"5\" fill=\"var(--_l)\"{}/>",style.line,style.shape),K::Choice=>format!("<polygon points=\"0,{} {},0 0,{} {},0\"{SURFACE}{}/>",num(-h/2.),num(w/2.),num(h/2.),num(-w/2.),style.shape),K::Fork|K::Join=>rect(-w/2.,-h/2.,w,h,&format!(" rx=\"2\" fill=\"var(--_l)\"{}",style.shape)),K::Note=>{let(r,b,fold,corner)=(num(w/2.),num(h/2.),num(w/2.-8.),num(8.-h/2.));format!("<path d=\"M-{r},-{b}H{fold}L{r},{corner}V{b}H-{r}Z\" fill=\"var(--_bg)\" stroke=\"var(--_b)\"/><path d=\"M{fold},-{b}V{corner}H{r}\"{RULE}/>{}",label_svg(&view.label,0.,0.,&format!(" class=\"pele-label\" font-size=\"{}\" fill=\"var(--_m)\"",svg::js_num(small)),resources)?)},_=>{let mut body=rect(-w/2.,-h/2.,w,h,&format!(" rx=\"{}\"{SURFACE}{}",num(10_f64.min(h/2.)),style.shape));if view.kind==K::State{body+=&label_svg(&view.label,0.,0.,&attrs,resources)?}else{let mut at=10.-h/2.+view.label.height;body+=&format!("<path d=\"M{},{}H{}\"{RULE}{}/>",num(-w/2.),num(at+6.),num(w/2.),style.line);body+=&label_svg(&view.label,0.,at-view.label.height/2.,&attrs,resources)?;at+=14.;for line in &view.lines{body+=&label_svg(line,0.,at+line.height/2.,&format!(" class=\"pele-state-description\" font-size=\"{}\"{}",svg::js_num(small),style.text),resources)?;at+=line.height}}body}};
+        let mut body=match view.kind{K::Composite=>{let(left,top)=(x-c.w/2.,y-c.h/2.);let mut body=rect(left,top,c.w,c.h,&format!(" rx=\"10\" fill=\"var(--_a)\" fill-opacity=\"0.5\" stroke=\"var(--_b)\"{}",style.shape));if view.title_h>0.{body+=&format!("<path d=\"M{},{}H{}\"{RULE}{}/>",num(left),num(top+view.title_h),num(left+c.w),style.line);body+=&label_svg(&view.label,title_x(c,view.label.width,&crossings)+pad,top+view.title_h/2.,&format!(" class=\"pele-cluster-label\"{}",style.text),resources)?}dividers+=&divide(&children[i],&views,&nodes,pad,left,top+view.title_h,left+c.w,top+c.h);body},K::Start=>format!("<circle r=\"7\" fill=\"var(--_l)\"{}/>",style.shape),K::End=>format!("<circle r=\"8.5\" fill=\"var(--_bg)\" stroke=\"var(--_l)\"{}/><circle r=\"5\" fill=\"var(--_l)\"{}/>",style.line,style.shape),K::Choice=>format!("<polygon points=\"0,{} {},0 0,{} {},0\"{SURFACE}{}/>",num(-h/2.),num(w/2.),num(h/2.),num(-w/2.),style.shape),K::Fork|K::Join=>rect(-w/2.,-h/2.,w,h,&format!(" rx=\"2\" fill=\"var(--_l)\"{}",style.shape)),K::Note=>{let(r,b,fold,corner)=(num(w/2.),num(h/2.),num(w/2.-8.),num(8.-h/2.));format!("<path d=\"M-{r},-{b}H{fold}L{r},{corner}V{b}H-{r}Z\" fill=\"var(--_bg)\" stroke=\"var(--_b)\"/><path d=\"M{fold},-{b}V{corner}H{r}\"{RULE}/>{}",label_svg(&view.label,0.,0.,&format!(" class=\"pele-label\" font-size=\"{}\" fill=\"var(--_m)\"",svg::js_num(small)),resources)?)},_=>{let mut body=rect(-w/2.,-h/2.,w,h,&format!(" rx=\"{}\"{SURFACE}{}",num(10_f64.js_min(h/2.)),style.shape));if view.kind==K::State{body+=&label_svg(&view.label,0.,0.,&attrs,resources)?}else{let mut at=10.-h/2.+view.label.height;body+=&format!("<path d=\"M{},{}H{}\"{RULE}{}/>",num(-w/2.),num(at+6.),num(w/2.),style.line);body+=&label_svg(&view.label,0.,at-view.label.height/2.,&attrs,resources)?;at+=14.;for line in &view.lines{body+=&label_svg(line,0.,at+line.height/2.,&format!(" class=\"pele-state-description\" font-size=\"{}\"{}",svg::js_num(small),style.text),resources)?;at+=line.height}}body}};
         if let Some((_, link)) = db.links.iter().find(|(id, _)| id == &node.id) {
             let tip = decode_entities(link.tooltip.trim_matches('"'))?;
             if !tip.is_empty() {
@@ -831,8 +848,8 @@ fn draw(
             };
             let out = if side { w } else { h } / 2.;
             let spread = (if side { h } else { w } / 2. - 4.)
-                .min(8. + k * 6.)
-                .max(2.);
+                .js_min(8. + k * 6.)
+                .js_max(2.);
             let reach = 26. + k * 8.;
             let trim = marker_trim(end_type) / reach.hypot(spread);
             let px = |dx: f64, dy: f64| a.x + pad + if side { out + dx } else { -dy };

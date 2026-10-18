@@ -1,5 +1,6 @@
 //! Pele diagrams/radar/render.ts and common/fit-width.ts, 458322a5 (MIT, kepano).
 use super::RadarModel;
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     svg::{self, esc_text, js_num, label_svg, num, series_color},
     text::layout_label,
@@ -17,12 +18,12 @@ fn option(config: &Object, key: &str, fallback: f64, min: f64, max: f64) -> f64 
         .and_then(Value::as_object)
         .and_then(|v| v.get(key))
     {
-        Some(Value::Number(value)) if *value >= min => value.min(max),
+        Some(Value::Number(value)) if *value >= min => value.js_min(max),
         _ => fallback,
     }
 }
 fn relative_radius(value: f64, min: f64, max: f64, radius: f64) -> f64 {
-    radius * (value.max(min).min(max) - min) / (max - min)
+    radius * (value.js_max(min).js_min(max) - min) / (max - min)
 }
 fn polygon(points: &[Point]) -> String {
     points
@@ -74,7 +75,7 @@ pub(super) fn render(
     if result.width <= available {
         return Ok(result);
     }
-    let floor = 160f64.min(natural);
+    let floor = 160f64.js_min(natural);
     let mut plot = natural;
     result = draw(
         model,
@@ -86,10 +87,10 @@ pub(super) fn render(
         true,
     )?;
     for _ in 0..3 {
-        if result.width <= available || plot <= floor {
+        if !(result.width > available && plot > floor) {
             break;
         }
-        plot = (plot - (result.width - available)).max(floor);
+        plot = (plot - (result.width - available)).js_max(floor);
         result = draw(
             model,
             config,
@@ -112,12 +113,12 @@ fn draw(
     tight: bool,
 ) -> Result<Rendered, PeleError> {
     let size = options.font_size.unwrap_or(16.);
-    let small = (size * 0.875 + 0.5).floor();
+    let small = round(size * 0.875);
     let pad = options.padding.unwrap_or(8.);
     let axis_scale = option(config, "axisScaleFactor", 1., 0., 10.);
     let label_factor = option(config, "axisLabelFactor", 1.05, 0., 10.);
     let tension = option(config, "curveTension", 0.17, 0., 1.);
-    let radius = width.min(height) / 2.;
+    let radius = width.js_min(height) / 2.;
     let count = model.axes.len();
     let unit: Vec<_> = model
         .axes
@@ -152,7 +153,7 @@ fn draw(
     let mut grid = String::new();
     let mut i = 0;
     while (i as f64) < model.options.ticks {
-        let r = radius.min(radius * (i as f64 + 1.) / model.options.ticks);
+        let r = radius.js_min(radius * (i as f64 + 1.) / model.options.ticks);
         if model.options.graticule == "circle" {
             grid.push_str(&format!("<circle r=\"{}\"/>", num(r)))
         } else {
@@ -202,10 +203,10 @@ fn draw(
             esc_text(&model.axes[i].name)?,
             label_svg(&label, cx, cy, "")
         ));
-        x0 = x0.min(cx - label.width / 2.);
-        x1 = x1.max(cx + label.width / 2.);
-        y0 = y0.min(cy - label.height / 2.);
-        y1 = y1.max(cy + label.height / 2.)
+        x0 = x0.js_min(cx - label.width / 2.);
+        x1 = x1.js_max(cx + label.width / 2.);
+        y0 = y0.js_min(cy - label.height / 2.);
+        y1 = y1.js_max(cy + label.height / 2.)
     }
     let mut shapes = String::new();
     for (index, curve) in model.curves.iter().enumerate() {
@@ -253,7 +254,7 @@ fn draw(
             )?)
         }
     }
-    let legend_width = legend.iter().map(|l| l.width).fold(0., f64::max);
+    let legend_width = legend.iter().map(|l| l.width).fold(0., NumberMath::js_max);
     let legend_height = legend.len() as f64 * 26.;
     let legend_x = if tight {
         -(12. + 8. + legend_width) / 2.
@@ -262,13 +263,13 @@ fn draw(
     };
     let legend_top = if tight { y1 + 12. } else { -legend_height / 2. };
     if !legend.is_empty() && tight {
-        x0 = x0.min(legend_x);
-        x1 = x1.max(-legend_x);
+        x0 = x0.js_min(legend_x);
+        x1 = x1.js_max(-legend_x);
         y1 = legend_top + legend_height
     } else if !legend.is_empty() {
         x1 = legend_x + 12. + 8. + legend_width;
-        y0 = y0.min(-legend_height / 2.);
-        y1 = y1.max(legend_height / 2.)
+        y0 = y0.js_min(-legend_height / 2.);
+        y1 = y1.js_max(legend_height / 2.)
     }
     let mut legend_out = String::new();
     for (index, label) in legend.iter().enumerate() {
@@ -279,7 +280,7 @@ fn draw(
     let title_room = options
         .max_width
         .filter(|v| *v > 0.)
-        .map_or(4000., |v| (v - 2. * pad).max(80.));
+        .map_or(4000., |v| (v - 2. * pad).js_max(80.));
     let title = layout_label(
         model.title.as_deref(),
         false,
@@ -294,7 +295,7 @@ fn draw(
     } else {
         0.
     };
-    let body_width = (x1 - x0).max(title.width);
+    let body_width = (x1 - x0).js_max(title.width);
     let total_width = (body_width + 2. * pad).ceil();
     let total_height = (y1 - y0 + title_height + 2. * pad).ceil();
     let origin = format!(

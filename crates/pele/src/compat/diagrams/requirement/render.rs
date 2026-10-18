@@ -1,6 +1,7 @@
 //! Pele requirement/render.ts measured requirement tables, compound graph routing,
 //! port spreading, containment marks and responsive rotation, 458322a5 (MIT, kepano).
 use super::model::RequirementModel;
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     layout::{
         compound::{compound_layout, direction, CEdge, CNode, Dir},
@@ -220,7 +221,7 @@ fn spread(nodes: &[CNode], edges: &mut [CEdge], views: &[View]) {
         } else {
             views[node].w
         } - 28.;
-        let step = (span / (list.len() - 1) as f64).min(28.).max(0.);
+        let step = (span / (list.len() - 1) as f64).js_min(28.).js_max(0.);
         list.sort_by(|a, b| {
             a.toward
                 .partial_cmp(&b.toward)
@@ -269,7 +270,7 @@ fn draw(
     turned: bool,
 ) -> Result<Rendered, PeleError> {
     let size = o.font_size.unwrap_or(16.);
-    let small = (size * 0.875 + 0.5).floor();
+    let small = round(size * 0.875);
     let pad = o.padding.unwrap_or(8.);
     let mut index = HashMap::new();
     let mut views = vec![];
@@ -329,9 +330,9 @@ fn draw(
             }
             let key = text(label, false, body_size, 4000., base, r, o)?;
             let value = text(raw, true, body_size, 240., base, r, o)?;
-            let height = key.height.max(value.height);
-            key_width = key_width.max(key.width);
-            value_width = value_width.max(value.width);
+            let height = key.height.js_max(value.height);
+            key_width = key_width.js_max(key.width);
+            value_width = value_width.js_max(value.width);
             body_height += height + 2.;
             rows.push(Row { key, value, height });
         }
@@ -340,8 +341,8 @@ fn draw(
         }
         let head_height = 20. + kind.height + name.height;
         let w = 120_f64
-            .max(kind.width.max(name.width) + 28.)
-            .max(if rows.is_empty() {
+            .js_max(kind.width.js_max(name.width) + 28.)
+            .js_max(if rows.is_empty() {
                 0.
             } else {
                 key_width + 12. + value_width + 28.
@@ -441,7 +442,7 @@ fn draw(
     } else {
         0.
     };
-    let inner = layout.width.max(title.width);
+    let inner = layout.width.js_max(title.width);
     let ox = pad + (inner - layout.width) / 2.;
     let oy = pad + title_height;
     let width = (inner + 2. * pad).ceil();
@@ -520,7 +521,7 @@ fn draw(
             let k = *loop_seen.entry(ce.src).or_default();
             *loop_seen.get_mut(&ce.src).unwrap() += 1;
             let half = if sideways { v.w } else { v.h } / 2.;
-            let spread = (half - 4.).min(12. + k as f64 * 6.);
+            let spread = (half - 4.).js_min(12. + k as f64 * 6.);
             let reach = 26. + k as f64 * 8.;
             let at = |out: f64, along: f64| {
                 if sideways {

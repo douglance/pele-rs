@@ -1,5 +1,6 @@
 //! Pele journey/render.ts and common/{fit,fit-width}.ts, 458322a5 (MIT, kepano).
 use super::JourneyModel;
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     source::space,
     svg::{document, esc_text, js_num, label_svg, num, series_color},
@@ -53,9 +54,6 @@ fn fit(
     }
     plain(Some(&out), r, o, size, max, base)
 }
-fn round(v: f64) -> f64 {
-    (v + 0.5).floor()
-}
 fn face(x: f64, y: f64, score: f64) -> String {
     let (mood, mouth) = if score > 3. {
         ("happy", "M-5,2A6,6 0 0 0 5,2")
@@ -100,7 +98,7 @@ pub(super) fn render(
     let Some(available) = o.max_width else {
         return Ok(across);
     };
-    if o.auto_direction == Some(false) || available <= 0. || across.width <= available {
+    if o.auto_direction == Some(false) || !(available > 0.) || across.width <= available {
         return Ok(across);
     }
     let breakpoint = o.direction_breakpoint.filter(|v| *v > 0.).unwrap_or(640.);
@@ -149,9 +147,9 @@ fn horizontal(
     for t in tasks {
         labels.push(plain(Some(&t.task), r, o, small, text_w, 0)?)
     }
-    let widest = labels.iter().map(|l| l.width).fold(0., f64::max);
+    let widest = labels.iter().map(|l| l.width).fold(0., NumberMath::js_max);
     if widest > text_w {
-        text_w = widest.ceil().min(200.);
+        text_w = widest.ceil().js_min(200.);
         labels.clear();
         for t in tasks {
             labels.push(fit(Some(&t.task), r, o, small, text_w, 0)?)
@@ -161,7 +159,7 @@ fn horizontal(
     let pitch = card_w + 12.;
     let plot_w = if n > 0 { n as f64 * pitch - 12. } else { 0. };
     let line_h = round(small * 1.5);
-    let limit = plot_w.max(240.);
+    let limit = plot_w.js_max(240.);
     let mut legend: Vec<Legend> = Vec::new();
     let (mut legend_w, mut legend_h, mut lx) = (0f64, 0f64, 0f64);
     for name in &names {
@@ -176,7 +174,7 @@ fn horizontal(
         } else {
             legend_h
         };
-        let h = label.height.max(line_h);
+        let h = label.height.js_max(line_h);
         legend.push(Legend {
             name: name.clone(),
             label,
@@ -185,20 +183,20 @@ fn horizontal(
             h,
         });
         lx += w;
-        legend_w = legend_w.max(lx);
-        legend_h = legend_h.max(y + h);
+        legend_w = legend_w.js_max(lx);
+        legend_h = legend_h.js_max(y + h);
         lx += 20.;
     }
     let body_w = if n > 0 { 24. + plot_w } else { 0. };
-    let title = fit(m.title.as_deref(), r, o, size, body_w.max(320.), 1)?;
+    let title = fit(m.title.as_deref(), r, o, size, body_w.js_max(320.), 1)?;
     let title_h = if title.height > 0. {
         title.height + 16.
     } else {
         0.
     };
     let width = body_w
-        .max(title.width)
-        .max(if n > 0 { 24. + legend_w } else { 0. });
+        .js_max(title.width)
+        .js_max(if n > 0 { 24. + legend_w } else { 0. });
     let left = pad + (width - body_w) / 2. + 24.;
     let top = pad + title_h;
     let mut runs = Vec::new();
@@ -220,7 +218,7 @@ fn horizontal(
                 (end - i) as f64 * pitch - 12. - 20.,
                 1,
             )?;
-            band_h = band_h.max(label.height.max(line_h) + 12.);
+            band_h = band_h.js_max(label.height.js_max(line_h) + 12.);
             Some(label)
         };
         runs.push(Run {
@@ -230,7 +228,10 @@ fn horizontal(
         });
         i = end;
     }
-    let text_h = labels.iter().map(|l| l.height).fold(line_h, f64::max);
+    let text_h = labels
+        .iter()
+        .map(|l| l.height)
+        .fold(line_h, NumberMath::js_max);
     let dots_h = if names.is_empty() { 0. } else { 16. };
     let card_h = text_h + dots_h + 16.;
     let cards_y = top + if band_h > 0. { band_h + 6. } else { 0. };
@@ -277,7 +278,8 @@ fn horizontal(
             faces.push_str(&face(cx, y, t.score));
             let mut dots = String::new();
             let people: Vec<_> = t.people.iter().filter(|s| !s.is_empty()).collect();
-            let step = 13f64.min((card_w - 30.) / (people.len().saturating_sub(1).max(1) as f64));
+            let step =
+                13f64.js_min((card_w - 30.) / (people.len().saturating_sub(1).max(1) as f64));
             for (k, name) in people.iter().enumerate() {
                 dots.push_str(&format!("<circle class=\"pele-actor\" cx=\"{}\" cy=\"{}\" r=\"5\" fill=\"{}\" stroke=\"var(--_s)\"><title>{}</title></circle>",num(cx+(k as f64-(people.len()as f64-1.)/2.)*step),num(cards_y+card_h-13.),series_color(actor(name)),esc_text(name)?));
             }
@@ -311,7 +313,7 @@ fn horizontal(
         }
     }
     let total_width = (width + 2. * pad).ceil();
-    let total_height = (bottom.max(pad) + pad).ceil();
+    let total_height = (bottom.js_max(pad) + pad).ceil();
     let content = label_svg(
         &title,
         pad + width / 2.,
@@ -328,7 +330,7 @@ fn vertical(
     let size = o.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
     let pad = o.padding.unwrap_or(8.);
-    let room = (o.max_width.unwrap_or(320.) - 2. * pad).max(140.);
+    let room = (o.max_width.unwrap_or(320.) - 2. * pad).js_max(140.);
     let title = fit(m.title.as_deref(), r, o, size, room, 1)?;
     let names: Vec<_> = m.actors().into_iter().filter(|s| !s.is_empty()).collect();
     let actors: std::collections::HashMap<&str, usize> = names
@@ -337,7 +339,7 @@ fn vertical(
         .map(|(i, s)| (s.as_str(), i))
         .collect();
     let mut y = pad
-        + if title.height != 0. {
+        + if title.height != 0. && !title.height.is_nan() {
             title.height + 16.
         } else {
             0.
@@ -349,14 +351,14 @@ fn vertical(
         if Some(t.section.as_str()) != section {
             section = Some(&t.section);
             let head = fit(section, r, o, size, room - 16., 1)?;
-            if head.height != 0. {
+            if head.height != 0. && !head.height.is_nan() {
                 body.push_str(&label_svg(
                     &head,
                     pad + 8. + head.width / 2.,
                     y + head.height / 2.,
                     " class=\"pele-cluster-label\" font-weight=\"var(--_hw)\"",
                 ));
-                width = width.max(head.width + 16.);
+                width = width.js_max(head.width + 16.);
                 y += head.height + 8.;
             }
         }
@@ -365,12 +367,12 @@ fn vertical(
         for name in t.people.iter().filter(|s| !s.is_empty()) {
             people.push((name, fit(Some(name), r, o, small, room - 44., 0)?))
         }
-        let text_h = label.height.max(42.);
+        let text_h = label.height.js_max(42.);
         let mut h = 16. + text_h;
         for (_, label) in &people {
-            h += 16f64.max(label.height) + 4.
+            h += 16f64.js_max(label.height) + 4.
         }
-        let w = room.max(label.width + 72.);
+        let w = room.js_max(label.width + 72.);
         body.push_str(&format!("<g class=\"pele-node pele-journey-step\" data-id=\"{index}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{RADIUS}\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/>",num(pad),num(y),num(w),num(h)));
         body.push_str(&label_svg(
             &label,
@@ -385,7 +387,7 @@ fn vertical(
         }
         let mut py = y + 8. + text_h + 4.;
         for (name, label) in people {
-            let ph = 16f64.max(label.height);
+            let ph = 16f64.js_max(label.height);
             body.push_str(&format!(
                 "<circle class=\"pele-actor\" cx=\"{}\" cy=\"{}\" r=\"5\" fill=\"{}\"/>{}",
                 num(pad + 16.),
@@ -413,11 +415,11 @@ fn vertical(
             ));
         }
         y += 16.;
-        width = width.max(w);
+        width = width.js_max(w);
     }
     let total_width = (width + 2. * pad).ceil();
     let height =
-        ((pad + title.height).max(y - if m.tasks.is_empty() { 0. } else { 16. }) + pad).ceil();
+        ((pad + title.height).js_max(y - if m.tasks.is_empty() { 0. } else { 16. }) + pad).ceil();
     let content = label_svg(
         &title,
         total_width / 2.,

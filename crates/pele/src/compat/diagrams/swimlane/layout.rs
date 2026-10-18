@@ -4,6 +4,7 @@ use crate::compat::layout::{
     compound::{CEdge, CNode, CompoundResult, Dir},
     layered::{orient, rank, Kind, LEdge, LNode, LayeredOptions},
 };
+use crate::compat::number_math::{round, NumberMath};
 use std::collections::HashSet;
 const BUDGET: usize = 2_000_000;
 struct Plan<'a> {
@@ -28,9 +29,6 @@ struct Placed {
     routed: Vec<bool>,
     margins: Vec<bool>,
     work: usize,
-}
-fn round(v: f64) -> f64 {
-    (v + 0.5).floor()
 }
 pub(super) fn lane_layout(
     nodes: &mut [CNode],
@@ -124,8 +122,8 @@ pub(super) fn lane_layout(
             if lane_slot[t] < 0 {
                 room += nodes[t]
                     .pad_x
-                    .max(nodes[t].pad_top)
-                    .max(nodes[t].pad_bottom)
+                    .js_max(nodes[t].pad_top)
+                    .js_max(nodes[t].pad_bottom)
             }
         }
         let lane = lane_slot[t].max(0) as usize;
@@ -245,7 +243,7 @@ impl Plan<'_> {
             .lane_pads
             .iter()
             .enumerate()
-            .map(|(i, &p)| if margins[i] { p.max(20.) } else { p })
+            .map(|(i, &p)| if margins[i] { p.js_max(20.) } else { p })
             .collect();
         let mut used = vec![false; count];
         let span: Vec<_> = self
@@ -377,7 +375,7 @@ impl Plan<'_> {
         let mut breadth = vec![0_f64; count];
         let mut head: f64 = if self.lanes.is_empty() { 0. } else { 34. };
         for (k, &i) in self.lanes.iter().enumerate() {
-            breadth[k] = (nodes[i].min_w - 2. * pad[k]).max(0.);
+            breadth[k] = (nodes[i].min_w - 2. * pad[k]).js_max(0.);
             head = head.max(nodes[i].pad_top)
         }
         for row in &rows {
@@ -439,7 +437,7 @@ impl Plan<'_> {
                     let mut floor = lane_start[l] + pad[l];
                     for k in from..=to {
                         let i = row[k];
-                        cross[i] = want[i].max(floor + size[i] / 2.);
+                        cross[i] = want[i].js_max(floor + size[i] / 2.);
                         if k < to {
                             floor = cross[i] + size[i] / 2. + gap(i, row[k + 1], &dummy, self.opt)
                         }
@@ -447,7 +445,7 @@ impl Plan<'_> {
                     let mut ceil = lane_start[l + 1] - pad[l];
                     for k in (from..=to).rev() {
                         let i = row[k];
-                        cross[i] = cross[i].min(ceil - size[i] / 2.);
+                        cross[i] = cross[i].js_min(ceil - size[i] / 2.);
                         if k > from {
                             ceil = cross[i] - size[i] / 2. - gap(row[k - 1], i, &dummy, self.opt)
                         }
@@ -471,8 +469,9 @@ impl Plan<'_> {
                     if e.label_h <= 0. || span[k] > self.step {
                         continue;
                     }
-                    let room =
-                        full.min((e.label_h + 40. - depth[a].min(depth[b]) / 2.) / span[k] as f64);
+                    let room = full.js_min(
+                        (e.label_h + 40. - depth[a].js_min(depth[b]) / 2.) / span[k] as f64,
+                    );
                     for r in ranks[a]..ranks[b] {
                         sep[r] = sep[r].max(room)
                     }
@@ -569,7 +568,7 @@ impl Plan<'_> {
                 continue;
             }
             c.x = (b[0] + b[2]) / 2.;
-            c.w = (b[2] - b[0] + 2. * c.pad_x).max(c.min_w);
+            c.w = (b[2] - b[0] + 2. * c.pad_x).js_max(c.min_w);
             c.y = (b[1] - c.pad_top + b[3] + c.pad_bottom) / 2.;
             c.h = b[3] - b[1] + c.pad_top + c.pad_bottom;
             if c.parent >= 0 && self.lane_slot[c.parent as usize] < 0 {
@@ -715,7 +714,7 @@ impl Plan<'_> {
                     [lane[a], lane[b]]
                 };
                 for l in lanes {
-                    let inset = (pad[l] - 14.).max((pad[l] / 2.).min(6.));
+                    let inset = (pad[l] - 14.).js_max((pad[l] / 2.).js_min(6.));
                     for ch in [lane_start[l] + inset, lane_start[l + 1] - inset] {
                         if (ch - ac).abs() < size[a] / 2. + 4.
                             || (ch - bc).abs() < size[b] / 2. + 4.
@@ -739,12 +738,16 @@ impl Plan<'_> {
                         for p in (2..pts.len()).step_by(2) {
                             let (x0, y0) = coords.point(pts[p - 2], pts[p - 1]);
                             let (x1, y1) = coords.point(pts[p], pts[p + 1]);
-                            cost +=
-                                router.crossings(x0.min(x1), y0.min(y1), x0.max(x1), y0.max(y1), ei)
-                                    as f64
-                                    * 1e6
-                                    + (x1 - x0).abs()
-                                    + (y1 - y0).abs()
+                            cost += router.crossings(
+                                x0.js_min(x1),
+                                y0.js_min(y1),
+                                x0.js_max(x1),
+                                y0.js_max(y1),
+                                ei,
+                            ) as f64
+                                * 1e6
+                                + (x1 - x0).abs()
+                                + (y1 - y0).abs()
                         }
                         around.push((pts, cost, l))
                     }
@@ -799,8 +802,8 @@ fn grow(b: &mut [f64; 4], c: &CNode) {
 fn border(from: &CNode, to: &CNode) -> (f64, f64) {
     let dx = to.x - from.x;
     let dy = to.y - from.y;
-    let hw = (from.w / 2.).max(0.5);
-    let hh = (from.h / 2.).max(0.5);
+    let hw = (from.w / 2.).js_max(0.5);
+    let hh = (from.h / 2.).js_max(0.5);
     if dx.abs() < hw && dy.abs() < hh {
         return if hw - dx.abs() < hh - dy.abs() {
             (from.x + if dx < 0. { -hw } else { hw }, to.y)
@@ -813,7 +816,7 @@ fn border(from: &CNode, to: &CNode) -> (f64, f64) {
     } else {
         f64::INFINITY
     })
-    .min(if dy != 0. {
+    .js_min(if dy != 0. {
         hh / dy.abs()
     } else {
         f64::INFINITY
@@ -889,10 +892,10 @@ impl Router<'_> {
             }
             let r = &e.route;
             for j in (3..r.len()).step_by(3) {
-                if r[j - 3].max(r[j]) > x0
-                    && r[j - 3].min(r[j]) < x1
-                    && r[j - 2].max(r[j + 1]) > y0
-                    && r[j - 2].min(r[j + 1]) < y1
+                if r[j - 3].js_max(r[j]) > x0
+                    && r[j - 3].js_min(r[j]) < x1
+                    && r[j - 2].js_max(r[j + 1]) > y0
+                    && r[j - 2].js_min(r[j + 1]) < y1
                 {
                     count += 1;
                     break;
@@ -920,9 +923,9 @@ impl Router<'_> {
     fn retraces(&self, x0: f64, y0: f64, x1: f64, y1: f64, ei: usize) -> bool {
         let upright = (x1 - x0).abs() < 0.5;
         let (lo, hi) = if upright {
-            (y0.min(y1), y0.max(y1))
+            (y0.js_min(y1), y0.js_max(y1))
         } else {
-            (x0.min(x1), x0.max(x1))
+            (x0.js_min(x1), x0.js_max(x1))
         };
         let line = if upright { x0 } else { y0 };
         for (i, e) in self.edges.iter().enumerate() {
@@ -938,7 +941,7 @@ impl Router<'_> {
                 }
                 let axis = if upright { 1 } else { 0 };
                 let (v0, v1) = (r[j - 3 + axis], r[j + axis]);
-                if hi.min(v0.max(v1)) - lo.max(v0.min(v1)) > 1. {
+                if hi.js_min(v0.js_max(v1)) - lo.js_max(v0.js_min(v1)) > 1. {
                     return true;
                 }
             }
@@ -956,10 +959,10 @@ impl Router<'_> {
     ) -> bool {
         for p in (2..pts.len()).step_by(2) {
             if !self.clear(
-                pts[p - 2].min(pts[p]) - margin,
-                pts[p - 1].min(pts[p + 1]) - margin,
-                pts[p - 2].max(pts[p]) + margin,
-                pts[p - 1].max(pts[p + 1]) + margin,
+                pts[p - 2].js_min(pts[p]) - margin,
+                pts[p - 1].js_min(pts[p + 1]) - margin,
+                pts[p - 2].js_max(pts[p]) + margin,
+                pts[p - 1].js_max(pts[p + 1]) + margin,
                 a as isize,
                 b as isize,
                 ei,

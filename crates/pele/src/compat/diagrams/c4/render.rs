@@ -4,6 +4,7 @@ use super::{
     model::{C4Model, ElementRef},
     route::{self, crosses, cyl_ry, queue_rx, Box, Lanes, HEAD, LANE},
 };
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     diagrams::common::literal_label::left_label_svg,
     source::url::{linked, sanitize_url},
@@ -52,7 +53,7 @@ fn link(
 }
 fn title_room(options: &RenderSettings) -> f64 {
     options.max_width.filter(|v| *v > 0.).map_or(4000., |v| {
-        80_f64.max(v - 2. * options.padding.unwrap_or(8.))
+        80_f64.js_max(v - 2. * options.padding.unwrap_or(8.))
     })
 }
 pub(super) fn render(
@@ -93,20 +94,20 @@ struct Bounds {
 }
 impl Bounds {
     fn grow(&mut self, x0: f64, y0: f64, x1: f64, y1: f64) {
-        self.min_x = self.min_x.min(x0);
-        self.min_y = self.min_y.min(y0);
-        self.max_x = self.max_x.max(x1);
-        self.max_y = self.max_y.max(y1)
+        self.min_x = self.min_x.js_min(x0);
+        self.min_y = self.min_y.js_min(y0);
+        self.max_x = self.max_x.js_max(x1);
+        self.max_y = self.max_y.js_max(y1)
     }
 }
 fn covered(taken: &[f64], x0: f64, y0: f64, x1: f64, y1: f64) -> f64 {
     let mut area = 0.;
     for b in taken.chunks_exact(4) {
-        let w = x1.min(b[2]) - x0.max(b[0]);
+        let w = x1.js_min(b[2]) - x0.js_max(b[0]);
         if w <= 0. {
             continue;
         }
-        let h = y1.min(b[3]) - y0.max(b[1]);
+        let h = y1.js_min(b[3]) - y0.js_max(b[1]);
         if h > 0. {
             area += w * h
         }
@@ -127,7 +128,7 @@ fn draw(
     gap: f64,
 ) -> Result<(Rendered, usize), PeleError> {
     let size = options.font_size.unwrap_or(16.);
-    let small = (size * 0.8125 + 0.5).floor();
+    let small = round(size * 0.8125);
     let pad = options.padding.unwrap_or(8.);
     let mut links = Vec::new();
     let mut layout = layout::layout(
@@ -137,7 +138,7 @@ fn draw(
         size,
         small,
         if tight {
-            Some(80_f64.max(options.max_width.unwrap_or(320.) - 2. * pad))
+            Some(80_f64.js_max(options.max_width.unwrap_or(320.) - 2. * pad))
         } else {
             None
         },
@@ -223,10 +224,10 @@ fn draw(
             if end_arrow { trim } else { 0. },
         );
         bounds.grow(
-            r.x0.min(r.x1),
-            r.y0.min(r.y1),
-            r.x0.max(r.x1),
-            r.y0.max(r.y1),
+            r.x0.js_min(r.x1),
+            r.y0.js_min(r.y1),
+            r.x0.js_max(r.x1),
+            r.y0.js_max(r.y1),
         );
         if start_arrow && careful {
             taken.extend([r.sx - ARROW, r.sy - ARROW, r.sx + ARROW, r.sy + ARROW])
@@ -317,14 +318,14 @@ fn draw(
             r.room,
             2,
         )?;
-        let lw = label.width.max(techn.width) + 8.;
+        let lw = label.width.js_max(techn.width) + 8.;
         let lh = label.height + techn.height;
         if lh == 0. {
             continue;
         }
         let beside = r.nx.abs() * (lw / 2.) + r.ny.abs() * (lh / 2.) + 2.;
         let aside = if r.lean != 0. {
-            0_f64.max(r.lean.min(beside - 14.))
+            0_f64.js_max(r.lean.js_min(beside - 14.))
         } else {
             beside
         };
@@ -531,7 +532,7 @@ fn draw(
     } else {
         0.
     };
-    let inner = (bounds.max_x - bounds.min_x).max(title.width);
+    let inner = (bounds.max_x - bounds.min_x).js_max(title.width);
     let width = (inner + 2. * pad).ceil();
     let height = (bounds.max_y - bounds.min_y + title_height + 2. * pad).ceil();
     let ox = pad - bounds.min_x + (inner - (bounds.max_x - bounds.min_x)) / 2.;

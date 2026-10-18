@@ -3,6 +3,7 @@ use super::{
     model::{C4Model, C4Shape, ElementRef},
     route::{Box, HEAD, LANE},
 };
+use crate::compat::number_math::NumberMath;
 use crate::compat::{
     source::space,
     text::{layout_label, Label},
@@ -118,7 +119,7 @@ fn measure(
     let mut tw = 0_f64;
     let mut text_h = if labels[3].height > 0. { 4. } else { 0. };
     for label in &labels {
-        tw = tw.max(label.width);
+        tw = tw.js_max(label.width);
         text_h += label.height
     }
     Ok(Node {
@@ -126,8 +127,8 @@ fn measure(
         bbox: Box::new(
             identity,
             form,
-            width.max(tw + 28. + cap_w),
-            64_f64.max(text_h + 24. + cap_h),
+            width.js_max(tw + 28. + cap_w),
+            64_f64.js_max(text_h + 24. + cap_h),
         ),
         labels,
         text_h,
@@ -141,16 +142,25 @@ fn count(
     pad: f64,
 ) -> f64 {
     let Some(room) = room else { return limit };
-    let widest = widths.fold(1_f64, f64::max);
-    1_f64.max(limit.min(((room + gap - 2. * pad) / (widest + gap)).floor()))
+    let widest = widths.fold(1_f64, |a, b| a.js_max(b));
+    1_f64.js_max(limit.js_min(((room + gap - 2. * pad) / (widest + gap)).floor()))
 }
 fn rows(boxes: &mut [&mut Box], per_row: f64, gap_x: f64, gap_y: f64, stretch: bool) -> (f64, f64) {
+    // The JS loop enters its first row, but `i < Math.min(n, NaN)`
+    // places no boxes. Its next `from += NaN` ends the outer loop.
+    if per_row.is_nan() {
+        return if boxes.is_empty() {
+            (0., 0.)
+        } else {
+            (0_f64.js_max(-gap_x), gap_y - gap_y)
+        };
+    }
     let mut width = 0_f64;
     let mut y = 0.;
-    let per_row = (per_row.min(boxes.len().max(1) as f64)) as usize;
+    let per_row = (per_row.js_min(boxes.len().max(1) as f64)) as usize;
     for row in boxes.chunks_mut(per_row.max(1)) {
         let mut x = 0.;
-        let row_h = row.iter().map(|b| b.h).fold(0_f64, f64::max);
+        let row_h = row.iter().map(|b| b.h).fold(0_f64, |a, b| a.js_max(b));
         for b in row {
             b.x = x;
             b.y = y;
@@ -159,7 +169,7 @@ fn rows(boxes: &mut [&mut Box], per_row: f64, gap_x: f64, gap_y: f64, stretch: b
             }
             x += b.w + gap_x
         }
-        width = width.max(x - gap_x);
+        width = width.js_max(x - gap_x);
         y += row_h + gap_y
     }
     (width, if boxes.is_empty() { 0. } else { y - gap_y })
@@ -177,7 +187,7 @@ pub(super) fn layout(
     let mut groups = Vec::new();
     for (i, boundary) in db.boundaries.iter().enumerate() {
         let label_room = room.map_or(4000., |room| {
-            80_f64.max(room - 2. * HEAD_LEFT - 2. * GROUP_PAD * 2.)
+            80_f64.js_max(room - 2. * HEAD_LEFT - 2. * GROUP_PAD * 2.)
         });
         let labels = if boundary.parent.is_some() {
             let typ = boundary
@@ -221,7 +231,7 @@ pub(super) fn layout(
         let mut head_w = 0_f64;
         for label in &labels {
             head += label.height;
-            head_w = head_w.max(label.width)
+            head_w = head_w.js_max(label.width)
         }
         groups.push(Group {
             boundary: i,
@@ -269,7 +279,7 @@ pub(super) fn layout(
         if let Some(p) = shape.parent {
             let depth = depths[p].unwrap_or(0);
             let width = room.map_or(216., |room| {
-                100_f64.max(216_f64.min(room - 2. * depth as f64 * pad - 32.))
+                100_f64.js_max(216_f64.js_min(room - 2. * depth as f64 * pad - 32.))
             });
             let index = nodes.len();
             nodes.push(measure(
@@ -285,8 +295,8 @@ pub(super) fn layout(
             groups[p].nodes.push(index)
         }
     }
-    let per_row = 1_f64.max(db.shape_in_row);
-    let groups_per_row = 1_f64.max(db.boundary_in_row);
+    let per_row = 1_f64.js_max(db.shape_in_row);
+    let groups_per_row = 1_f64.js_max(db.boundary_in_row);
     let mut kids_top = vec![0.; groups.len()];
     for &i in order.iter().rev() {
         let gap_x = if room.is_some() { gap } else { 100. };
@@ -322,8 +332,8 @@ pub(super) fn layout(
         let frame = if i == 0 { 0. } else { pad };
         kids_top[i] = grid_h + between;
         groups[i].bbox.w = grid_w
-            .max(kids_w)
-            .max(groups[i].head_w + 2. * HEAD_LEFT - 2. * frame)
+            .js_max(kids_w)
+            .js_max(groups[i].head_w + 2. * HEAD_LEFT - 2. * frame)
             + 2. * frame;
         groups[i].bbox.h =
             if frame != 0. { groups[i].head } else { 0. } + grid_h + between + kids_h + frame;

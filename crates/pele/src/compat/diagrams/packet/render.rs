@@ -1,39 +1,12 @@
 //! Pele packet/render.ts and common/{literal-label,fit-text,fit-width}.ts, 458322a5 (MIT, kepano).
 use super::{packet_option, PacketBlock, PacketModel};
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     source::{decode_entities, space},
     svg::{self, esc, js_num, label_svg, num},
     text::{layout_label, measure, Label, Span},
     ErrorCode, Object, PeleError, RenderResources, RenderSettings, Rendered, Value,
 };
-// Rust min/max discard NaN; JavaScript Math.min/max retain it.
-trait JsExtrema {
-    fn js_min(self, other: Self) -> Self;
-    fn js_max(self, other: Self) -> Self;
-}
-impl JsExtrema for f64 {
-    fn js_min(self, other: Self) -> Self {
-        if self.is_nan() || other.is_nan() {
-            f64::NAN
-        } else if self == 0. && other == 0. {
-            f64::from_bits(self.to_bits() | other.to_bits())
-        } else {
-            self.min(other)
-        }
-    }
-    fn js_max(self, other: Self) -> Self {
-        if self.is_nan() || other.is_nan() {
-            f64::NAN
-        } else if self == 0. && other == 0. {
-            f64::from_bits(self.to_bits() & other.to_bits())
-        } else {
-            self.max(other)
-        }
-    }
-}
-fn round(n: f64) -> f64 {
-    (n + 0.5).floor()
-}
 fn literal(
     text: &str,
     r: &mut dyn RenderResources,

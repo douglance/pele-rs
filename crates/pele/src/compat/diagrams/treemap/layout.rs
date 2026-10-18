@@ -1,5 +1,6 @@
 //! Pele treemap/layout.ts squarified rows, hierarchy sums and section insets.
 use super::TreemapNode;
+use crate::compat::number_math::{round, NumberMath};
 pub(super) struct Box<'a> {
     pub node: &'a TreemapNode,
     parent: Option<usize>,
@@ -32,15 +33,8 @@ impl<'a> Box<'a> {
         }
     }
 }
-fn round(n: f64) -> f64 {
-    (n + 0.5).floor()
-}
 fn max(a: f64, b: f64) -> f64 {
-    if a.is_nan() || b.is_nan() {
-        f64::NAN
-    } else {
-        a.max(b)
-    }
+    a.js_max(b)
 }
 fn squarify(
     all: &mut [Box<'_>],
@@ -56,7 +50,7 @@ fn squarify(
     let mut from = 0;
     while from < boxes.len() {
         let scale = w * h / rest;
-        let side = w.min(h);
+        let side = w.js_min(h);
         let mut sum = all[boxes[from]].value * scale;
         let largest = sum;
         let mut worst = max(

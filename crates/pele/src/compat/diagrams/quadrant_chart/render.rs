@@ -1,5 +1,6 @@
 //! Pele diagrams/quadrant/render.ts, pinned 458322a5 (MIT, kepano).
 use super::{QuadrantModel, QuadrantText};
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     svg::{self, edges::theme::resolve_style, esc_text, label_svg, num, series_color},
     text::{layout_label, Label},
@@ -75,7 +76,7 @@ fn setting<'a>(config: &'a Object, key: &str) -> Option<&'a Value> {
 }
 fn length(config: &Object, key: &str, fallback: f64, max: f64) -> f64 {
     match setting(config, key) {
-        Some(Value::Number(n)) if *n >= 0. => n.min(max),
+        Some(Value::Number(n)) if *n >= 0. => n.js_min(max),
         _ => fallback,
     }
 }
@@ -92,7 +93,7 @@ fn label(
         r,
         o,
         size,
-        max.max(40.),
+        max.js_max(40.),
         0,
     )
 }
@@ -144,16 +145,16 @@ pub(super) fn render(
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
     let size = o.font_size.unwrap_or(16.);
-    let axis_size = (size * 0.875 + 0.5).floor();
-    let point_size = (size * 0.75 + 0.5).floor();
-    let natural = (length(c, "chartWidth", 500., 4000.).max(100.) + 0.5).floor();
+    let axis_size = round(size * 0.875);
+    let point_size = round(size * 0.75);
+    let natural = round(length(c, "chartWidth", 500., 4000.).js_max(100.));
     let width = if let Some(available) = o.max_width.filter(|n| *n > 0.) {
-        280f64.min(natural).max(natural.min(available))
+        280f64.js_min(natural).js_max(natural.js_min(available))
     } else {
         natural
     };
-    let width = (width + 0.5).floor();
-    let height = (length(c, "chartHeight", 500., 4000.).max(100.) * width / natural + 0.5).floor();
+    let width = round(width);
+    let height = round(length(c, "chartHeight", 500., 4000.).js_max(100.) * width / natural);
     let outer = length(c, "quadrantPadding", o.padding.unwrap_or(8.), 200.);
     let x_pad = length(c, "xAxisLabelPadding", 5., 200.);
     let y_pad = length(c, "yAxisLabelPadding", 5., 200.);
@@ -164,7 +165,7 @@ pub(super) fn render(
         r,
         o,
         size,
-        (width - 2. * outer).max(40.),
+        (width - 2. * outer).js_max(40.),
         1,
     )?;
     let title_pad = length(c, "titlePadding", 10., 200.);
@@ -193,7 +194,7 @@ pub(super) fn render(
         o,
     )?;
     let x_right = label(m.x_axis_right.as_ref(), axis_size, side / 2. - 16., r, o)?;
-    let x_height = x_left.height.max(x_right.height);
+    let x_height = x_left.height.js_max(x_right.height);
     let x_space = if has_x { x_height + x_pad } else { 0. };
     let tall = height - 2. * outer - title_space - x_space;
     let y_bottom = label(
@@ -208,14 +209,14 @@ pub(super) fn render(
         o,
     )?;
     let y_top = label(m.y_axis_top.as_ref(), axis_size, tall / 2. - 16., r, o)?;
-    let y_height = y_bottom.height.max(y_top.height);
+    let y_height = y_bottom.height.js_max(y_top.height);
     let y_space = if has_y { y_height + y_pad } else { 0. };
     let left = outer + if y_right { 0. } else { y_space };
     let top = outer + title_space + if x_below { 0. } else { x_space };
-    let w = (side - y_space).max(0.);
-    let h = tall.max(0.);
-    let tile_w = ((w - 4.) / 2.).max(0.);
-    let tile_h = ((h - 4.) / 2.).max(0.);
+    let w = (side - y_space).js_max(0.);
+    let h = tall.js_max(0.);
+    let tile_w = ((w - 4.) / 2.).js_max(0.);
+    let tile_h = ((h - 4.) / 2.).js_max(0.);
     let mut taken = vec![
         left + tile_w,
         top,
@@ -317,7 +318,7 @@ pub(super) fn render(
         let radius = if radius.is_nan() {
             radius
         } else {
-            radius.min(2000.)
+            radius.js_min(2000.)
         };
         let color = p
             .color
@@ -350,7 +351,7 @@ pub(super) fn render(
                 if n.is_nan() {
                     n
                 } else {
-                    n.min(400.) / 2.
+                    n.js_min(400.) / 2.
                 }
             });
         dots.push(Dot {
@@ -413,7 +414,7 @@ pub(super) fn render(
         for k in (0..16).step_by(2) {
             let spot = k % 8;
             let x = if spot < 4 && text.width < w {
-                spots[spot].max(left + half_w).min(left + w - half_w)
+                spots[spot].js_max(left + half_w).js_min(left + w - half_w)
             } else {
                 spots[spot]
             };

@@ -1,4 +1,5 @@
 //! Pele common/literal-label.ts, 458322a5 (MIT, kepano).
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     source::space,
     svg::{esc, label_svg, num},
@@ -80,8 +81,8 @@ pub(crate) fn literal_label(
         .iter()
         .map(|s| measure(r, o, s, size, style))
         .collect::<Result<Vec<_>, _>>()?;
-    let width = widths.iter().copied().fold(0_f64, f64::max);
-    let line_height = (size * 1.5 + 0.5).floor();
+    let width = widths.iter().copied().fold(0_f64, NumberMath::js_max);
+    let line_height = round(size * 1.5);
     let height = lines.len() as f64 * line_height;
     let lines = lines
         .into_iter()
@@ -172,7 +173,7 @@ pub(crate) fn break_label(
             widths.push(width)
         }
     }
-    let width = widths.iter().copied().fold(0_f64, f64::max);
+    let width = widths.iter().copied().fold(0_f64, NumberMath::js_max);
     let height = lines.len() as f64 * label.line_height;
     Ok(Label {
         lines,

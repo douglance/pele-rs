@@ -5,6 +5,7 @@ use super::{
     kinds::*,
     model::{MessageText, SeqActor, SequenceModel},
 };
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     svg::{
         self,
@@ -116,9 +117,6 @@ fn option(c: Option<&Object>, key: &str, fallback: f64) -> f64 {
 }
 fn truth(c: Option<&Object>, key: &str) -> bool {
     c.and_then(|c| c.get(key)) == Some(&Value::Bool(true))
-}
-fn round(v: f64) -> f64 {
-    (v + 0.5).floor()
 }
 fn half(x: f64, y: f64, dir: f64, up: f64, stick: bool) -> String {
     let bx = num(x - dir * ARROW);
@@ -273,7 +271,7 @@ impl TextContext<'_> {
             base,
         )?;
         if self.tight {
-            break_label(label, self.resources, self.options, 120_f64.max(width))
+            break_label(label, self.resources, self.options, 120_f64.js_max(width))
         } else {
             Ok(label)
         }
@@ -302,7 +300,7 @@ fn badge_width(
     ctx: &mut TextContext<'_>,
 ) -> Result<f64, PeleError> {
     if n.shown[i] {
-        Ok(BADGE_H.max(ctx.width(&js_num(n.index[i]), tiny, 0)? + 8.))
+        Ok(BADGE_H.js_max(ctx.width(&js_num(n.index[i]), tiny, 0)? + 8.))
     } else {
         Ok(0.)
     }
@@ -364,7 +362,7 @@ fn end_activation(
     out: &mut Vec<String>,
 ) -> Result<f64, PeleError> {
     let start = col.activations.pop().unwrap();
-    let bottom = end.max(start + ACT_MIN);
+    let bottom = end.js_max(start + ACT_MIN);
     let x = col.x - ACT_W / 2. + col.activations.len() as f64 * ACT_STEP;
     extend(min_x, max_x, x, x + ACT_W);
     out.push(format!("<rect class=\"pele-activation\" data-id=\"{}\" x=\"{}\" y=\"{}\" width=\"{ACT_W}\" height=\"{}\" rx=\"2\"/>",esc_text(&col.id)?,num(x),num(start),num(bottom-start)));
@@ -450,11 +448,12 @@ fn draw(
     let pad = options.padding.unwrap_or(8.);
     let mirror = conf.and_then(|c| c.get("mirrorActors")) != Some(&Value::Bool(false));
     let right_angles = truth(conf, "rightAngles");
-    let actor_margin = option(conf, "actorMargin", 40.).min(if tight { 8. } else { f64::INFINITY });
-    let min_w = option(conf, "width", 64.).min(if tight { 48. } else { f64::INFINITY });
+    let actor_margin =
+        option(conf, "actorMargin", 40.).js_min(if tight { 8. } else { f64::INFINITY });
+    let min_w = option(conf, "width", 64.).js_min(if tight { 48. } else { f64::INFINITY });
     let min_h = option(conf, "height", round(size * 1.5) + 20.);
-    let wrap_w = option(conf, "width", 160.).min(if tight {
-        32_f64.max(
+    let wrap_w = option(conf, "width", 160.).js_min(if tight {
+        32_f64.js_max(
             (options.max_width.unwrap_or(320.) - 2. * pad) / db.actors.len().max(1) as f64
                 - actor_margin
                 - 24.,
@@ -462,9 +461,9 @@ fn draw(
     } else {
         f64::INFINITY
     });
-    let msg_gap = (14. + option(conf, "messageMargin", 35.) - 35.).max(4.);
-    let note_pad = option(conf, "noteMargin", 10.).min(if tight { 6. } else { f64::INFINITY });
-    let box_pad = option(conf, "boxMargin", 10.).min(if tight { 6. } else { f64::INFINITY });
+    let msg_gap = (14. + option(conf, "messageMargin", 35.) - 35.).js_max(4.);
+    let note_pad = option(conf, "noteMargin", 10.).js_min(if tight { 6. } else { f64::INFINITY });
+    let box_pad = option(conf, "boxMargin", 10.).js_min(if tight { 6. } else { f64::INFINITY });
     let align = match conf.and_then(|c| c.get("messageAlign")) {
         Some(Value::String(s)) if s == "left" => -1,
         Some(Value::String(s)) if s == "right" => 1,
@@ -640,7 +639,7 @@ fn draw(
                     a.min(b) as isize,
                     a.max(b) as isize,
                     if tight {
-                        label.width.min(16_f64.max(wrap_w - 16.))
+                        label.width.js_min(16_f64.js_max(wrap_w - 16.))
                     } else {
                         label.width
                     } + 2. * msg_pad
@@ -698,7 +697,7 @@ fn draw(
         } else {
             0.
         };
-        gaps[i] = (l.size.w / 2. + r.size.w / 2. + actor_margin + boxed).max(
+        gaps[i] = (l.size.w / 2. + r.size.w / 2. + actor_margin + boxed).js_max(
             needs
                 .iter()
                 .find(|(k, _)| *k == i * cols.len() + i + 1)
@@ -732,7 +731,7 @@ fn draw(
     for run in &mut runs {
         let inner = cols[run.last].x + cols[run.last].size.w / 2.
             - (cols[run.first].x - cols[run.first].size.w / 2.);
-        run.grow = ((run.title.width - inner) / 2.).max(0.);
+        run.grow = ((run.title.width - inner) / 2.).js_max(0.);
         if run.grow == 0. {
             continue;
         }
@@ -816,8 +815,8 @@ fn draw(
                             Some(&format!("[{raw}]")),
                             small,
                             true,
-                            Some(room.max(if tight {
-                                FRAME_TEXT.min(wrap_w)
+                            Some(room.js_max(if tight {
+                                FRAME_TEXT.js_min(wrap_w)
                             } else {
                                 FRAME_TEXT
                             })),
@@ -837,8 +836,8 @@ fn draw(
             let (x0, x1) = (f.x0, f.x1);
             extend(&mut min_x, &mut max_x, x0, x1);
             if let Some(parent) = open.last() {
-                frames[*parent].x0 = frames[*parent].x0.min(x0 - frame_nest);
-                frames[*parent].x1 = frames[*parent].x1.max(x1 + frame_nest);
+                frames[*parent].x0 = frames[*parent].x0.js_min(x0 - frame_nest);
+                frames[*parent].x1 = frames[*parent].x1.js_max(x1 + frame_nest);
             }
         } else if let Some(v) = &mut views[i] {
             let a = &cols[v.a];
@@ -852,18 +851,18 @@ fn draw(
                 } else if v.a == v.b {
                     v.x = a.x - v.w / 2.
                 } else {
-                    let lo = a.x.min(b.x) - note_over;
-                    let hi = a.x.max(b.x) + note_over;
+                    let lo = a.x.js_min(b.x) - note_over;
+                    let hi = a.x.js_max(b.x) + note_over;
                     if tight || m.wrap {
                         v.label = ctx.text(
                             m.message.text(),
                             small,
                             true,
-                            Some(wrap_w.max(hi - lo - 2. * note_pad)),
+                            Some(wrap_w.js_max(hi - lo - 2. * note_pad)),
                             0,
                         )?
                     }
-                    v.w = (hi - lo).max(v.label.width + 2. * note_pad);
+                    v.w = (hi - lo).js_max(v.label.width + 2. * note_pad);
                     v.x = (lo + hi - v.w) / 2.;
                 }
                 x0 = v.x;
@@ -877,14 +876,14 @@ fn draw(
                     + v.label.width
                     + badge_width(i, &numbering, tiny, &mut ctx)?;
             } else {
-                let mut lo = a.x.min(b.x);
-                let mut hi = a.x.max(b.x);
+                let mut lo = a.x.js_min(b.x);
+                let mut hi = a.x.js_max(b.x);
                 if tight || m.wrap {
                     v.label = ctx.text(
                         m.message.text(),
                         small,
                         true,
-                        Some(wrap_w.max(hi - lo - 2. * msg_pad - ACT_W)),
+                        Some(wrap_w.js_max(hi - lo - 2. * msg_pad - ACT_W)),
                         0,
                     )?
                 }
@@ -901,12 +900,12 @@ fn draw(
             extend(&mut min_x, &mut max_x, x0, x1);
             if let Some(index) = open.last() {
                 let f = &mut frames[*index];
-                f.x0 = f.x0.min(x0 - frame_pad);
-                f.x1 = f.x1.max(x1 + frame_pad);
+                f.x0 = f.x0.js_min(x0 - frame_pad);
+                f.x1 = f.x1.js_max(x1 + frame_pad);
             }
         }
     }
-    let box_title_h = runs.iter().fold(0_f64, |h, r| h.max(r.title.height));
+    let box_title_h = runs.iter().fold(0_f64, |h, r| h.js_max(r.title.height));
     let box_top = if !runs.is_empty() {
         box_pad
             + if box_title_h > 0. {
@@ -920,7 +919,7 @@ fn draw(
     let row_h = cols
         .iter()
         .filter(|c| c.create_at < 0)
-        .fold(0_f64, |h, c| h.max(c.size.h));
+        .fold(0_f64, |h, c| h.js_max(c.size.h));
     let head_bottom = box_top + row_h;
     for c in &mut cols {
         c.top = head_bottom - c.size.h;
@@ -948,7 +947,7 @@ fn draw(
         } else if kind == Some(ACTIVE_END) {
             if let Some(&c) = m.from.as_ref().and_then(|s| col_of.get(s)) {
                 if !cols[c].activations.is_empty() {
-                    y = y.max(end_activation(
+                    y = y.js_max(end_activation(
                         &mut cols[c],
                         y,
                         &mut min_x,
@@ -966,7 +965,7 @@ fn draw(
                     y = f.top;
                 } else {
                     f.top = y + 12.;
-                    y = f.top + TAB_H.max(f.title.height + 2.);
+                    y = f.top + TAB_H.js_max(f.title.height + 2.);
                 }
             } else {
                 stack.pop();
@@ -999,7 +998,7 @@ fn draw(
                             )?
                         ));
                     }
-                    inner.push_str(&format!("<rect x=\"{x}\" y=\"{}\" width=\"{}\" height=\"{TAB_H}\" rx=\"{RADIUS}\" fill=\"var(--_s)\"/><text class=\"pele-frame-kind\" x=\"{}\" y=\"{}\" text-anchor=\"middle\" font-size=\"{}\" font-weight=\"var(--_hw)\" fill=\"var(--_m)\" stroke=\"none\">{}</text>{}",num(f.top),num(f.tab_w),num(f.x0+f.tab_w/2.),num(f.top+TAB_H/2.+tiny*0.35),js_num(tiny),f.kind,backed(&f.title,f.x0+f.tab_w+8.+f.title.width/2.,f.top+TAB_H.max(f.title.height)/2.," class=\"pele-frame-label\" fill=\"var(--_m)\" stroke=\"none\"",&xs,&mut ctx)?));
+                    inner.push_str(&format!("<rect x=\"{x}\" y=\"{}\" width=\"{}\" height=\"{TAB_H}\" rx=\"{RADIUS}\" fill=\"var(--_s)\"/><text class=\"pele-frame-kind\" x=\"{}\" y=\"{}\" text-anchor=\"middle\" font-size=\"{}\" font-weight=\"var(--_hw)\" fill=\"var(--_m)\" stroke=\"none\">{}</text>{}",num(f.top),num(f.tab_w),num(f.x0+f.tab_w/2.),num(f.top+TAB_H/2.+tiny*0.35),js_num(tiny),f.kind,backed(&f.title,f.x0+f.tab_w+8.+f.title.width/2.,f.top+TAB_H.js_max(f.title.height)/2.," class=\"pele-frame-label\" fill=\"var(--_m)\" stroke=\"none\"",&xs,&mut ctx)?));
                     frames_out.push_str(&format!(
                         "<g class=\"pele-frame pele-frame-{}\">{inner}</g>",
                         f.kind
@@ -1017,7 +1016,7 @@ fn draw(
         } else if let Some(v) = view {
             if v.kind == V::Note {
                 let a = &cols[v.a];
-                let h = v.label.height + 2. * 4_f64.max(note_pad - 4.);
+                let h = v.label.height + 2. * 4_f64.js_max(note_pad - 4.);
                 let top = y + 10.;
                 let mut x = v.x;
                 if m.placement == Some(1) {
@@ -1063,7 +1062,7 @@ fn draw(
             let line_y;
             if v.kind == V::SelfLoop {
                 let a = &cols[v.a];
-                let top = y + msg_gap + ((label.height - SELF_H) / 2.).max(0.);
+                let top = y + msg_gap + ((label.height - SELF_H) / 2.).js_max(0.);
                 let bottom = top + SELF_H;
                 let mut x0 = if circle_from {
                     a.x + CENTRAL_R
@@ -1075,7 +1074,7 @@ fn draw(
                 } else {
                     right_edge(a, starting)
                 };
-                let out = x0.max(x1) + SELF_W + bw / 2.;
+                let out = x0.js_max(x1) + SELF_W + bw / 2.;
                 if circle_from {
                     inner.push_str(&circle(a.x, top))
                 }
@@ -1144,7 +1143,7 @@ fn draw(
                     } else {
                         6.
                     })
-                    .max(if creating {
+                    .js_max(if creating {
                         b.size.h / 2. - msg_gap + 6.
                     } else {
                         0.
@@ -1213,8 +1212,8 @@ fn draw(
                     num(to)
                 );
                 if label.width > 0. {
-                    let l = x0.min(x1);
-                    let r = x0.max(x1);
+                    let l = x0.js_min(x1);
+                    let r = x0.js_max(x1);
                     let cx = if align < 0 {
                         l + msg_pad + label.width / 2.
                     } else if align > 0 {
@@ -1252,12 +1251,12 @@ fn draw(
                 "<g class=\"pele-edge pele-message\" data-id=\"i{}\">{inner}</g>",
                 esc_text(&m.id)?
             ));
-            y = y.max(line_y);
+            y = y.js_max(line_y);
             if cols[v.a].destroy_at == i as isize {
-                y = y.max(destroy(&mut cols[v.a], line_y, &mut crosses_out)?)
+                y = y.js_max(destroy(&mut cols[v.a], line_y, &mut crosses_out)?)
             }
             if v.a != v.b && cols[v.b].destroy_at == i as isize {
-                y = y.max(destroy(&mut cols[v.b], line_y, &mut crosses_out)?)
+                y = y.js_max(destroy(&mut cols[v.b], line_y, &mut crosses_out)?)
             }
         }
     }
@@ -1274,7 +1273,7 @@ fn draw(
             if col.life_end >= 0. {
                 continue;
             }
-            foot_h = foot_h.max(col.size.h);
+            foot_h = foot_h.js_max(col.size.h);
             actors_out.push_str(&actor_svg(col, y, true, &mut ctx)?);
         }
         bottom = y + foot_h;
@@ -1316,7 +1315,7 @@ fn draw(
     let mut min_y = 0.;
     let mut title_out = String::new();
     let title_room = options.max_width.filter(|n| *n > 0.).map_or(4000., |n| {
-        80_f64.max(n - 2. * options.padding.unwrap_or(8.))
+        80_f64.js_max(n - 2. * options.padding.unwrap_or(8.))
     });
     let title = ctx.text(
         db.title.as_deref(),
@@ -1326,7 +1325,7 @@ fn draw(
         1,
     )?;
     if min_x > max_x {
-        extend(&mut min_x, &mut max_x, 0., title.width.max(40.))
+        extend(&mut min_x, &mut max_x, 0., title.width.js_max(40.))
     }
     if title.width > 0. {
         let cx = (min_x + max_x) / 2.;

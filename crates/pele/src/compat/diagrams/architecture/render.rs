@@ -3,6 +3,7 @@ use super::{
     layout::{place, side_index, DX, DY},
     model::*,
 };
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     svg::{
         document,
@@ -112,7 +113,7 @@ fn fit(
         }
         lines.push(line);
         widths.push(width);
-        widest = widest.max(width)
+        widest = widest.js_max(width)
     }
     label.height = lines.len() as f64 * label.line_height;
     label.lines = lines;
@@ -184,16 +185,16 @@ fn route(s: Port, e: Port) -> Vec<f64> {
     } else if offset.abs() >= 1. {
         if sideways {
             let x = if sdx > 0. {
-                sx.max(ex) + STUB
+                sx.js_max(ex) + STUB
             } else {
-                sx.min(ex) - STUB
+                sx.js_min(ex) - STUB
             };
             return vec![sx, sy, x, sy, x, ey, ex, ey];
         }
         let y = if sdy > 0. {
-            sy.max(ey) + STUB
+            sy.js_max(ey) + STUB
         } else {
-            sy.min(ey) - STUB
+            sy.js_min(ey) - STUB
         };
         return vec![sx, sy, sx, y, ex, y, ex, ey];
     }
@@ -203,7 +204,7 @@ fn route(s: Port, e: Port) -> Vec<f64> {
         } else if e.y1 + STUB <= s.y0 {
             (e.y1 + s.y0) / 2.
         } else {
-            s.y1.max(e.y1) + STUB
+            s.y1.js_max(e.y1) + STUB
         };
         vec![sx, sy, s1x, sy, s1x, lane, e1x, lane, e1x, ey, ex, ey]
     } else {
@@ -212,7 +213,7 @@ fn route(s: Port, e: Port) -> Vec<f64> {
         } else if e.x1 + STUB <= s.x0 {
             (e.x1 + s.x0) / 2.
         } else {
-            s.x1.max(e.x1) + STUB
+            s.x1.js_max(e.x1) + STUB
         };
         vec![sx, sy, sx, s1y, lane, s1y, lane, e1y, ex, e1y, ex, ey]
     }
@@ -246,7 +247,7 @@ fn path_data(p: &[f64], start_trim: f64, end_trim: f64) -> String {
     let mut ys: Vec<f64> = p.chunks_exact(2).map(|p| p[1]).collect();
     for (at, toward, amount) in [(0, 1, start_trim), (n - 1, n - 2, end_trim)] {
         let len = (xs[toward] - xs[at]).hypot(ys[toward] - ys[at]);
-        let t = amount.min((len - 1.).max(0.));
+        let t = amount.js_min((len - 1.).js_max(0.));
         if len > 0. && t > 0. {
             xs[at] += (xs[toward] - xs[at]) / len * t;
             ys[at] += (ys[toward] - ys[at]) / len * t
@@ -256,7 +257,7 @@ fn path_data(p: &[f64], start_trim: f64, end_trim: f64) -> String {
     for i in 1..n - 1 {
         let before = (xs[i] - xs[i - 1]).hypot(ys[i] - ys[i - 1]);
         let after = (xs[i + 1] - xs[i]).hypot(ys[i + 1] - ys[i]);
-        let rad = 6f64.min(before / 2.).min(after / 2.);
+        let rad = 6f64.js_min(before / 2.).js_min(after / 2.);
         if rad < 0.5 {
             d += &format!("L{},{}", num(xs[i]), num(ys[i]));
             continue;
@@ -297,7 +298,7 @@ pub fn render(
 fn title_room(o: &RenderSettings) -> f64 {
     o.max_width
         .filter(|w| *w > 0.)
-        .map_or(4000., |w| (w - 2. * o.padding.unwrap_or(8.)).max(80.))
+        .map_or(4000., |w| (w - 2. * o.padding.unwrap_or(8.)).js_max(80.))
 }
 fn draw(
     m: &ArchitectureModel,
@@ -309,8 +310,8 @@ fn draw(
     let icon_size = setting(c, "iconSize", 48., 8., 512.);
     let size = setting(c, "fontSize", o.font_size.unwrap_or(16.), 4., 128.);
     let group_pad =
-        setting(c, "padding", 20., 0., 256.).min(if tight { 12. } else { f64::INFINITY });
-    let small = (size * 0.875 + 0.5).floor();
+        setting(c, "padding", 20., 0., 256.).js_min(if tight { 12. } else { f64::INFINITY });
+    let small = round(size * 0.875);
     let pad = o.padding.unwrap_or(8.);
     let half = icon_size / 2.;
     let nodes = &m.nodes;
@@ -326,9 +327,9 @@ fn draw(
     let mut box_w = vec![0f64; n];
     let mut box_h = vec![0f64; n];
     let wrap = if tight {
-        icon_size.max(64.)
+        icon_size.js_max(64.)
     } else {
-        (icon_size * 2.25).max(96.)
+        (icon_size * 2.25).js_max(96.)
     };
     for i in 0..n {
         let node = &nodes[i].1;
@@ -345,7 +346,7 @@ fn draw(
             wrap,
             0,
         )?;
-        box_w[i] = icon_size.max(2. * (label.width / 2.).ceil());
+        box_w[i] = icon_size.js_max(2. * (label.width / 2.).ceil());
         box_h[i] = icon_size
             + if label.height > 0. {
                 4. + label.height
@@ -368,24 +369,24 @@ fn draw(
     let mut cw = vec![0f64; cols];
     let mut rh = vec![0f64; rows];
     let gap = if tight {
-        24f64.max(2. * STUB)
+        24f64.js_max(2. * STUB)
     } else {
-        40f64.max((icon_size * 0.75 + 0.5).floor())
+        40f64.js_max(round(icon_size * 0.75))
     };
     let mut gx = vec![gap; cols];
     let mut gy = vec![gap; rows];
     let nc: Vec<usize> = grid.col.iter().map(|v| co[v]).collect();
     let nr: Vec<usize> = grid.row.iter().map(|v| ro[v]).collect();
     for i in 0..n {
-        cw[nc[i]] = cw[nc[i]].max(box_w[i]);
-        rh[nr[i]] = rh[nr[i]].max(box_h[i]);
+        cw[nc[i]] = cw[nc[i]].js_max(box_w[i]);
+        rh[nr[i]] = rh[nr[i]].js_max(box_h[i]);
     }
     for k in 0..g {
         if grid.group_empty[k] {
             let c = co[&grid.group_col[k]];
             let rr = ro[&grid.group_row[k]];
-            cw[c] = cw[c].max(icon_size);
-            rh[rr] = rh[rr].max(half)
+            cw[c] = cw[c].js_max(icon_size);
+            rh[rr] = rh[rr].js_max(half)
         }
     }
     let mut edge_labels = vec![];
@@ -399,12 +400,12 @@ fn draw(
             if let (Some(a), Some(b)) = (a, b) {
                 if nc[a] != nc[b] {
                     let at = nc[a].min(nc[b]);
-                    gx[at] = gx[at].max(label.width.ceil() + 28.)
+                    gx[at] = gx[at].js_max(label.width.ceil() + 28.)
                 } else {
-                    cw[nc[a]] = cw[nc[a]].max(2. * (label.width / 2.).ceil() + 8.);
+                    cw[nc[a]] = cw[nc[a]].js_max(2. * (label.width / 2.).ceil() + 8.);
                     if nr[a] != nr[b] {
                         let at = nr[a].min(nr[b]);
-                        gy[at] = gy[at].max(label.height.ceil() + 24.)
+                        gy[at] = gy[at].js_max(label.height.ceil() + 24.)
                     }
                 }
             }
@@ -427,7 +428,7 @@ fn draw(
         vec![0f64; rows],
         vec![0f64; rows],
     );
-    let badge = (size * 1.25 + 0.5).floor();
+    let badge = round(size * 1.25);
     for k in 0..g {
         c0[k] = co.get(&grid.group_col[k]).copied().unwrap_or(0);
         c1[k] = co
@@ -446,7 +447,7 @@ fn draw(
             o,
             size,
             if tight {
-                80f64.max(title_room(o) / 2.)
+                80f64.js_max(title_room(o) / 2.)
             } else {
                 320.
             },
@@ -464,14 +465,14 @@ fn draw(
             } else {
                 0.
             };
-        hh[k] = label.height.max(icon);
+        hh[k] = label.height.js_max(icon);
         gl.push(label)
     }
     for k in (0..g).rev() {
         let left = group_pad + il[k];
         let mut right = group_pad + ir[k];
         let top = if hh[k] > 0. {
-            group_pad.max(hh[k] + 12.)
+            group_pad.js_max(hh[k] + 12.)
         } else {
             group_pad
         } + it[k];
@@ -494,23 +495,23 @@ fn draw(
         ir[k] = right;
         it[k] = top;
         ib[k] = bottom;
-        cl[c0[k]] = cl[c0[k]].max(left);
-        cr[c1[k]] = cr[c1[k]].max(right);
-        rt[r0[k]] = rt[r0[k]].max(top);
-        rb[r1[k]] = rb[r1[k]].max(bottom);
+        cl[c0[k]] = cl[c0[k]].js_max(left);
+        cr[c1[k]] = cr[c1[k]].js_max(right);
+        rt[r0[k]] = rt[r0[k]].js_max(top);
+        rb[r1[k]] = rb[r1[k]].js_max(bottom);
         if grid.group_parent[k] >= 0 {
             let p = grid.group_parent[k] as usize;
             if c0[p] == c0[k] {
-                il[p] = il[p].max(left)
+                il[p] = il[p].js_max(left)
             }
             if c1[p] == c1[k] {
-                ir[p] = ir[p].max(right)
+                ir[p] = ir[p].js_max(right)
             }
             if r0[p] == r0[k] {
-                it[p] = it[p].max(top)
+                it[p] = it[p].js_max(top)
             }
             if r1[p] == r1[k] {
-                ib[p] = ib[p].max(bottom)
+                ib[p] = ib[p].js_max(bottom)
             }
         }
     }
@@ -652,10 +653,10 @@ fn draw(
         let (mut best_len, mut flat_len) = (-1f64, -1f64);
         let label = &edge_labels[k];
         for p in points.chunks_exact(2) {
-            min_x = min_x.min(p[0] - 4.);
-            max_x = max_x.max(p[0] + 4.);
-            min_y = min_y.min(p[1] - 4.);
-            max_y = max_y.max(p[1] + 4.)
+            min_x = min_x.js_min(p[0] - 4.);
+            max_x = max_x.js_max(p[0] + 4.);
+            min_y = min_y.js_min(p[1] - 4.);
+            max_y = max_y.js_max(p[1] + 4.)
         }
         for at in (0..points.len() - 3).step_by(2) {
             let horizontal = (points[at + 1] - points[at + 3]).abs() < 0.01;
@@ -663,8 +664,8 @@ fn draw(
             if !horizontal {
                 runs.push((
                     points[at],
-                    points[at + 1].min(points[at + 3]),
-                    points[at + 1].max(points[at + 3]),
+                    points[at + 1].js_min(points[at + 3]),
+                    points[at + 1].js_max(points[at + 3]),
                 ))
             }
             if len > best_len {
@@ -708,10 +709,10 @@ fn draw(
                     }
                 }
             }
-            min_x = min_x.min(x - w / 2.);
-            max_x = max_x.max(x + w / 2.);
-            min_y = min_y.min(y - label.height / 2.);
-            max_y = max_y.max(y + label.height / 2.);
+            min_x = min_x.js_min(x - w / 2.);
+            max_x = max_x.js_max(x + w / 2.);
+            min_y = min_y.js_min(y - label.height / 2.);
+            max_y = max_y.js_max(y + label.height / 2.);
             labels_out += &edge_label_svg(&id, label, x, y, "", r)?
         }
     }
@@ -736,7 +737,7 @@ fn draw(
                 if cross - 6. - start >= hw[k] {
                     break;
                 }
-                start = start.max(cross + 6.)
+                start = start.js_max(cross + 6.)
             }
             if start + hw[k] > x + w - 4. {
                 start = x + 10.
@@ -759,7 +760,7 @@ fn draw(
     }
     let mut nodes_out = String::new();
     let glyph = icon_size * 0.5;
-    let text_size = 6f64.max((size * 0.75 + 0.5).floor());
+    let text_size = 6f64.js_max(round(size * 0.75));
     for i in 0..n {
         let node = &nodes[i].1;
         let at = format!(
@@ -784,7 +785,7 @@ fn draw(
                     1.
                 })
             .floor()
-            .max(1.) as usize;
+            .js_max(1.) as usize;
             inner = label_svg_with_resources(
                 &fit(text, icon_size - 8., lines, o, r)?,
                 0.,
@@ -809,10 +810,10 @@ fn draw(
     } else {
         0.
     };
-    let width = ((max_x - min_x).max(title.width) + 2. * pad).ceil();
+    let width = ((max_x - min_x).js_max(title.width) + 2. * pad).ceil();
     let height = (max_y - min_y + th + 2. * pad).ceil();
-    let ox = ((width - (max_x - min_x)) / 2. - min_x + 0.5).floor();
-    let oy = (pad + th - min_y + 0.5).floor();
+    let ox = round((width - (max_x - min_x)) / 2. - min_x);
+    let oy = round(pad + th - min_y);
     let mut body = String::new();
     for(content,pre,post)in[(&clusters,"<g class=\"pele-clusters\">","</g>"),(&edges_out,"<g class=\"pele-edges\" fill=\"none\" stroke=\"var(--_l)\" stroke-linecap=\"round\" stroke-linejoin=\"round\">","</g>"),(&labels_out,&format!("<g class=\"pele-edge-labels\" font-size=\"{}\">",num(small)),"</g>"),(&nodes_out,"<g class=\"pele-nodes\">","</g>")]{if !content.is_empty(){body+=pre;body+=content;body+=post}}
     let content = label_svg(

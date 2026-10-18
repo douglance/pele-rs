@@ -5,6 +5,7 @@ use super::{
     model::{AgentflowModel, LabelType},
     shapes::{canonical, kind_slot},
 };
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     layout::{
         compound::{compound_layout, direction, shift_layout, CEdge, CNode, Dir},
@@ -35,7 +36,7 @@ fn number(c: &Object, key: &str, fallback: f64) -> f64 {
         .and_then(Value::as_object)
         .and_then(|v| v.get(key))
     {
-        Some(Value::Number(n)) if *n > 0. => n.min(2000.),
+        Some(Value::Number(n)) if *n > 0. => n.js_min(2000.),
         _ => fallback,
     }
 }
@@ -184,7 +185,7 @@ fn draw(
         .as_ref()
         .expect("parsed agentflow has its normalized graph");
     let size = o.font_size.unwrap_or(16.);
-    let edge_size = (size * 0.875 + 0.5).floor();
+    let edge_size = round(size * 0.875);
     let wrap = number(config, "wrappingWidth", 120.);
     let min_width = number(config, "minNodeWidth", 120.);
     let pad = o.padding.unwrap_or(8.);
@@ -235,7 +236,7 @@ fn draw(
             )
         } else if node.shape == "collapsedGroup" {
             let label = layout_label(node.label.as_deref(), markdown, r, o, font, wrap, bits)?;
-            let w = label.width.max(min_width) + 2. * PAD_X;
+            let w = label.width.js_max(min_width) + 2. * PAD_X;
             let h = label.height + 2. * PAD_Y + 14.;
             (
                 CNode::new(w, h, -1),
@@ -258,7 +259,7 @@ fn draw(
                 if shape == "diam" {
                     label.width
                 } else {
-                    label.width.max(min_width)
+                    label.width.js_max(min_width)
                 },
                 label.height,
             );
@@ -393,7 +394,7 @@ fn draw(
     } else {
         0.
     };
-    let inner = layout.width.max(title.width);
+    let inner = layout.width.js_max(title.width);
     let ox = pad + (inner - layout.width) / 2.;
     let oy = pad + title_height;
     shift_layout(&mut nodes, &mut edges, ox, oy);
@@ -435,10 +436,10 @@ fn draw(
             nodes.iter().enumerate().any(|(k, c)| {
                 k != i
                     && !c.is_group
-                    && c.x + c.w / 2. > route[0].min(route[3]) - 1.
-                    && c.x - c.w / 2. < route[0].max(route[3]) + 1.
-                    && c.y + c.h / 2. > route[1].min(route[4]) - 1.
-                    && c.y - c.h / 2. < route[1].max(route[4]) + 1.
+                    && c.x + c.w / 2. > route[0].js_min(route[3]) - 1.
+                    && c.x - c.w / 2. < route[0].js_max(route[3]) + 1.
+                    && c.y + c.h / 2. > route[1].js_min(route[4]) - 1.
+                    && c.y - c.h / 2. < route[1].js_max(route[4]) + 1.
             })
         };
         let mut route = toward(first);

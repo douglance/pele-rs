@@ -1,5 +1,6 @@
 //! Railroad box algebra, track routing and responsive folding, Pele 458322a5 (MIT).
 use super::model::{RailroadModel as Model, RailroadNode as N};
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     source::decode_entities,
     svg::{self, esc, esc_text, num},
@@ -56,7 +57,7 @@ fn option(c: &Object, key: &str, fallback: f64, max: f64) -> f64 {
         .and_then(Value::as_object)
         .and_then(|o| o.get(key))
     {
-        Some(Value::Number(v)) if *v >= 0. => v.min(max),
+        Some(Value::Number(v)) if *v >= 0. => v.js_min(max),
         _ => fallback,
     }
 }
@@ -75,7 +76,7 @@ fn even(v: f64) -> f64 {
     (v / 2.).ceil() * 2.
 }
 fn below(offset: f64, a: &Boxed, b: &Boxed, m: &Metrics) -> f64 {
-    (offset + a.down + m.sep + b.up).max(2. * m.arc)
+    (offset + a.down + m.sep + b.up).js_max(2. * m.arc)
 }
 fn count(min: f64, max: f64) -> String {
     if max == f64::INFINITY && min <= 1. {
@@ -105,7 +106,7 @@ fn put(a: &mut Vec<Boxed>, b: Boxed) -> usize {
 }
 fn bypass(a: &mut Vec<Boxed>, kid: usize, m: &Metrics) -> usize {
     let k = &a[kid];
-    let reach = (k.up + m.sep).max(2. * m.arc);
+    let reach = (k.up + m.sep).js_max(2. * m.arc);
     let mut b = Boxed::new(Kind::Bypass, k.width + 4. * m.arc, reach, k.down, vec![kid]);
     b.reach = reach;
     put(a, b)
@@ -119,7 +120,7 @@ fn leaf(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Boxed, PeleError> {
-    let width = even(measure(r, o, &text, m.size, style)? + 2. * m.padding).max(m.height);
+    let width = even(measure(r, o, &text, m.size, style)? + 2. * m.padding).js_max(m.height);
     let mut b = Boxed::new(kind, width, m.height / 2., m.height / 2., vec![]);
     b.text = text;
     b.id = id;
@@ -170,7 +171,7 @@ fn boxes(
                 _ => 0.,
             };
             for &child in node.children() {
-                pending.push((child, 40_f64.max(width - around)));
+                pending.push((child, 40_f64.js_max(width - around)));
             }
         }
     }
@@ -226,8 +227,8 @@ fn boxes(
                 let (mut up, mut down) = (0f64, 0f64);
                 for &k in &kids {
                     width += a[k].width;
-                    up = up.max(a[k].up);
-                    down = down.max(a[k].down)
+                    up = up.js_max(a[k].up);
+                    down = down.js_max(a[k].down)
                 }
                 if width <= room || kids.len() < 2 {
                     put(&mut a, Boxed::new(Kind::Sequence, width, up, down, kids))
@@ -241,8 +242,8 @@ fn boxes(
                                  a: &mut Vec<Boxed>| {
                         let (mut up, mut down) = (0f64, 0f64);
                         for &k in row.iter() {
-                            up = up.max(a[k].up);
-                            down = down.max(a[k].down)
+                            up = up.js_max(a[k].up);
+                            down = down.js_max(a[k].down)
                         }
                         rows.push(put(
                             a,
@@ -252,7 +253,7 @@ fn boxes(
                     };
                     for &k in &kids {
                         if !row.is_empty()
-                            && row_w + m.gap + a[k].width > 40f64.max(room - 6. * m.arc)
+                            && row_w + m.gap + a[k].width > 40f64.js_max(room - 6. * m.arc)
                         {
                             flush(&mut row, &mut row_w, &mut rows, &mut a)
                         }
@@ -265,9 +266,9 @@ fn boxes(
                     } else {
                         let (mut width, mut offset) = (0f64, 0f64);
                         for (j, &row) in rows.iter().enumerate() {
-                            width = width.max(a[row].width);
+                            width = width.js_max(a[row].width);
                             if j > 0 {
-                                offset += a[rows[j - 1]].down + m.sep.max(2. * m.arc) + a[row].up
+                                offset += a[rows[j - 1]].down + m.sep.js_max(2. * m.arc) + a[row].up
                             }
                         }
                         let up = a[rows[0]].up;
@@ -282,7 +283,7 @@ fn boxes(
             N::Choice(_) => {
                 let (mut inner, mut offset) = (0f64, 0f64);
                 for (j, &k) in kids.iter().enumerate() {
-                    inner = inner.max(a[k].width);
+                    inner = inner.js_max(a[k].width);
                     if j > 0 {
                         offset = below(offset, &a[kids[j - 1]], &a[k], m)
                     }
@@ -301,7 +302,7 @@ fn boxes(
                     k
                 } else {
                     let text = count(*min, *max);
-                    let reach = (a[k].down + m.sep).max(2. * m.arc);
+                    let reach = (a[k].down + m.sep).js_max(2. * m.arc);
                     let label = if text.is_empty() {
                         0.
                     } else {
@@ -309,7 +310,7 @@ fn boxes(
                     };
                     let mut b = Boxed::new(
                         Kind::Loop,
-                        a[k].width.max(label) + 2. * m.arc,
+                        a[k].width.js_max(label) + 2. * m.arc,
                         a[k].up,
                         reach + if text.is_empty() { 4.5 } else { 18. },
                         vec![k],
@@ -398,8 +399,8 @@ impl<'a> Painter<'a> {
                         if j + 1 < kids.len() {
                             let next = &self.a[kids[j + 1]];
                             let next_offset =
-                                offset + kid.down + self.m.sep.max(2. * arc) + next.up;
-                            let mid = y + offset + kid.down + self.m.sep.max(2. * arc) / 2.;
+                                offset + kid.down + self.m.sep.js_max(2. * arc) + next.up;
+                            let mid = y + offset + kid.down + self.m.sep.js_max(2. * arc) / 2.;
                             self.track += &format!(
                                 "M{},{}H{}V{}H{}V{}H{}",
                                 num(start + kid.width),
@@ -586,22 +587,22 @@ fn draw(
     let size = if font_size != 0. {
         font_size
     } else {
-        (base * 0.875 + 0.5).floor()
+        round(base * 0.875)
     };
     let head_size = if font_size != 0. { font_size } else { base };
     let padding = option(c, "padding", -1., 200.);
-    let line_height = (size * 1.5 + 0.5).floor();
+    let line_height = round(size * 1.5);
     let m = Metrics {
         size,
         padding: if padding < 0. { 12. } else { padding },
         height: even(line_height + if padding < 0. { 9. } else { 2. * padding }),
-        gap: option(c, "horizontalSeparation", 16., 500.).min(if tight {
+        gap: option(c, "horizontalSeparation", 16., 500.).js_min(if tight {
             12.
         } else {
             f64::INFINITY
         }),
         sep: option(c, "verticalSeparation", 10., 500.),
-        arc: option(c, "arcRadius", 10., 200.).min(if tight { 6. } else { f64::INFINITY }),
+        arc: option(c, "arcRadius", 10., 200.).js_min(if tight { 6. } else { f64::INFINITY }),
     };
     let radius = if matches!(
         c.get("railroad")
@@ -623,7 +624,7 @@ fn draw(
     let title_room = if tight {
         o.max_width
             .filter(|w| *w > 0.)
-            .map_or(4000., |w| 80f64.max(w - 2. * pad))
+            .map_or(4000., |w| 80f64.js_max(w - 2. * pad))
     } else {
         4000.
     };
@@ -633,14 +634,14 @@ fn draw(
     } else {
         0.
     };
-    let head_height = (head_size * 1.5 + 0.5).floor();
+    let head_height = round(head_size * 1.5);
     let mut rules = String::new();
     let mut width = title.width;
     let mut top = pad + title_height;
     let mut bottom = pad + title.height;
     for rule in &model.rules {
         let room = if tight {
-            80f64.max(o.max_width.unwrap_or(320.) - 2. * pad - 4. * radius - 24. - 1.)
+            80f64.js_max(o.max_width.unwrap_or(320.) - 2. * pad - 4. * radius - 24. - 1.)
         } else {
             f64::INFINITY
         };
@@ -662,8 +663,8 @@ fn draw(
         };
         rules+=&format!("<g class=\"pele-rule\" data-id=\"{}\"><text class=\"pele-rule-name\" x=\"{}\" y=\"{}\" font-size=\"{}\" font-weight=\"var(--_hw)\" text-anchor=\"start\">{}</text><path class=\"pele-edge pele-track\" d=\"{}\" fill=\"none\" stroke=\"var(--_l)\"{stroke}/>{}{markers}{}</g>",esc_text(&rule.name)?,num(pad),num(top+head_height/2.+head_size*0.35),num(head_size),esc(&name),p.track,if p.arrows.is_empty(){String::new()}else{format!("<path class=\"pele-marker\" d=\"{}\" fill=\"var(--_l)\"/>",p.arrows)},p.nodes);
         width = width
-            .max(end + 2. * radius - pad)
-            .max(measure(r, o, &name, head_size, 1)?);
+            .js_max(end + 2. * radius - pad)
+            .js_max(measure(r, o, &name, head_size, 1)?);
         bottom = baseline + b.down;
         top = bottom + m.sep + 18.;
     }

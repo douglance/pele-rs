@@ -1,5 +1,6 @@
 //! Pele diagrams/mindmap/render.ts, 458322a5 (MIT, kepano).
 use super::{MindmapModel, MindmapNode};
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     svg::{
         document,
@@ -70,7 +71,7 @@ fn stack(
         rel[c] = y;
         let grouped = !nodes[c].children.is_empty()
             || (k + 1 < to && !nodes[list[k + 1]].children.is_empty());
-        last = if grouped { gap.max(GROUP_GAP) } else { gap };
+        last = if grouped { gap.js_max(GROUP_GAP) } else { gap };
         y += extent[c] + last;
     }
     let a = list[from];
@@ -124,7 +125,7 @@ fn draw(
             }
         })
         .filter(|v| *v > 0.)
-        .map_or(200., |v| v.min(2000.));
+        .map_or(200., |v| v.js_min(2000.));
     let glyph = size * 1.25;
     let nodes = &m.nodes;
     let n = nodes.len();
@@ -157,7 +158,7 @@ fn draw(
         } else {
             false
         };
-        let fit = wrap.min(72f64.max(
+        let fit = wrap.js_min(72f64.js_max(
             room - depth[i] as f64 * INDENT
                 - 2. * TEXT_PAD
                 - if drawn[i] { glyph + ICON_GAP } else { 0. },
@@ -169,7 +170,7 @@ fn draw(
             } else {
                 0.
             };
-        let th = label.height.max((size * 1.5 + 0.5).floor());
+        let th = label.height.js_max(round(size * 1.5));
         let mut shape = match node.node_type {
             1 => "rounded",
             2 => "rect",
@@ -225,8 +226,8 @@ fn draw(
             &mut rel,
         );
         let top = middle - anchor[i];
-        let low = 0f64.min(top);
-        extent[i] = stacked.max(top + h[i]) - low;
+        let low = 0f64.js_min(top);
+        extent[i] = stacked.js_max(top + h[i]) - low;
         own[i] = top - low;
         kids[i] = -low;
     }
@@ -311,10 +312,10 @@ fn draw(
         let label = &labels[i];
         let cx = x[i];
         let top = y[i];
-        min_x = min_x.min(cx - w[i] / 2.);
-        max_x = max_x.max(cx + w[i] / 2.);
-        min_y = min_y.min(top);
-        max_y = max_y.max(top + h[i]);
+        min_x = min_x.js_min(cx - w[i] / 2.);
+        max_x = max_x.js_max(cx + w[i] / 2.);
+        min_y = min_y.js_min(top);
+        max_y = max_y.js_max(top + h[i]);
         if (i == 0 || parent[i] == 0) && !body.is_empty() {
             out+=&format!("<g class=\"pele-branch pele-section-{}\"><g class=\"pele-edges\" fill=\"none\" stroke=\"{color}\" stroke-width=\"1.5\">{edges}</g>{body}</g>",nodes[k-1].section.unwrap_or(0));
             edges.clear();
@@ -326,11 +327,11 @@ fn draw(
             }
             let p = parent[i];
             let stem = if p == 0 {
-                STEM.max(h[0] / 2.).min(INDENT - BEND)
+                STEM.js_max(h[0] / 2.).js_min(INDENT - BEND)
             } else {
                 STEM
             };
-            let x1 = x[p] - w[p] / 2. + stem.min(w[p] / 2.);
+            let x1 = x[p] - w[p] / 2. + stem.js_min(w[p] / 2.);
             let y1 = if trunk[p] != 0. {
                 trunk[p]
             } else {
@@ -344,7 +345,7 @@ fn draw(
                     0.
                 };
             let y2 = top + anchor[i];
-            let bend = 0f64.max(BEND.min(x2 - x1).min(y2 - y1));
+            let bend = 0f64.js_max(BEND.js_min(x2 - x1).js_min(y2 - y1));
             trunk[p] = y2 - bend;
             edges += &format!(
                 "<path class=\"pele-edge\" d=\"M{},{}V{}Q{},{} {},{}H{}\"/>",
@@ -438,14 +439,14 @@ fn draw(
     let title_room = o
         .max_width
         .filter(|v| *v > 0.)
-        .map_or(4000., |v| 80f64.max(v - 2. * pad));
+        .map_or(4000., |v| 80f64.js_max(v - 2. * pad));
     let title = layout_label(m.title.as_deref(), false, r, o, size, title_room, 1)?;
     let title_height = if title.height > 0. {
         title.height + 16.
     } else {
         0.
     };
-    let width = (max_x - min_x).max(title.width);
+    let width = (max_x - min_x).js_max(title.width);
     let total_w = (width + 2. * pad).ceil();
     let total_h = (max_y - min_y + title_height + 2. * pad).ceil();
     let content = label_svg(

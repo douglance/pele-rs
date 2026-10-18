@@ -1,5 +1,6 @@
 //! Pele git/render.ts commit lanes, symbols and connectors, 458322a5 (MIT, kepano).
 use super::model::{GitCommit, GitModel};
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     diagrams::common::plain_label::plain_label,
     svg::{self, esc_text, label_svg, num, series_color},
@@ -111,7 +112,7 @@ fn draw(
     direction: &str,
 ) -> Result<Rendered, PeleError> {
     let size = options.font_size.unwrap_or(16.);
-    let small = (size * 0.75 + 0.5).floor();
+    let small = round(size * 0.75);
     let pad = options.padding.unwrap_or(8.);
     let show_branches = flag(config, "showBranches", true);
     let show_label = flag(config, "showCommitLabel", true);
@@ -126,7 +127,7 @@ fn draw(
         .map(|(i, n)| (n.as_str(), i))
         .collect();
     let lane_count = model.lanes.len();
-    let medium = (size * 0.875 + 0.5).floor();
+    let medium = round(size * 0.875);
     let mut names = Vec::new();
     for name in &model.lanes {
         names.push(plain_label(
@@ -185,10 +186,10 @@ fn draw(
         for tag in &view.tags {
             let w = tag_width(tag);
             if vertical {
-                tags_main = tags_main.max(tag.height);
+                tags_main = tags_main.js_max(tag.height);
                 tags_cross += w + 4.
             } else {
-                tags_main = tags_main.max(w);
+                tags_main = tags_main.js_max(w);
                 tags_cross += tag.height + 3.
             }
         }
@@ -202,7 +203,7 @@ fn draw(
                 label_cross = 6. + if vertical { label.width } else { label.height }
             }
         }
-        half[k] = 7_f64.max(tags_main / 2.).max(label_main / 2.);
+        half[k] = 7_f64.js_max(tags_main / 2.).js_max(label_main / 2.);
         tag_half[k] = tags_main / 2.;
         let tag_side = 7.
             + if !view.tags.is_empty() {
@@ -211,8 +212,8 @@ fn draw(
                 0.
             };
         let label_side = 7. + label_cross;
-        lo[view.lane] = lo[view.lane].max(if vertical { label_side } else { tag_side });
-        hi[view.lane] = hi[view.lane].max(if vertical { tag_side } else { label_side })
+        lo[view.lane] = lo[view.lane].js_max(if vertical { label_side } else { tag_side });
+        hi[view.lane] = hi[view.lane].js_max(if vertical { tag_side } else { label_side })
     }
     let mut lead = vec![0.; views.len()];
     if !vertical {
@@ -230,11 +231,13 @@ fn draw(
         }
     }
     let space = |p: usize, k: usize| {
-        44_f64.max(half[p] + half[k] + 8.).max(if lead[k] > 0. {
-            half[p] + 36. + lead[k]
-        } else {
-            0.
-        })
+        44_f64
+            .js_max(half[p] + half[k] + 8.)
+            .js_max(if lead[k] > 0. {
+                half[p] + 36. + lead[k]
+            } else {
+                0.
+            })
     };
     for k in 0..views.len() {
         if !parallel {
@@ -249,7 +252,7 @@ fn draw(
         for id in &views[k].commit.parents {
             if let Some(&p) = by_id.get(id.as_str()) {
                 if p < k {
-                    m = m.max(views[p].m + space(p, k))
+                    m = m.js_max(views[p].m + space(p, k))
                 }
             }
         }
@@ -257,7 +260,7 @@ fn draw(
     }
     let mut end = 0_f64;
     for view in &views {
-        end = end.max(view.m)
+        end = end.js_max(view.m)
     }
     let mut cross = vec![0.; lane_count];
     for i in 0..lane_count {
@@ -269,10 +272,10 @@ fn draw(
         } else {
             name.height / 2. + 2.
         };
-        lo[i] = lo[i].max(reach);
-        hi[i] = hi[i].max(reach);
+        lo[i] = lo[i].js_max(reach);
+        hi[i] = hi[i].js_max(reach);
         if i > 0 {
-            cross[i] = cross[i - 1] + 44_f64.max(hi[i - 1] + lo[i] + 8.)
+            cross[i] = cross[i - 1] + 44_f64.js_max(hi[i - 1] + lo[i] + 8.)
         }
     }
     let px = |m: f64, c: f64| if vertical { c } else { m };
@@ -370,7 +373,7 @@ fn draw(
                 let mid = (m1 + m2) / 2.;
                 d += &format!("C{} {} {}", point(mid, c1), point(mid, c2), point(m2, c2))
             } else if !merged && !busy(view.lane, m1, m2) {
-                let s = 36_f64.min(m2 - m1);
+                let s = 36_f64.js_min(m2 - m1);
                 d += &format!(
                     "C{} {} {}L{}",
                     point(m1 + s / 2., c1),
@@ -384,7 +387,7 @@ fn draw(
                 } else {
                     m2
                 };
-                let mut s = 36_f64.min(to - m1);
+                let mut s = 36_f64.js_min(to - m1);
                 let mut along = c1;
                 if !merged || busy(parent.lane, m1, m2) {
                     along = if c1 > c2 {
@@ -392,7 +395,7 @@ fn draw(
                     } else {
                         c2 - lo[view.lane] - 4.
                     };
-                    s = 36_f64.min((to - m1) / 2.);
+                    s = 36_f64.js_min((to - m1) / 2.);
                     d += &format!(
                         "C{} {} {}",
                         point(m1 + s / 2., c1),
@@ -521,7 +524,7 @@ fn draw(
     } else {
         0.
     };
-    let inner = (bounds.max_x - bounds.min_x).max(title.width);
+    let inner = (bounds.max_x - bounds.min_x).js_max(title.width);
     let width = (inner + 2. * pad).ceil();
     let height = (bounds.max_y - bounds.min_y + title_height + 2. * pad).ceil();
     let dx = pad - bounds.min_x + (inner - (bounds.max_x - bounds.min_x)) / 2.;

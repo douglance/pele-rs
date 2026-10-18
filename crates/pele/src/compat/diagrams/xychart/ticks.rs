@@ -1,4 +1,5 @@
 //! Pele xychart/ticks.ts bounded decimal tick construction, 458322a5 (MIT, kepano).
+use crate::compat::number_math::{round, NumberMath};
 // Integer decimal powers are exact conversions in the pinned JS engine. The
 // WASM libc pow implementation can differ by one ulp, changing tick text and
 // therefore margins. Parsing the decimal power preserves the same binary value
@@ -16,7 +17,7 @@ fn decimal_power(power: f64) -> f64 {
     format!("1e{}", power as i32).parse().unwrap()
 }
 pub(super) fn tick_step(span: f64, count: f64) -> f64 {
-    let raw = span / count.max(1.);
+    let raw = span / count.js_max(1.);
     let power = raw.log10().floor();
     let unit = raw / decimal_power(power);
     let factor = if unit >= 7.07 {
@@ -49,11 +50,11 @@ pub(super) fn tick_value(step: f64, index: f64) -> f64 {
     }
 }
 pub(super) fn ticks_between(lo: f64, hi: f64, step: f64) -> Vec<f64> {
-    let mut first = (tick_index(step, lo) + 0.5).floor();
+    let mut first = round(tick_index(step, lo));
     if tick_value(step, first) < lo {
         first += 1.
     }
-    let mut last = (tick_index(step, hi) + 0.5).floor();
+    let mut last = round(tick_index(step, hi));
     if tick_value(step, last) > hi {
         last -= 1.
     }

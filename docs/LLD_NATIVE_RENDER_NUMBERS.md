@@ -355,3 +355,31 @@ calendar::with_resources and current output writer; avoid another host bridge.
 Oracle owner: extractor/fixture under isolated temporary directory until root
 approves adoption. Root integrates one coherent slice and performs one consolidated
 build/verification after source freeze. No performance candidate adoption here.
+
+## All-family numeric acceptance checkpoint (2026-10-19)
+
+The corrected pinned oracle contains 1,023 cases: 33 families, baseline and each
+of five numeric settings set to NaN, positive/negative infinity, negative zero,
+0.5 and 13.25. The generator runs an owned, bounded worker per case. All cases
+return SVG in the pinned library; no native timeout or callback budget is counted
+as an oracle error. The gzip fixture SHA-256 is
+`732d7a45b958563712e12134ce283db8ed354b5c158a16aacf231b89e2be2ac8`.
+
+`public_all_render_numbers` passed all 3,069 renders through source, retained
+immutable document and public mutable document APIs. It compares complete SVG,
+dimension bits, ordered text-measurement callbacks and complete canonical mutable
+graphs before/after rendering. Independent BFS canonicalization retains genuine
+nested ClassMember prototypes; method source/minifier spelling is excluded.
+NaN arithmetic results compare as NaN; input payloads retain separate strict
+bit-pattern transport checks. Signed zero and infinities compare exactly.
+
+The fixes preserve JavaScript Math.min/Math.max/Math.round semantics at the actual
+math call sites. Conditional extrema and ternary clamps keep their different
+semantics. Positive fit-loop predicates also preserve NaN termination, preventing
+the infinite-font Treemap loop. Timeline preserves measurements of all period
+labels before all events and the original NaN fit branch.
+
+The four original `public_render_numbers` feature tests also passed, including
+exact/legacy dispatch, lazy clock behavior, source byte guards, original callback
+errors, retained state and independent native SVG output budgets. These are Rust
+proofs. New C v9, actual Swift SDK and browser acceptance remain separate gates.

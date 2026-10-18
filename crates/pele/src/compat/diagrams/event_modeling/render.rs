@@ -1,5 +1,6 @@
 //! Pele eventmodeling/render.ts, 458322a5 (MIT, kepano).
 use super::model::*;
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     diagrams::common::literal_label::{break_label, left_label_svg, literal_label},
     source::decode_entities,
@@ -17,9 +18,6 @@ use std::{
 };
 fn key<T>(v: &Arc<T>) -> usize {
     Arc::as_ptr(v) as usize
-}
-fn round(n: f64) -> f64 {
-    (n + 0.5).floor()
 }
 fn series(kind: EntityKind) -> Option<usize> {
     match kind {
@@ -83,7 +81,7 @@ fn widest(
 ) -> Result<f64, PeleError> {
     let mut width = 0_f64;
     for row in rows {
-        width = width.max(measure(r, o, row, size, style)?);
+        width = width.js_max(measure(r, o, row, size, style)?);
     }
     Ok(width)
 }
@@ -159,7 +157,7 @@ fn horizontal(
     let mut label_column = 0_f64;
     for (i, lane) in m.lanes.iter().enumerate() {
         let label = layout_label(Some(&lane.label), false, r, o, small, 4000., 1)?;
-        label_column = label_column.max(label.width);
+        label_column = label_column.js_max(label.width);
         band_of.insert(key(lane), bands.len());
         bands.push(Band {
             lane: i,
@@ -179,7 +177,7 @@ fn horizontal(
             Some(data) => hard_wrap(data, 48)?,
             None => vec![],
         };
-        let w = 96_f64.max(name.width.max(widest(&data, mono, 4, o, r)?) + 24.);
+        let w = 96_f64.js_max(name.width.js_max(widest(&data, mono, 4, o, r)?) + 24.);
         let h = 20.
             + name.height
             + if data.is_empty() {
@@ -189,15 +187,15 @@ fn horizontal(
             };
         let mut x = 0.;
         if let Some(previous) = placed.last() {
-            let stagger = previous.x + (previous.w / 2.).max(previous.w - 80.);
+            let stagger = previous.x + (previous.w / 2.).js_max(previous.w - 80.);
             x = if Arc::ptr_eq(&m.boxes[previous.index].lane, &b.lane) {
                 band.right + 16.
             } else {
-                stagger.max(band.right + 16.)
+                stagger.js_max(band.right + 16.)
             };
         }
         band.right = x + w;
-        band.h = band.h.max(h);
+        band.h = band.h.js_max(h);
         by_box.insert(key(b), placed.len());
         placed.push(Placed {
             index,
@@ -209,7 +207,9 @@ fn horizontal(
             h,
         });
     }
-    let content_right = placed.iter().fold(0_f64, |right, p| right.max(p.x + p.w));
+    let content_right = placed
+        .iter()
+        .fold(0_f64, |right, p| right.js_max(p.x + p.w));
     let lane_width = label_column + content_right + 12.;
     let title = layout_label(m.title.as_deref(), false, r, o, size, 4000., 1)?;
     let title_height = if title.height > 0. {
@@ -308,9 +308,9 @@ fn horizontal(
             head = marker("arrow_point", tx, ty, dir, 0., "var(--_l)");
         } else {
             let down = t.y > s.y;
-            let from = s.x.max(t.x);
-            let to = (s.x + s.w).min(t.x + t.w);
-            let inset = |w: f64| 24_f64.min(w / 4.);
+            let from = s.x.js_max(t.x);
+            let to = (s.x + s.w).js_min(t.x + t.w);
+            let inset = |w: f64| 24_f64.js_min(w / 4.);
             let sx = if to - from >= 16. {
                 (from + to) / 2.
             } else if t.x > s.x {
@@ -365,7 +365,7 @@ fn horizontal(
             4000.,
             1,
         )?;
-        let w = head.width.max(widest(&rows, small, 0, o, r)?) + 24.;
+        let w = head.width.js_max(widest(&rows, small, 0, o, r)?) + 24.;
         let h = 20. + head.height + rows.len() as f64 * small_step;
         let cy = bottom
             + if cards.is_empty() && bands.is_empty() {
@@ -375,7 +375,7 @@ fn horizontal(
             };
         cards+=&format!("<g class=\"pele-em-{kind}\" data-id=\"{}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"var(--pele-radius,4px)\" fill=\"var(--_bg)\" stroke=\"var(--_b)\"/>{}{}</g>",esc_text(frame)?,num(left),num(cy),num(w),num(h),label_svg(&head,left+12.+head.width/2.,cy+10.+head.height/2.,&format!(" font-size=\"{}\" font-weight=\"var(--_hw)\"",js_num(small))),lines(&rows,left+12.,cy+10.+head.height+small_step/2.+small*0.35,small_step,&format!(" font-size=\"{}\"",js_num(small))));
         bottom = cy + h;
-        cards_right = cards_right.max(w);
+        cards_right = cards_right.js_max(w);
         Ok(())
     };
     for note in &m.notes {
@@ -392,8 +392,8 @@ fn horizontal(
         card("specification", "Given / When / Then", &spec.frame, rows)?;
     }
     let width = (if bands.is_empty() { 0. } else { lane_width })
-        .max(cards_right)
-        .max(title.width);
+        .js_max(cards_right)
+        .js_max(title.width);
     let total_width = (width + 2. * pad).ceil();
     let total_height = (bottom + pad).ceil();
     let content = format!(
@@ -444,7 +444,7 @@ fn vertical(
     let small = round(size * 0.875);
     let mono = round(size * 0.75);
     let pad = o.padding.unwrap_or(8.);
-    let room = 160_f64.max(o.max_width.unwrap_or(320.) - 2. * pad);
+    let room = 160_f64.js_max(o.max_width.unwrap_or(320.) - 2. * pad);
     let order = m
         .boxes
         .iter()
@@ -492,8 +492,8 @@ fn vertical(
         }
         rail_of.insert(target, rail);
     }
-    let gutter = 24. + 8. * (rail_ends.len() as f64 - 1.).max(0.);
-    let card_width = 120_f64.max(room - gutter);
+    let gutter = 24. + 8. * (rail_ends.len() as f64 - 1.).js_max(0.);
+    let card_width = 120_f64.js_max(room - gutter);
     let text_room = card_width - 24.;
     let title = layout_label(m.title.as_deref(), false, r, o, size, room, 1)?;
     let mut y = pad
@@ -503,7 +503,7 @@ fn vertical(
             0.
         };
     let mut bottom = pad + title.height;
-    let mut width = title.width.max(card_width + gutter);
+    let mut width = title.width.js_max(card_width + gutter);
     let mut nodes = String::new();
     let mut edges = String::new();
     let mut cards = String::new();
@@ -530,9 +530,9 @@ fn vertical(
             None
         };
         let w = card_width
-            .max(lane.width + 24.)
-            .max(name.width + 24. + 36.)
-            .max(data.as_ref().map_or(0., |d| d.width) + 24.);
+            .js_max(lane.width + 24.)
+            .js_max(name.width + 24. + 36.)
+            .js_max(data.as_ref().map_or(0., |d| d.width) + 24.);
         let head_h = lane.height + 12.;
         let h = 20. + name.height + data.as_ref().map_or(0., |d| d.height + 6.);
         let cy = y + head_h;
@@ -567,7 +567,7 @@ fn vertical(
             index,
             lane: lane.width,
         });
-        width = width.max(w + gutter);
+        width = width.js_max(w + gutter);
         bottom = cy + h;
         y = bottom + 28.;
     }
@@ -589,7 +589,8 @@ fn vertical(
         let ty = if down { t.y } else { t.y + t.h };
         let (d, head);
         if s.index.abs_diff(t.index) == 1 {
-            let cx = pad + (s.w.min(t.w) / 2.).max(12. + if down { t.lane } else { s.lane } + 16.);
+            let cx =
+                pad + (s.w.js_min(t.w) / 2.).js_max(12. + if down { t.lane } else { s.lane } + 16.);
             d = format!(
                 "M{},{}V{}",
                 num(cx),
@@ -629,12 +630,12 @@ fn vertical(
             1,
         )?;
         let body = literal_label(&decode_entities(raw)?, r, o, small, text_room, 0)?;
-        let w = card_width.max(head.width + 24.).max(body.width + 24.);
+        let w = card_width.js_max(head.width + 24.).js_max(body.width + 24.);
         let h = 20. + head.height + body.height;
         cards+=&format!("<g class=\"pele-em-{kind}\" data-id=\"{}\"><rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"var(--pele-radius,4px)\" fill=\"var(--_bg)\" stroke=\"var(--_b)\"/>{}{}</g>",esc_text(frame)?,num(pad),num(y),num(w),num(h),label_svg(&head,pad+12.+head.width/2.,y+10.+head.height/2.,&format!(" font-size=\"{}\" font-weight=\"var(--_hw)\"",js_num(small))),lines(&label_lines(&body),pad+12.,y+10.+head.height+body.line_height/2.+small*0.35,body.line_height,&format!(" font-size=\"{}\"",js_num(small))));
         bottom = y + h;
         y = bottom + 8.;
-        width = width.max(w);
+        width = width.js_max(w);
         Ok(())
     };
     for note in &m.notes {

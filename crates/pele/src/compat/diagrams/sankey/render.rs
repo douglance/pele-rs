@@ -4,6 +4,7 @@ use super::{
     layout::{self, max, min, Alignment, Options},
     SankeyModel,
 };
+use crate::compat::number_math::round;
 use crate::compat::{
     svg::{self, edges::theme::resolve_style, esc, esc_text, js_num, label_svg, num, series_color},
     text::{layout_label, measure},
@@ -30,7 +31,7 @@ fn text(conf: &Object, key: &str) -> String {
 }
 fn rounded(n: f64) -> f64 {
     if n.abs() < 1e15 {
-        (n * 100. + 0.5).floor() / 100.
+        round(n * 100.) / 100.
     } else {
         n
     }
@@ -64,7 +65,7 @@ pub(super) fn render(
     let mut plot = natural;
     result = draw(m, conf, o, r, plot)?;
     for _ in 0..3 {
-        if result.width <= available || plot <= floor {
+        if !(result.width > available && plot > floor) {
             break;
         }
         plot = max(floor, plot - (result.width - available));
@@ -80,7 +81,7 @@ fn draw(
     chart_width: f64,
 ) -> Result<Rendered, PeleError> {
     let size = o.font_size.unwrap_or(16.);
-    let small = (size * 0.875 + 0.5).floor();
+    let small = round(size * 0.875);
     let pad = o.padding.unwrap_or(8.);
     let chart_height = number(c, "height", 400., 1., 10000.);
     let node_width = min(number(c, "nodeWidth", 10., 1., 200.), chart_width);

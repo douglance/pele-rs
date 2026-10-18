@@ -1,5 +1,6 @@
 //! Dedicated TreeView row/guide renderer, Pele treeview/render.ts, 458322a5 (MIT).
 use super::{icons, NodeType, TreeViewModel};
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     diagrams::common::literal_label::{left_label_svg, literal_label},
     source::{decode_entities, space},
@@ -78,15 +79,15 @@ fn draw(
     }
     let step = if tight {
         (row_indent + padding_x)
-            .min(2_f64.max((o.max_width.unwrap_or(320.) - 120.) / max_depth.max(1) as f64))
+            .js_min(2_f64.js_max((o.max_width.unwrap_or(320.) - 120.) / max_depth.max(1) as f64))
     } else {
         row_indent + padding_x
     };
-    let row_height = (size * 1.5 + 0.5).floor() + 2. * padding_y;
+    let row_height = round(size * 1.5) + 2. * padding_y;
     let room = if tight {
         o.max_width
             .filter(|v| *v > 0.)
-            .map_or(4000., |v| 80_f64.max(v - 2. * pad))
+            .map_or(4000., |v| 80_f64.js_max(v - 2. * pad))
     } else {
         4000.
     };
@@ -116,7 +117,7 @@ fn draw(
         let x = depth as f64 * step;
         let text = decode_entities(&node.name)?;
         let label_x = x + if slot { size + 6. } else { 0. };
-        let room = 40_f64.max(o.max_width.unwrap_or(320.) - 2. * pad - 8. - label_x);
+        let room = 40_f64.js_max(o.max_width.unwrap_or(320.) - 2. * pad - 8. - label_x);
         let label = if tight {
             Some(literal_label(
                 &text,
@@ -169,14 +170,15 @@ fn draw(
         }
         let label_height = label.as_ref().map_or(0., |l| l.height);
         let height = if tight {
-            row_height
-                .max(label_height + description.as_ref().map_or(0., |l| l.height) + 2. * padding_y)
+            row_height.js_max(
+                label_height + description.as_ref().map_or(0., |l| l.height) + 2. * padding_y,
+            )
         } else {
             row_height
         };
         let cy = rows_height
             + if tight {
-                padding_y + size.max(label_height) / 2.
+                padding_y + size.js_max(label_height) / 2.
             } else {
                 height / 2.
             };
@@ -213,9 +215,9 @@ fn draw(
         } else {
             measure(r, o, &decode_entities(description)?, size, 2)?
         };
-        width = width.max(if tight { row.label_x } else { desc_x } + w);
+        width = width.js_max(if tight { row.label_x } else { desc_x } + w);
     }
-    width = width.max(title.width);
+    width = width.js_max(title.width);
     let inset = pad + if any_highlight { 4. } else { 0. };
     let top = pad + title_height;
     let total_width = (width + 2. * inset).ceil();
@@ -227,9 +229,9 @@ fn draw(
             continue;
         }
         let gx = inset + row.x + 7.;
-        let tick = gx.max(inset + row.x + step - padding_x);
+        let tick = gx.js_max(inset + row.x + step - padding_x);
         let last = top + rows[row_of[*children.last().unwrap()]].cy;
-        let radius = 4_f64.min(tick - gx);
+        let radius = 4_f64.js_min(tick - gx);
         let mut d = format!(
             "M{},{}V{}",
             num(gx),

@@ -1,6 +1,7 @@
 //! Pele kanban/render.ts, 458322a5 (MIT, kepano).
 use super::super::common::icon::icon_svg;
 use super::{KanbanModel, KanbanNode};
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     source::{
         space,
@@ -41,7 +42,7 @@ fn fit(
     ) {
         lines.push(std::mem::take(line));
         widths.push(*width);
-        *widest = widest.max(*width);
+        *widest = widest.js_max(*width);
         *width = 0.;
     }
     for (i, original) in label.lines.iter().enumerate() {
@@ -162,9 +163,9 @@ pub(super) fn render(
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
     let size = o.font_size.unwrap_or(16.);
-    let small = (size * 0.875 + 0.5).floor();
-    let line = (size * 1.5 + 0.5).floor();
-    let small_line = (small * 1.5 + 0.5).floor();
+    let small = round(size * 0.875);
+    let line = round(size * 1.5);
+    let small_line = round(small * 1.5);
     let pad = o.padding.unwrap_or(8.);
     let conf = c.get("kanban").and_then(Value::as_object);
     let own = match conf.and_then(|c| c.get("sectionWidth")) {
@@ -177,16 +178,19 @@ pub(super) fn render(
         .map_or(f64::INFINITY, |n| n - 2. * pad);
     let count = m.sections.len();
     let fits = count as f64 * (own + 12.) - 12. <= room;
+    // Keep NaN as a number: JavaScript does not coerce this row count to an
+    // integer. In that case one empty row is accumulated and indexed row
+    // lookups later yield undefined (formatted numerically as NaN).
     let per_row = if fits {
-        count.max(1)
+        (count as f64).js_max(1.)
     } else {
-        (((room + 12.) / (own + 12.)).floor().max(1.)) as usize
+        ((room + 12.) / (own + 12.)).floor().js_max(1.)
     };
     let column_width = if fits {
         own
     } else {
-        own.min(room)
-            .max((((room + 12.) / per_row as f64).floor() - 12.).min(own * 2.))
+        own.js_min(room)
+            .js_max((((room + 12.) / per_row).floor() - 12.).js_min(own * 2.))
     };
     let base_url = match conf.and_then(|c| c.get("ticketBaseUrl")) {
         Some(Value::String(s)) => s.as_str(),
@@ -219,7 +223,7 @@ pub(super) fn render(
             card_width - 8. - reserved,
             1,
         )?;
-        head_height = head_height.max(title.height);
+        head_height = head_height.js_max(title.height);
         count_widths.push(count_width);
         titles.push(title);
         let mut list = Vec::new();
@@ -244,10 +248,15 @@ pub(super) fn render(
             let meta = if ticket.width + assigned.width + 8. > text_width {
                 ticket.height + assigned.height
             } else {
-                ticket.height.max(assigned.height)
+                ticket.height.js_max(assigned.height)
             };
-            let card_height =
-                20. + label.height.max(small_line) + if meta != 0. { 4. + meta } else { 0. };
+            let card_height = 20.
+                + label.height.js_max(small_line)
+                + if meta != 0. && !meta.is_nan() {
+                    4. + meta
+                } else {
+                    0.
+                };
             list.push(Card {
                 item,
                 label,
@@ -265,14 +274,19 @@ pub(super) fn render(
     let mut row_heights = Vec::new();
     let mut row_tops = Vec::new();
     let mut y = 0.;
-    for first in (0..count).step_by(per_row) {
-        let tallest = body_heights[first..(first + per_row).min(count)]
-            .iter()
-            .copied()
-            .fold(8., f64::max);
+    let mut first = 0.;
+    while first < count as f64 {
+        let mut tallest = 8_f64;
+        let end = (first + per_row).js_min(count as f64);
+        let mut index = first;
+        while index < end {
+            tallest = tallest.js_max(body_heights[index as usize]);
+            index += 1.;
+        }
         row_tops.push(y);
         row_heights.push(head_height + tallest);
-        y += head_height + tallest + 12.
+        y += head_height + tallest + 12.;
+        first += per_row;
     }
     let board_height = row_tops
         .last()
@@ -281,24 +295,34 @@ pub(super) fn render(
     let title_room = o
         .max_width
         .filter(|n| *n > 0.)
-        .map_or(4000., |n| (n - 2. * pad).max(80.));
+        .map_or(4000., |n| (n - 2. * pad).js_max(80.));
     let title = layout_label(m.title.as_deref(), false, r, o, size, title_room, 1)?;
     let title_height = if title.height > 0. {
         title.height + 16.
     } else {
         0.
     };
-    let board_width = (count.min(per_row) as f64 * (column_width + 12.) - 12.).max(0.);
-    let width = board_width.max(title.width);
+    let board_width = ((count as f64).js_min(per_row) * (column_width + 12.) - 12.).js_max(0.);
+    let width = board_width.js_max(title.width);
     let left = pad + (width - board_width) / 2.;
     let edge = column_width - 12.;
     let mut out = String::new();
     for (index, section) in m.sections.iter().enumerate() {
-        let row = index / per_row;
+        let row = (index as f64 / per_row).floor();
+        let row_height = if row.is_nan() {
+            f64::NAN
+        } else {
+            row_heights.get(row as usize).copied().unwrap_or(f64::NAN)
+        };
+        let row_top = if row.is_nan() {
+            f64::NAN
+        } else {
+            row_tops.get(row as usize).copied().unwrap_or(f64::NAN)
+        };
         let mut body = format!(
             "<rect width=\"{}\" height=\"{}\" rx=\"{RADIUS}\" fill=\"var(--_s)\"/>{}<text class=\"pele-count\" x=\"{}\" y=\"{}\" text-anchor=\"end\" font-size=\"{}\" fill=\"var(--_m)\">{}</text>",
             js_num(column_width),
-            num(row_heights[row]),
+            num(row_height),
             text_block(
                 &titles[index],
                 12.,
@@ -413,7 +437,7 @@ pub(super) fn render(
             body.push_str(&format!("<g class=\"pele-node pele-card{}{}\" data-id=\"{}\" transform=\"translate(8,{})\" font-size=\"{}\">{inner}</g>",if color.is_some(){format!(" pele-priority-{}",priority.replacen(' ',"-",1))}else{String::new()},class_names(item.css_classes.as_deref().unwrap_or("")),esc_text(&item.id)?,num(y),js_num(small)));
             y += card.height + 8.;
         }
-        out.push_str(&format!("<g class=\"pele-cluster pele-column{}\" data-id=\"{}\" transform=\"translate({},{})\">{body}</g>",class_names(section.node.css_classes.as_deref().unwrap_or("")),esc_text(&section.node.id)?,num(left+(index%per_row)as f64*(column_width+12.)),num(pad+title_height+row_tops[row])));
+        out.push_str(&format!("<g class=\"pele-cluster pele-column{}\" data-id=\"{}\" transform=\"translate({},{})\">{body}</g>",class_names(section.node.css_classes.as_deref().unwrap_or("")),esc_text(&section.node.id)?,num(left+(index as f64%per_row)*(column_width+12.)),num(pad+title_height+row_top)));
     }
     let total_width = (width + 2. * pad).ceil();
     let total_height = (board_height + title_height + 2. * pad).ceil();

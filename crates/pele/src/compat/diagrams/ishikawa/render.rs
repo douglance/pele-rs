@@ -1,14 +1,12 @@
 //! Actual fishbone rows/twigs and narrow outline layout, Pele ishikawa/render.ts (MIT).
 use super::IshikawaModel;
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     diagrams::common::literal_label::break_label,
     svg::{document, edges::marker, esc_text, js_num, label_svg, num},
     text::{layout_label, Label},
     PeleError, RenderResources, RenderSettings, Rendered,
 };
-fn round(n: f64) -> f64 {
-    (n + 0.5).floor()
-}
 struct Bone {
     label: Label,
     depth: usize,
@@ -85,7 +83,7 @@ fn arrange(
     }
     let mut rise = 14.;
     for index in rows {
-        let height = bones[index].label.height.max(line_height) + 6.;
+        let height = bones[index].label.height.js_max(line_height) + 6.;
         bones[index].rise = rise + height / 2.;
         rise += height;
     }
@@ -109,7 +107,7 @@ fn arrange(
         };
         bones[i].at = at;
         bones[i].text_end = text_end;
-        reach = reach.max(bones[i].label.width - text_end);
+        reach = reach.js_max(bones[i].label.width - text_end);
     }
     let box_h = label.height + 10.;
     Ok(Category {
@@ -162,7 +160,7 @@ fn horizontal(
     let (mut min_x, mut max_x, mut min_y, mut max_y) = (0_f64, 0_f64, 0_f64, 0_f64);
     if let Some(root) = m.root {
         let head = layout_label(Some(&m.nodes[root].text), false, r, o, size, 200., 1)?;
-        let head_h = (head.height + 24.).max(48.);
+        let head_h = (head.height + 24.).js_max(48.);
         let head_w = head.width + 24. + head_h / 2.;
         let mut categories = m.nodes[root]
             .children
@@ -171,7 +169,7 @@ fn horizontal(
             .map(|(i, &node)| arrange(node, i % 2 == 0, m, o, r, size, small))
             .collect::<Result<Vec<_>, _>>()?;
         for c in &mut categories {
-            c.rise = c.rise.max(head_h / 2. + 14.);
+            c.rise = c.rise.js_max(head_h / 2. + 14.);
         }
         let mut xs = vec![];
         let mut x = -34.;
@@ -181,7 +179,7 @@ fn horizontal(
                 for side in 0..2 {
                     if let Some(before) = categories.get(i - 2 + side) {
                         let next = categories.get(i + side);
-                        room = room.max(before.reach + next.map_or(0., |next| next.box_w / 2.));
+                        room = room.js_max(before.reach + next.map_or(0., |next| next.box_w / 2.));
                     }
                 }
                 x -= room + 26.;
@@ -240,19 +238,19 @@ fn horizontal(
                         ""
                     },
                 );
-                min_x = min_x.min(right - bone.label.width);
+                min_x = min_x.js_min(right - bone.label.width);
             }
             let box_y = end_y + sign * (c.box_h / 2.);
-            min_x = min_x.min(end_x - c.box_w / 2.);
-            max_x = max_x.max(end_x + c.box_w / 2.);
-            min_y = min_y.min(box_y - c.box_h / 2.);
-            max_y = max_y.max(box_y + c.box_h / 2.);
+            min_x = min_x.js_min(end_x - c.box_w / 2.);
+            max_x = max_x.js_max(end_x + c.box_w / 2.);
+            min_y = min_y.js_min(box_y - c.box_h / 2.);
+            max_y = max_y.js_max(box_y + c.box_h / 2.);
             groups+=&format!("<g class=\"pele-ishikawa-category\" data-id=\"{}\"><path class=\"pele-ishikawa-bones\" d=\"{d}\" fill=\"none\" stroke=\"var(--_l)\"/>{}<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"var(--pele-radius,4px)\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/>{}{}</g>",esc_text(&m.nodes[c.node].text)?,marker("arrow_point",ax,0.,0.5/length,-sign/length,"var(--_l)"),num(end_x-c.box_w/2.),num(box_y-c.box_h/2.),num(c.box_w),num(c.box_h),label_svg(&c.label,end_x,box_y," class=\"pele-label\""),if texts.is_empty(){String::new()}else{format!("<g class=\"pele-ishikawa-causes\" font-size=\"{}\">{texts}</g>",js_num(small))});
         }
         let radius = head_h / 2.;
         body=format!("<path class=\"pele-ishikawa-spine\" d=\"M{},0H-7\" fill=\"none\" stroke=\"var(--_l)\"/>{}{groups}<g class=\"pele-ishikawa-head\" data-id=\"{}\"><path d=\"M0,{}H{}A{},{} 0 0 1 {},{}H0Z\" fill=\"var(--_s)\" stroke=\"var(--_b)\" stroke-linejoin=\"round\"/>{}</g>",num(tail),marker("arrow_point",0.,0.,1.,0.,"var(--_l)"),esc_text(&m.nodes[root].text)?,num(-radius),num(head_w-radius),num(radius),num(radius),num(head_w-radius),num(radius),label_svg(&head,12.+head.width/2.,0.," class=\"pele-label\" font-weight=\"var(--_hw)\""));
     }
-    let inner = (max_x - min_x).max(title.width);
+    let inner = (max_x - min_x).js_max(title.width);
     let width = (inner + 2. * pad).ceil();
     let height = (max_y - min_y + title_height + 2. * pad).ceil();
     let ox = pad + (inner - (max_x - min_x)) / 2. - min_x;
@@ -299,11 +297,11 @@ fn vertical(
     let size = o.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
     let pad = o.padding.unwrap_or(8.);
-    let room = 140_f64.max(o.max_width.unwrap_or(320.) - 2. * pad);
+    let room = 140_f64.js_max(o.max_width.unwrap_or(320.) - 2. * pad);
     let title_room = o
         .max_width
         .filter(|w| *w > 0.)
-        .map_or(4000., |w| 80_f64.max(w - 2. * pad));
+        .map_or(4000., |w| 80_f64.js_max(w - 2. * pad));
     let title = layout_label(m.title.as_deref(), false, r, o, size, title_room, 1)?;
     let mut order = vec![];
     let mut pending = m.root.map_or(vec![], |node| vec![(node, 0usize, None)]);
@@ -324,7 +322,7 @@ fn vertical(
             pending.push((child, depth + 1, Some(index)));
         }
     }
-    let indent = 20_f64.min(2_f64.max((room - 120.) / max_depth.max(1) as f64));
+    let indent = 20_f64.js_min(2_f64.js_max((room - 120.) / max_depth.max(1) as f64));
     let mut y = pad
         + if title.height != 0. {
             title.height + 12.
@@ -337,7 +335,7 @@ fn vertical(
     for i in 0..order.len() {
         let entry = &mut order[i];
         entry.x = pad + entry.depth as f64 * indent;
-        let label_room = 60_f64.max(room - entry.depth as f64 * indent - 20.);
+        let label_room = 60_f64.js_max(room - entry.depth as f64 * indent - 20.);
         let label = layout_label(
             Some(&m.nodes[entry.node].text),
             false,
@@ -352,7 +350,7 @@ fn vertical(
         entry.h = label.height + 12.;
         entry.y = y;
         y += entry.h + 12.;
-        width = width.max(entry.x - pad + entry.w);
+        width = width.js_max(entry.x - pad + entry.w);
         let shape = if entry.depth < 2 {
             format!("<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{}\" fill=\"var(--_s)\" stroke=\"var(--_b)\"/>",num(entry.x),num(entry.y),num(entry.w),num(entry.h),if entry.depth==0{12}else{4})
         } else {
@@ -401,7 +399,7 @@ fn vertical(
         }
     }
     let total_width = (width + 2. * pad).ceil();
-    let height = ((pad + title.height).max(y - 12.) + pad).ceil();
+    let height = ((pad + title.height).js_max(y - 12.) + pad).ceil();
     let content = format!(
         "{}{edges}{nodes}",
         label_svg(

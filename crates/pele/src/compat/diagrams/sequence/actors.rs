@@ -1,4 +1,5 @@
 //! Pele sequence/actors.ts participant shape geometry, 458322a5 (MIT, kepano).
+use crate::compat::number_math::NumberMath;
 use crate::compat::{
     svg::{label_svg_with_resources, num},
     text::Label,
@@ -44,7 +45,7 @@ pub(super) fn actor_size(
 ) -> ActorSize {
     if is_figure(kind) {
         ActorSize {
-            w: 40_f64.max(label.width + 8.),
+            w: 40_f64.js_max(label.width + 8.),
             h: 34.
                 + if label.height > 0. {
                     4. + label.height
@@ -61,8 +62,8 @@ pub(super) fn actor_size(
             0.
         };
         ActorSize {
-            w: min_w.max(label.width + 2. * padding_x) + extra,
-            h: min_h.max(label.height + 20.) + if kind == "collections" { 5. } else { 0. },
+            w: min_w.js_max(label.width + 2. * padding_x) + extra,
+            h: min_h.js_max(label.height + 20.) + if kind == "collections" { 5. } else { 0. },
         }
     }
 }

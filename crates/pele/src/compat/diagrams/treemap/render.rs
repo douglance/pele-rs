@@ -1,5 +1,6 @@
 //! Pele treemap/render.ts and common/fit-text.ts, 458322a5 (MIT, kepano).
 use super::{format::Formatter, layout, TreemapModel};
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     source::{decode_entities, space},
     svg::{
@@ -12,7 +13,7 @@ use crate::compat::{
 };
 fn option(c: Option<&Object>, key: &str, fallback: f64, min: f64, max: f64) -> f64 {
     match c.and_then(|c| c.get(key)) {
-        Some(Value::Number(n)) if *n >= min => n.min(max),
+        Some(Value::Number(n)) if *n >= min => n.js_min(max),
         _ => fallback,
     }
 }
@@ -32,7 +33,7 @@ fn fitted(
     if width <= max {
         return Ok(Some((text.into(), size)));
     }
-    let mut fitted = min.max((size * max / width).floor());
+    let mut fitted = min.js_max((size * max / width).floor());
     while fitted >= min {
         width = measure(r, o, text, fitted, style)?;
         if width <= max {
@@ -78,7 +79,6 @@ pub(super) fn render(
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
     let size = o.font_size.unwrap_or(16.);
-    let round = |n: f64| (n + 0.5).floor();
     let small = round(size * 0.875);
     let tiny = round(size * 0.75);
     let least = round(size * 0.5625);
@@ -91,7 +91,9 @@ pub(super) fn render(
         .unwrap_or_else(|| option(conf, "diagramPadding", 8., 0., 2000.));
     let natural = option(conf, "nodeWidth", 64., 1., 400.) * 10.;
     let width = round(if let Some(available) = o.max_width.filter(|v| *v > 0.) {
-        natural.min(available - 2. * pad).max(200_f64.min(natural))
+        natural
+            .js_min(available - 2. * pad)
+            .js_max(200_f64.js_min(natural))
     } else {
         natural
     });
@@ -111,14 +113,14 @@ pub(super) fn render(
     let room = o
         .max_width
         .filter(|v| *v > 0.)
-        .map_or(4000., |v| 80_f64.max(v - 2. * o.padding.unwrap_or(8.)));
+        .map_or(4000., |v| 80_f64.js_max(v - 2. * o.padding.unwrap_or(8.)));
     let title = layout_label(m.title.as_deref(), false, r, o, size, room, 1)?;
     let title_height = if title.height > 0. {
         title.height + 8.
     } else {
         0.
     };
-    let left = pad + 0_f64.max((title.width - width) / 2.);
+    let left = pad + 0_f64.js_max((title.width - width) / 2.);
     let top = pad + title_height;
     let (mut sections, mut leaves) = (String::new(), String::new());
     for b in boxes {
@@ -195,7 +197,7 @@ pub(super) fn render(
         }
         let mut text = String::new();
         let room = b.w - 8.;
-        let tallest = size.min(((b.h - 4.) / 1.25).floor());
+        let tallest = size.js_min(((b.h - 4.) / 1.25).floor());
         let label = if tallest >= least {
             fitted(name, room, tallest, least, 0, r, o)?
         } else {
@@ -204,7 +206,7 @@ pub(super) fn render(
         if let Some((label, label_size)) = label {
             let cx = num(x + b.w / 2.);
             let cy = y + b.h / 2.;
-            let value_size = least.max(round(label_size * 0.8));
+            let value_size = least.js_max(round(label_size * 0.8));
             let lines = (label_size + value_size) * 1.25;
             if !value.is_empty()
                 && lines <= b.h - 4.
@@ -228,7 +230,7 @@ pub(super) fn render(
             style.shape
         ));
     }
-    let total_width = (width.max(title.width) + 2. * pad).ceil();
+    let total_width = (width.js_max(title.width) + 2. * pad).ceil();
     let total_height = (height + title_height + 2. * pad).ceil();
     let content = format!(
         "{}{}{}",

@@ -5,6 +5,7 @@ use super::{
     markers,
     model::*,
 };
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     layout::{
         compound::{compound_layout, direction, CEdge, CNode, Dir},
@@ -78,7 +79,7 @@ struct End {
 }
 fn number(conf: &Object, key: &str, fallback: f64) -> f64 {
     match conf.get(key) {
-        Some(Value::Number(n)) if *n > 0. => n.min(2000.),
+        Some(Value::Number(n)) if *n > 0. => n.js_min(2000.),
         _ => fallback,
     }
 }
@@ -178,8 +179,8 @@ fn class_view(
 ) -> Result<View, PeleError> {
     let style = cache.resolve(db, cls);
     let font_size = style.font_size.unwrap_or(size);
-    let member_size = (font_size * 0.875 + 0.5).floor();
-    let line_height = (member_size * 1.5 + 0.5).floor();
+    let member_size = round(font_size * 0.875);
+    let line_height = round(member_size * 1.5);
     let generic = if cls.generic.is_empty() {
         String::new()
     } else {
@@ -221,10 +222,10 @@ fn class_view(
         .collect::<Result<Vec<_>, _>>()?;
     let mut inner = label.width;
     for a in &annotations {
-        inner = inner.max(measure(r, o, a, tiny, 0)?)
+        inner = inner.js_max(measure(r, o, a, tiny, 0)?)
     }
     for l in attributes.iter().chain(&methods) {
-        inner = inner.max(l.width)
+        inner = inner.js_max(l.width)
     }
     let sections = !(hide_empty && attributes.is_empty() && methods.is_empty());
     let section = |count: usize| {
@@ -237,14 +238,14 @@ fn class_view(
         }
     };
     let title_h =
-        16. + annotations.len() as f64 * tiny_h + label.height.max((font_size * 1.5 + 0.5).floor());
+        16. + annotations.len() as f64 * tiny_h + label.height.js_max(round(font_size * 1.5));
     let attributes_h = section(attributes.len());
     let h = title_h + attributes_h + section(methods.len());
     Ok(View {
         node,
         style,
         label,
-        w: (inner + 24.).max(64.),
+        w: (inner + 24.).js_max(64.),
         h,
         annotations,
         attributes,
@@ -386,9 +387,9 @@ fn draw(
     );
     let hide_empty = conf.get("hideEmptyMembersBox") == Some(&Value::Bool(true));
     let size = o.font_size.unwrap_or(16.);
-    let small = (size * 0.875 + 0.5).floor();
-    let tiny = (size * 0.8 + 0.5).floor();
-    let tiny_h = (tiny * 1.4 + 0.5).floor();
+    let small = round(size * 0.875);
+    let tiny = round(size * 0.8);
+    let tiny_h = round(tiny * 1.4);
     let pad = o.padding.unwrap_or(8.);
     let root_dir = if turned {
         Dir::TB
@@ -440,12 +441,12 @@ fn draw(
                 cn.pad_bottom = 20.;
                 cn.min_w = view.label.width + 40. - 12.
                     + if crossed[i] && !tight {
-                        (view.label.width + 24.).min(240.)
+                        (view.label.width + 24.).js_min(240.)
                     } else {
                         0.
                     };
             } else {
-                view.w = (view.label.width + 40.).max(80.);
+                view.w = (view.label.width + 40.).js_max(80.);
                 view.h = view.label.height + 40.;
                 cn = CNode::new(view.w, view.h, -1)
             }
@@ -465,14 +466,14 @@ fn draw(
             cn = CNode::new(view.w, view.h, -1)
         } else if node.shape == "note" {
             let label = layout_label(Some(&node.label), true, r, o, small, 260., 0)?;
-            let w = (label.width + 24.).max(40.);
+            let w = (label.width + 24.).js_max(40.);
             let h = label.height + 16.;
             view = View::base(node, label, w, h, small);
             cn = CNode::new(w, h, -1)
         } else {
             let label = layout_label(Some(&node.label), false, r, o, small, 200., 0)?;
-            let w = label.width.max(12.) + 4.;
-            let h = label.height.max(12.);
+            let w = label.width.js_max(12.) + 4.;
+            let h = label.height.js_max(12.);
             view = View::base(node, label, w, h, small);
             cn = CNode::new(w, h, -1)
         }
@@ -515,7 +516,9 @@ fn draw(
         } else {
             for (item, slot, room) in [(src, 0, sw), (dst, 2, ew)] {
                 crowd[item * 4 + slot] += 1.;
-                crowd[item * 4 + slot + 1] = crowd[item * 4 + slot + 1].max(room)
+                if room > crowd[item * 4 + slot + 1] {
+                    crowd[item * 4 + slot + 1] = room;
+                }
             }
         }
         start_room.push(sw);
@@ -551,10 +554,11 @@ fn draw(
                 let count = crowd[i * 4 + slot];
                 let room = crowd[i * 4 + slot + 1];
                 if count > 1. {
-                    need = need.max((count - 1.) * if room > 0. { room + 24. } else { 14. } + 24.)
+                    need =
+                        need.js_max((count - 1.) * if room > 0. { room + 24. } else { 14. } + 24.)
                 }
             }
-            need = need.min(480.);
+            need = need.js_min(480.);
             if need > views[i].w {
                 cnodes[i].w += need - views[i].w;
                 views[i].w = need
@@ -665,7 +669,7 @@ fn draw(
             gaps[j] = gap;
             total += gap
         }
-        let scale = ((length - 24.) / total).min(1.);
+        let scale = ((length - 24.) / total).js_min(1.);
         if scale <= 0. {
             continue;
         }
@@ -722,7 +726,7 @@ fn draw(
                 at - 3 + 1 - across
             }] - ce.route[along])
                 .abs();
-            let length = if across != 0 { room + 10. } else { tiny_h + 6. }.min(reach * 0.35);
+            let length = if across != 0 { room + 10. } else { tiny_h + 6. }.js_min(reach * 0.35);
             if length < 4. {
                 continue;
             }
@@ -747,10 +751,10 @@ fn draw(
                 cy += if side == 0 { -1. } else { 1. } * (3. + tiny_h / 2.)
             }
             cards.push((decode_entities(raw)?, cx, cy));
-            min_x = min_x.min(cx - width / 2.);
-            max_x = max_x.max(cx + width / 2.);
-            min_y = min_y.min(cy - tiny_h / 2.);
-            max_y = max_y.max(cy + tiny_h / 2.);
+            min_x = min_x.js_min(cx - width / 2.);
+            max_x = max_x.js_max(cx + width / 2.);
+            min_y = min_y.js_min(cy - tiny_h / 2.);
+            max_y = max_y.js_max(cy + tiny_h / 2.);
             Ok(())
         };
     let mut loop_seen: HashMap<usize, usize> = HashMap::new();
@@ -764,7 +768,7 @@ fn draw(
             let c = &cnodes[ce.src];
             let v = &views[ce.src];
             let x = c.x + v.w / 2.;
-            let spread = (v.h / 2. - 4.).min(8. + k as f64 * 6.);
+            let spread = (v.h / 2. - 4.).js_min(8. + k as f64 * 6.);
             card(
                 &e.start_label_right,
                 start_room[i],
@@ -883,7 +887,7 @@ fn draw(
             let k = loop_at[i] as f64;
             let x = c.x + ox + v.w / 2.;
             let y = c.y + oy;
-            let spread = (v.h / 2. - 4.).min(8. + k * 6.);
+            let spread = (v.h / 2. - 4.).js_min(8. + k * 6.);
             let reach = 26. + k * 8.;
             path = EdgePath {
                 d: format!(
@@ -980,7 +984,7 @@ fn draw(
     let title = layout_label(db.title.as_deref(), false, r, o, size, 4000., 1)?;
     if title.height > 0. {
         let shift = title.height + 12.;
-        let full = width.max((title.width + 2. * pad).ceil());
+        let full = width.js_max((title.width + 2. * pad).ceil());
         content = format!(
             "{}<g transform=\"translate({},{})\">{content}</g>",
             label_svg_with_resources(
@@ -1030,8 +1034,8 @@ fn class_svg(
     let style = &v.style;
     let left = -w / 2.;
     let top = -h / 2.;
-    let member_size = (v.font_size * 0.875 + 0.5).floor();
-    let line_h = (member_size * 1.5 + 0.5).floor();
+    let member_size = round(v.font_size * 0.875);
+    let line_h = round(member_size * 1.5);
     let mut body=format!("<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" rx=\"{RADIUS}\" fill=\"var(--_s)\" stroke=\"var(--_b)\"{}/>",num(left),num(top),num(w),num(h),style.shape);
     let first = top + v.title_h;
     let second = first + v.attributes_h;

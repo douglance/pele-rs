@@ -5,6 +5,7 @@ use super::{
     markers::{marker, MARKER_LENGTH},
     model::ErModel,
 };
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     layout::{
         compound::{compound_layout, direction, shift_layout, CEdge, CNode, Dir},
@@ -60,16 +61,13 @@ struct Loop {
     band: f64,
     at: f64,
 }
-fn round(v: f64) -> f64 {
-    (v + 0.5).floor()
-}
 fn number_option(config: &Object, key: &str, fallback: f64) -> f64 {
     match config
         .get("er")
         .and_then(Value::as_object)
         .and_then(|o| o.get(key))
     {
-        Some(Value::Number(n)) if *n > 0. => n.min(2000.),
+        Some(Value::Number(n)) if *n > 0. => n.js_min(2000.),
         _ => fallback,
     }
 }
@@ -342,19 +340,19 @@ fn draw(
         let mut bands = 0.;
         for &l in own {
             let lp = &mut loops[l];
-            lp.band = LOOP_BAND.max(if below {
+            lp.band = LOOP_BAND.js_max(if below {
                 lp.label.width + 12.
             } else {
                 lp.label.height + 6.
             });
             bands += lp.band;
-            reach = reach.max(if below {
+            reach = reach.js_max(if below {
                 lp.label.height
             } else {
                 lp.label.width
             });
         }
-        let min_w = MIN_WIDTH.max(if below { bands + 8. } else { 0. });
+        let min_w = MIN_WIDTH.js_max(if below { bands + 8. } else { 0. });
         let mut c;
         if node.is_group {
             c = CNode::new(0., 0., -1);
@@ -371,12 +369,12 @@ fn draw(
                 GROUP_PAD
             };
             c.pad_bottom = GROUP_PAD;
-            c.min_w = (view.label.width + 2. * GROUP_PAD - 12.).max(MIN_WIDTH);
+            c.min_w = (view.label.width + 2. * GROUP_PAD - 12.).js_max(MIN_WIDTH);
         } else {
-            let name_h = view.label.height.max(round(name_size * 1.5));
+            let name_h = view.label.height.js_max(round(name_size * 1.5));
             if node.attributes.is_empty() {
-                view.w = (view.label.width + 2. * BOX_PAD_X).max(min_w);
-                view.h = (name_h + 2. * BOX_PAD_Y).max(if below { 0. } else { bands + 8. });
+                view.w = (view.label.width + 2. * BOX_PAD_X).js_max(min_w);
+                view.h = (name_h + 2. * BOX_PAD_Y).js_max(if below { 0. } else { bands + 8. });
             } else {
                 let row_line = round(row_size * 1.5);
                 let mut widths = [0_f64; 4];
@@ -418,8 +416,12 @@ fn draw(
                     ];
                     let mut h = row_line;
                     for k in 0..4 {
-                        widths[k] = widths[k].max(cells[k].width);
-                        h = h.max(cells[k].height);
+                        if cells[k].width > widths[k] {
+                            widths[k] = cells[k].width;
+                        }
+                        if cells[k].height > h {
+                            h = cells[k].height;
+                        }
                     }
                     view.rows.push(Row {
                         cells,
@@ -437,8 +439,8 @@ fn draw(
                     columns += 1;
                 }
                 view.w = (inner + 2. * CELL_PAD_X)
-                    .max(view.label.width + 2. * BOX_PAD_X)
-                    .max(min_w);
+                    .js_max(view.label.width + 2. * BOX_PAD_X)
+                    .js_max(min_w);
                 let spare = if columns > 0 {
                     (view.w - inner - 2. * CELL_PAD_X) / columns as f64
                 } else {
@@ -502,8 +504,12 @@ fn draw(
         if !c.is_group || own.is_empty() {
             continue;
         }
-        let reach = own.iter().map(|i| loops[*i].label.width).fold(0., f64::max);
-        layout_width = layout_width.max(c.x + c.w / 2. + MARKER_LENGTH + LOOP * 0.75 + 10. + reach);
+        let reach = own
+            .iter()
+            .map(|i| loops[*i].label.width)
+            .fold(0., NumberMath::js_max);
+        layout_width =
+            layout_width.js_max(c.x + c.w / 2. + MARKER_LENGTH + LOOP * 0.75 + 10. + reach);
     }
     let title = layout_label(
         db.title.as_deref(),
@@ -519,7 +525,7 @@ fn draw(
     } else {
         0.
     };
-    let inner = layout_width.max(title.width);
+    let inner = layout_width.js_max(title.width);
     let ox = pad + (inner - layout_width) / 2.;
     let oy = pad + title_height;
     shift_layout(&mut cnodes, &mut cedges, ox, oy);
@@ -691,7 +697,8 @@ fn draw(
         }
         let view = &views[i];
         let total: f64 = own.iter().map(|j| loops[*j].band).sum();
-        let scale = 1_f64.min(((if view.below { view.w } else { view.h }) - 8.).max(0.) / total);
+        let scale =
+            1_f64.js_min(((if view.below { view.w } else { view.h }) - 8.).js_max(0.) / total);
         let mut at = -total * scale / 2.;
         for &j in own {
             let lp = &mut loops[j];
@@ -709,7 +716,7 @@ fn draw(
         if let Some(lp) = loop_of[i].map(|j| &loops[j]) {
             let c = &cnodes[ce.src];
             let view = &views[ce.src];
-            let spread = (lp.band / 2. - 6.).min(13.).max(1.);
+            let spread = (lp.band / 2. - 6.).js_min(13.).js_max(1.);
             let far = MARKER_LENGTH + LOOP * 0.75 + 6.;
             if view.below {
                 let x = c.x + lp.at;
@@ -920,7 +927,9 @@ fn spread_ends(edges: &mut [CEdge], nodes: &[CNode], views: &[View]) {
         } else {
             v.w
         };
-        let step = 18_f64.min((length - 28.) / (ends.len() - 1) as f64).max(0.);
+        let step = 18_f64
+            .js_min((length - 28.) / (ends.len() - 1) as f64)
+            .js_max(0.);
         let center = if vertical { c.y } else { c.x };
         ends.sort_by(|a, b| {
             a.toward

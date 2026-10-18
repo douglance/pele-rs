@@ -1,6 +1,7 @@
 //! Pele sankey/layout.ts topological columns, flow scaling and six relaxation passes.
 //! 458322a5 (MIT, kepano). Sorts retain insertion ties, matching JS stable sort.
 use super::SankeyModel;
+use crate::compat::number_math::NumberMath;
 use crate::compat::{ErrorCode, PeleError};
 #[derive(Clone, Copy)]
 pub(super) enum Alignment {
@@ -36,20 +37,12 @@ pub(super) struct Layout {
     pub nodes: Vec<Node>,
     pub links: Vec<Link>,
 }
-// NaN propagation is observable for subnormal weights whose reciprocal overflows.
+// Match Math.min/max NaN propagation and signed-zero ties.
 pub(super) fn min(a: f64, b: f64) -> f64 {
-    if a.is_nan() || b.is_nan() {
-        f64::NAN
-    } else {
-        a.min(b)
-    }
+    a.js_min(b)
 }
 pub(super) fn max(a: f64, b: f64) -> f64 {
-    if a.is_nan() || b.is_nan() {
-        f64::NAN
-    } else {
-        a.max(b)
-    }
+    a.js_max(b)
 }
 fn compare(a: f64, b: f64, ia: usize, ib: usize) -> std::cmp::Ordering {
     let d = a - b;

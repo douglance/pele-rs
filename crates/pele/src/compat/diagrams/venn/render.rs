@@ -4,6 +4,7 @@ use super::{
     layout::{self, Circle, Spot},
     model::{normalize, semantic, VennModel},
 };
+use crate::compat::number_math::round;
 use crate::compat::{
     svg::{
         self,
@@ -53,8 +54,8 @@ pub(super) fn render(
         ));
     }
     let size = o.font_size.unwrap_or(16.);
-    let small = (size * 0.875 + 0.5).floor();
-    let tiny = (size * 0.8125 + 0.5).floor();
+    let small = round(size * 0.875);
+    let tiny = round(size * 0.8125);
     let pad = o.padding.unwrap_or(8.);
     let circles = layout::layout(&model.subsets)?;
     let index: HashMap<_, _> = circles

@@ -1,5 +1,6 @@
 //! Pele c4/route.ts geometric outline intersections and obstacle routing, 458322a5 (MIT, kepano).
 use super::model::ElementRef;
+use crate::compat::number_math::NumberMath;
 use crate::compat::svg::num;
 use std::collections::HashMap;
 #[derive(Clone, Debug)]
@@ -30,10 +31,10 @@ const NEAR: f64 = 6.;
 const FRAME_NEAR: f64 = 3.;
 const PORT_STEP: f64 = 12.;
 pub(super) fn cyl_ry(w: f64) -> f64 {
-    12_f64.min(6_f64.max(w / 14.))
+    12_f64.js_min(6_f64.js_max(w / 14.))
 }
 pub(super) fn queue_rx(h: f64) -> f64 {
-    12_f64.min(h / 4.)
+    12_f64.js_min(h / 4.)
 }
 #[derive(Clone, Debug)]
 pub(super) struct Route {
@@ -72,8 +73,8 @@ fn hit_rect(x0: f64, y0: f64, x1: f64, y1: f64, px: f64, py: f64, dx: f64, dy: f
         }
     } else {
         let (a, b) = ((x0 - px) / dx, (x1 - px) / dx);
-        enter = enter.max(a.min(b));
-        leave = leave.min(a.max(b))
+        enter = enter.js_max(a.js_min(b));
+        leave = leave.js_min(a.js_max(b))
     }
     if dy == 0. {
         if py < y0 || py > y1 {
@@ -81,8 +82,8 @@ fn hit_rect(x0: f64, y0: f64, x1: f64, y1: f64, px: f64, py: f64, dx: f64, dy: f
         }
     } else {
         let (a, b) = ((y0 - py) / dy, (y1 - py) / dy);
-        enter = enter.max(a.min(b));
-        leave = leave.min(a.max(b))
+        enter = enter.js_max(a.js_min(b));
+        leave = leave.js_min(a.js_max(b))
     }
     if enter <= leave {
         enter
@@ -113,7 +114,7 @@ fn hit(b: &Box, px: f64, py: f64, qx: f64, qy: f64) -> f64 {
     let (x, y, w, h) = (b.x, b.y, b.w, b.h);
     let (dx, dy) = (qx - px, qy - py);
     match b.form.as_str() {
-        "person" => hit_rect(x, y + HEAD, x + w, y + h, px, py, dx, dy).min(hit_ellipse(
+        "person" => hit_rect(x, y + HEAD, x + w, y + h, px, py, dx, dy).js_min(hit_ellipse(
             x + w / 2.,
             y + 14.,
             13.,
@@ -126,8 +127,8 @@ fn hit(b: &Box, px: f64, py: f64, qx: f64, qy: f64) -> f64 {
         "cyl" => {
             let ry = cyl_ry(w);
             hit_rect(x, y + ry, x + w, y + h - ry, px, py, dx, dy)
-                .min(hit_ellipse(x + w / 2., y + ry, w / 2., ry, px, py, dx, dy))
-                .min(hit_ellipse(
+                .js_min(hit_ellipse(x + w / 2., y + ry, w / 2., ry, px, py, dx, dy))
+                .js_min(hit_ellipse(
                     x + w / 2.,
                     y + h - ry,
                     w / 2.,
@@ -141,8 +142,8 @@ fn hit(b: &Box, px: f64, py: f64, qx: f64, qy: f64) -> f64 {
         "h-cyl" => {
             let rx = queue_rx(h);
             hit_rect(x + rx, y, x + w - rx, y + h, px, py, dx, dy)
-                .min(hit_ellipse(x + rx, y + h / 2., rx, h / 2., px, py, dx, dy))
-                .min(hit_ellipse(
+                .js_min(hit_ellipse(x + rx, y + h / 2., rx, h / 2., px, py, dx, dy))
+                .js_min(hit_ellipse(
                     x + w - rx,
                     y + h / 2.,
                     rx,
@@ -188,7 +189,7 @@ fn connect(a: &Box, b: &Box, shift: f64) -> [f64; 4] {
             inner.y - outer.y,
             outer.y + outer.h - inner.y - inner.h,
         );
-        let least = left.min(right).min(top).min(bottom);
+        let least = left.js_min(right).js_min(top).js_min(bottom);
         let ox = if least == left {
             outer.x
         } else if least == right {
@@ -203,7 +204,7 @@ fn connect(a: &Box, b: &Box, shift: f64) -> [f64; 4] {
         } else {
             outer.y
         };
-        let t = hit(inner, ox, oy, ix, iy).min(1.);
+        let t = hit(inner, ox, oy, ix, iy).js_min(1.);
         let (mx, my) = (ox + (ix - ox) * t, oy + (iy - oy) * t);
         return if down {
             [ox, oy, mx, my]
@@ -213,10 +214,10 @@ fn connect(a: &Box, b: &Box, shift: f64) -> [f64; 4] {
     }
     let (mut px, mut py, mut qx, mut qy) = (ax, ay, bx, by);
     let (x0, x1, y0, y1) = (
-        a.x.max(b.x),
-        (a.x + a.w).min(b.x + b.w),
-        a.y.max(b.y),
-        (a.y + a.h).min(b.y + b.h),
+        a.x.js_max(b.x),
+        (a.x + a.w).js_min(b.x + b.w),
+        a.y.js_max(b.y),
+        (a.y + a.h).js_min(b.y + b.h),
     );
     if x0 < x1 {
         px = (x0 + x1) / 2.;
@@ -226,7 +227,7 @@ fn connect(a: &Box, b: &Box, shift: f64) -> [f64; 4] {
         qy = py
     }
     let len = (qx - px).hypot(qy - py);
-    let len = if len == 0. { 1. } else { len };
+    let len = if len == 0. || len.is_nan() { 1. } else { len };
     let (nx, ny) = (-(qy - py) / len * shift, (qx - px) / len * shift);
     let (mut ta, mut tb) = (
         hit(a, qx + nx, qy + ny, px + nx, py + ny),
@@ -242,8 +243,8 @@ fn connect(a: &Box, b: &Box, shift: f64) -> [f64; 4] {
         py = ay;
         qx = bx;
         qy = by;
-        ta = hit(a, qx, qy, px, py).min(1.);
-        tb = hit(b, px, py, qx, qy).min(1.)
+        ta = hit(a, qx, qy, px, py).js_min(1.);
+        tb = hit(b, px, py, qx, qy).js_min(1.)
     }
     [
         qx + (px - qx) * ta,
@@ -262,7 +263,7 @@ pub(super) struct Lanes {
 }
 impl Lanes {
     fn free(&self, upright: bool, at: f64, a0: f64, a1: f64) -> bool {
-        let (lo, hi) = (a0.min(a1), a0.max(a1));
+        let (lo, hi) = (a0.js_min(a1), a0.js_max(a1));
         let near = |list: &[f64], gap: f64| {
             list.chunks_exact(3)
                 .any(|p| (p[0] - at).abs() < gap && p[1] < hi && p[2] > lo)
@@ -280,7 +281,7 @@ impl Lanes {
             } else {
                 (points[i - 2], points[i])
             };
-            let (lo, hi) = (a.min(b), a.max(b));
+            let (lo, hi) = (a.js_min(b), a.js_max(b));
             for p in if upright { &self.level } else { &self.upright }.chunks_exact(3) {
                 if p[0] > lo && p[0] < hi && p[1] < at && p[2] > at {
                     count += 1
@@ -298,14 +299,14 @@ impl Lanes {
             if points[i] == points[i - 2] {
                 self.upright.extend([
                     points[i],
-                    points[i - 1].min(points[i + 1]),
-                    points[i - 1].max(points[i + 1]),
+                    points[i - 1].js_min(points[i + 1]),
+                    points[i - 1].js_max(points[i + 1]),
                 ])
             } else if points[i + 1] == points[i - 1] {
                 self.level.extend([
                     points[i + 1],
-                    points[i - 2].min(points[i]),
-                    points[i - 2].max(points[i]),
+                    points[i - 2].js_min(points[i]),
+                    points[i - 2].js_max(points[i]),
                 ])
             }
         }
@@ -350,8 +351,8 @@ fn path(points: &[f64], start_trim: f64, end_trim: f64) -> String {
         let (ix, iy) = (sign(x - points[i - 2]), sign(y - points[i - 1]));
         let (ox, oy) = (sign(points[i + 2] - x), sign(points[i + 3] - y));
         let r = 8_f64
-            .min((x - points[i - 2] + y - points[i - 1]).abs() / 2.)
-            .min((points[i + 2] - x + points[i + 3] - y).abs() / 2.);
+            .js_min((x - points[i - 2] + y - points[i - 1]).abs() / 2.)
+            .js_min((points[i + 2] - x + points[i + 3] - y).abs() / 2.);
         d += &format!(
             "{}Q{},{} {},{}",
             if ix != 0. {
@@ -423,7 +424,7 @@ fn bent(
 fn across(lo: f64, hi: f64) -> Vec<f64> {
     let mut out = Vec::new();
     let mid = (lo + hi) / 2.;
-    let step = 7_f64.max((hi - lo) / 4.);
+    let step = 7_f64.js_max((hi - lo) / 4.);
     for k in 0usize..9 {
         let at = mid + if k & 1 != 0 { 1. } else { -1. } * (k as f64 / 2.).ceil() * step;
         if at >= lo + NEAR && at <= hi - NEAR {
@@ -505,8 +506,8 @@ fn elbow(
         {
             for y1 in lanes.ports(b, sides[1], by - down * b.h / 4., b.y + 8., b.y + b.h - 8.) {
                 for &lane in &lanes_across {
-                    let x0 = lane + (ax - lane) * hit(a, lane, y0, ax, y0).min(1.);
-                    let x1 = lane + (bx - lane) * hit(b, lane, y1, bx, y1).min(1.);
+                    let x0 = lane + (ax - lane) * hit(a, lane, y0, ax, y0).js_min(1.);
+                    let x1 = lane + (bx - lane) * hit(b, lane, y1, bx, y1).js_min(1.);
                     if consider(
                         &mut best,
                         vec![x0, y0, lane, y0, lane, y1, x1, y1],
@@ -546,8 +547,8 @@ fn elbow(
                 b.x + b.w - 8.,
             ) {
                 for &lane in &lanes_across {
-                    let y0 = lane + (ay - lane) * hit(a, x0, lane, x0, ay).min(1.);
-                    let y1 = lane + (by - lane) * hit(b, x1, lane, x1, by).min(1.);
+                    let y0 = lane + (ay - lane) * hit(a, x0, lane, x0, ay).js_min(1.);
+                    let y1 = lane + (by - lane) * hit(b, x1, lane, x1, by).js_min(1.);
                     if consider(
                         &mut best,
                         vec![x0, y0, x0, lane, x1, lane, x1, y1],
@@ -617,9 +618,9 @@ fn lane_on(forward: bool, upright: bool, a: &Box, b: &Box, others: &[Box], ends:
     let mut widen = |b: &Box| {
         let edge = if upright { b.x } else { b.y };
         lane = if forward {
-            lane.max(edge + if upright { b.w } else { b.h })
+            lane.js_max(edge + if upright { b.w } else { b.h })
         } else {
-            lane.min(edge)
+            lane.js_min(edge)
         }
     };
     widen(a);
@@ -710,12 +711,12 @@ fn along(
     };
     let points_at = |at: f64| {
         if upright {
-            let x0 = at + (ax - at) * hit(a, at, p0, ax, p0).min(1.);
-            let x1 = at + (bx - at) * hit(b, at, p1, bx, p1).min(1.);
+            let x0 = at + (ax - at) * hit(a, at, p0, ax, p0).js_min(1.);
+            let x1 = at + (bx - at) * hit(b, at, p1, bx, p1).js_min(1.);
             vec![x0, p0, at, p0, at, p1, x1, p1]
         } else {
-            let y0 = at + (ay - at) * hit(a, p0, at, p0, ay).min(1.);
-            let y1 = at + (by - at) * hit(b, p1, at, p1, by).min(1.);
+            let y0 = at + (ay - at) * hit(a, p0, at, p0, ay).js_min(1.);
+            let y1 = at + (by - at) * hit(b, p1, at, p1, by).js_min(1.);
             vec![p0, y0, p0, at, p1, at, p1, y1]
         }
     };
@@ -758,7 +759,7 @@ pub(super) fn route(
     end_trim: f64,
 ) -> Route {
     if a.id == b.id {
-        let spread = (a.h / 2. - 4.).min(10.);
+        let spread = (a.h / 2. - 4.).js_min(10.);
         let len = LOOP.hypot(spread);
         let x = a.x + a.w;
         let cy = a.y + a.h / 2.;
@@ -811,11 +812,15 @@ pub(super) fn route(
         lanes.squeezed += 1
     }
     if let Some(others) = others.filter(|_| blocked && (upright || sy == ey)) {
-        let lo = if upright { a.y.min(b.y) } else { a.x.min(b.x) };
-        let hi = if upright {
-            (a.y + a.h).max(b.y + b.h)
+        let lo = if upright {
+            a.y.js_min(b.y)
         } else {
-            (a.x + a.w).max(b.x + b.w)
+            a.x.js_min(b.x)
+        };
+        let hi = if upright {
+            (a.y + a.h).js_max(b.y + b.h)
+        } else {
+            (a.x + a.w).js_max(b.x + b.w)
         };
         let natural = if upright { ey > sy } else { ex < sx };
         let out = outside(
@@ -877,7 +882,7 @@ pub(super) fn route(
         );
     }
     let len = (ex - sx).hypot(ey - sy);
-    let len = if len == 0. { 1. } else { len };
+    let len = if len == 0. || len.is_nan() { 1. } else { len };
     let (dx, dy) = ((ex - sx) / len, (ey - sy) / len);
     if upright || sy == ey {
         lanes.take(&[sx, sy, ex, ey])

@@ -1,5 +1,6 @@
 //! Cynefin domains, ellipse clearance and clipped quadratic transitions, Pele 458322a5 (MIT).
 use super::{boundaries as b, model::*};
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     svg::{
         self,
@@ -70,7 +71,7 @@ fn badge(
     let label = layout_label(Some(&text), false, r, o, m.item_size, 200., 0)?;
     Ok(Badge {
         w: label.width + 20.,
-        h: label.height.max(m.item_line) + 8.,
+        h: label.height.js_max(m.item_line) + 8.,
         text,
         label,
         overflow,
@@ -115,14 +116,14 @@ fn block(
     let mut w = title.width;
     let mut h = title.height;
     for s in &subtitles {
-        w = w.max(s.width);
+        w = w.js_max(s.width);
         h += s.height;
     }
     if !badges.is_empty() {
         h += 4.;
     }
     for b in &badges {
-        w = w.max(b.w);
+        w = w.js_max(b.w);
         h += 6. + b.h;
     }
     Ok(Block {
@@ -181,8 +182,8 @@ pub(super) fn render(
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
     let size = o.font_size.unwrap_or(16.);
-    let small = (size * 0.8125 + 0.5).floor();
-    let item_size = (size * 0.875 + 0.5).floor();
+    let small = round(size * 0.8125);
+    let item_size = round(size * 0.875);
     let pad = o.padding.unwrap_or(8.);
     let show_descriptions = !matches!(
         c.get("cynefin")
@@ -199,7 +200,7 @@ pub(super) fn render(
         size,
         small,
         item_size,
-        item_line: (item_size * 1.5 + 0.5).floor(),
+        item_line: round(item_size * 1.5),
         show_descriptions,
     };
     let mut quadrants = vec![];
@@ -207,13 +208,13 @@ pub(super) fn render(
         quadrants.push(block(name, model, &m, o, r)?);
     }
     let mut confusion = block(Confusion, model, &m, o, r)?;
-    let rx = 88f64.max(confusion.w * 0.71 + 8.);
-    let ry = 64f64.max(confusion.h * 0.71 + 6.);
+    let rx = 88f64.js_max(confusion.w * 0.71 + 8.);
+    let ry = 64f64.js_max(confusion.h * 0.71 + 6.);
     let mut quad_w = setting(c, "width", 640., 100., 10000.) / 2.;
     let mut quad_h = setting(c, "height", 440., 100., 10000.) / 2.;
     for b in &quadrants {
-        quad_w = quad_w.max(b.w + 40.);
-        quad_h = quad_h.max(b.h + 40.)
+        quad_w = quad_w.js_max(b.w + 40.);
+        quad_h = quad_h.js_max(b.h + 40.)
     }
     for b in &quadrants {
         let dx = (quad_w - b.w) / 2.;
@@ -224,9 +225,9 @@ pub(super) fn render(
         let wider = b.w + 2. * (rx + 10.);
         let taller = b.h + 2. * (ry + 10.);
         if wider * quad_h <= quad_w * taller {
-            quad_w = quad_w.max(wider)
+            quad_w = quad_w.js_max(wider)
         } else {
-            quad_h = quad_h.max(taller)
+            quad_h = quad_h.js_max(taller)
         }
     }
     let title = layout_label(model.title.as_deref(), false, r, o, size, 4000., 1)?;
@@ -398,8 +399,8 @@ pub(super) fn render(
             let away = (nx.abs() * label.width) / 2. + (ny.abs() * label.height) / 2. + 6.;
             let half = label.width / 2. + 4.;
             let tx = (lx + nx * away)
-                .max(x0 + half)
-                .min((right - half).max(x0 + half));
+                .js_max(x0 + half)
+                .js_min((right - half).js_max(x0 + half));
             text = label_svg_with_resources(
                 &label,
                 tx,
@@ -413,7 +414,7 @@ pub(super) fn render(
         }
         edges+=&format!("<g class=\"pele-edge\" data-id=\"{}-{}\"><path d=\"M{},{}Q{},{} {},{}\" fill=\"none\" stroke=\"var(--_l)\"/>{head}{text}</g>",t.from.as_str(),t.to.as_str(),num(sx),num(sy),num(qx),num(qy),num(ex),num(ey));
     }
-    let total_width = (width.max(title.width) + 2. * pad).ceil();
+    let total_width = (width.js_max(title.width) + 2. * pad).ceil();
     let total_height = (height + title_height + 2. * pad).ceil();
     let content = label_svg(
         &title,

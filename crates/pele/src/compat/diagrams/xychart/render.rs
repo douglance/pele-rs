@@ -3,33 +3,12 @@ use super::{
     model::{Orientation, PlotType, XAxis, XyChartModel},
     ticks::*,
 };
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     svg::{self, esc, esc_text, js_num, label_svg, num, series_color},
     text::{layout_label, Label},
     ErrorCode, Object, PeleError, RenderResources, RenderSettings, Rendered, TextRequest, Value,
 };
-// JS Math.min/max propagate NaN; Rust's IEEE min/max choose the other
-// operand. Preserve pinned explicit-range/clamp and subnormal tick behavior.
-trait JsBounds {
-    fn js_min(self, other: f64) -> f64;
-    fn js_max(self, other: f64) -> f64;
-}
-impl JsBounds for f64 {
-    fn js_min(self, other: f64) -> f64 {
-        if self.is_nan() || other.is_nan() {
-            f64::NAN
-        } else {
-            self.min(other)
-        }
-    }
-    fn js_max(self, other: f64) -> f64 {
-        if self.is_nan() || other.is_nan() {
-            f64::NAN
-        } else {
-            self.max(other)
-        }
-    }
-}
 const TICK: f64 = 4.;
 const SWATCH: f64 = 12.;
 const ROW: f64 = 26.;
@@ -51,9 +30,6 @@ fn dimension(value: Option<&Value>, fallback: f64) -> f64 {
         Some(Value::Number(n)) if *n > 0. => round(n.js_max(100.).js_min(4000.)),
         _ => fallback,
     }
-}
-fn round(v: f64) -> f64 {
-    (v + 0.5).floor()
 }
 fn finite(value: Option<f64>) -> Option<f64> {
     value
