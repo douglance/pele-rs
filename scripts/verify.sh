@@ -28,7 +28,7 @@ target/ffi-provider-resources-integration
 cc -Wall -Wextra -Werror -std=c11 -I include tests/ffi_presentation_v11.c target/release/libpele_ffi.a -o target/ffi-presentation-integration
 target/ffi-presentation-integration
 if [[ "$(uname -s)" == Darwin ]]; then
-    PELE_VERIFY_MUTABLE=1 swift test -c release --package-path bindings/swift --skip '(^|[./])(MountTests|ZoomTests)([./]|$)'
+    PELE_VERIFY_MUTABLE=1 swift test -c release --package-path bindings/swift --skip '(^|[./])(MountTests|ZoomTests|PresentationUITests)([./]|$)'
     scripts/test-swift-ui.sh
     swift run -c release --package-path bindings/swift pele-smoke "$repo_dir" "$repo_dir/dist/evidence"
     if [[ -f Package.swift ]]; then swift run -c release --package-path tests/swift-consumer; fi

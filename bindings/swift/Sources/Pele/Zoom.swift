@@ -126,6 +126,7 @@ extension Pele {
                 for (index, key) in ["in", "out", "reset"].enumerated() {
                     let button = NSButton(image: NSImage(systemSymbolName: symbols[key]!, accessibilityDescription: nil) ?? NSImage(), target: self, action: actions[key])
                     button.bezelStyle = .texturedRounded; button.toolTip = labels[key]; button.setAccessibilityLabel(labels[key])
+                    button.cell?.setAccessibilityLabel(labels[key])
                     button.frame = NSRect(x: 0, y: index * 26, width: 26, height: 24)
                     container.addSubview(button); buttons[key] = button
                 }
@@ -136,6 +137,7 @@ extension Pele {
             buttons["out"]?.isEnabled = activeScale != 0
             buttons["reset"]?.isHidden = activeScale == 0
             if !zoomable && view.window?.firstResponder === view { view.window?.makeFirstResponder(nil) }
+            view.synchronizeNativeAccessibilityChildren()
         }
         @objc private func enlarge() { show(scale * 1.5625) }
         @objc private func reduce() { show(scale / 1.5625) }
@@ -204,9 +206,10 @@ extension Pele {
         public func destroy() {
             guard !destroyed else { return }
             reset(); destroyed = true; bar?.removeFromSuperview(); bar = nil; buttons = [:]
+            view?.synchronizeNativeAccessibilityChildren()
             if let view, view.zoomController === self {
                 if view.window?.firstResponder === view { view.window?.makeFirstResponder(nil) }
-                view.zoomController = nil; view.stopZoomObservation(); view.needsDisplay = true
+                view.zoomController = nil; view.synchronizeInputObservation(); view.needsDisplay = true
             }
         }
     }

@@ -67,7 +67,7 @@ static NSString *const QAIdentifier = @"com.unlocalhosted.pele.native-ui-qa";
     XCTestSuite *suite = [[XCTestSuite alloc] initWithName:@"Pele native GUI integration"];
     NSMutableDictionary *counts = [NSMutableDictionary dictionary];
     // Async tests use SwiftPM's XCTest driver, never this synchronous GUI host.
-    for (NSString *name in @[@"MountTests", @"ZoomTests"]) {
+    for (NSString *name in @[@"MountTests", @"ZoomTests", @"PresentationUITests"]) {
         Class testClass = NSClassFromString([@"PeleTests." stringByAppendingString:name]);
         if (!testClass) { fprintf(stdout, "Missing test class: %s\n", name.UTF8String); exit(3); }
         XCTestSuite *child = [XCTestSuite testSuiteForTestCaseClass:testClass];

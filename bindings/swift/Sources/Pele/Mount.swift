@@ -3,6 +3,13 @@ import AppKit
 // Both retained native model lanes share presentation without exporting a graph.
 internal protocol MountedDocument: AnyObject {
     func render(outputLimit: Pele.OutputLimit, options: Pele.Engine.Options, resources: Pele.HostResources) throws -> FullRenderedDiagram
+    func renderPresentation(outputLimit: Pele.OutputLimit?, budget: Pele.PresentationBudget, options: Pele.Engine.Options, resources: Pele.HostResources) throws -> FullRenderedDiagram
+}
+extension MountedDocument {
+    func renderPresentation(outputLimit: Pele.OutputLimit?, budget: Pele.PresentationBudget, options: Pele.Engine.Options, resources: Pele.HostResources) throws -> FullRenderedDiagram {
+        // Custom providers have no Rust-produced artifact in this slice.
+        try render(outputLimit: outputLimit ?? .undefined, options: options, resources: resources)
+    }
 }
 extension Pele.MutableDocument: MountedDocument {}
 extension Pele.ProviderDocument: MountedDocument {}
@@ -15,6 +22,11 @@ extension Pele {
         public var outputLimit: OutputLimit?
         public var resources = HostResources()
         public var zoom: ZoomPolicy = .automatic
+        public var presentationBudget = PresentationBudget()
+        /// A custom image explicitly depicts the complete SVG over its full image
+        /// bounds. Default false disables native geometry/actions for custom images.
+        public var preparedImagePreservesSVGGeometry = false
+        public var onLink: ((PresentationLink) throws -> Void)?
         public var preparePresentation: ((FullRenderedDiagram) throws -> NSImage)?
         public var onRender: ((FullRenderedDiagram) throws -> Void)?
         public var onError: ((any Error) throws -> Void)?
@@ -26,37 +38,51 @@ extension Pele {
         public fileprivate(set) var presentation: NSImage?
         public fileprivate(set) var diagnostic: (any Error)?
         fileprivate var mounted: Mounted?
+        internal let nativePresentationState = NativePresentationState()
         internal var zoomController: Zoom?
         internal var presentationCamera: Zoom?
         private weak var observedZoomWindow: NSWindow?
+        internal func synchronizeInputObservation() {
+            if zoomController != nil || hasNativeLinkActions { startZoomObservation() }
+            else { stopZoomObservation() }
+        }
         internal func startZoomObservation() {
             stopZoomObservation(); observedZoomWindow = window
             if let window { NotificationCenter.default.addObserver(self, selector: #selector(windowInactive), name: NSWindow.didResignKeyNotification, object: window) }
         }
         internal func stopZoomObservation() {
-            if let observedZoomWindow { NotificationCenter.default.removeObserver(self, name: NSWindow.didResignKeyNotification, object: observedZoomWindow) }
+            NotificationCenter.default.removeObserver(self, name: NSWindow.didResignKeyNotification, object: nil)
             observedZoomWindow = nil
         }
-        @objc private func windowInactive(_ notification: Notification) { zoomController?.cancelInput(); needsDisplay = true }
-        public override var acceptsFirstResponder: Bool { zoomController?.zoomable == true }
+        @objc private func windowInactive(_ notification: Notification) { zoomController?.cancelInput(); cancelNativeLinkInput(); needsDisplay = true }
+        public override var acceptsFirstResponder: Bool { zoomController?.zoomable == true || hasNativeLinkActions }
         public override var focusRingMaskBounds: NSRect { bounds }
         public override func drawFocusRingMask() { NSBezierPath(rect: bounds).fill() }
         public override func becomeFirstResponder() -> Bool {
             if NSApp.currentEvent?.type == .keyDown { zoomController?.keyboardFocus = true }
             needsDisplay = true; return super.becomeFirstResponder()
         }
-        public override func resignFirstResponder() -> Bool { zoomController?.cancelInput(); needsDisplay = true; return super.resignFirstResponder() }
+        public override func resignFirstResponder() -> Bool { zoomController?.cancelInput(); cancelNativeLinkInput(); needsDisplay = true; return super.resignFirstResponder() }
         public override func resetCursorRects() {
             if let zoomController, zoomController.zoomable && zoomController.isEnlarged {
                 addCursorRect(bounds, cursor: zoomController.dragging ? .closedHand : .openHand)
-            } else { super.resetCursorRects() }
+            } else {
+                super.resetCursorRects()
+                for index in nativePresentationState.commit?.artifact?.links.indices ?? 0..<0 {
+                    if hasNativeLinkActions, let rect = nativeLinkRect(index) { addCursorRect(rect, cursor: .pointingHand) }
+                }
+            }
         }
-        public override func keyDown(with event: NSEvent) { if zoomController?.key(event) != true { super.keyDown(with: event) } }
+        public override func keyDown(with event: NSEvent) { if zoomController?.key(event) != true && !nativeLinkKey(event) { super.keyDown(with: event) } }
         public override func scrollWheel(with event: NSEvent) { if zoomController?.wheel(event) != true { super.scrollWheel(with: event) } }
         public override func magnify(with event: NSEvent) { if zoomController?.magnify(event) != true { super.magnify(with: event) } }
-        public override func mouseDown(with event: NSEvent) { if zoomController?.down(event) != true { super.mouseDown(with: event) } }
-        public override func mouseDragged(with event: NSEvent) { if zoomController?.dragged(event) != true { super.mouseDragged(with: event) } }
-        public override func mouseUp(with event: NSEvent) { if zoomController?.up(event) != true { super.mouseUp(with: event) } }
+        public override func mouseDown(with event: NSEvent) { nativeLinkDown(event); if zoomController?.down(event) != true && nativePresentationState.pressed == nil { super.mouseDown(with: event) } }
+        public override func mouseDragged(with event: NSEvent) { nativeLinkDragged(event); if zoomController?.dragged(event) != true && nativePresentationState.pressedAt == nil { super.mouseDragged(with: event) } }
+        public override func mouseUp(with event: NSEvent) {
+            let claimed = zoomController?.up(event) == true
+            let suppressed = zoomController?.consumeSuppressedActivation() == true
+            if !nativeLinkUp(event, suppressed: suppressed) && !claimed { super.mouseUp(with: event) }
+        }
         fileprivate func observeFonts() {
             NotificationCenter.default.removeObserver(self, name: NSFont.fontSetChangedNotification, object: nil)
             NotificationCenter.default.addObserver(self, selector: #selector(fontsChanged), name: NSFont.fontSetChangedNotification, object: nil)
@@ -68,15 +94,14 @@ extension Pele {
         public override func draw(_ dirtyRect: NSRect) {
             super.draw(dirtyRect)
             if let image = presentation {
-                let width = min(bounds.width, image.size.width)
-                let height = image.size.width > 0 ? image.size.height * (width / image.size.width) : 0
-                let rect = presentationCamera?.imageRect ?? NSRect(x: 0, y: 0, width: width, height: height)
+                let rect = nativeImageRect
                 NSGraphicsContext.saveGraphicsState(); NSBezierPath(rect: bounds).addClip()
                 image.draw(in: rect, from: .zero,
                            operation: .sourceOver, fraction: diagnostic == nil ? 1 : 0.4,
                            respectFlipped: true, hints: nil)
                 NSGraphicsContext.restoreGraphicsState()
             }
+            drawNativeLinkFocus()
             if let diagnostic {
                 let full = Self.message(diagnostic)
                 let lines = full.components(separatedBy: .newlines).filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
@@ -95,22 +120,23 @@ extension Pele {
         }
         public override func layout() { super.layout(); mounted?.observeRefresh(); zoomController?.resized() }
         public override func viewDidMoveToWindow() {
-            super.viewDidMoveToWindow(); zoomController?.cancelInput()
-            if zoomController != nil { startZoomObservation() }
+            super.viewDidMoveToWindow(); zoomController?.cancelInput(); cancelNativeLinkInput()
+            synchronizeInputObservation()
             mounted?.environmentChanged()
         }
-        public override func viewDidHide() { super.viewDidHide(); mounted?.observeRefresh() }
+        public override func viewDidHide() { super.viewDidHide(); cancelNativeLinkInput(); mounted?.observeRefresh() }
         public override func viewDidUnhide() { super.viewDidUnhide(); mounted?.observeRefresh() }
         private static func message(_ error: any Error) -> String {
             if let error = error as? CompatibilityError { return error.message }
             if let error = error as? PeleError { return error.message }
             return String(describing: error)
         }
-        fileprivate func install(_ image: NSImage?, error: (any Error)?) {
+        fileprivate func install(_ image: NSImage?, error: (any Error)?, native: NativePresentationCommit?) {
             presentation = image; diagnostic = error
             if zoomController == nil { presentationCamera = nil }
+            installNativePresentation(native)
             toolTip = error.map(Self.message)
-            setAccessibilityHelp(toolTip)
+            updateNativeAccessibilityHelp(toolTip)
             invalidateIntrinsicContentSize(); needsDisplay = true
         }
     }
@@ -175,6 +201,7 @@ extension Pele {
         private var resourceGeneration: UInt64 = 0
         private var drawnGeneration: UInt64 = 0
         private var image: NSImage?
+        private var nativePresentation: NativePresentationCommit?
         fileprivate init(view: DiagramView, options: MountOptions, parse: @escaping Parse) { self.view = view; settings = options; self.parse = parse }
 
         /// Forces resource-sensitive re-rendering without reparsing the model.
@@ -266,8 +293,11 @@ extension Pele {
         }
         public func destroy() {
             destroyed = true
+            if let old = nativePresentation {
+                nativePresentation = NativePresentationCommit(outcome: old.outcome, drawingType: old.drawingType, mapsSVG: old.mapsSVG, activate: nil, failed: nil)
+            }
             zoom?.destroy()
-            if view?.mounted === self { view?.stopObservingFonts() }
+            if view?.mounted === self { view?.stopObservingFonts(); view?.deactivateNativePresentation() }
         }
         fileprivate func fontsChanged() {
             guard !destroyed else { return }
@@ -281,14 +311,14 @@ extension Pele {
             guard !destroyed, !busy else { return }
             do { try refresh() } catch { unhandledCallbackError = error }
         }
-        private func publishDiagnostic() { view?.install(image, error: error) }
+        private func publishDiagnostic() { view?.install(image, error: error, native: nativePresentation) }
         private func render(_ document: any MountedDocument, width: Double?) throws -> FullRenderedDiagram {
             var options = settings.render; options.maxWidth = width
             options.limit = nil; options.maxEdges = nil; options.config = [:]
             if options.idPrefix == nil { options.idPrefix = idPrefix }
             if options.nativeTheme == nil { options.nativeTheme = NativeTheme() }
             let output = settings.outputLimit ?? settings.render.outputLimit.map { .number(Double($0)) } ?? .undefined
-            return try document.render(outputLimit: output, options: options, resources: settings.resources)
+            return try document.renderPresentation(outputLimit: output, budget: settings.presentationBudget, options: options, resources: settings.resources)
         }
         private func draw(fresh: Bool, force: Bool, preserveError: Bool) throws -> FullRenderedDiagram? {
             guard let model else { return nil }
@@ -317,6 +347,10 @@ extension Pele {
                 drawnWidth = width; drawnGeneration = resourceGeneration
                 stale = view?.window == nil
                 drawnModel = model; result = drawing; image = prepared
+                nativePresentation = NativePresentationCommit(outcome: drawing.presentation ?? .unavailable(.unsupportedDiagram),
+                    drawingType: drawing.type, mapsSVG: settings.preparePresentation == nil || settings.preparedImagePreservesSVGGeometry,
+                    activate: destroyed ? nil : settings.onLink,
+                    failed: { [weak self] error in self?.unhandledCallbackError = error })
                 if !preserveError { error = nil }
                 publishDiagnostic()
                 if !quiet { zoom?.refresh() }

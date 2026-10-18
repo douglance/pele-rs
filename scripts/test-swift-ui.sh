@@ -185,7 +185,7 @@ try:
         raise RuntimeError("Native UI result exceeds its 64 KiB budget")
     result = json.loads(result_file.read_text())
     qa_pid = result["pid"]
-    if result.get("version") != 1 or result.get("host") != "com.unlocalhosted.pele.native-ui-qa" or not result.get("active") or not result.get("succeeded") or result.get("failures") != 0 or result.get("executed") != result.get("expected") or set(result.get("suites", {})) != {"MountTests", "ZoomTests"}:
+    if result.get("version") != 1 or result.get("host") != "com.unlocalhosted.pele.native-ui-qa" or not result.get("active") or not result.get("succeeded") or result.get("failures") != 0 or result.get("executed") != result.get("expected") or set(result.get("suites", {})) != {"MountTests", "ZoomTests", "PresentationUITests"}:
         raise RuntimeError("Native UI feature assertions failed; see runtime.log and result.json")
     deadline = time.monotonic() + 5
     while owns_process(qa_pid) and time.monotonic() < deadline:
@@ -196,7 +196,7 @@ try:
         raise RuntimeError("Swift source or native SDK changed during the UI run")
     write_json(run / "runner-result.json", {"succeeded": True, "executed": result["executed"], "pid": qa_pid})
     write_json(evidence / "latest.json", {"run": str(run.relative_to(root)), "succeeded": True})
-    print(f"Native GUI Mount + Zoom: {result['executed']} passed. Evidence: {run}")
+    print(f"Native GUI Mount + Zoom + Presentation: {result['executed']} passed. Evidence: {run}")
 except Exception as error:
     write_json(run / "runner-result.json", {"succeeded": False, "error": str(error), "pid": qa_pid})
     write_json(evidence / "latest.json", {"run": str(run.relative_to(root)), "succeeded": False, "status": "failed"})
