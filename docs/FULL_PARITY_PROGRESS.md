@@ -845,3 +845,15 @@ against pinned complete SVG hashes and reports native stages, JS references,
 allocations and transport independently. The initial shared-host baseline and
 warmup caveats are recorded in its results directory. No runtime optimization or
 general Rust/GPU speedup claim follows from this first baseline.
+
+## Consolidated native verification
+
+The frozen all-33-codec core at `cbad8d4` passes one consolidated release run:
+326 integration tests across 75 test binaries, including original family corpora,
+all mutable codecs, shared methods, binary exchange, returned Errors and stateful
+render operations. `cargo package --locked --allow-dirty -p pele-rs` verifies the
+actual packaged library; the separate Rust consumer then links that unpacked
+package and parses, edits, renders and snapshots every one of the 33 mutable
+families. Raw UTF-16 extension fields survive the consumer's graph round trips.
+This is native/package proof; final Swift and universal/Intel results remain
+separate gates.
