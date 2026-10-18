@@ -1,8 +1,10 @@
 # Native presentation artifact: first Rust slice
 
-Flowchart and Swimlane can produce a version 1 presentation artifact alongside
-normal Rust rendering. This is the first interaction/accessibility gate from
-`LLD_NATIVE_API_COMPLETION.md`. Other families report `UnsupportedDiagram`.
+Flowchart, Swimlane, AgentFlow, ER and Kanban can produce a version 1
+presentation artifact alongside normal Rust rendering. This is the first
+interaction/accessibility gate from `LLD_NATIVE_API_COMPLETION.md`; producer
+specifics are recorded in `NATIVE_PRESENTATION_PRODUCERS.md`. Other families
+report `UnsupportedDiagram`.
 There is no C/Swift/WASM artifact transport or native link activation in this slice.
 
 ```rust
@@ -73,7 +75,7 @@ retains at most three candidate frames simultaneously, each independently
 bounded. These are metadata storage/work bounds, not universal peak-allocation
 limits for the renderer, user callbacks or trusted extension implementations.
 Custom modules opting into the capture hook must respect the requested budget;
-this first artifact producer is the built-in Flowchart/Swimlane renderer.
+the current built-in producers are Flowchart/Swimlane, AgentFlow, ER and Kanban.
 
 `presentation_flowchart` exercises typed and mutable public calls, whole SVG and
 host-call equality against ordinary rendering, actual emitted rectangle/anchor

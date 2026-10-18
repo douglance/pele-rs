@@ -192,29 +192,35 @@ pub(super) fn render(
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    let across = draw(db, config, options, resources, false)?;
-    if !matches!(db.direction.as_str(), "LR" | "RL") {
-        return Ok(across);
+    let selected = (|| -> Result<_, PeleError> {
+        let across = draw(db, config, options, resources, false)?;
+        if !matches!(db.direction.as_str(), "LR" | "RL") {
+            return Ok(across);
+        }
+        let Some(available) = options.max_width.filter(|n| *n > 0.) else {
+            return Ok(across);
+        };
+        if options.auto_direction == Some(false)
+            || across.0.width <= available
+            || available
+                >= options
+                    .direction_breakpoint
+                    .filter(|n| *n > 0.)
+                    .unwrap_or(640.)
+        {
+            return Ok(across);
+        }
+        let down = draw(db, config, options, resources, true)?;
+        Ok(if down.0.width < across.0.width {
+            down
+        } else {
+            across
+        })
+    })()?;
+    if let Some(frame) = selected.1 {
+        resources.capture_presentation(frame);
     }
-    let Some(available) = options.max_width.filter(|n| *n > 0.) else {
-        return Ok(across);
-    };
-    if options.auto_direction == Some(false)
-        || across.width <= available
-        || available
-            >= options
-                .direction_breakpoint
-                .filter(|n| *n > 0.)
-                .unwrap_or(640.)
-    {
-        return Ok(across);
-    }
-    let down = draw(db, config, options, resources, true)?;
-    Ok(if down.width < across.width {
-        down
-    } else {
-        across
-    })
+    Ok(selected.0)
 }
 fn draw(
     db: &ErModel,
@@ -222,7 +228,7 @@ fn draw(
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
     turned: bool,
-) -> Result<Rendered, PeleError> {
+) -> Result<(Rendered, Option<crate::compat::PresentationOutcome>), PeleError> {
     let (nodes, edges) = graph::build(db);
     let size = options.font_size.unwrap_or(16.);
     let small = round(size * 0.875);
@@ -531,6 +537,15 @@ fn draw(
     shift_layout(&mut cnodes, &mut cedges, ox, oy);
     let width = (inner + 2. * pad).ceil();
     let height = (layout.height + title_height + 2. * pad).ceil();
+    let mut presentation = resources.presentation_budget().map(|budget| {
+        crate::compat::presentation::FrameBuilder::new(
+            budget,
+            width,
+            height,
+            db.acc_title.as_deref().or(db.title.as_deref()),
+            db.acc_descr.as_deref(),
+        )
+    });
     let mut links = vec![];
     let mut crossings = Crossings::new();
     if cnodes.iter().any(|c| c.is_group) {
@@ -543,6 +558,9 @@ fn draw(
     for (i, view) in views.iter_mut().enumerate() {
         let c = &cnodes[i];
         let node = &view.node;
+        if let Some(frame) = &mut presentation {
+            frame.label(if c.is_group { &node.id } else { &node.label }, &view.label);
+        }
         let stripped = node
             .css_classes
             .strip_prefix("default")
@@ -616,6 +634,25 @@ fn draw(
                     String::new()
                 }
             );
+            if safe {
+                if let Some(frame) = &mut presentation {
+                    frame.link(
+                        &node.label,
+                        &display,
+                        true,
+                        crate::compat::PresentationRect::centered(
+                            c.x,
+                            c.y + if !view.rows.is_empty() {
+                                y0 + view.head_h / 2.
+                            } else {
+                                0.
+                            },
+                            view.label.width,
+                            view.label.height,
+                        ),
+                    );
+                }
+            }
             links.push(LinkInfo {
                 id: node.label.clone(),
                 href: display,
@@ -640,6 +677,11 @@ fn draw(
             let mut cells = String::new();
             let mut y = y0 + view.head_h;
             for (r, row) in view.rows.iter().enumerate() {
+                if let Some(frame) = &mut presentation {
+                    for cell in &row.cells {
+                        frame.label(&node.label, cell);
+                    }
+                }
                 if r % 2 == 0 {
                     let span = format!("x=\"{}\" width=\"{}\"", num(x0), num(w));
                     if r == view.rows.len() - 1 {
@@ -799,6 +841,9 @@ fn draw(
             }
         ));
         if label.width > 0. {
+            if let Some(frame) = &mut presentation {
+                frame.label(&edge.id, label);
+            }
             labels_out.push_str(&edge_label_svg(
                 &edge.id, label, ce.label_x, ce.label_y, "", resources,
             )?)
@@ -841,12 +886,15 @@ fn draw(
         db.acc_descr.as_deref(),
         &body,
     )?;
-    Ok(Rendered {
-        svg,
-        width,
-        height,
-        links,
-    })
+    Ok((
+        Rendered {
+            svg,
+            width,
+            height,
+            links,
+        },
+        presentation.map(|frame| frame.finish()),
+    ))
 }
 fn straighten(route: &[f64]) -> Vec<f64> {
     let mut out = route[..route.len().min(3)].to_vec();

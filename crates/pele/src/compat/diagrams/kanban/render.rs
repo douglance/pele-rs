@@ -304,10 +304,24 @@ pub(super) fn render(
     };
     let board_width = ((count as f64).js_min(per_row) * (column_width + 12.) - 12.).js_max(0.);
     let width = board_width.js_max(title.width);
+    let total_width = (width + 2. * pad).ceil();
+    let total_height = (board_height + title_height + 2. * pad).ceil();
+    let mut presentation = r.presentation_budget().map(|budget| {
+        crate::compat::presentation::FrameBuilder::new(
+            budget,
+            total_width,
+            total_height,
+            m.title.as_deref(),
+            None,
+        )
+    });
     let left = pad + (width - board_width) / 2.;
     let edge = column_width - 12.;
     let mut out = String::new();
     for (index, section) in m.sections.iter().enumerate() {
+        if let Some(frame) = &mut presentation {
+            frame.label(&section.node.id, &titles[index]);
+        }
         let row = (index as f64 / per_row).floor();
         let row_height = if row.is_nan() {
             f64::NAN
@@ -348,6 +362,11 @@ pub(super) fn render(
         let mut y = head_height;
         for card in &cards[index] {
             let item = card.item;
+            if let Some(frame) = &mut presentation {
+                frame.label(&item.id, &card.label);
+                frame.label(&item.id, &card.ticket);
+                frame.label(&item.id, &card.assigned);
+            }
             let priority = item
                 .priority
                 .as_deref()
@@ -408,6 +427,22 @@ pub(super) fn render(
                             false
                         )?
                     ));
+                    if let Some(frame) = &mut presentation {
+                        frame.link(
+                            &item.id,
+                            &href,
+                            false,
+                            crate::compat::PresentationRect {
+                                x: left
+                                    + (index as f64 % per_row) * (column_width + 12.)
+                                    + 8.
+                                    + 10.,
+                                y: pad + title_height + row_top + y + top,
+                                width: card.ticket.width,
+                                height: card.ticket.height,
+                            },
+                        );
+                    }
                     links.push(LinkInfo {
                         id: item.id.clone(),
                         href,
@@ -439,15 +474,14 @@ pub(super) fn render(
         }
         out.push_str(&format!("<g class=\"pele-cluster pele-column{}\" data-id=\"{}\" transform=\"translate({},{})\">{body}</g>",class_names(section.node.css_classes.as_deref().unwrap_or("")),esc_text(&section.node.id)?,num(left+(index as f64%per_row)*(column_width+12.)),num(pad+title_height+row_top)));
     }
-    let total_width = (width + 2. * pad).ceil();
-    let total_height = (board_height + title_height + 2. * pad).ceil();
+
     let content = label_svg(
         &title,
         total_width / 2.,
         pad + title.height / 2.,
         " class=\"pele-title\" font-weight=\"var(--_tw)\"",
     ) + &out;
-    Ok(Rendered {
+    let rendered = Rendered {
         svg: document(
             "kanban",
             total_width,
@@ -461,5 +495,9 @@ pub(super) fn render(
         width: total_width,
         height: total_height,
         links,
-    })
+    };
+    if let Some(frame) = presentation {
+        r.capture_presentation(frame.finish());
+    }
+    Ok(rendered)
 }

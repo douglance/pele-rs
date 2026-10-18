@@ -101,25 +101,31 @@ pub(super) fn render(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    let across = draw(db, c, o, r, false)?;
-    if !matches!(db.direction.as_deref(), Some("LR" | "RL")) {
-        return Ok(across);
+    let selected = (|| -> Result<_, PeleError> {
+        let across = draw(db, c, o, r, false)?;
+        if !matches!(db.direction.as_deref(), Some("LR" | "RL")) {
+            return Ok(across);
+        }
+        let Some(available) = o.max_width.filter(|v| *v > 0.) else {
+            return Ok(across);
+        };
+        if o.auto_direction == Some(false)
+            || across.0.width <= available
+            || available >= o.direction_breakpoint.filter(|v| *v > 0.).unwrap_or(640.)
+        {
+            return Ok(across);
+        }
+        let down = draw(db, c, o, r, true)?;
+        Ok(if down.0.width < across.0.width {
+            down
+        } else {
+            across
+        })
+    })()?;
+    if let Some(frame) = selected.1 {
+        r.capture_presentation(frame);
     }
-    let Some(available) = o.max_width.filter(|v| *v > 0.) else {
-        return Ok(across);
-    };
-    if o.auto_direction == Some(false)
-        || across.width <= available
-        || available >= o.direction_breakpoint.filter(|v| *v > 0.).unwrap_or(640.)
-    {
-        return Ok(across);
-    }
-    let down = draw(db, c, o, r, true)?;
-    Ok(if down.width < across.width {
-        down
-    } else {
-        across
-    })
+    Ok(selected.0)
 }
 fn contains(nodes: &[CNode], depth: &[isize], group: usize, i: usize) -> bool {
     let mut j = i as isize;
@@ -179,7 +185,7 @@ fn draw(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
     turned: bool,
-) -> Result<Rendered, PeleError> {
+) -> Result<(Rendered, Option<crate::compat::PresentationOutcome>), PeleError> {
     let graph = db
         .graph
         .as_ref()
@@ -400,6 +406,15 @@ fn draw(
     shift_layout(&mut nodes, &mut edges, ox, oy);
     let width = (inner + 2. * pad).ceil();
     let height = (layout.height + title_height + 2. * pad).ceil();
+    let mut presentation = r.presentation_budget().map(|budget| {
+        crate::compat::presentation::FrameBuilder::new(
+            budget,
+            width,
+            height,
+            db.acc_title.as_deref().or(db.title.as_deref()),
+            db.acc_descr.as_deref(),
+        )
+    });
     let mut links = vec![];
     let mut held_paths = vec![];
     let mut held_labels = vec![];
@@ -478,6 +493,9 @@ fn draw(
     for (i, v) in views.iter().enumerate() {
         let c = &nodes[i];
         let node = &v.node;
+        if let Some(frame) = &mut presentation {
+            frame.label(&node.id, &v.label);
+        }
         let classes = class_names(
             node.css_classes
                 .strip_prefix("default")
@@ -541,6 +559,21 @@ fn draw(
                     String::new()
                 }
             );
+            if safe {
+                if let Some(frame) = &mut presentation {
+                    frame.link(
+                        &node.id,
+                        &name,
+                        true,
+                        crate::compat::PresentationRect::centered(
+                            c.x,
+                            c.y + v.dy,
+                            v.label.width,
+                            v.label.height,
+                        ),
+                    );
+                }
+            }
             links.push(LinkInfo {
                 id: node.id.clone(),
                 href: name,
@@ -557,7 +590,18 @@ fn draw(
                 .as_ref()
                 .filter(|s| !s.is_empty())
                 .map_or_else(String::new, |s| format!(" target=\"{}\"", esc(s)));
+            let link_index = links.len();
             body = linked(&body, link, &node.id, &mut links, o, &attrs);
+            if let Some(frame) = &mut presentation {
+                if let Some(approved) = links.get(link_index) {
+                    frame.link(
+                        &node.id,
+                        &approved.href,
+                        false,
+                        crate::compat::PresentationRect::centered(c.x, c.y, v.w, v.h),
+                    );
+                }
+            }
         }
         nodes_out.push_str(&format!("<g class=\"pele-node pele-shape-{}{kind}{classes}\" data-id=\"{id}\" transform=\"translate({},{})\">{body}</g>",v.shape,num(c.x),num(c.y)));
     }
@@ -608,6 +652,11 @@ fn draw(
                 None,
             )
         };
+        if label.width > 0. {
+            if let Some(frame) = &mut presentation {
+                frame.label(&edge.id, label);
+            }
+        }
         put(
             edge,
             label,
@@ -620,6 +669,11 @@ fn draw(
         )?;
     }
     for (i, (edge, label, _, _)) in held.iter().enumerate() {
+        if label.width > 0. {
+            if let Some(frame) = &mut presentation {
+                frame.label(&edge.id, label);
+            }
+        }
         put(
             edge,
             label,
@@ -660,10 +714,13 @@ fn draw(
         db.acc_descr.as_deref(),
         &content,
     )?;
-    Ok(Rendered {
-        svg,
-        width,
-        height,
-        links,
-    })
+    Ok((
+        Rendered {
+            svg,
+            width,
+            height,
+            links,
+        },
+        presentation.map(|frame| frame.finish()),
+    ))
 }
