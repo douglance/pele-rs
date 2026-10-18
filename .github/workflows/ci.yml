@@ -1,9 +1,12 @@
-name: Shared flowchart conformance
+name: Full library compatibility
 on:
   push:
     paths-ignore: ['**/*.md', 'docs/**']
   pull_request:
     paths-ignore: ['**/*.md', 'docs/**']
+concurrency:
+  group: pele-compatibility-${{ github.head_ref || github.ref_name }}
+  cancel-in-progress: true
 permissions:
   contents: read
 jobs:
