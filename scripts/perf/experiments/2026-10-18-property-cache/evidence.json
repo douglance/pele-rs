@@ -1,0 +1,3473 @@
+{
+  "schemaVersion": 1,
+  "status": "isolated allocation attribution; runtime adoption held; no elapsed timing or speed claim",
+  "baselineCommit": "a34ca6c91040fb8a9d7915d7c03a4eda10396c17",
+  "upstream": "458322a5b8abb1ae57ddf127c32017ab9fb14a92",
+  "oracleSha256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "toolchain": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "platform": {
+    "os": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M1 Pro",
+    "node": "v25.9.0"
+  },
+  "baselineBuild": {
+    "schemaVersion": 1,
+    "sourceInputSha256": "238ec161befcfcbc4857da8b50374d2c8c360b96210ff8af739dfc9e5a8166ac",
+    "revision": "a34ca6c91040fb8a9d7915d7c03a4eda10396c17",
+    "builtAt": "2026-10-18T17:56:51.812Z",
+    "binaries": {
+      "pele-perf": "a1f68a8b2b84de4705dd0e6f2a8ec87bb3b55e071ea111a03f2bcb17a2d539f4",
+      "pele-perf-alloc": "5fa7b5432ff603c363121a9d17156b593e37c0793f21c7761cc2ba334194701c"
+    }
+  },
+  "prototypeBuild": {
+    "schemaVersion": 1,
+    "sourceInputSha256": "7ee816f69f2286cc8d5f89803d5bbedeb94b842b62ce6e6fe5d6ccd30090a0a3",
+    "revision": "a34ca6c91040fb8a9d7915d7c03a4eda10396c17",
+    "builtAt": "2026-10-18T17:59:59.892Z",
+    "binaries": {
+      "pele-perf": "a19c6bb6f667eed86d71afd75b459a76a800bc92253bd711807c3efbdfb52927",
+      "pele-perf-alloc": "7ef0c99d25938903cec137840274a94dc4de91b8261db4b99184b3c898ac7cc2"
+    }
+  },
+  "graphWriterInlineBytes": {
+    "before": 120,
+    "after": 168
+  },
+  "verification": {
+    "wholeSvgAndDimensions": true,
+    "completeModelGraphIdentityOrder": true,
+    "extraRawUtf16RepeatedUniqueGraph": true,
+    "caseCount": 21,
+    "allocationRowsPerBuild": 84,
+    "elapsedRows": 0
+  },
+  "cases": [
+    {
+      "id": "flowchart/small",
+      "units": 8,
+      "sourceSha256": "647d1649fff45083426d711811675be3bb058a9178bd1c469b5940aeb0bb783b",
+      "output": {
+        "type": "flowchart",
+        "widthBits": "405b800000000000",
+        "heightBits": "4087000000000000",
+        "svgSha256": "9aa81d216d0f8804a49140d117b98e29f93eb16942f5829e426da1fd5000b4de",
+        "svgBytes": 4116
+      },
+      "graphSha256": "d8fb80050cfb5a6b1fabc7fe91d8672e9d7ce6b824b7e334922430dbb72abf41",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 9,
+          "properties": 140,
+          "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+          "strings": 28
+        },
+        "unique": {
+          "nodes": 9,
+          "properties": 140,
+          "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+          "strings": 141
+        }
+      }
+    },
+    {
+      "id": "sequence/small",
+      "units": 8,
+      "sourceSha256": "761e97cb09258622eb0e4b26b51a78b927bfecc75f05dad9ec97b7a982bc6bc6",
+      "output": {
+        "type": "sequence",
+        "widthBits": "4068200000000000",
+        "heightBits": "407aa00000000000",
+        "svgSha256": "81dfb69796084be2b9dbdd8d80368e2fa969c9c37689f5d2f1f878701768999a",
+        "svgBytes": 4404
+      },
+      "graphSha256": "d636ba61f06535683fe6995f5b91c09d23565a155fa68a1da7a73a972319a93e",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 9,
+          "properties": 140,
+          "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+          "strings": 28
+        },
+        "unique": {
+          "nodes": 9,
+          "properties": 140,
+          "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+          "strings": 141
+        }
+      }
+    },
+    {
+      "id": "er/small",
+      "units": 8,
+      "sourceSha256": "5a6e7a2ba89f903cdb22547387e4f04df621bae730a0a6a172bcfa1a0345790d",
+      "output": {
+        "type": "er",
+        "widthBits": "4066600000000000",
+        "heightBits": "4096bc0000000000",
+        "svgSha256": "475a8c17cfb501bbaf7e41062c1cd9166faa8cca151f75a0ad9f93432d0d3984",
+        "svgBytes": 11874
+      },
+      "graphSha256": "020d5f34dd9c2cae38354ea0f33cc46e620f425af07ea1c4be56af43b3eab481",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 9,
+          "properties": 140,
+          "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+          "strings": 28
+        },
+        "unique": {
+          "nodes": 9,
+          "properties": 140,
+          "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+          "strings": 141
+        }
+      }
+    },
+    {
+      "id": "pie/small",
+      "units": 8,
+      "sourceSha256": "148212294e69607b7cae24468114ec57c3fdd59971156137746d83b1e4272f2b",
+      "output": {
+        "type": "pie",
+        "widthBits": "407a700000000000",
+        "heightBits": "4076000000000000",
+        "svgSha256": "cd8cefb8884714ae9eff91326c65ddb3f579ebfc6fcd587acb28feef7c7d9706",
+        "svgBytes": 4131
+      },
+      "graphSha256": "d38e3303d8a97b9fa8ca73a21c77c755ef24e03ceb11d7238245019e61cb6f23",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 9,
+          "properties": 140,
+          "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+          "strings": 28
+        },
+        "unique": {
+          "nodes": 9,
+          "properties": 140,
+          "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+          "strings": 141
+        }
+      }
+    },
+    {
+      "id": "sankey/small",
+      "units": 8,
+      "sourceSha256": "e0bac64249ac2903390cfcffd9822508c74e6cdff134aa0dfff7b6c88c65786e",
+      "output": {
+        "type": "sankey",
+        "widthBits": "4083400000000000",
+        "heightBits": "407a000000000000",
+        "svgSha256": "4c8372081ec9f54f9450ac6f28ceb0cdb744fcecc346d86f18b504a03200c491",
+        "svgBytes": 4589
+      },
+      "graphSha256": "8f74921e2206b5f8962bcb37f2fbf5bc743ca818f5a7a3ab2a84615c0676839e",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 9,
+          "properties": 140,
+          "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+          "strings": 28
+        },
+        "unique": {
+          "nodes": 9,
+          "properties": 140,
+          "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+          "strings": 141
+        }
+      }
+    },
+    {
+      "id": "gantt/small",
+      "units": 8,
+      "sourceSha256": "e95d857b2d21277ff82edeab27a83c843a3012c9ab06f2c55b30c0b96c0fd531",
+      "output": {
+        "type": "gantt",
+        "widthBits": "4089000000000000",
+        "heightBits": "4071500000000000",
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "svgBytes": 3407
+      },
+      "graphSha256": "9fb7022860984ebdc1c14d1ca1f0150d6576f8fca8532b3cf8dfe404cd75e50e",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 9,
+          "properties": 140,
+          "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+          "strings": 28
+        },
+        "unique": {
+          "nodes": 9,
+          "properties": 140,
+          "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+          "strings": 141
+        }
+      }
+    },
+    {
+      "id": "railroad/small",
+      "units": 3,
+      "sourceSha256": "c81c9badf39b8e955da47fa8a7ed38e4bd3f24876a26eededc54d55a94374816",
+      "output": {
+        "type": "railroad",
+        "widthBits": "4077c00000000000",
+        "heightBits": "407b000000000000",
+        "svgSha256": "96e9d750a58266724dd06599c282c56bec8baf3524e8e07af66b72dabf1b083a",
+        "svgBytes": 6036
+      },
+      "graphSha256": "2ecb075ba354ffe6e9399a1466baf72e20f7b7498f7c86e8a2195dc937394038",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 4,
+          "properties": 55,
+          "sha256": "3366a045752643d0c3a10496783695f2605a12ad4d88dfd945eb7b1c54547110",
+          "strings": 23
+        },
+        "unique": {
+          "nodes": 4,
+          "properties": 55,
+          "sha256": "5ac6d4f31e16711a87e396123c54345a1abee81a61b0ceb551374db0c186c50e",
+          "strings": 56
+        }
+      }
+    },
+    {
+      "id": "flowchart/medium",
+      "units": 48,
+      "sourceSha256": "d3ffdd90a8476c76234d30bf49cb41c7faaeb437c67ec4b5d92dd1e75dd2c5ca",
+      "output": {
+        "type": "flowchart",
+        "widthBits": "405e000000000000",
+        "heightBits": "40b1e00000000000",
+        "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+        "svgBytes": 21889
+      },
+      "graphSha256": "5ba84ab112c45a16c833a8397c817b0b3ed74944375a40041224488cbe7bbd9c",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 49,
+          "properties": 820,
+          "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+          "strings": 68
+        },
+        "unique": {
+          "nodes": 49,
+          "properties": 820,
+          "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+          "strings": 821
+        }
+      }
+    },
+    {
+      "id": "sequence/medium",
+      "units": 48,
+      "sourceSha256": "ff4d80b120bdba34c800984585ea064e45cb46ce19ea198c35ab0e7a5064cd1c",
+      "output": {
+        "type": "sequence",
+        "widthBits": "4069400000000000",
+        "heightBits": "409dc80000000000",
+        "svgSha256": "656d674a53bf2a97bb9429486711300be4d97c6694f14dee62a939f80d54444a",
+        "svgBytes": 15759
+      },
+      "graphSha256": "0991e675be7002702370f76bb218c4357a5f1fa68dd810754839776642b05569",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 49,
+          "properties": 820,
+          "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+          "strings": 68
+        },
+        "unique": {
+          "nodes": 49,
+          "properties": 820,
+          "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+          "strings": 821
+        }
+      }
+    },
+    {
+      "id": "er/medium",
+      "units": 48,
+      "sourceSha256": "51f222a39995ad6774e0fc6094dd5b8902d32febcd97d3a67b282f8c7851b748",
+      "output": {
+        "type": "er",
+        "widthBits": "4066600000000000",
+        "heightBits": "40c1c38000000000",
+        "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+        "svgBytes": 70404
+      },
+      "graphSha256": "b8ec01a15071df3a58038246a7b5b74adcc34b5aaaf19a465e153858d89156a9",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 49,
+          "properties": 820,
+          "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+          "strings": 68
+        },
+        "unique": {
+          "nodes": 49,
+          "properties": 820,
+          "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+          "strings": 821
+        }
+      }
+    },
+    {
+      "id": "pie/medium",
+      "units": 48,
+      "sourceSha256": "71db10120ad41f8031b3d4f5eac266754e1eba7680ac530e2c5a00f3938e8954",
+      "output": {
+        "type": "pie",
+        "widthBits": "407b000000000000",
+        "heightBits": "4094600000000000",
+        "svgSha256": "36f57bc6717ac42cc50f971a0f87d18027d58a863ef0cfc9b6841634a8f0c72a",
+        "svgBytes": 17134
+      },
+      "graphSha256": "cdb98e84e9c36ddea2f5217874343808379dfc4140150283b34ad0e7b61b3565",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 49,
+          "properties": 820,
+          "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+          "strings": 68
+        },
+        "unique": {
+          "nodes": 49,
+          "properties": 820,
+          "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+          "strings": 821
+        }
+      }
+    },
+    {
+      "id": "sankey/medium",
+      "units": 48,
+      "sourceSha256": "6543cd2e087fca2b0c5636630c6b73381f1298dea196e4379c6056f33a1ebd7c",
+      "output": {
+        "type": "sankey",
+        "widthBits": "4083400000000000",
+        "heightBits": "407a000000000000",
+        "svgSha256": "f6a9ac0c183550e62c53181252222401f56b9be509a32a947f7bba1bbf5b4928",
+        "svgBytes": 24853
+      },
+      "graphSha256": "3613c81902c8e5326cb6ac291deb3be5e42e0b82f8841fcdc03fca2f0d0d642f",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 49,
+          "properties": 820,
+          "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+          "strings": 68
+        },
+        "unique": {
+          "nodes": 49,
+          "properties": 820,
+          "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+          "strings": 821
+        }
+      }
+    },
+    {
+      "id": "gantt/medium",
+      "units": 48,
+      "sourceSha256": "5e15788ce4ee74b56b1f8c9ccdbd6569f3211b54a428ca6d4f0ea32fc4e485f1",
+      "output": {
+        "type": "gantt",
+        "widthBits": "4089000000000000",
+        "heightBits": "4097140000000000",
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "svgBytes": 12574
+      },
+      "graphSha256": "8af0117957fb6a4cb95c2f8d66129c7c46be864dc7ad181bf1ff0e44ffa401e1",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 49,
+          "properties": 820,
+          "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+          "strings": 68
+        },
+        "unique": {
+          "nodes": 49,
+          "properties": 820,
+          "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+          "strings": 821
+        }
+      }
+    },
+    {
+      "id": "railroad/medium",
+      "units": 15,
+      "sourceSha256": "368f387f0b24c8d1f198738179c4d03e6ac744ca578a5c5ad03ebdba67804963",
+      "output": {
+        "type": "railroad",
+        "widthBits": "4078400000000000",
+        "heightBits": "40a1400000000000",
+        "svgSha256": "3d395b112a50a03e8838b204ce4fa4510c31faf1cb83ffb1665ebf5aacaaee54",
+        "svgBytes": 27258
+      },
+      "graphSha256": "c82d618fb2c520b2d7f4f928016d4d2650fdf0a75d54e987e217abc769aa6319",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 16,
+          "properties": 259,
+          "sha256": "a92bc9c0cd4ec0cb7a19b4f04cbed32198808e71447971faac6a2c6e20624f0f",
+          "strings": 35
+        },
+        "unique": {
+          "nodes": 16,
+          "properties": 259,
+          "sha256": "aaec1d58a336ccb3ac2441b523df0f6de9a25f24db1e8fd018060b9fca69b9eb",
+          "strings": 260
+        }
+      }
+    },
+    {
+      "id": "flowchart/large",
+      "units": 200,
+      "sourceSha256": "98e63c8c7589e05375c15a786827e79a207ffa960d1138c7873dee8abbeec042",
+      "output": {
+        "type": "flowchart",
+        "widthBits": "4060200000000000",
+        "heightBits": "40d2b80000000000",
+        "svgSha256": "9b097740e50f249ff18a4ca622f650360e0bbd495f2fe7ca00f406e3044cfb01",
+        "svgBytes": 90501
+      },
+      "graphSha256": "799044862db9b26ded474599335b397b747b45780606e7fafa9e79b21439ba1c",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 201,
+          "properties": 3404,
+          "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+          "strings": 220
+        },
+        "unique": {
+          "nodes": 201,
+          "properties": 3404,
+          "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+          "strings": 3405
+        }
+      }
+    },
+    {
+      "id": "sequence/large",
+      "units": 200,
+      "sourceSha256": "665168f531e73c50aecb2eb8bbf290895604f50bb6e91cfbe786a3d62012dae0",
+      "output": {
+        "type": "sequence",
+        "widthBits": "406a400000000000",
+        "heightBits": "40bd6a0000000000",
+        "svgSha256": "606a97b7015c98c33bbb9bb38f2c8c138a67bf5bd6a6989bfe52aff1a4dd649d",
+        "svgBytes": 61165
+      },
+      "graphSha256": "54202237f79e1f25a35cd8e0cd66c02bb597042500854c3783174c71a9f82bef",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 201,
+          "properties": 3404,
+          "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+          "strings": 220
+        },
+        "unique": {
+          "nodes": 201,
+          "properties": 3404,
+          "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+          "strings": 3405
+        }
+      }
+    },
+    {
+      "id": "er/large",
+      "units": 200,
+      "sourceSha256": "4969b249e415d09f27b830d3e67b339add055118255d2d65c7d4cbe0bfc3a50d",
+      "output": {
+        "type": "er",
+        "widthBits": "4066600000000000",
+        "heightBits": "40e29de000000000",
+        "svgSha256": "b49418b80220f9ccabe764c7c2eecbb7735a48f23324b7ef09eccfd5b2d57590",
+        "svgBytes": 296039
+      },
+      "graphSha256": "734f15bf503274e159e06e615834da501d2839c3f403e5f9e1ea32e285c550e6",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 201,
+          "properties": 3404,
+          "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+          "strings": 220
+        },
+        "unique": {
+          "nodes": 201,
+          "properties": 3404,
+          "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+          "strings": 3405
+        }
+      }
+    },
+    {
+      "id": "pie/large",
+      "units": 200,
+      "sourceSha256": "0c14fa64eaa629fb651c5f007b8328476b321ce53ba7419feab3e71ab3a3a994",
+      "output": {
+        "type": "pie",
+        "widthBits": "4078000000000000",
+        "heightBits": "40b4880000000000",
+        "svgSha256": "1bda4d22d8a21e9ff0c2bf48b2d677aeb518c9e0f81ec60e5ce4f07027547829",
+        "svgBytes": 41981
+      },
+      "graphSha256": "578c96fff237f8b172b0fd3937a86f88528af9e52e4b71acc96a6dbd1effb4cc",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 201,
+          "properties": 3404,
+          "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+          "strings": 220
+        },
+        "unique": {
+          "nodes": 201,
+          "properties": 3404,
+          "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+          "strings": 3405
+        }
+      }
+    },
+    {
+      "id": "sankey/large",
+      "units": 200,
+      "sourceSha256": "4e2cd5fa88548ad1649e77ae1d9eba11ec975e08f3091143b2a72399c9a42852",
+      "output": {
+        "type": "sankey",
+        "widthBits": "4083400000000000",
+        "heightBits": "407a000000000000",
+        "svgSha256": "57633ffee48452e0df1fe9bacd17a093bd85ece6059991c48e842cf5768a0f61",
+        "svgBytes": 102559
+      },
+      "graphSha256": "8e500b00dbb65d35299f7edfdaeb6eb81a36476e456ba68386b46760f2c62a17",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 201,
+          "properties": 3404,
+          "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+          "strings": 220
+        },
+        "unique": {
+          "nodes": 201,
+          "properties": 3404,
+          "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+          "strings": 3405
+        }
+      }
+    },
+    {
+      "id": "gantt/large",
+      "units": 200,
+      "sourceSha256": "1b44e7d9f858100864304e01163c081d9b86efab39b4677585fe6cfdd0b2a6aa",
+      "output": {
+        "type": "gantt",
+        "widthBits": "4089000000000000",
+        "heightBits": "40b7950000000000",
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "svgBytes": 48636
+      },
+      "graphSha256": "fd4870d9497f6c583a0828572d707438bb2279d1a95d4c3affee7cf539c819f8",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 201,
+          "properties": 3404,
+          "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+          "strings": 220
+        },
+        "unique": {
+          "nodes": 201,
+          "properties": 3404,
+          "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+          "strings": 3405
+        }
+      }
+    },
+    {
+      "id": "railroad/large",
+      "units": 60,
+      "sourceSha256": "6551d00c3bcfe67834b31127dd18f26e9e0dd6f90e2521ad95cefc5e3f7ae39c",
+      "output": {
+        "type": "railroad",
+        "widthBits": "4078400000000000",
+        "heightBits": "40c1520000000000",
+        "svgSha256": "49b86183c15428a1e239981e1ff04a0189f7e83b91b07833bfcd1dba8e86abc2",
+        "svgBytes": 107448
+      },
+      "graphSha256": "87c33019222d342edfade4d3bbc100067e5da79bb151db2bc89782f19b5f213a",
+      "propertyGraphs": {
+        "repeated": {
+          "nodes": 61,
+          "properties": 1024,
+          "sha256": "bfca3e5ff0d7c5314582095a523031d324fce9566bcf7bf542a642a9ebf3f4b5",
+          "strings": 80
+        },
+        "unique": {
+          "nodes": 61,
+          "properties": 1024,
+          "sha256": "8d4e2189907ed7d5c3570093afb9e599abebab4dd208783351959070f94d5f74",
+          "strings": 1025
+        }
+      }
+    }
+  ],
+  "allocationDeltas": [
+    {
+      "case": "flowchart/small",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 1061,
+        "after": 1061,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 425,
+        "after": 425,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 106854,
+        "after": 106854,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 36488,
+        "after": 36488,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "flowchart/small",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 1234,
+        "after": 1234,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 433,
+        "after": 433,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 118927,
+        "after": 118927,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 47601,
+        "after": 47601,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "flowchart/small",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 195,
+        "after": 111,
+        "change": -84,
+        "percent": -43.07692307692308
+      },
+      "reallocations": {
+        "before": 141,
+        "after": 28,
+        "change": -113,
+        "percent": -80.1418439716312
+      },
+      "requestedBytes": {
+        "before": 12816,
+        "after": 12245,
+        "change": -571,
+        "percent": -4.455368289637953
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 7086,
+        "after": 8279,
+        "change": 1193,
+        "percent": 16.836014676827546
+      }
+    },
+    {
+      "case": "flowchart/small",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 311,
+        "after": 381,
+        "change": 70,
+        "percent": 22.508038585209004
+      },
+      "reallocations": {
+        "before": 144,
+        "after": 144,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 40042,
+        "after": 48878,
+        "change": 8836,
+        "percent": 22.066829828679886
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 23328,
+        "after": 28032,
+        "change": 4704,
+        "percent": 20.16460905349794
+      }
+    },
+    {
+      "case": "sequence/small",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 654,
+        "after": 654,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 218,
+        "after": 218,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 61449,
+        "after": 61449,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 18848,
+        "after": 18848,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "sequence/small",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 827,
+        "after": 827,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 226,
+        "after": 226,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 73522,
+        "after": 73522,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 29961,
+        "after": 29961,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "sequence/small",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 195,
+        "after": 111,
+        "change": -84,
+        "percent": -43.07692307692308
+      },
+      "reallocations": {
+        "before": 141,
+        "after": 28,
+        "change": -113,
+        "percent": -80.1418439716312
+      },
+      "requestedBytes": {
+        "before": 12816,
+        "after": 12245,
+        "change": -571,
+        "percent": -4.455368289637953
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 7086,
+        "after": 8279,
+        "change": 1193,
+        "percent": 16.836014676827546
+      }
+    },
+    {
+      "case": "sequence/small",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 311,
+        "after": 381,
+        "change": 70,
+        "percent": 22.508038585209004
+      },
+      "reallocations": {
+        "before": 144,
+        "after": 144,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 40042,
+        "after": 48878,
+        "change": 8836,
+        "percent": 22.066829828679886
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 23328,
+        "after": 28032,
+        "change": 4704,
+        "percent": 20.16460905349794
+      }
+    },
+    {
+      "case": "er/small",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 1116,
+        "after": 986,
+        "change": -130,
+        "percent": -11.648745519713263
+      },
+      "reallocations": {
+        "before": 309,
+        "after": 196,
+        "change": -113,
+        "percent": -36.56957928802589
+      },
+      "requestedBytes": {
+        "before": 94696,
+        "after": 95530,
+        "change": 834,
+        "percent": 0.8807130185013095
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 30468,
+        "after": 32744,
+        "change": 2276,
+        "percent": 7.470132598135749
+      }
+    },
+    {
+      "case": "er/small",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 1289,
+        "after": 1159,
+        "change": -130,
+        "percent": -10.08533747090768
+      },
+      "reallocations": {
+        "before": 317,
+        "after": 204,
+        "change": -113,
+        "percent": -35.646687697160885
+      },
+      "requestedBytes": {
+        "before": 106769,
+        "after": 107603,
+        "change": 834,
+        "percent": 0.7811256076201893
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 41581,
+        "after": 43857,
+        "change": 2276,
+        "percent": 5.473653832279166
+      }
+    },
+    {
+      "case": "er/small",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 195,
+        "after": 111,
+        "change": -84,
+        "percent": -43.07692307692308
+      },
+      "reallocations": {
+        "before": 141,
+        "after": 28,
+        "change": -113,
+        "percent": -80.1418439716312
+      },
+      "requestedBytes": {
+        "before": 12816,
+        "after": 12245,
+        "change": -571,
+        "percent": -4.455368289637953
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 7086,
+        "after": 8279,
+        "change": 1193,
+        "percent": 16.836014676827546
+      }
+    },
+    {
+      "case": "er/small",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 311,
+        "after": 381,
+        "change": 70,
+        "percent": 22.508038585209004
+      },
+      "reallocations": {
+        "before": 144,
+        "after": 144,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 40042,
+        "after": 48878,
+        "change": 8836,
+        "percent": 22.066829828679886
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 23328,
+        "after": 28032,
+        "change": 4704,
+        "percent": 20.16460905349794
+      }
+    },
+    {
+      "case": "pie/small",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 60,
+        "after": 68,
+        "change": 8,
+        "percent": 13.333333333333334
+      },
+      "reallocations": {
+        "before": 27,
+        "after": 27,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 9006,
+        "after": 9459,
+        "change": 453,
+        "percent": 5.02998001332445
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 3442,
+        "after": 3739,
+        "change": 297,
+        "percent": 8.62870424171993
+      }
+    },
+    {
+      "case": "pie/small",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 233,
+        "after": 241,
+        "change": 8,
+        "percent": 3.4334763948497855
+      },
+      "reallocations": {
+        "before": 35,
+        "after": 35,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 21079,
+        "after": 21532,
+        "change": 453,
+        "percent": 2.149058304473647
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 14555,
+        "after": 14852,
+        "change": 297,
+        "percent": 2.0405358983167297
+      }
+    },
+    {
+      "case": "pie/small",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 195,
+        "after": 111,
+        "change": -84,
+        "percent": -43.07692307692308
+      },
+      "reallocations": {
+        "before": 141,
+        "after": 28,
+        "change": -113,
+        "percent": -80.1418439716312
+      },
+      "requestedBytes": {
+        "before": 12816,
+        "after": 12245,
+        "change": -571,
+        "percent": -4.455368289637953
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 7086,
+        "after": 8279,
+        "change": 1193,
+        "percent": 16.836014676827546
+      }
+    },
+    {
+      "case": "pie/small",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 311,
+        "after": 381,
+        "change": 70,
+        "percent": 22.508038585209004
+      },
+      "reallocations": {
+        "before": 144,
+        "after": 144,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 40042,
+        "after": 48878,
+        "change": 8836,
+        "percent": 22.066829828679886
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 23328,
+        "after": 28032,
+        "change": 4704,
+        "percent": 20.16460905349794
+      }
+    },
+    {
+      "case": "sankey/small",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 267,
+        "after": 252,
+        "change": -15,
+        "percent": -5.617977528089887
+      },
+      "reallocations": {
+        "before": 51,
+        "after": 26,
+        "change": -25,
+        "percent": -49.01960784313725
+      },
+      "requestedBytes": {
+        "before": 23511,
+        "after": 24884,
+        "change": 1373,
+        "percent": 5.839819658883076
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 9474,
+        "after": 10605,
+        "change": 1131,
+        "percent": 11.937935402153261
+      }
+    },
+    {
+      "case": "sankey/small",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 440,
+        "after": 425,
+        "change": -15,
+        "percent": -3.4090909090909087
+      },
+      "reallocations": {
+        "before": 59,
+        "after": 34,
+        "change": -25,
+        "percent": -42.3728813559322
+      },
+      "requestedBytes": {
+        "before": 35584,
+        "after": 36957,
+        "change": 1373,
+        "percent": 3.8584757194244603
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 20587,
+        "after": 21718,
+        "change": 1131,
+        "percent": 5.493758196920387
+      }
+    },
+    {
+      "case": "sankey/small",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 195,
+        "after": 111,
+        "change": -84,
+        "percent": -43.07692307692308
+      },
+      "reallocations": {
+        "before": 141,
+        "after": 28,
+        "change": -113,
+        "percent": -80.1418439716312
+      },
+      "requestedBytes": {
+        "before": 12816,
+        "after": 12245,
+        "change": -571,
+        "percent": -4.455368289637953
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 7086,
+        "after": 8279,
+        "change": 1193,
+        "percent": 16.836014676827546
+      }
+    },
+    {
+      "case": "sankey/small",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 311,
+        "after": 381,
+        "change": 70,
+        "percent": 22.508038585209004
+      },
+      "reallocations": {
+        "before": 144,
+        "after": 144,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 40042,
+        "after": 48878,
+        "change": 8836,
+        "percent": 22.066829828679886
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 23328,
+        "after": 28032,
+        "change": 4704,
+        "percent": 20.16460905349794
+      }
+    },
+    {
+      "case": "gantt/small",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 761,
+        "after": 761,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 316,
+        "after": 316,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 110214,
+        "after": 110214,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 37650,
+        "after": 37650,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "gantt/small",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 934,
+        "after": 934,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 324,
+        "after": 324,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 122287,
+        "after": 122287,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 48763,
+        "after": 48763,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "gantt/small",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 195,
+        "after": 111,
+        "change": -84,
+        "percent": -43.07692307692308
+      },
+      "reallocations": {
+        "before": 141,
+        "after": 28,
+        "change": -113,
+        "percent": -80.1418439716312
+      },
+      "requestedBytes": {
+        "before": 12816,
+        "after": 12245,
+        "change": -571,
+        "percent": -4.455368289637953
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 7086,
+        "after": 8279,
+        "change": 1193,
+        "percent": 16.836014676827546
+      }
+    },
+    {
+      "case": "gantt/small",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 311,
+        "after": 381,
+        "change": 70,
+        "percent": 22.508038585209004
+      },
+      "reallocations": {
+        "before": 144,
+        "after": 144,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 40042,
+        "after": 48878,
+        "change": 8836,
+        "percent": 22.066829828679886
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 23328,
+        "after": 28032,
+        "change": 4704,
+        "percent": 20.16460905349794
+      }
+    },
+    {
+      "case": "railroad/small",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 458,
+        "after": 413,
+        "change": -45,
+        "percent": -9.82532751091703
+      },
+      "reallocations": {
+        "before": 139,
+        "after": 116,
+        "change": -23,
+        "percent": -16.546762589928058
+      },
+      "requestedBytes": {
+        "before": 48976,
+        "after": 50091,
+        "change": 1115,
+        "percent": 2.276625285854296
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 16028,
+        "after": 17109,
+        "change": 1081,
+        "percent": 6.744447217369603
+      }
+    },
+    {
+      "case": "railroad/small",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 631,
+        "after": 586,
+        "change": -45,
+        "percent": -7.131537242472266
+      },
+      "reallocations": {
+        "before": 147,
+        "after": 124,
+        "change": -23,
+        "percent": -15.646258503401361
+      },
+      "requestedBytes": {
+        "before": 61049,
+        "after": 62164,
+        "change": 1115,
+        "percent": 1.826401742862291
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 27141,
+        "after": 28222,
+        "change": 1081,
+        "percent": 3.9829040934379725
+      }
+    },
+    {
+      "case": "railroad/small",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 95,
+        "after": 86,
+        "change": -9,
+        "percent": -9.473684210526317
+      },
+      "reallocations": {
+        "before": 57,
+        "after": 24,
+        "change": -33,
+        "percent": -57.89473684210527
+      },
+      "requestedBytes": {
+        "before": 7065,
+        "after": 8409,
+        "change": 1344,
+        "percent": 19.02335456475584
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 4189,
+        "after": 5377,
+        "change": 1188,
+        "percent": 28.359990451181666
+      }
+    },
+    {
+      "case": "railroad/small",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 129,
+        "after": 187,
+        "change": 58,
+        "percent": 44.96124031007752
+      },
+      "reallocations": {
+        "before": 58,
+        "after": 58,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 11207,
+        "after": 15706,
+        "change": 4499,
+        "percent": 40.144552511822965
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 7027,
+        "after": 9514,
+        "change": 2487,
+        "percent": 35.39205920022769
+      }
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 5961,
+        "after": 5961,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 2310,
+        "after": 2310,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 665327,
+        "after": 665327,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 207462,
+        "after": 207462,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 6134,
+        "after": 6134,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 2318,
+        "after": 2318,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 677400,
+        "after": 677400,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 218575,
+        "after": 218575,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 997,
+        "after": 313,
+        "change": -684,
+        "percent": -68.60581745235707
+      },
+      "reallocations": {
+        "before": 790,
+        "after": 37,
+        "change": -753,
+        "percent": -95.31645569620252
+      },
+      "requestedBytes": {
+        "before": 64522,
+        "after": 55017,
+        "change": -9505,
+        "percent": -14.7314094417408
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 33584,
+        "after": 38029,
+        "change": 4445,
+        "percent": 13.235469271081469
+      }
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 1753,
+        "after": 1823,
+        "change": 70,
+        "percent": 3.993154592127781
+      },
+      "reallocations": {
+        "before": 1021,
+        "after": 1021,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 186308,
+        "after": 195144,
+        "change": 8836,
+        "percent": 4.742684157416751
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 112222,
+        "after": 116926,
+        "change": 4704,
+        "percent": 4.191691468695978
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 2820,
+        "after": 2820,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 757,
+        "after": 757,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 285121,
+        "after": 285121,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 68980,
+        "after": 68980,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 2993,
+        "after": 2993,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 765,
+        "after": 765,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 297194,
+        "after": 297194,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 80093,
+        "after": 80093,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 997,
+        "after": 313,
+        "change": -684,
+        "percent": -68.60581745235707
+      },
+      "reallocations": {
+        "before": 790,
+        "after": 37,
+        "change": -753,
+        "percent": -95.31645569620252
+      },
+      "requestedBytes": {
+        "before": 64522,
+        "after": 55017,
+        "change": -9505,
+        "percent": -14.7314094417408
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 33584,
+        "after": 38029,
+        "change": 4445,
+        "percent": 13.235469271081469
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 1753,
+        "after": 1823,
+        "change": 70,
+        "percent": 3.993154592127781
+      },
+      "reallocations": {
+        "before": 1021,
+        "after": 1021,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 186308,
+        "after": 195144,
+        "change": 8836,
+        "percent": 4.742684157416751
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 112222,
+        "after": 116926,
+        "change": 4704,
+        "percent": 4.191691468695978
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 6359,
+        "after": 5300,
+        "change": -1059,
+        "percent": -16.65356188079887
+      },
+      "reallocations": {
+        "before": 1773,
+        "after": 980,
+        "change": -793,
+        "percent": -44.72645234066554
+      },
+      "requestedBytes": {
+        "before": 469486,
+        "after": 454061,
+        "change": -15425,
+        "percent": -3.2855079810686583
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 164589,
+        "after": 164589,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 6532,
+        "after": 5473,
+        "change": -1059,
+        "percent": -16.21249234537661
+      },
+      "reallocations": {
+        "before": 1781,
+        "after": 988,
+        "change": -793,
+        "percent": -44.52554744525548
+      },
+      "requestedBytes": {
+        "before": 481559,
+        "after": 466134,
+        "change": -15425,
+        "percent": -3.2031381409131594
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 175702,
+        "after": 175702,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 997,
+        "after": 313,
+        "change": -684,
+        "percent": -68.60581745235707
+      },
+      "reallocations": {
+        "before": 790,
+        "after": 37,
+        "change": -753,
+        "percent": -95.31645569620252
+      },
+      "requestedBytes": {
+        "before": 64522,
+        "after": 55017,
+        "change": -9505,
+        "percent": -14.7314094417408
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 33584,
+        "after": 38029,
+        "change": 4445,
+        "percent": 13.235469271081469
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 1753,
+        "after": 1823,
+        "change": 70,
+        "percent": 3.993154592127781
+      },
+      "reallocations": {
+        "before": 1021,
+        "after": 1021,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 186308,
+        "after": 195144,
+        "change": 8836,
+        "percent": 4.742684157416751
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 112222,
+        "after": 116926,
+        "change": 4704,
+        "percent": 4.191691468695978
+      }
+    },
+    {
+      "case": "pie/medium",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 181,
+        "after": 189,
+        "change": 8,
+        "percent": 4.41988950276243
+      },
+      "reallocations": {
+        "before": 77,
+        "after": 77,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 37466,
+        "after": 37919,
+        "change": 453,
+        "percent": 1.2090962472641862
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 13328,
+        "after": 13328,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "pie/medium",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 354,
+        "after": 362,
+        "change": 8,
+        "percent": 2.2598870056497176
+      },
+      "reallocations": {
+        "before": 85,
+        "after": 85,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 49539,
+        "after": 49992,
+        "change": 453,
+        "percent": 0.9144310543208382
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 24441,
+        "after": 24441,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "pie/medium",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 997,
+        "after": 313,
+        "change": -684,
+        "percent": -68.60581745235707
+      },
+      "reallocations": {
+        "before": 790,
+        "after": 37,
+        "change": -753,
+        "percent": -95.31645569620252
+      },
+      "requestedBytes": {
+        "before": 64522,
+        "after": 55017,
+        "change": -9505,
+        "percent": -14.7314094417408
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 33584,
+        "after": 38029,
+        "change": 4445,
+        "percent": 13.235469271081469
+      }
+    },
+    {
+      "case": "pie/medium",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 1753,
+        "after": 1823,
+        "change": 70,
+        "percent": 3.993154592127781
+      },
+      "reallocations": {
+        "before": 1021,
+        "after": 1021,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 186308,
+        "after": 195144,
+        "change": 8836,
+        "percent": 4.742684157416751
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 112222,
+        "after": 116926,
+        "change": 4704,
+        "percent": 4.191691468695978
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 1281,
+        "after": 1068,
+        "change": -213,
+        "percent": -16.627634660421545
+      },
+      "reallocations": {
+        "before": 224,
+        "after": 39,
+        "change": -185,
+        "percent": -82.58928571428571
+      },
+      "requestedBytes": {
+        "before": 115592,
+        "after": 118915,
+        "change": 3323,
+        "percent": 2.874766419821441
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 39439,
+        "after": 41472,
+        "change": 2033,
+        "percent": 5.1547960140977205
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 1454,
+        "after": 1241,
+        "change": -213,
+        "percent": -14.649243466299863
+      },
+      "reallocations": {
+        "before": 232,
+        "after": 47,
+        "change": -185,
+        "percent": -79.74137931034483
+      },
+      "requestedBytes": {
+        "before": 127665,
+        "after": 130988,
+        "change": 3323,
+        "percent": 2.602906043159832
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 50552,
+        "after": 52585,
+        "change": 2033,
+        "percent": 4.021601519227726
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 997,
+        "after": 313,
+        "change": -684,
+        "percent": -68.60581745235707
+      },
+      "reallocations": {
+        "before": 790,
+        "after": 37,
+        "change": -753,
+        "percent": -95.31645569620252
+      },
+      "requestedBytes": {
+        "before": 64522,
+        "after": 55017,
+        "change": -9505,
+        "percent": -14.7314094417408
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 33584,
+        "after": 38029,
+        "change": 4445,
+        "percent": 13.235469271081469
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 1753,
+        "after": 1823,
+        "change": 70,
+        "percent": 3.993154592127781
+      },
+      "reallocations": {
+        "before": 1021,
+        "after": 1021,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 186308,
+        "after": 195144,
+        "change": 8836,
+        "percent": 4.742684157416751
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 112222,
+        "after": 116926,
+        "change": 4704,
+        "percent": 4.191691468695978
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 3471,
+        "after": 3471,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 1539,
+        "after": 1539,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 499645,
+        "after": 499645,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 169236,
+        "after": 169236,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 3644,
+        "after": 3644,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 1547,
+        "after": 1547,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 511718,
+        "after": 511718,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 180349,
+        "after": 180349,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 997,
+        "after": 313,
+        "change": -684,
+        "percent": -68.60581745235707
+      },
+      "reallocations": {
+        "before": 790,
+        "after": 37,
+        "change": -753,
+        "percent": -95.31645569620252
+      },
+      "requestedBytes": {
+        "before": 64522,
+        "after": 55017,
+        "change": -9505,
+        "percent": -14.7314094417408
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 33584,
+        "after": 38029,
+        "change": 4445,
+        "percent": 13.235469271081469
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 1753,
+        "after": 1823,
+        "change": 70,
+        "percent": 3.993154592127781
+      },
+      "reallocations": {
+        "before": 1021,
+        "after": 1021,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 186308,
+        "after": 195144,
+        "change": 8836,
+        "percent": 4.742684157416751
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 112222,
+        "after": 116926,
+        "change": 4704,
+        "percent": 4.191691468695978
+      }
+    },
+    {
+      "case": "railroad/medium",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 1932,
+        "after": 1600,
+        "change": -332,
+        "percent": -17.184265010351968
+      },
+      "reallocations": {
+        "before": 567,
+        "after": 424,
+        "change": -143,
+        "percent": -25.220458553791886
+      },
+      "requestedBytes": {
+        "before": 200873,
+        "after": 199253,
+        "change": -1620,
+        "percent": -0.8064797160394876
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 58331,
+        "after": 61216,
+        "change": 2885,
+        "percent": 4.945912122199174
+      }
+    },
+    {
+      "case": "railroad/medium",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 2105,
+        "after": 1773,
+        "change": -332,
+        "percent": -15.771971496437054
+      },
+      "reallocations": {
+        "before": 575,
+        "after": 432,
+        "change": -143,
+        "percent": -24.869565217391305
+      },
+      "requestedBytes": {
+        "before": 212946,
+        "after": 211326,
+        "change": -1620,
+        "percent": -0.7607562480628892
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 69444,
+        "after": 72329,
+        "change": 2885,
+        "percent": 4.154426588330165
+      }
+    },
+    {
+      "case": "railroad/medium",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 336,
+        "after": 148,
+        "change": -188,
+        "percent": -55.952380952380956
+      },
+      "reallocations": {
+        "before": 256,
+        "after": 31,
+        "change": -225,
+        "percent": -87.890625
+      },
+      "requestedBytes": {
+        "before": 22964,
+        "after": 21837,
+        "change": -1127,
+        "percent": -4.907681588573419
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 12192,
+        "after": 14453,
+        "change": 2261,
+        "percent": 18.54494750656168
+      }
+    },
+    {
+      "case": "railroad/medium",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 564,
+        "after": 634,
+        "change": 70,
+        "percent": 12.411347517730496
+      },
+      "reallocations": {
+        "before": 289,
+        "after": 289,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 78498,
+        "after": 87334,
+        "change": 8836,
+        "percent": 11.256337741088945
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 45416,
+        "after": 50120,
+        "change": 4704,
+        "percent": 10.35758323057953
+      }
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 24521,
+        "after": 24521,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 9532,
+        "after": 9532,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 2723274,
+        "after": 2723274,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 838864,
+        "after": 838864,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 24694,
+        "after": 24694,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 9540,
+        "after": 9540,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 2735347,
+        "after": 2735347,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 849977,
+        "after": 849977,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 4038,
+        "after": 922,
+        "change": -3116,
+        "percent": -77.16691431401685
+      },
+      "reallocations": {
+        "before": 3229,
+        "after": 44,
+        "change": -3185,
+        "percent": -98.63734902446578
+      },
+      "requestedBytes": {
+        "before": 235150,
+        "after": 167277,
+        "change": -67873,
+        "percent": -28.863704018711463
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 119253,
+        "after": 123688,
+        "change": 4435,
+        "percent": 3.7189840087880386
+      }
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 7227,
+        "after": 7297,
+        "change": 70,
+        "percent": 0.9685900096859
+      },
+      "reallocations": {
+        "before": 5373,
+        "after": 5373,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 797680,
+        "after": 806516,
+        "change": 8836,
+        "percent": 1.1077123658609969
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 479591,
+        "after": 484295,
+        "change": 4704,
+        "percent": 0.9808357537985491
+      }
+    },
+    {
+      "case": "sequence/large",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 11033,
+        "after": 11033,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 2747,
+        "after": 2747,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 1059685,
+        "after": 1059685,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 232180,
+        "after": 232180,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "sequence/large",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 11206,
+        "after": 11206,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 2755,
+        "after": 2755,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 1071758,
+        "after": 1071758,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 243293,
+        "after": 243293,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "sequence/large",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 4038,
+        "after": 922,
+        "change": -3116,
+        "percent": -77.16691431401685
+      },
+      "reallocations": {
+        "before": 3229,
+        "after": 44,
+        "change": -3185,
+        "percent": -98.63734902446578
+      },
+      "requestedBytes": {
+        "before": 235150,
+        "after": 167277,
+        "change": -67873,
+        "percent": -28.863704018711463
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 119253,
+        "after": 123688,
+        "change": 4435,
+        "percent": 3.7189840087880386
+      }
+    },
+    {
+      "case": "sequence/large",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 7227,
+        "after": 7297,
+        "change": 70,
+        "percent": 0.9685900096859
+      },
+      "reallocations": {
+        "before": 5373,
+        "after": 5373,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 797680,
+        "after": 806516,
+        "change": 8836,
+        "percent": 1.1077123658609969
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 479591,
+        "after": 484295,
+        "change": 4704,
+        "percent": 0.9808357537985491
+      }
+    },
+    {
+      "case": "er/large",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 26275,
+        "after": 21568,
+        "change": -4707,
+        "percent": -17.914367269267366
+      },
+      "reallocations": {
+        "before": 7263,
+        "after": 3886,
+        "change": -3377,
+        "percent": -46.49593831749966
+      },
+      "requestedBytes": {
+        "before": 1923848,
+        "after": 1830599,
+        "change": -93249,
+        "percent": -4.847004545057613
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 673651,
+        "after": 673651,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "er/large",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 26448,
+        "after": 21741,
+        "change": -4707,
+        "percent": -17.797186932849364
+      },
+      "reallocations": {
+        "before": 7271,
+        "after": 3894,
+        "change": -3377,
+        "percent": -46.4447806354009
+      },
+      "requestedBytes": {
+        "before": 1935921,
+        "after": 1842672,
+        "change": -93249,
+        "percent": -4.816777130884989
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 684764,
+        "after": 684764,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "er/large",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 4038,
+        "after": 922,
+        "change": -3116,
+        "percent": -77.16691431401685
+      },
+      "reallocations": {
+        "before": 3229,
+        "after": 44,
+        "change": -3185,
+        "percent": -98.63734902446578
+      },
+      "requestedBytes": {
+        "before": 235150,
+        "after": 167277,
+        "change": -67873,
+        "percent": -28.863704018711463
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 119253,
+        "after": 123688,
+        "change": 4435,
+        "percent": 3.7189840087880386
+      }
+    },
+    {
+      "case": "er/large",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 7227,
+        "after": 7297,
+        "change": 70,
+        "percent": 0.9685900096859
+      },
+      "reallocations": {
+        "before": 5373,
+        "after": 5373,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 797680,
+        "after": 806516,
+        "change": 8836,
+        "percent": 1.1077123658609969
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 479591,
+        "after": 484295,
+        "change": 4704,
+        "percent": 0.9808357537985491
+      }
+    },
+    {
+      "case": "pie/large",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 639,
+        "after": 647,
+        "change": 8,
+        "percent": 1.2519561815336464
+      },
+      "reallocations": {
+        "before": 437,
+        "after": 437,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 156602,
+        "after": 157055,
+        "change": 453,
+        "percent": 0.2892683362920014
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 55380,
+        "after": 55380,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "pie/large",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 812,
+        "after": 820,
+        "change": 8,
+        "percent": 0.9852216748768473
+      },
+      "reallocations": {
+        "before": 445,
+        "after": 445,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 168675,
+        "after": 169128,
+        "change": 453,
+        "percent": 0.26856380613606046
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 66493,
+        "after": 66493,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "pie/large",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 4038,
+        "after": 922,
+        "change": -3116,
+        "percent": -77.16691431401685
+      },
+      "reallocations": {
+        "before": 3229,
+        "after": 44,
+        "change": -3185,
+        "percent": -98.63734902446578
+      },
+      "requestedBytes": {
+        "before": 235150,
+        "after": 167277,
+        "change": -67873,
+        "percent": -28.863704018711463
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 119253,
+        "after": 123688,
+        "change": 4435,
+        "percent": 3.7189840087880386
+      }
+    },
+    {
+      "case": "pie/large",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 7227,
+        "after": 7297,
+        "change": 70,
+        "percent": 0.9685900096859
+      },
+      "reallocations": {
+        "before": 5373,
+        "after": 5373,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 797680,
+        "after": 806516,
+        "change": 8836,
+        "percent": 1.1077123658609969
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 479591,
+        "after": 484295,
+        "change": 4704,
+        "percent": 0.9808357537985491
+      }
+    },
+    {
+      "case": "sankey/large",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 5095,
+        "after": 4705,
+        "change": -390,
+        "percent": -7.654563297350343
+      },
+      "reallocations": {
+        "before": 842,
+        "after": 643,
+        "change": -199,
+        "percent": -23.634204275534444
+      },
+      "requestedBytes": {
+        "before": 470671,
+        "after": 472292,
+        "change": 1621,
+        "percent": 0.34440192831085836
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 160426,
+        "after": 160426,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "sankey/large",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 5268,
+        "after": 4878,
+        "change": -390,
+        "percent": -7.403189066059225
+      },
+      "reallocations": {
+        "before": 850,
+        "after": 651,
+        "change": -199,
+        "percent": -23.411764705882355
+      },
+      "requestedBytes": {
+        "before": 482744,
+        "after": 484365,
+        "change": 1621,
+        "percent": 0.33578874103044265
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 171539,
+        "after": 171539,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "sankey/large",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 4038,
+        "after": 922,
+        "change": -3116,
+        "percent": -77.16691431401685
+      },
+      "reallocations": {
+        "before": 3229,
+        "after": 44,
+        "change": -3185,
+        "percent": -98.63734902446578
+      },
+      "requestedBytes": {
+        "before": 235150,
+        "after": 167277,
+        "change": -67873,
+        "percent": -28.863704018711463
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 119253,
+        "after": 123688,
+        "change": 4435,
+        "percent": 3.7189840087880386
+      }
+    },
+    {
+      "case": "sankey/large",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 7227,
+        "after": 7297,
+        "change": 70,
+        "percent": 0.9685900096859
+      },
+      "reallocations": {
+        "before": 5373,
+        "after": 5373,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 797680,
+        "after": 806516,
+        "change": 8836,
+        "percent": 1.1077123658609969
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 479591,
+        "after": 484295,
+        "change": 4704,
+        "percent": 0.9808357537985491
+      }
+    },
+    {
+      "case": "gantt/large",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 13664,
+        "after": 13664,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 6115,
+        "after": 6115,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 1862228,
+        "after": 1862228,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 606032,
+        "after": 606032,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "gantt/large",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 13837,
+        "after": 13837,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 6123,
+        "after": 6123,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 1874301,
+        "after": 1874301,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 617145,
+        "after": 617145,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "gantt/large",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 4038,
+        "after": 922,
+        "change": -3116,
+        "percent": -77.16691431401685
+      },
+      "reallocations": {
+        "before": 3229,
+        "after": 44,
+        "change": -3185,
+        "percent": -98.63734902446578
+      },
+      "requestedBytes": {
+        "before": 235150,
+        "after": 167277,
+        "change": -67873,
+        "percent": -28.863704018711463
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 119253,
+        "after": 123688,
+        "change": 4435,
+        "percent": 3.7189840087880386
+      }
+    },
+    {
+      "case": "gantt/large",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 7227,
+        "after": 7297,
+        "change": 70,
+        "percent": 0.9685900096859
+      },
+      "reallocations": {
+        "before": 5373,
+        "after": 5373,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 797680,
+        "after": 806516,
+        "change": 8836,
+        "percent": 1.1077123658609969
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 479591,
+        "after": 484295,
+        "change": 4704,
+        "percent": 0.9808357537985491
+      }
+    },
+    {
+      "case": "railroad/large",
+      "stage": "parse-public",
+      "allocations": {
+        "before": 7429,
+        "after": 6007,
+        "change": -1422,
+        "percent": -19.141203392111994
+      },
+      "reallocations": {
+        "before": 2118,
+        "after": 1525,
+        "change": -593,
+        "percent": -27.998111425873468
+      },
+      "requestedBytes": {
+        "before": 771907,
+        "after": 756289,
+        "change": -15618,
+        "percent": -2.023300734414897
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 221222,
+        "after": 221222,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "railroad/large",
+      "stage": "parse-public-fresh-registry",
+      "allocations": {
+        "before": 7602,
+        "after": 6180,
+        "change": -1422,
+        "percent": -18.705603788476715
+      },
+      "reallocations": {
+        "before": 2126,
+        "after": 1533,
+        "change": -593,
+        "percent": -27.89275634995296
+      },
+      "requestedBytes": {
+        "before": 783980,
+        "after": 768362,
+        "change": -15618,
+        "percent": -1.9921426567004261
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 232335,
+        "after": 232335,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "case": "railroad/large",
+      "stage": "property-repeated",
+      "allocations": {
+        "before": 1237,
+        "after": 361,
+        "change": -876,
+        "percent": -70.8164915117219
+      },
+      "reallocations": {
+        "before": 982,
+        "after": 37,
+        "change": -945,
+        "percent": -96.23217922606925
+      },
+      "requestedBytes": {
+        "before": 73906,
+        "after": 59793,
+        "change": -14113,
+        "percent": -19.095878548426377
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 38192,
+        "after": 42637,
+        "change": 4445,
+        "percent": 11.638563049853373
+      }
+    },
+    {
+      "case": "railroad/large",
+      "stage": "property-unique",
+      "allocations": {
+        "before": 2186,
+        "after": 2256,
+        "change": 70,
+        "percent": 3.2021957913998174
+      },
+      "reallocations": {
+        "before": 1286,
+        "after": 1286,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 317956,
+        "after": 326792,
+        "change": 8836,
+        "percent": 2.779000868044635
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 185504,
+        "after": 190208,
+        "change": 4704,
+        "percent": 2.535794376401587
+      }
+    }
+  ]
+}

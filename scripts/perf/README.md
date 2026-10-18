@@ -53,3 +53,10 @@ Six one-operation warmups plus at least 100 ms of measured work per runtime/stag
 A candidate optimization needs evidence from matched outputs and relevant feature/corpus regression tests, plus before/after samples on the same host and allocation counts. Registry caching needs thread-safety and state isolation proof. Removing preflight graph snapshots needs equivalent resource validation and failure ordering; simply skipping validation is not an optimization. This harness makes no Rust, WebAssembly, Swift or WebGPU speed claim in advance.
 
 The [first local baseline](results/2026-10-18-first-native-js.md) records measured costs, output proof, shared-host load, initial warmup limitations, and one bounded optimization proposal.
+
+The [isolated property-cache experiment](experiments/2026-10-18-property-cache/README.md)
+records exact output/graph equivalence and before/after allocation evidence for
+all 21 workloads. Runtime adoption is held: ER/Railroad allocations improve,
+while small Pie workloads and unique-key memory regress. Its source-only replay
+bundle preserves the experiment without changing the production library or
+claiming a latency improvement.
