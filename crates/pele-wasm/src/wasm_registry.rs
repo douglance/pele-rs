@@ -1,10 +1,13 @@
 //! Owned web registry. Native registrations and retained documents stay in Rust.
 use pele::compat::{public::PublicEngine, ErrorCode, PeleError, MAX_PUBLIC_SOURCE_BYTES};
+use pele::compat::{DiagramType, Engine};
+use std::collections::HashMap;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen(js_name = NativeRegistry)]
 pub struct NativeRegistry {
     inner: Option<PublicEngine>,
+    foreign: HashMap<DiagramType, JsValue>,
 }
 fn closed() -> PeleError {
     PeleError::new("Registry is closed", ErrorCode::Semantic)
@@ -32,6 +35,7 @@ impl NativeRegistry {
             } else {
                 PublicEngine::empty()
             }),
+            foreign: HashMap::new(),
         }
     }
     pub fn registered(&self, id: &str) -> Result<String, JsValue> {
@@ -42,11 +46,29 @@ impl NativeRegistry {
             .find(|kind| kind.as_str() == id)
             .map(pele::compat::DiagramId::Builtin)
             .unwrap_or_else(|| pele::compat::DiagramId::extension(id));
-        Ok(super::public_result(&engine.registered(id)))
+        let foreign = pele::compat::DIAGRAM_TYPES
+            .into_iter()
+            .find(|kind| kind.as_str() == id.as_str())
+            .is_some_and(|kind| self.foreign.contains_key(&kind));
+        Ok(super::public_result(&(foreign || engine.registered(id))))
     }
     pub fn capabilities(&self) -> Result<String, JsValue> {
         let engine = self.inner.as_ref().ok_or_else(|| failure(closed()))?;
-        Ok(super::public_result(&engine.capabilities()))
+        let mut capabilities = engine.capabilities();
+        for value in &mut capabilities {
+            if pele::compat::DIAGRAM_TYPES
+                .into_iter()
+                .find(|kind| kind.as_str() == value.diagram_type.as_str())
+                .is_some_and(|kind| self.foreign.contains_key(&kind))
+            {
+                value.registered = true;
+                value.syntax_parity = false;
+                value.semantic_parity = false;
+                value.render_parity = false;
+                value.host_parity = false;
+            }
+        }
+        Ok(super::public_result(&capabilities))
     }
     pub fn register_builtin(&mut self, id: &str) -> Result<(), JsValue> {
         let engine = self.inner.as_mut().ok_or_else(|| failure(closed()))?;
@@ -61,6 +83,7 @@ impl NativeRegistry {
                 ))
             })?;
         engine.register_builtin(kind);
+        self.foreign.remove(&kind);
         Ok(())
     }
     pub fn detect_type(&self, source: &str) -> Result<String, JsValue> {
@@ -72,7 +95,64 @@ impl NativeRegistry {
     pub fn supports(&self, source: &str) -> Result<String, JsValue> {
         let engine = self.inner.as_ref().ok_or_else(|| failure(closed()))?;
         bounded(source).map_err(failure)?;
-        Ok(super::public_result(&engine.supports(source)))
+        let supported = engine
+            .detect_type(source)
+            .ok()
+            .flatten()
+            .is_some_and(|kind| self.foreign.contains_key(&kind) || engine.registered(kind));
+        Ok(super::public_result(&supported))
+    }
+    pub fn register_foreign(&mut self, id: &str, provider: JsValue) -> Result<(), JsValue> {
+        self.inner.as_ref().ok_or_else(|| failure(closed()))?;
+        let kind = pele::compat::DIAGRAM_TYPES
+            .into_iter()
+            .find(|kind| kind.as_str() == id)
+            .ok_or_else(|| {
+                failure(PeleError::new(
+                    "Unknown foreign provider diagram type",
+                    ErrorCode::UnsupportedDiagram,
+                ))
+            })?;
+        self.foreign.insert(kind, provider);
+        Ok(())
+    }
+    pub fn has_foreign(&self) -> bool {
+        !self.foreign.is_empty()
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub fn parse_foreign(
+        &self,
+        source: &str,
+        json: &str,
+        source_kind: u32,
+        source_value: f64,
+        edge_kind: u32,
+        edge_value: f64,
+    ) -> Result<Option<super::foreign_provider::ForeignDocument>, JsValue> {
+        self.inner.as_ref().ok_or_else(|| failure(closed()))?;
+        if self.foreign.is_empty() {
+            return Ok(None);
+        }
+        let (options, limits) = super::parse_limits::decode_parse_options(
+            source,
+            json,
+            source_kind,
+            source_value,
+            edge_kind,
+            edge_value,
+        )
+        .map_err(failure)?;
+        let inspection = Engine::empty()
+            .inspect_with_limits(source, &options, limits)
+            .map_err(failure)?;
+        let Some(kind) = inspection.diagram_type else {
+            return Ok(None);
+        };
+        let Some(provider) = self.foreign.get(&kind) else {
+            return Ok(None);
+        };
+        super::foreign_provider::prepare(kind, provider.clone(), inspection, &options, limits)
+            .map(Some)
     }
     #[allow(clippy::too_many_arguments)]
     pub fn parse(
@@ -146,5 +226,6 @@ impl NativeRegistry {
     /// Retained PublicDocuments own their registration and survive registry close.
     pub fn close(&mut self) {
         self.inner.take();
+        self.foreign.clear();
     }
 }

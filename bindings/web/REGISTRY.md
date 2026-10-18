@@ -1,4 +1,4 @@
-# Owned built-in registries
+# Owned diagram registries
 
 `loadRegistry()` creates an independent, empty native registry. Select a linked
 built-in with `registerBuiltin('pie')`; `loadRegistry(undefined, {allBuiltins:true})`
@@ -13,14 +13,47 @@ detected family before parsing. A mounted document's later synchronous `update`
 does not load another family automatically. Native built-ins are already linked
 in the WASM artifact; lazy selection does not promise binary code splitting.
 
-This is a supported built-in layer, not full JavaScript provider registration.
-Pinned Pele `register(...Diagram)` accepts arbitrary host-authored parse/render
-functions and per-diagram entries expose those low-level functions with encoded
-source, config, title, line offset and parse policies. The current WASM boundary
-does not expose an owned foreign `DiagramModule` provider or that low-level parse
-entry. Consequently `register(Diagram)` and `./diagrams/*` are deliberately absent;
-there are no stand-in JavaScript renderers or fabricated native descriptors.
+`register(...diagrams)` accepts ordinary caller-authored `Diagram<Model>` objects
+for canonical detected types. The caller supplies its parser and renderer; every
+built-in algorithm remains Rust. The host methods receive the pinned low-level
+contract: prepared/entity-encoded source, merged config, title, line offset and
+exact maxEdges; rendering receives the original model, retained config and options.
+Rust resolves responsive defaults and applies output limits, icon-name decoding
+and returned link-ID decoding.
 
-Source/config domains retain the documented UTF-8 and native transport bounds.
-No malformed UTF-16, arbitrary JavaScript coercion, constructor or method-replacement
-capability is added by selecting a built-in.
+```js
+const registry = await loadRegistry();
+registry.register({
+  type: 'pie',
+  parse(source, config, title, lineOffset, limits) {
+    return {source, config, title, lineOffset, limits, width: 40};
+  },
+  render(model, config, options) {
+    return {svg: `<svg width="${model.width}" height="20"/>`,
+      width: model.width, height: 20, links: []};
+  }
+});
+const model = registry.parse('pie');
+model.width = 80;
+const drawing = registry.render(model);
+registry.close(); // the model retains its selected provider
+registry.dispose(model);
+```
+
+Replacing registration affects future parses. Old models retain the old provider
+object and observe its later render/section edits. keepComments is read per parse;
+provider.type is captured as the registration key. Provider callbacks preserve
+original thrown values and partial model edits. A renderer may catch resource
+callback errors and recover. Same-document reentrant render/dispose is rejected;
+registration or registry close inside a parser does not invalidate that parse.
+
+Models remain ordinary JS objects: custom prototypes, Maps and aliases are not
+serialized. Config crosses Rust as bounded finite JSON (1 MiB); the same JS config
+object is retained for callbacks, and finite edits are synchronized before render.
+Nonfinite Config and cycles are outside this transport; source/SVG use the existing
+well-formed UTF-8 boundary. SVG plus returned link text is bounded independently of
+numeric output limits. These bounds do not constrain arbitrary host callback work.
+
+The `./diagrams/*` low-level built-in entries, isolated UTF-16 text and arbitrary
+runtime coercion/method replacement on native built-in models remain separate API
+gaps. Custom registration does not imply those capabilities or full API parity.

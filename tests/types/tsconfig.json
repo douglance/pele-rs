@@ -15,6 +15,7 @@
     "public-models.mts",
     "public-remaining-er.mts",
     "public-remaining-info.mts",
-    "public-registry-lazy.mts"
+    "public-registry-lazy.mts",
+    "public-foreign-providers.mts"
   ]
 }

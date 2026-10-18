@@ -11,6 +11,20 @@ export interface RenderOptions extends ParseOptions {
   padding?: number; outputLimit?: number; linkSchemes?: string[]; imageSchemes?: string[];
   links?: boolean; images?: boolean; linkRel?: string; now?: number | Date;
 }
+/** Caller-authored extension. Config uses bounded finite JSON values; models
+ * retain their original identity and methods without a graph codec. */
+export interface Diagram<Model> {
+  type: import('./core.js').DiagramType;
+  section?: string;
+  keepComments?: boolean;
+  parse(source: string, config: { [key: string]: ConfigValue }, title: string | undefined,
+    lineOffset: number, limits: {maxEdges: number}): Model;
+  render(model: Model, config: { [key: string]: ConfigValue }, options: RenderOptions): ProviderRendered;
+}
+export interface ProviderRendered {
+  svg: string; width: number; height: number;
+  links: {id: string; href: string; internal: boolean}[];
+}
 export interface PieModel { type: 'pie'; title?: string; accTitle?: string; accDescr?: string; showData: boolean; sections: Map<string, number> }
 export interface AccessibleModel { title?: string; accTitle?: string; accDescr?: string }
 export interface PacketBlock { start: number; end: number; bits: number; label: string }
@@ -365,6 +379,7 @@ export interface Mounted {
 }
 export function enableZoom(element: HTMLElement, options?: ZoomOptions): Zoom;
 export interface Renderer {
+  register(...providers: Diagram<any>[]): void;
   registered(type: DiagramId): boolean;
   registerBuiltin(type: import('./core.js').DiagramType): void;
   detectType(source: string): import('./core.js').DiagramType | null;
@@ -372,10 +387,10 @@ export interface Renderer {
   close(): void;
   mount(element: HTMLElement, text: string, options?: MountOptions): Mounted;
   capabilities(): Capability[];
-  parse(source: string, options?: ParseOptions): DiagramModel;
-  render(input: string | DiagramModel, options?: RenderOptions): Rendered;
+  parse<Model = DiagramModel>(source: string, options?: ParseOptions): Model;
+  render(input: string | object, options?: RenderOptions): Rendered;
   query(model: DiagramModel, operation: string, argumentsValue?: ConfigValue): ConfigValue;
-  dispose(model: DiagramModel): void;
+  dispose(model: object): void;
 }
 export function loadRenderer(moduleOrPath?: string | URL | Response | BufferSource | WebAssembly.Module): Promise<Renderer>;
 

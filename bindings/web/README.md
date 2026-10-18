@@ -46,4 +46,5 @@ and the explicit remaining compatibility boundaries.
 entry creates an independent empty registry, and `./lazy` adds asynchronous family
 selection, rendering and mounting. Native built-ins are linked into one WASM
 artifact; lazy selection does not download smaller binaries. See [registry
-contracts](REGISTRY.md), including the remaining custom-provider/low-level-entry gap.
+contracts](REGISTRY.md) for ordinary `register(...Diagram)` extensions, ownership,
+finite Config transport and the remaining low-level built-in entry gap.

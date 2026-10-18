@@ -1,7 +1,7 @@
 import type {DiagramId, DiagramType} from './core.js';
 import type {Renderer} from './full.js';
 export {PeleError, PeleCompatibilityError} from './full.js';
-/** Owns native built-in registrations; retained models survive close(). */
+/** Owns native built-in and caller-authored registrations; retained models survive close(). */
 export interface Registry extends Renderer {
   registered(type: DiagramId): boolean;
   registerBuiltin(type: DiagramType): void;

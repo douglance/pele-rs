@@ -2,7 +2,7 @@ import {parseLimitOptions, parseLimitValues} from './parse-limits.js';
 export {loadRegistry} from './registry.js';
 import {mountWith} from './mount.js';
 export {enableZoom} from './zoom.js';
-import initialize, { parse_v2, render_numbers_with_resources, builtin_capabilities, NativeRegistry } from './pkg/pele.js';
+import initialize, { parse_v2, render_numbers_with_resources, builtin_capabilities, NativeRegistry, foreign_decode_entities } from './pkg/pele.js';
 import {renderNumericOptions} from './render-numbers.js';
 import {encodeGraphBinary,decodeGraphBinary} from './graph-binary.js';
 import {fromNativeError} from './errors.js';
@@ -19,6 +19,22 @@ function result(json) {
 function nativeValue(call) {
   try { return result(call()); }
   catch (error) { if (typeof error === 'string') return result(error); throw error; }
+}
+// Foreign callbacks can throw any JS value, including strings. Native envelopes
+// and one-element callback wrappers remain disjoint until this boundary.
+function foreignValue(call) {
+  try { return call(); }
+  catch (error) {
+    if (Array.isArray(error) && error.length === 1) throw error[0];
+    if (typeof error === 'string') return result(error);
+    throw error;
+  }
+}
+function finiteConfigJSON(config) {
+  return JSON.stringify(config, (_key, value) => {
+    if (typeof value === 'number' && !Number.isFinite(value)) throw new TypeError('Foreign provider Config requires finite numbers');
+    return value;
+  });
 }
 function binaryResult(call) {
   try {const exchange=decodeGraphBinary(call());return {revision:exchange.revision,graph:exchange.graph,result:exchange.metadata};}
@@ -65,14 +81,61 @@ export async function loadRenderer(moduleOrPath) {
 export function createRenderer(nativeRegistry) {
   const documents = new WeakMap(), registry = new ModelRegistry();
   const finalizer = typeof FinalizationRegistry === 'function' ? new FinalizationRegistry(handle => handle.free()) : null;
+  let registryBusy = false;
+  const registryCall = operation => {
+    if (registryBusy) throw new TypeError('Registry is already in use');
+    registryBusy = true; try { return operation(); } finally { registryBusy = false; }
+  };
+  function foreignParse(source, options) {
+    if (!nativeRegistry?.has_foreign()) return null;
+    const limits = parseLimitOptions(options);
+    const handle = registryCall(() => foreignValue(() => nativeRegistry.parse_foreign(source, limits.json,
+      limits.sourceKind, limits.sourceValue, limits.edgeKind, limits.edgeValue)));
+    if (!handle) return null;
+    try {
+      if (options.config !== undefined) finiteConfigJSON(options.config);
+      const [model, provider, config] = foreignValue(() => handle.take_values());
+      return {handle, model, provider, config, foreign: true, busy: false, disposed: false};
+    } catch (error) { handle.free(); throw error; }
+  }
+  function foreignRender(entry, model, options) {
+    if (entry.disposed) throw new TypeError('Public model document is disposed');
+    if (entry.busy) throw new TypeError('Public model document is already in use');
+    entry.busy = true;
+    try {
+      const originalIcons = options.icons;
+      const callbackOptions = {...options, responsive: options.responsive, icons: originalIcons && (name => originalIcons(foreignValue(() => foreign_decode_entities(name))))};
+      // Passive parse options remain visible to custom renderers. Only their
+      // native render-policy decoding is omitted on this retained-model path.
+      const numeric = renderNumericOptions({...options, limit: undefined, maxEdges: undefined, config: undefined});
+      return foreignValue(() => entry.handle.render(model, entry.provider, entry.config, finiteConfigJSON(entry.config), callbackOptions,
+        numeric.json, numeric.mask, numeric.numbers, numeric.outputKind, numeric.output));
+    } finally { entry.busy = false; }
+  }
   const renderer = {
     capabilities() { return nativeRegistry ? nativeValue(() => nativeRegistry.capabilities()) : result(builtin_capabilities()); },
     registered(type) { return nativeValue(() => nativeRegistry.registered(type)); },
-    registerBuiltin(type) { nativeValue(() => { nativeRegistry.register_builtin(type); return '{"version":2,"ok":true,"result":null}'; }); },
+    register(...providers) {
+      for (const provider of providers) registryCall(() => foreignValue(() => nativeRegistry.register_foreign(provider.type, provider)));
+    },
+    registerBuiltin(type) { registryCall(() => nativeValue(() => { nativeRegistry.register_builtin(type); return '{"version":2,"ok":true,"result":null}'; })); },
     detectType(source) { return nativeValue(() => nativeRegistry.detect_type(source)); },
     supports(source) { return nativeValue(() => nativeRegistry.supports(source)); },
-    close() { nativeRegistry.close(); },
+    close() { registryCall(() => nativeRegistry.close()); },
     parse(source, options = {}) {
+      let foreign;
+      try { foreign = foreignParse(source, options); } catch (error) { throw renderError(error); }
+      if (foreign) {
+        const model = foreign.model;
+        delete foreign.model;
+        if (typeof model === 'object' && model !== null) {
+          const old = documents.get(model);
+          if (old?.busy) { foreign.handle.free(); throw new TypeError('Public model document is already in use'); }
+          if (old) { finalizer?.unregister(model); old.handle.free(); }
+          documents.set(model, foreign); finalizer?.register(model, foreign.handle, model);
+        } else foreign.handle.free();
+        return model;
+      }
       let document;
       try {
         if (nativeRegistry) {
@@ -163,6 +226,16 @@ export function createRenderer(nativeRegistry) {
     render(input, options = {}) {
       let callbackError, callbackFailed = false;
       try {
+        if (typeof input === 'string') {
+          const foreign = foreignParse(input, options);
+          if (foreign) {
+            try { return foreignRender(foreign, foreign.model, options); }
+            finally { foreign.handle.free(); }
+          }
+        } else {
+          const foreign = documents.get(input);
+          if (foreign?.foreign) return foreignRender(foreign, input, options);
+        }
         const measurer = options.measurer ?? defaultMeasurer(options.fontFamily);
         const width = (text, size, style) => { try { return measurer.width(text, size, style); } catch (e) { callbackFailed = true; callbackError = e; throw e; } };
         const icons = options.icons && (name => { try { return options.icons(name); } catch (e) { callbackFailed = true; callbackError = e; throw e; } });
@@ -202,6 +275,7 @@ export function createRenderer(nativeRegistry) {
     query(model, operation, argumentsValue = null) {
       const document = documents.get(model);
       if (!document) throw new TypeError('query() takes a model that parse() returned.');
+      if (document.foreign) throw new TypeError('Custom provider models are ordinary host objects; call their methods directly.');
       if (document.bridge) {
         if(document.bridge.registration.schema.id==='pele/agentflow@1'&&operation==='semanticModel'&&argumentsValue===null)return model.semanticModel();
         throw new TypeError('This mutable model does not expose read-only queries.');
@@ -210,6 +284,7 @@ export function createRenderer(nativeRegistry) {
     },
     dispose(model) {
       const document = documents.get(model);
+      if (document?.busy) throw new TypeError('Public model document is already in use');
       if (document) { documents.delete(model); document.disposed = true; if(document.bridge)document.bridge.disposed=true; finalizer?.unregister(model); document.handle.free(); }
     }
   };
