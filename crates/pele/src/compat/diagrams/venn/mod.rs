@@ -36,3 +36,6 @@ pub fn parse(source: &str, options: &ParseOptions) -> Result<VennModel, PeleErro
     source.push('\n');
     parser::parse(&source, inspected.prepared.title.as_deref())
 }
+
+mod public_model;
+pub use public_model::VennPublicState;

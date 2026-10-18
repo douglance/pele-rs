@@ -632,3 +632,20 @@ render entry behavior is unchanged. The frozen sixteen-family host checkpoint
 passes strict C integration, nine Swift mutable-document integration slices and
 twenty-four packed-package checks across Chrome, Firefox and WebKit. This proves
 post-call publication; pre-callback synchronization/reentry remains open.
+
+
+## Venn mutable native checkpoint
+
+Venn brings native mutable coverage to twenty-four families; the separately
+committed foreign checkpoint remains sixteen. Nine public and two source
+baseline release integration slices pass all 22,121 historical outcomes,
+twenty-six pinned edited/method SVG comparisons, undeclared-ID geometry, raw
+UTF-16 semantic errors, alias/partial-error behavior and native raster/resource
+recovery. All eight real methods operate on known/current state. Skipped ordered
+known provenance preserves stale private bookkeeping for typed callers; public
+graph edits preserve exact current-array identity. The existing inferred-pair
+ceiling remains an explicit native extension, with upstream rendering deliberately
+unexecuted. Active sparse/lone-surrogate rendering, nonnumeric singleton sizes
+with triple inference, exact render-error categories, exotic overrides and work
+ceilings remain open. A typed Vec cannot retain original array identity after
+permuting indistinguishable duplicate subsets. The renderer is unchanged.

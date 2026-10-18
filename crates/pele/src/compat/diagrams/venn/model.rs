@@ -54,7 +54,10 @@ pub struct VennModel {
     pub text_nodes: Vec<VennText>,
     pub styles: Vec<VennStyle>,
     #[serde(skip)]
-    known: HashSet<String>,
+    pub(super) known: HashSet<String>,
+    // Preserve JS Set insertion order independently of public subset edits.
+    #[serde(skip)]
+    pub(super) known_order: Vec<String>,
     #[serde(skip)]
     pub(super) current: Option<Vec<String>>,
     #[serde(skip)]
@@ -69,6 +72,7 @@ impl VennModel {
             text_nodes: vec![],
             styles: vec![],
             known: HashSet::new(),
+            known_order: vec![],
             current: None,
             indent: false,
         }
@@ -77,8 +81,8 @@ impl VennModel {
         let n = list.len();
         let sets = ids(list);
         self.current = Some(sets.clone());
-        if sets.len() == 1 {
-            self.known.insert(sets[0].clone());
+        if sets.len() == 1 && self.known.insert(sets[0].clone()) {
+            self.known_order.push(sets[0].clone());
         }
         self.subsets.push(VennSubset {
             sets,
