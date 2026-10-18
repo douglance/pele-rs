@@ -1,5 +1,6 @@
 //! Shared Langium-style token behavior, Pele common/tokens.ts (458322a5, MIT).
 use crate::compat::source::space;
+pub(crate) mod generics;
 pub(crate) mod icon;
 pub mod outline;
 

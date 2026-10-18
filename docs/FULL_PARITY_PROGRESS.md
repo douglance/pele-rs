@@ -6,11 +6,11 @@ release or new GIF has been published from this branch.
 
 ## Implemented renderers
 
-`Engine::with_builtins()` currently registers nine actual Rust diagram modules.
+`Engine::with_builtins()` currently registers twelve actual Rust diagram modules.
 `Engine::empty()` and typed `DiagramModule<Model>` remain extension interfaces.
 Registration never certifies a global parity flag; all public API gates remain open.
 
-| Family | Public scenarios | Model/SVG results | Errors |
+| Family | Public scenarios | SVG results | Errors |
 | --- | ---: | ---: | ---: |
 | pie | 3,678 | 1,179 | 2,499 |
 | quadrantChart | 10,614 | 1,586 | 9,028 |
@@ -21,12 +21,17 @@ Registration never certifies a global parity flag; all public API gates remain o
 | flowchart | 18,175 | 8,952 | 9,223 |
 | kanban | 11,681 | 5,290 | 6,391 |
 | mindmap | 11,335 | 4,204 | 7,131 |
-| Total | 99,345 | 37,187 | 62,158 |
+| class | 24,758 | 8,746 | 16,012 |
+| er | 17,437 | 7,535 | 9,902 |
+| xychart | 9,886 | 3,705 | 6,181 |
+| Total | 151,426 | 57,173 | 94,253 |
 
-Flowchart includes one parsed model whose render reaches the output limit; the
-model assertion and render-error assertion are both retained.
+There are 57,569 complete model comparisons. Parsed models are retained when a
+subsequent render fails. Six class stress cases explicitly exceed the JSON
+projection depth/size budget; their typed models and exact source renders/errors
+remain covered. These transport exceptions do not earn full public API parity.
 
-These fixtures run through Rust, Swift/C and real browser WASM. Models and errors
+These fixtures run through Rust, Swift/C and real browser WASM. Available model projections and all errors
 compare completely. SVG compares byte-for-byte, or by SHA256 of every UTF-8 byte
 for large outputs. Extractors pin the upstream revision and source-file hashes.
 
@@ -67,15 +72,18 @@ Rust owns all branch/column geometry and responsive behavior.
 Host: macOS 26.6 arm64 / Apple M1 Pro, Rust 1.98.1, Swift 6.4, Node 25.9.
 
 - Public Rust integration coverage passes across legacy, preparation, extension,
-  all nine families, including full flowchart rendering. No unit tests added.
+  all twelve families, including full flowchart rendering. The consolidated
+  release-profile run passed 42 public integration tests after the numeric fix. No unit tests added.
 - Source preparation: all 5,345 scenarios, including 761 examples from 34 upstream
   corpora; extension links: 1,536 entity/link scenarios.
 - All four Swift integration tests pass. The additional-diagram test exercises
-  every packet/radar/quadrant/timeline/journey/flowchart/kanban/mindmap fixture through owned documents,
+  every packet/radar/quadrant/timeline/journey/flowchart/kanban/mindmap/class/er/xychart fixture through owned documents,
   callbacks and source rendering; pie and preparation have their own full corpora.
-- Forty-two browser integration tests pass with one worker in Chrome, Firefox
+- Fifty-one browser integration checks pass with one worker in Chrome, Firefox
   and WebKit, using the extracted npm tarball. Includes exact corpus comparisons,
   actual SVG pixels, browser Canvas/font behavior and callback error propagation.
+  The consolidated run passed 48 checks; the final three XYChart checks passed
+  after its targeted tick-portability fix.
 - C executable passes NULL/UTF-8/limits/ownership checks: 400 legacy lifetimes plus
   200 owned pie document lifetimes.
 - Rust crate packaging and independent downstream Cargo consumer pass.
@@ -89,6 +97,9 @@ only to raster evidence, while exported diagrams retain SVG transparency.
 | --- | --- | --- |
 | legacy flowchart | 416 x 789; 6,846 painted | Legacy outlined font path |
 | pie | 358 x 296; 44,733 colored | Native compatibility export |
+| class | 140 x 240; 3,904 painted | Members, relations and labels |
+| er | 158 x 279; 4,467 painted | Attribute tables and cardinalities |
+| xychart | 700 x 500; 81,821 painted | Bars, line, axes and 260 title pixels |
 | full flowchart | 115 x 336; 3,338 painted | Nested group and resolved title halo |
 | kanban | 428 x 105; 3,069 painted | Columns and card labels |
 | mindmap | 269 x 73; 1,241 painted | Root and both branches |
@@ -103,9 +114,24 @@ Packet has one additional stress scenario: 40,000-character label shared across
 hosts verify a bounded projection error and successful exact source-render hash.
 The 400 MB JSON projection is deliberately not built.
 
+## Numeric portability
+
+Host comparisons found two failures that the original Rust JSON oracle comparisons
+had masked. `serde_json` now enables `float_roundtrip`, preserving decimal values
+through `Value::Number` serialization instead of moving some extreme values by one
+ulp. WASM's libc `pow(10, integer)` also differed from the pinned JS engine, changing
+XYChart tick strings and label margins. Integer decimal powers now use exact
+string-to-f64 conversion; all 633 finite exponent cases from -324 through 308 were
+checked against the development JS oracle. The public XYChart corpus passes on
+native Rust, Swift/C and all three browser engines after both corrections.
+
+Pinned XYChart explicitly clamped equal bounds can still emit NaN path geometry;
+that upstream behavior is preserved and does not constitute a universal finite-SVG
+claim. Ordinary diagrams have XML and real raster evidence.
+
 ## Remaining acceptance work
 
-- Twenty-four family renderers, remaining shared behavior and the complete
+- Twenty-one family renderers, remaining shared behavior and the complete
   registration/lazy/mount/zoom/public model interface remain required.
 - JavaScript model projections currently do not apply mutations back into the
   retained Rust document. Prototype methods/private enumerable state also need
@@ -114,7 +140,8 @@ The 400 MB JSON projection is deliberately not built.
   quadrant three and mindmap seven unrepresentable mutations explicitly; they are not passing cases.
   Init-JSON's explicit 64-level work cap, extreme radix rounding and non-finite/
   negative numeric host budgets also require broader conformance.
-- The 16 MiB JSON projection cap is an explicit transport extension. Large typed
+- The 16 MiB JSON projection cap is an explicit transport extension. Class also
+  guards deep repeated namespace projections. Large typed
   models/source rendering work without that expanded projection. Mindmap also
   preflights depth 48 before recursive model encoding. Its depth 80, 310 and 3,000
   source renders match exact SVG hashes in Rust, Swift/C and all browser engines.

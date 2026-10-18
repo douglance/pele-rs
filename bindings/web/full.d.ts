@@ -34,7 +34,23 @@ export interface KanbanSection extends KanbanNode { items: KanbanNode[] }
 export interface KanbanModel { type: 'kanban'; title?: string; sections: KanbanSection[]; last?: KanbanNode | KanbanSection; sectionLevel: number; misplaced?: KanbanNode }
 export interface MindmapNode { id: number; nodeId: string; level: number; descr: string; type: number; children: MindmapNode[]; isRoot: boolean; section?: number; class?: string; icon?: string }
 export interface MindmapModel { type: 'mindmap'; title?: string; nodes: MindmapNode[]; baseLevel: number; open: MindmapNode[] }
-export type DiagramModel = PieModel | PacketModel | RadarModel | QuadrantModel | TimelineModel | JourneyModel | FlowchartModel | KanbanModel | MindmapModel;
+export interface ClassMember { id: string; memberType: string; visibility: string; classifier: string; parameters: string; returnType: string }
+export interface ClassNode { id: string; type: string; label: string; cssClasses: string; methods: ClassMember[]; members: ClassMember[]; annotations: string[]; styles: string[]; parent?: string; link?: string; linkTarget?: string; haveCallback?: boolean; tooltip?: string }
+export interface ClassRelation { id1: string; id2: string; relationTitle1: string; relationTitle2: string; title?: string; relation: { type1: number | 'none'; type2: number | 'none'; lineType: number } }
+export interface ClassNote { id: string; class?: string; text: string; index: number; parent?: string }
+export interface ClassNamespace { id: string; label: string; classes: ReadonlyMap<string, ClassNode>; notes: ReadonlyMap<string, ClassNote>; children: ReadonlyMap<string, ClassNamespace>; parent?: string; explicit: boolean }
+export interface ClassModel extends AccessibleModel { type: 'class'; lineType: { LINE: 0; DOTTED_LINE: 1 }; relationType: { AGGREGATION: 0; EXTENSION: 1; COMPOSITION: 2; DEPENDENCY: 3; LOLLIPOP: 4 }; direction: string; classes: ReadonlyMap<string, ClassNode>; relations: ClassRelation[]; notes: ReadonlyMap<string, ClassNote>; namespaces: ReadonlyMap<string, ClassNamespace>; interfaces: { id: string; label: string; classId: string }[]; styleClasses: ReadonlyMap<string, FlowClassDef>; namespaceStack: string[]; withCssClass: ReadonlyMap<string, Readonly<Record<string, never>>> }
+export interface ErAttribute { type: string; name: string; keys: string[]; comment: string }
+export interface ErEntity { id: string; label: string; alias: string; attributes: ErAttribute[]; cssClasses: string; cssStyles: string[] }
+export type ErCardinality = 'ZERO_OR_ONE' | 'ZERO_OR_MORE' | 'ONE_OR_MORE' | 'ONLY_ONE' | 'MD_PARENT';
+export interface ErRelationship { entityA: string; roleA: string; entityB: string; relSpec: { cardA: ErCardinality; relType: 'NON_IDENTIFYING' | 'IDENTIFYING'; cardB: ErCardinality } }
+export interface ErSubgraph extends FlowSubgraph { cssStyles: string[] }
+export interface ErModel extends AccessibleModel { type: 'er'; direction: string; entities: ReadonlyMap<string, ErEntity>; relationships: ErRelationship[]; classes: ReadonlyMap<string, FlowClassDef>; subgraphs: ErSubgraph[] }
+export interface XyLinearAxis { type: 'linear'; title: string; min: number | null; max: number | null }
+export interface XyBandAxis { type: 'band'; title: string; categories: string[] }
+export interface XyPlot { type: 'line' | 'bar'; title: string; data: [string, number | null][]; pointLabels?: string[] }
+export interface XyChartModel extends AccessibleModel { type: 'xychart'; orientation?: 'vertical' | 'horizontal'; xAxis: XyLinearAxis | XyBandAxis; yAxis: XyLinearAxis; hasSetXAxis: boolean; hasSetYAxis: boolean; plots: XyPlot[] }
+export type DiagramModel = PieModel | PacketModel | RadarModel | QuadrantModel | TimelineModel | JourneyModel | FlowchartModel | KanbanModel | MindmapModel | ClassModel | ErModel | XyChartModel;
 export interface Rendered { type: DiagramId; svg: string; width: number; height: number; links: { id: string; href: string; internal: boolean }[] }
 export interface Renderer {
   capabilities(): Capability[];

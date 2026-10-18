@@ -23,6 +23,12 @@ export async function loadRenderer(moduleOrPath) {
         const model = projection.model;
         if (projection.type === 'pie') model.sections = new Map(model.sections);
         if (projection.type === 'quadrantChart') model.classes = new Map(model.classes);
+        if (projection.type === 'er') for (const key of ['entities', 'classes']) model[key] = new Map(model[key]);
+        if (projection.type === 'class') {
+          const namespaces = values => new Map(values.map(([id, value]) => [id, {...value, classes: new Map(value.classes), notes: new Map(value.notes), children: namespaces(value.children)}]));
+          for (const key of ['classes', 'notes', 'styleClasses', 'withCssClass']) model[key] = new Map(model[key]);
+          model.namespaces = namespaces(model.namespaces);
+        }
         if (projection.type === 'flowchart') for (const key of ['nodes', 'classes', 'tooltips']) model[key] = new Map(model[key]);
         documents.set(model, document);
         return model;

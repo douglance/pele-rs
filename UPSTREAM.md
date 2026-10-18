@@ -52,6 +52,10 @@ origin and SHA-256 are in `crates/pele/assets/fonts/README.md`.
 | `compat/diagrams/radar/` | `src/diagrams/radar/{parser,model,render,index}.ts` | Axes/curves/options, reference entries, radial geometry, legends and width fitting |
 | `compat/diagrams/timeline/` | `src/diagrams/timeline/{index,db,lexer,parser,render}.ts` | Periods/events/sections, colors, horizontal/vertical layout and narrow adaptation |
 | `compat/diagrams/journey/` | `src/diagrams/journey/{index,db,lexer,parser,render}.ts` | Tasks/actors/scores, ordered sections, faces and horizontal/vertical layout |
+| `compat/diagrams/class_diagram/` | `src/diagrams/class/{index,db,types,members,lexer,parser,tokens,graph,render,markers}.ts` | Generic members, namespaces, notes, interfaces, relation markers and actual compound rendering |
+| `compat/diagrams/er/` | `src/diagrams/er/{index,db,types,lexer,parser,tokens,graph,render,markers}.ts` | Entities/attributes/groups/classes and full cardinality/table rendering |
+| `compat/diagrams/xychart/` | `src/diagrams/xychart/{index,db,lexer,parser,tokens,ticks,render}.ts` | Axes, data series, ticks, clipping, legends and responsive layout |
+| `compat/diagrams/common/generics.rs` | `src/diagrams/common/generics.ts` | Shared generic display formatting |
 | `compat/diagrams/common.rs` | `src/diagrams/common/tokens.ts` | Hidden YAML greedy-optional-body behavior shared by pie, packet and radar |
 | `compat/diagrams/flowchart/` | `src/diagrams/flowchart/{lexer,parser,db,types,shapes,graph,render}.ts` | Full declared models, graph normalization and actual layered/compound SVG rendering |
 | `compat/layout/` | `src/layout/{layered,compound}.ts` | Actual rank/cycle/crossing/coordinates/routes, nested groups and bounded expansion translation |
@@ -70,13 +74,14 @@ checkout using Node's development-only TypeScript transformation. Its 34 source
 corpora include 761 examples across every family and agentflow reference cases.
 Mermaid fixture licensing is retained in `third_party/MERMAID-LICENSE`.
 
-The nine family fixtures and extractors pin source-file hashes and 99,345 public
+The twelve family fixtures and extractors pin source-file hashes and 151,426 public
 parse/render scenarios. Large SVGs use exact SHA256 comparisons; complete models
 remain present. A separate packet stress case checks shared labels and a 10,000-row
 typed model without materializing 400 MB of JSON. The oracle JavaScript is a
 development dependency only. Models/errors/SVG are checked through Rust, Swift/C
 and three real browser engines. This does
-not certify all public API behavior: JavaScript model mutations are not yet applied
+not certify all public API behavior: six Class stress models explicitly exceed
+projection budgets while exact typed/source rendering remains covered; JavaScript model mutations are not yet applied
 to retained Rust documents, and lazy registration/mount/zoom remain pending.
 Shared label model projections have an explicit 16 MiB JSON transport cap, while
 typed Rust models and direct source rendering retain shared data. Native export

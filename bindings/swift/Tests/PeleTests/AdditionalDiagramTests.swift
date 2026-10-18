@@ -7,7 +7,8 @@ final class AdditionalDiagramTests: XCTestCase {
     func testPinnedDiagramsThroughNativeDocuments() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent("../../../..").standardizedFileURL
         let decoder = JSONDecoder(), encoder = JSONEncoder(), engine = Pele.Engine()
-        for family in ["packet", "radar", "quadrant", "timeline", "journey", "flowchart", "kanban", "mindmap"] {
+        for family in ["packet", "radar", "quadrant", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart"] {
+            if let families = ProcessInfo.processInfo.environment["PELE_FAMILIES"], !families.split(separator: ",").contains(Substring(family)) { continue }
             let fixture = try JSONSerialization.jsonObject(with: Data(contentsOf: root.appendingPathComponent("fixtures/pele/\(family).json"))) as! [String: Any]
             let cases = fixture["cases"] as! [[String: Any]]
             XCTAssertFalse(cases.isEmpty, family)
@@ -32,6 +33,20 @@ final class AdditionalDiagramTests: XCTestCase {
                 let expected = item["expected"] as! [String: Any]
                 var projected = false
                 do {
+                    if host["modelProjection"] as? String == "excluded" {
+                        XCTAssertThrowsError(try engine.parse(source, options: parseOptions)) { error in
+                            XCTAssertEqual((error as? CompatibilityError)?.code, "limit", id)
+                            XCTAssertEqual((error as? CompatibilityError)?.type, family, id)
+                        }
+                        let rendered = try engine.render(source, options: options, resources: resources)
+                        let result = (try JSONSerialization.jsonObject(with: encoder.encode(rendered)) as! NSDictionary).mutableCopy() as! NSMutableDictionary
+                        if (expected["result"] as? [String: Any])?["svgSha256"] != nil {
+                            result.removeObject(forKey: "svg")
+                            result["svgSha256"] = SHA256.hash(data: Data(rendered.svg.utf8)).map { String(format: "%02x", $0) }.joined()
+                        }
+                        XCTAssertEqual(result, expected["result"] as? NSDictionary, id)
+                        continue
+                    }
                     let document = try engine.parse(source, options: parseOptions)
                     let model = try JSONSerialization.jsonObject(with: encoder.encode(document.model)) as! NSDictionary
                     if let expectedModel = expected["model"] as? NSDictionary {
@@ -87,6 +102,6 @@ final class AdditionalDiagramTests: XCTestCase {
             }
         }
         let capabilities = try engine.capabilities()
-        XCTAssertEqual(Set(capabilities.filter { $0.registered }.map(\.type)), Set(["pie", "packet", "radar", "quadrantChart", "timeline", "journey", "flowchart", "kanban", "mindmap"]))
+        XCTAssertEqual(Set(capabilities.filter { $0.registered }.map(\.type)), Set(["pie", "packet", "radar", "quadrantChart", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart"]))
     }
 }

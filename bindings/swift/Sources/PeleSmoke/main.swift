@@ -62,6 +62,9 @@ try piePNG.write(to: output.appendingPathComponent("swift-pie.png"))
 print("Swift owned pie + AppKit: \(pieWidth)x\(pieHeight), \(colored) colored pixels")
 
 for (type, source) in [
+    ("xychart", "xychart-beta\ntitle Revenue\nx-axis [Jan, Feb, Mar]\ny-axis Sales 0 --> 100\nbar [20, 40, 70]\nline [25, 45, 80]"),
+    ("class", "classDiagram\nclass Engine {\n +render() SVG\n}\nEngine --> Document : renders"),
+    ("er", "erDiagram\nUSER ||--o{ DOCUMENT : owns\nUSER {\n int id PK\n string name\n}\nDOCUMENT {\n int id PK\n}"),
     ("flowchart", "flowchart TD\nsubgraph one[My Group]\nA --> B\nend\nC --> A"),
     ("kanban", "kanban\n  Todo\n    task[Build Rust]\n  Done\n    ship[Ship Swift]"),
     ("mindmap", "mindmap\n  root((Rust))\n    Swift\n    Web"),
@@ -96,7 +99,7 @@ for (type, source) in [
         }
     }}
     guard painted > 100, let png = bitmap.representation(using: .png, properties: [:]) else { fatalError("No meaningful native \(type) pixels") }
-    guard ["flowchart", "kanban", "mindmap"].contains(type) || titleInk > 20 else { fatalError("AppKit dropped positioned title in \(type)") }
+    guard ["flowchart", "kanban", "mindmap", "class", "er"].contains(type) || titleInk > 20 else { fatalError("AppKit dropped positioned title in \(type)") }
     try png.write(to: output.appendingPathComponent("swift-\(type).png"))
     print("Swift owned \(type) + AppKit: \(width)x\(height), \(painted) painted pixels, \(titleInk) title pixels")
 }

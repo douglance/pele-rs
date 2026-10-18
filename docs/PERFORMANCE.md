@@ -29,7 +29,9 @@ Large-source render medians from the initial run:
 Higher ratios mean slower WASM. Across the eight small/large source-render cases,
 the current WASM path takes approximately 1.3–3.6 times the JS time. These are
 single-machine engineering measurements, not a cross-platform product benchmark.
-The initial run precedes the bounded model-projection and native AppKit text fixes.
+The initial run precedes bounded model projection, native AppKit text fixes,
+round-trip JSON floating-point parsing and XYChart decimal-power portability fixes.
+It is an archived baseline, not a timing of the latest worktree.
 Raw samples, worktree state, browser version and runtime SHA256 hashes are in
 [`benchmarks/2026-10-18-chrome-first.json`](benchmarks/2026-10-18-chrome-first.json).
 

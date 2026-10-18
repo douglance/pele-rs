@@ -13,7 +13,7 @@ test('full pie corpus matches pinned models/SVG through source and owned model A
     const model=engine.parse('pie\n"one":1');const retained=engine.render(model,{limit:0});engine.dispose(model);
     return{count:fixture.cases.length,mismatches,forged,retained:retained.type,capabilities:engine.capabilities()};
   });
-  expect(report.count).toBeGreaterThan(3600);expect(report.mismatches).toEqual([]);expect(report.forged).toBe(true);expect(report.retained).toBe('pie');expect(report.capabilities.filter(c=>c.registered).map(c=>c.type)).toEqual(['flowchart','pie','mindmap','kanban','timeline','journey','quadrantChart','packet','radar']);
+  expect(report.count).toBeGreaterThan(3600);expect(report.mismatches).toEqual([]);expect(report.forged).toBe(true);expect(report.retained).toBe('pie');expect(report.capabilities.filter(c=>c.registered).map(c=>c.type)).toEqual(['flowchart','pie','er','mindmap','kanban','timeline','journey','class','quadrantChart','xychart','packet','radar']);
 });
 test('native export paints colors and preserves authored text in real browser SVG',async({page})=>{
   await page.goto('/examples/web/');
