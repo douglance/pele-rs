@@ -22,6 +22,9 @@ pub struct KanbanNode {
     pub priority: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub css_classes: Option<String>,
+    /// Observable JS own-key insertion order, including section items.
+    #[serde(skip)]
+    pub(crate) public_property_order: Vec<String>,
 }
 #[derive(Clone, Debug, Serialize)]
 pub struct KanbanSection {
@@ -85,6 +88,7 @@ impl OutlineDb for KanbanModel {
             ticket: None,
             priority: None,
             css_classes: None,
+            public_property_order: vec!["id".into(), "level".into(), "label".into()],
         };
         if let Some(data) = shape_data {
             let raw = if data.contains('\n') {
@@ -120,7 +124,8 @@ impl OutlineDb for KanbanModel {
                     ("priority", &mut node.priority),
                 ] {
                     if let Some(value) = doc.get(key).filter(|v| v.truthy()) {
-                        *slot = Some(value.js_string())
+                        *slot = Some(value.js_string());
+                        node.public_property_order.push(key.into())
                     }
                 }
             }
@@ -136,6 +141,7 @@ impl OutlineDb for KanbanModel {
             self.section_level = level
         }
         if level == self.section_level {
+            node.public_property_order.push("items".into());
             self.last = Some((self.sections.len(), None));
             self.sections.push(KanbanSection {
                 node,
@@ -161,9 +167,15 @@ impl OutlineDb for KanbanModel {
                 &mut section.node
             };
             if let Some(icon) = icon.filter(|s| !s.is_empty()) {
+                if node.icon.is_none() {
+                    node.public_property_order.push("icon".into());
+                }
                 node.icon = Some(icon)
             }
             if let Some(class) = class.filter(|s| !s.is_empty()) {
+                if node.css_classes.is_none() {
+                    node.public_property_order.push("cssClasses".into());
+                }
                 node.css_classes = Some(class)
             }
         }
@@ -198,3 +210,6 @@ impl DiagramModule for Kanban {
         render::render(m, c, o, r)
     }
 }
+
+mod public_model;
+pub use public_model::KanbanPublicState;

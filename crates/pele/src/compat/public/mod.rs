@@ -8,7 +8,7 @@ pub use graph::{Atom, GraphWriter, JsString, ModelGraph, Node, Property};
 
 pub use schema::{
     FieldKind, FieldSchema, HostExceptionToken, InvocationOutcome, JavaScriptErrorKind, MemberKind,
-    MemberSchema, MethodCall, MethodId, MethodSchema, ModelSchema, PrototypeId, PrototypeParent,
-    PrototypeSchema, PublicError, PublicPeleError, RecordId, RecordKind, RecordSchema,
-    OPAQUE_MODEL_SCHEMA,
+    MemberSchema, MethodCall, MethodId, MethodSchema, ModelSchema, ModelSchemaView, PrototypeId,
+    PrototypeParent, PrototypeSchema, PublicError, PublicPeleError, RecordId, RecordKind,
+    RecordSchema, SharedFunction, OPAQUE_MODEL_SCHEMA,
 };

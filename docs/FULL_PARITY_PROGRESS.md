@@ -406,3 +406,26 @@ intermediary tree first. Native transport and post-call export limits remain
 explicit boundaries. The TypeScript consumer slice passes strict checking with
 TypeScript 4.9.5; this is a recorded local consumer check, not a CI compiler claim.
 No full mutable API/release parity claim is made; see `MUTABLE_MODELS.md`.
+
+
+## Twelve mutable native codecs
+
+Kanban, Mindmap and Timeline add native mutable codecs, bringing this layer to
+twelve families. Kanban and Mindmap expose their real own `getType` callable and
+builder methods; Timeline exposes eight prototype methods, including its exact
+`getCommonDb()` receiver identity. Sankey now exposes its two real methods and
+lookup behavior, including partial-failure cache updates. Ordered own fields,
+private stacks, aliases, detached values and data-property descriptors remain
+part of the exported graph rather than a normalized JSON projection.
+
+An additive shared-function descriptor identifies Kanban and Mindmap's imported
+outline helper across schemas. Existing extension schemas remain source
+compatible; registration validates aliases and retained documents keep their
+original handler. Foreign adapters still expose the previously verified nine
+codecs until their separate host checkpoint passes.
+
+The frozen native batch passes 46 release-profile integration tests across
+eleven targets, including all four affected historical corpora and shared
+registration contracts. Native mutation SVG vectors and bounded-work recovery
+are included. Constructors, active lone-surrogate rendering, arbitrary callback/
+coercion behavior and each codec's documented collection limits remain open.

@@ -111,6 +111,50 @@ pub struct ModelSchema {
     pub prototypes: &'static [PrototypeSchema],
     pub methods: &'static [MethodSchema],
 }
+/// A real callable imported by more than one model shares host identity even
+/// though its native method IDs remain local to each document schema.
+#[derive(Clone, Copy, Debug, Serialize)]
+pub struct SharedFunction {
+    pub method: MethodId,
+    pub identity: &'static str,
+}
+#[derive(Clone, Copy, Debug, Serialize)]
+pub struct ModelSchemaView {
+    #[serde(flatten)]
+    pub model: &'static ModelSchema,
+    #[serde(rename = "sharedFunctions")]
+    pub shared_functions: &'static [SharedFunction],
+}
+impl ModelSchemaView {
+    pub fn validate(&self) -> Result<(), PeleError> {
+        self.model.validate()?;
+        if self.shared_functions.len() > self.model.methods.len() {
+            return Err(invalid("Too many shared public function identities"));
+        }
+        let mut methods = HashSet::new();
+        let mut identities = HashMap::new();
+        for entry in self.shared_functions {
+            let method = self
+                .model
+                .method(entry.method)
+                .ok_or_else(|| invalid("Unknown shared public method"))?;
+            if entry.identity.is_empty()
+                || entry.identity.len() > 4096
+                || !methods.insert(entry.method)
+            {
+                return Err(invalid("Invalid shared public function identity"));
+            }
+            if let Some((name, arity)) =
+                identities.insert(entry.identity, (method.name, method.arity))
+            {
+                if (name, arity) != (method.name, method.arity) {
+                    return Err(invalid("Conflicting shared public function descriptor"));
+                }
+            }
+        }
+        Ok(())
+    }
+}
 /// Existing codecs remain usable without advertising unimplemented methods.
 /// This descriptor makes no claim about their family prototype or fields.
 pub static OPAQUE_MODEL_SCHEMA: ModelSchema = ModelSchema {

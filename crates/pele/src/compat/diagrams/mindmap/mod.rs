@@ -19,6 +19,8 @@ pub struct MindmapNode {
     pub section: Option<usize>,
     pub class: Option<String>,
     pub icon: Option<String>,
+    /// Parser provenance for the observable own-key insertion order.
+    pub(crate) public_property_order: Vec<String>,
 }
 #[derive(Clone, Debug)]
 pub struct MindmapModel {
@@ -195,6 +197,13 @@ impl OutlineDb for Db {
             section,
             class: None,
             icon: None,
+            public_property_order: [
+                "id", "nodeId", "level", "descr", "type", "children", "isRoot",
+            ]
+            .into_iter()
+            .chain(section.map(|_| "section"))
+            .map(str::to_owned)
+            .collect(),
         });
         if let Some(p) = parent {
             self.model.nodes[p].children.push(id_number);
@@ -205,9 +214,15 @@ impl OutlineDb for Db {
     fn decorate_node(&mut self, icon: Option<String>, class: Option<String>) {
         if let Some(n) = self.model.nodes.last_mut() {
             if let Some(icon) = icon.filter(|s| !s.is_empty()) {
+                if n.icon.is_none() {
+                    n.public_property_order.push("icon".into());
+                }
                 n.icon = Some(icon);
             }
             if let Some(class) = class.filter(|s| !s.is_empty()) {
+                if n.class.is_none() {
+                    n.public_property_order.push("class".into());
+                }
                 n.class = Some(class);
             }
         }
@@ -249,3 +264,6 @@ impl DiagramModule for Mindmap {
         render::render(m, c, o, r)
     }
 }
+
+mod public_model;
+pub use public_model::MindmapPublicState;

@@ -1,15 +1,21 @@
 //! Mutable parsed Sankey feature: real collection/object aliases, retained
 //! provenance, typed rendering, edit/error recovery and lossless flat graphs.
+//! Array length: Node::Array.length stores value; a nondefault own length
+//! Property stores descriptor flags0 (readonly). Default writable flags2 is implicit.
+//! Pinned db.ts SHA256 4128d8cb55bf40930a0f1fa31094b171d4d304d4b53cfc3973cd8abe3aa8b91d;
+//! render.ts SHA256 1108b7bf8d0b9e61cd2e054cf1089cf527ac2c486652ecdf2c2ea713142d933b.
 use pele::compat::{
     diagrams::sankey::{Sankey, SankeyLink, SankeyModel, SankeyNode},
     public::{
-        Atom, JsString, ModelGraph, Node, Property, PublicDiagramModule, PublicDocument,
-        PublicEngine,
+        Atom, InvocationOutcome, JavaScriptErrorKind, JsString, MethodCall, ModelGraph,
+        ModelSchema, Node, Property, PublicDiagramModule, PublicDocument, PublicEngine,
+        PublicError,
     },
     text::MetricsResources,
     DiagramModule, DiagramType, Engine, ErrorCode, ModuleDescriptor, Object, ParseContext,
     PeleError, RenderOptions, RenderResources, RenderSettings, Rendered, TextRequest,
 };
+use sha2::{Digest, Sha256};
 use std::sync::{
     atomic::{AtomicUsize, Ordering},
     Arc,
@@ -168,6 +174,18 @@ impl DiagramModule for Counted {
 }
 impl PublicDiagramModule for Counted {
     type PublicState = <Sankey as PublicDiagramModule>::PublicState;
+    fn model_schema(&self) -> &'static ModelSchema {
+        Sankey.model_schema()
+    }
+    fn invoke_public(
+        &self,
+        s: &mut Self::PublicState,
+        call: MethodCall,
+        c: &Object,
+        h: &mut dyn RenderResources,
+    ) -> Result<Atom, PublicError> {
+        Sankey.invoke_public(s, call, c, h)
+    }
     fn create_public(&self, m: &SankeyModel) -> Result<Self::PublicState, PeleError> {
         Sankey.create_public(m)
     }
@@ -506,4 +524,765 @@ fn mutable_sankey_retains_unknown_deep_cycles_utf16_and_ieee_fields() {
         );
         assert_eq!(fingerprint(&doc.snapshot().unwrap()), fingerprint(&edit));
     }
+}
+
+fn invoke(
+    doc: &mut PublicDocument,
+    name: &str,
+    receiver: Option<Atom>,
+    arguments: Vec<Atom>,
+) -> InvocationOutcome {
+    let id = doc
+        .model_schema()
+        .methods
+        .iter()
+        .find(|m| m.name == name)
+        .unwrap()
+        .id;
+    let receiver = receiver.unwrap_or_else(|| doc.snapshot().unwrap().root);
+    doc.invoke(
+        doc.revision(),
+        MethodCall {
+            method: id,
+            receiver,
+            arguments,
+        },
+        &mut MetricsResources,
+    )
+    .unwrap()
+}
+fn found(out: InvocationOutcome) -> (u32, ModelGraph) {
+    let id = reference(out.result.as_ref().unwrap());
+    (id, out.graph)
+}
+fn source_result(source: &str) -> pele::compat::RenderResult {
+    Engine::with_builtins()
+        .render_source(source, &Default::default(), &mut MetricsResources)
+        .unwrap()
+}
+fn same_source(doc: &mut PublicDocument, source: &str) {
+    assert_eq!(
+        doc.render(&Default::default(), &mut MetricsResources)
+            .unwrap(),
+        source_result(source)
+    )
+}
+fn apply_graph(doc: &mut PublicDocument, g: ModelGraph) {
+    doc.apply(doc.revision(), g).unwrap()
+}
+fn remove(g: &mut ModelGraph, id: u32, key: &str) {
+    let keys = g.strings.clone();
+    g.nodes[id as usize]
+        .properties_mut()
+        .retain(|p| !keys[p.key as usize].is(key))
+}
+#[test]
+fn sankey_native_methods_keep_real_prototype_aliases_live_cache_and_borrowed_receivers() {
+    let count = Arc::new(AtomicUsize::new(0));
+    let mut engine = PublicEngine::empty();
+    engine.register(Counted(count.clone()));
+    let mut doc = engine.parse(SOURCE, &Default::default()).unwrap();
+    let schema = doc.model_schema();
+    assert_eq!(schema.id, "pele/sankey@1");
+    assert_eq!(schema.prototypes[0].name, "SankeyDb");
+    assert_eq!(
+        schema
+            .methods
+            .iter()
+            .map(|m| (m.name, m.arity))
+            .collect::<Vec<_>>(),
+        [("findOrCreateNode", 1), ("addLink", 3)]
+    );
+    assert!(schema.prototypes[0].members.iter().all(|m| m.flags == 6));
+    let mut g = doc.snapshot().unwrap();
+    let root = root(&g);
+    assert!(matches!(g.nodes[root as usize], Node::Instance { .. }));
+    assert_eq!(g.root_properties().unwrap().len(), 7);
+    let nodes = reference(g.field("nodes").unwrap().unwrap());
+    let links = reference(g.field("links").unwrap().unwrap());
+    let lookup = reference(g.field("lookup").unwrap().unwrap());
+    let ids = array(&g, nodes);
+    let a = reference(&ids[0]);
+    let b = reference(&ids[1]);
+    let c = reference(&ids[2]);
+    let key_a = field(&g, a, "id").clone();
+    let d = string(&mut g, "D");
+    apply_graph(&mut doc, g);
+    let before = fingerprint(&doc.snapshot().unwrap());
+    let (old, g) = found(invoke(
+        &mut doc,
+        "findOrCreateNode",
+        None,
+        vec![key_a.clone()],
+    ));
+    assert_eq!(old, a);
+    assert_eq!(before, fingerprint(&g));
+    let (d_id, g) = found(invoke(&mut doc, "findOrCreateNode", None, vec![d.clone()]));
+    assert_eq!(array(&g, nodes).len(), 4);
+    assert_eq!(reference(&array(&g, nodes)[3]), d_id);
+    assert!(matches!(field(&g,d_id,"index"),Atom::Number(n)if *n==3.));
+    assert_eq!(
+        g.nodes[d_id as usize]
+            .properties()
+            .iter()
+            .map(|p| g.strings[p.key as usize].well_formed().unwrap())
+            .collect::<Vec<_>>(),
+        ["id", "index"]
+    );
+    assert!(g.nodes[d_id as usize]
+        .properties()
+        .iter()
+        .all(|p| p.flags == 7));
+    let Node::Map { entries, .. } = &g.nodes[lookup as usize] else {
+        panic!()
+    };
+    assert_eq!(reference(&entries[3].1), d_id);
+    let (out_id, _) = found(invoke(&mut doc, "findOrCreateNode", None, vec![d]));
+    assert_eq!(out_id, d_id);
+    let out = invoke(
+        &mut doc,
+        "addLink",
+        None,
+        vec![Atom::Ref(b), Atom::Ref(d_id), Atom::Number(4.)],
+    );
+    assert!(matches!(out.result, Ok(Atom::Undefined)));
+    let link = reference(&array(&out.graph, links)[2]);
+    assert_eq!(reference(field(&out.graph, link, "source")), b);
+    assert_eq!(reference(field(&out.graph, link, "target")), d_id);
+    assert_eq!(
+        out.graph.nodes[link as usize]
+            .properties()
+            .iter()
+            .map(|p| out.graph.strings[p.key as usize].well_formed().unwrap())
+            .collect::<Vec<_>>(),
+        ["source", "target", "value"]
+    );
+    same_source(&mut doc, "sankey-beta\nA,B,2\nA,C,3\nB,D,4");
+    // Changing a node ID does not rebuild lookup; the old key still returns it.
+    let mut g = doc.snapshot().unwrap();
+    let renamed = string(&mut g, "Renamed");
+    property(&mut g, a, "id", renamed);
+    let holder = push_object(
+        &mut g,
+        vec![
+            ("nodes", Atom::Ref(nodes)),
+            ("links", Atom::Ref(links)),
+            ("lookup", Atom::Ref(lookup)),
+        ],
+    );
+    let e = string(&mut g, "E");
+    apply_graph(&mut doc, g);
+    let (old, _) = found(invoke(&mut doc, "findOrCreateNode", None, vec![key_a]));
+    assert_eq!(old, a);
+    let (e_id, g) = found(invoke(
+        &mut doc,
+        "findOrCreateNode",
+        Some(Atom::Ref(holder)),
+        vec![e],
+    ));
+    assert_eq!(reference(&array(&g, nodes)[4]), e_id);
+    let out = invoke(
+        &mut doc,
+        "addLink",
+        Some(Atom::Ref(holder)),
+        vec![Atom::Ref(c), Atom::Ref(e_id), Atom::Number(5.)],
+    );
+    assert!(matches!(out.result, Ok(Atom::Undefined)));
+    same_source(
+        &mut doc,
+        "sankey-beta\nRenamed,B,2\nRenamed,C,3\nB,D,4\nC,E,5",
+    );
+    // Readonly root references do not freeze the mutable Array/Map contents.
+    let mut g = doc.snapshot().unwrap();
+    for p in g.nodes[root as usize].properties_mut() {
+        if ["nodes", "links", "lookup"]
+            .iter()
+            .any(|k| g.strings[p.key as usize].is(k))
+        {
+            p.flags = 1
+        }
+    }
+    let f = string(&mut g, "F");
+    let fake = string(&mut g, "application");
+    property(&mut g, root, "type", fake);
+    apply_graph(&mut doc, g);
+    let (f_id, _) = found(invoke(&mut doc, "findOrCreateNode", None, vec![f]));
+    assert!(matches!(
+        invoke(
+            &mut doc,
+            "addLink",
+            None,
+            vec![Atom::Ref(e_id), Atom::Ref(f_id), Atom::Number(6.)]
+        )
+        .result,
+        Ok(Atom::Undefined)
+    ));
+    engine.register(Sankey);
+    drop(engine);
+    same_source(
+        &mut doc,
+        "sankey-beta\nRenamed,B,2\nRenamed,C,3\nB,D,4\nC,E,5\nE,F,6",
+    );
+    assert_eq!(doc.diagram_type().as_str(), "sankey");
+    assert_eq!(count.load(Ordering::SeqCst), 1);
+}
+#[test]
+fn sankey_native_partial_failure_keeps_lookup_node_and_never_repairs_arrays_implicitly() {
+    let count = Arc::new(AtomicUsize::new(0));
+    let mut engine = PublicEngine::empty();
+    engine.register(Counted(count.clone()));
+    let mut doc = engine.parse(SOURCE, &Default::default()).unwrap();
+    let mut g = doc.snapshot().unwrap();
+    let root = root(&g);
+    let nodes = reference(g.field("nodes").unwrap().unwrap());
+    let links = reference(g.field("links").unwrap().unwrap());
+    let lookup = reference(g.field("lookup").unwrap().unwrap());
+    let ids = array(&g, nodes);
+    let a = reference(&ids[0]);
+    let key_a = field(&g, a, "id").clone();
+    let d = string(&mut g, "D");
+    property(&mut g, nodes, "push", Atom::Number(1.));
+    apply_graph(&mut doc, g);
+    let rev = doc.revision();
+    let out = invoke(&mut doc, "findOrCreateNode", None, vec![d.clone()]);
+    assert_eq!(out.revision, rev + 1);
+    assert!(
+        matches!(out.result,Err(PublicError::JavaScript{name:JavaScriptErrorKind::TypeError,message})if message.is("this.nodes.push is not a function"))
+    );
+    assert_eq!(array(&out.graph, nodes).len(), 3);
+    let Node::Map { entries, .. } = &out.graph.nodes[lookup as usize] else {
+        panic!()
+    };
+    let cached = reference(&entries.last().unwrap().1);
+    assert!(matches!(field(&out.graph,cached,"index"),Atom::Number(n)if *n==3.));
+    assert!(out
+        .graph
+        .text(field(&out.graph, cached, "id"))
+        .unwrap()
+        .is("D"));
+    assert_eq!(
+        fingerprint(&out.graph),
+        fingerprint(&doc.snapshot().unwrap())
+    );
+    same_source(&mut doc, SOURCE);
+    let before = fingerprint(&out.graph);
+    let (hit, g) = found(invoke(&mut doc, "findOrCreateNode", None, vec![d.clone()]));
+    assert_eq!(hit, cached);
+    assert_eq!(before, fingerprint(&g));
+    // Fixing push does not append the already cached node on the next call.
+    let mut g = g;
+    remove(&mut g, nodes, "push");
+    apply_graph(&mut doc, g);
+    let (_, g) = found(invoke(&mut doc, "findOrCreateNode", None, vec![d]));
+    assert_eq!(array(&g, nodes).len(), 3);
+    // Explicitly repairing the array preserves the cached record identity.
+    let mut g = g;
+    property(&mut g, nodes, "3", Atom::Ref(cached));
+    if let Node::Array { length, .. } = &mut g.nodes[nodes as usize] {
+        *length = 4
+    }
+    apply_graph(&mut doc, g);
+    assert!(matches!(
+        invoke(
+            &mut doc,
+            "addLink",
+            None,
+            vec![Atom::Ref(a), Atom::Ref(cached), Atom::Number(4.)]
+        )
+        .result,
+        Ok(Atom::Undefined)
+    ));
+    same_source(&mut doc, "sankey-beta\nA,B,2\nA,C,3\nA,D,4");
+    // A readonly array length fails after lookup.set, with the exact cached alias.
+    let mut g = doc.snapshot().unwrap();
+    property(&mut g, nodes, "length", Atom::Number(4.));
+    g.nodes[nodes as usize]
+        .properties_mut()
+        .iter_mut()
+        .find(|p| g.strings[p.key as usize].is("length"))
+        .unwrap()
+        .flags = 0;
+    let e = string(&mut g, "E");
+    apply_graph(&mut doc, g);
+    let out = invoke(&mut doc, "findOrCreateNode", None, vec![e.clone()]);
+    assert!(
+        matches!(out.result,Err(PublicError::JavaScript{message,..})if message.is("Cannot assign to read only property 'length' of object '[object Array]'"))
+    );
+    assert_eq!(array(&out.graph, nodes).len(), 4);
+    let Node::Map { entries, .. } = &out.graph.nodes[lookup as usize] else {
+        panic!()
+    };
+    let retained = reference(&entries.last().unwrap().1);
+    let (hit, _) = found(invoke(&mut doc, "findOrCreateNode", None, vec![e]));
+    assert_eq!(hit, retained);
+    // Cache hits bypass broken nodes entirely; misses fail before Map mutation.
+    let mut g = doc.snapshot().unwrap();
+    property(&mut g, root, "nodes", Atom::Null);
+    let missing = string(&mut g, "Missing");
+    apply_graph(&mut doc, g);
+    let (old, _) = found(invoke(&mut doc, "findOrCreateNode", None, vec![key_a]));
+    assert_eq!(old, a);
+    let before = fingerprint(&doc.snapshot().unwrap());
+    let out = invoke(&mut doc, "findOrCreateNode", None, vec![missing]);
+    assert_eq!(before, fingerprint(&out.graph));
+    assert!(
+        matches!(out.result,Err(PublicError::JavaScript{message,..})if message.is("Cannot read properties of null (reading 'length')"))
+    );
+    // Restore the live data without reparsing; a cyclic link is stored first and
+    // rejected only by the real renderer, with its graph retained for recovery.
+    let mut g = doc.snapshot().unwrap();
+    property(&mut g, root, "nodes", Atom::Ref(nodes));
+    remove(&mut g, nodes, "length");
+    apply_graph(&mut doc, g);
+    let valid = doc.snapshot().unwrap();
+    let out = invoke(
+        &mut doc,
+        "addLink",
+        None,
+        vec![Atom::Ref(cached), Atom::Ref(a), Atom::Number(1.)],
+    );
+    assert!(matches!(out.result, Ok(Atom::Undefined)));
+    assert_eq!(array(&out.graph, links).len(), 4);
+    assert!(doc
+        .render(&Default::default(), &mut MetricsResources)
+        .is_err());
+    assert_eq!(
+        fingerprint(&out.graph),
+        fingerprint(&doc.snapshot().unwrap())
+    );
+    apply_graph(&mut doc, valid);
+    same_source(&mut doc, "sankey-beta\nA,B,2\nA,C,3\nA,D,4");
+    assert_eq!(count.load(Ordering::SeqCst), 1);
+}
+#[test]
+fn sankey_native_lookup_returns_raw_values_same_value_zero_keys_and_utf16_storage() {
+    let mut engine = PublicEngine::empty();
+    engine.register(Sankey);
+    let mut doc = engine.parse(SOURCE, &Default::default()).unwrap();
+    let mut g = doc.snapshot().unwrap();
+    let root = root(&g);
+    let lookup = reference(g.field("lookup").unwrap().unwrap());
+    let nodes = reference(g.field("nodes").unwrap().unwrap());
+    let key = string(&mut g, "Raw");
+    if let Node::Map { entries, .. } = &mut g.nodes[lookup as usize] {
+        entries.push((key.clone(), Atom::Null))
+    }
+    apply_graph(&mut doc, g);
+    let before = fingerprint(&doc.snapshot().unwrap());
+    let out = invoke(&mut doc, "findOrCreateNode", None, vec![key.clone()]);
+    assert!(matches!(out.result, Ok(Atom::Null)));
+    assert_eq!(before, fingerprint(&out.graph));
+    let mut g = out.graph;
+    if let Node::Map { entries, .. } = &mut g.nodes[lookup as usize] {
+        entries.last_mut().unwrap().1 = Atom::Bool(false)
+    }
+    apply_graph(&mut doc, g);
+    assert!(matches!(
+        invoke(&mut doc, "findOrCreateNode", None, vec![key.clone()]).result,
+        Ok(Atom::Bool(false))
+    ));
+    let mut g = doc.snapshot().unwrap();
+    if let Node::Map { entries, .. } = &mut g.nodes[lookup as usize] {
+        entries.last_mut().unwrap().1 = Atom::Undefined
+    }
+    apply_graph(&mut doc, g);
+    let (raw, g) = found(invoke(&mut doc, "findOrCreateNode", None, vec![key]));
+    assert_eq!(array(&g, nodes).len(), 4);
+    let Node::Map { entries, .. } = &g.nodes[lookup as usize] else {
+        panic!()
+    };
+    assert_eq!(entries.len(), 4);
+    assert_eq!(reference(&entries[3].1), raw);
+    // -0 and +0 select the same Map key, but id keeps the original -0 bits.
+    let (zero, g) = found(invoke(
+        &mut doc,
+        "findOrCreateNode",
+        None,
+        vec![Atom::Number(-0.)],
+    ));
+    let Atom::Number(n) = field(&g, zero, "id") else {
+        panic!()
+    };
+    assert_eq!(n.to_bits(), (-0_f64).to_bits());
+    let Node::Map { entries, .. } = &g.nodes[lookup as usize] else {
+        panic!()
+    };
+    assert!(matches!(entries.last().unwrap().0,Atom::Number(n)if n.to_bits()==0));
+    let (same, _) = found(invoke(
+        &mut doc,
+        "findOrCreateNode",
+        None,
+        vec![Atom::Number(0.)],
+    ));
+    assert_eq!(zero, same);
+    let payload = f64::from_bits(0x7ff8000000000042);
+    let (nan, g) = found(invoke(
+        &mut doc,
+        "findOrCreateNode",
+        None,
+        vec![Atom::Number(payload)],
+    ));
+    let Atom::Number(n) = field(&g, nan, "id") else {
+        panic!()
+    };
+    assert_eq!(n.to_bits(), payload.to_bits());
+    let Node::Map { entries, .. } = &g.nodes[lookup as usize] else {
+        panic!()
+    };
+    assert!(matches!(entries.last().unwrap().0,Atom::Number(n)if n.to_bits()==payload.to_bits()));
+    let (same, _) = found(invoke(
+        &mut doc,
+        "findOrCreateNode",
+        None,
+        vec![Atom::Number(f64::NAN)],
+    ));
+    assert_eq!(nan, same);
+    let mut g = doc.snapshot().unwrap();
+    let arg = g.strings.len() as u32;
+    g.strings.push(JsString(vec![32, 0xd800, 10]));
+    apply_graph(&mut doc, g);
+    let (lone, g) = found(invoke(
+        &mut doc,
+        "findOrCreateNode",
+        None,
+        vec![Atom::String(arg)],
+    ));
+    assert_eq!(g.text(field(&g, lone, "id")).unwrap().0, [32, 0xd800, 10]);
+    let (same, _) = found(invoke(
+        &mut doc,
+        "findOrCreateNode",
+        None,
+        vec![Atom::String(arg)],
+    ));
+    assert_eq!(lone, same);
+    // A valid string identifier with an isolated surrogate is accepted by the
+    // builder unchanged. Its active label rendering limit stays explicit.
+    let mut isolated = engine.parse(SOURCE, &Default::default()).unwrap();
+    let mut raw = isolated.snapshot().unwrap();
+    let id = raw.strings.len() as u32;
+    raw.strings.push(JsString(vec![32, 0xd800, 10]));
+    apply_graph(&mut isolated, raw);
+    let (lone, raw) = found(invoke(
+        &mut isolated,
+        "findOrCreateNode",
+        None,
+        vec![Atom::String(id)],
+    ));
+    assert_eq!(
+        raw.text(field(&raw, lone, "id")).unwrap().0,
+        [32, 0xd800, 10]
+    );
+    assert!(isolated
+        .render(&Default::default(), &mut MetricsResources)
+        .unwrap_err()
+        .message
+        .contains("lone UTF-16"));
+    assert_eq!(
+        fingerprint(&raw),
+        fingerprint(&isolated.snapshot().unwrap())
+    );
+    // Replacing collections keeps the ordinary lookup fields and method receiver
+    // identity separate; callback overrides are explicit capability errors.
+    let mut g = doc.snapshot().unwrap();
+    let clean = push_array(&mut g, vec![]);
+    property(&mut g, root, "nodes", Atom::Ref(clean));
+    let class = string(&mut g, "callback");
+    property(&mut g, lookup, "get", Atom::HostReference(7));
+    apply_graph(&mut doc, g);
+    let out = invoke(&mut doc, "findOrCreateNode", None, vec![class]);
+    assert!(
+        matches!(out.result,Err(PublicError::Pele(PeleError{message,..}))if message.contains("callback dispatch is unavailable"))
+    );
+}
+
+fn find_label(doc: &mut PublicDocument, label: &str) -> u32 {
+    let mut g = doc.snapshot().unwrap();
+    let label = string(&mut g, label);
+    apply_graph(doc, g);
+    found(invoke(doc, "findOrCreateNode", None, vec![label])).0
+}
+#[test]
+fn sankey_real_methods_and_authored_edits_match_pinned_complete_svg_vectors() {
+    // Oracle uses parse(SOURCE), actual database method calls and the indicated
+    // direct ordinary edits. Hashes cover every byte of the resulting SVG.
+    let vectors = [
+        (
+            "builder",
+            616.,
+            416.,
+            "40bd1ab650938ca2ccfc47600178a2fb3120994a9bee927c69b99c0213828ee8",
+        ),
+        (
+            "raw-label",
+            616.,
+            416.,
+            "8e7c24b341afe755728544fc0ec0cdf8fe0fc942585af58145de34375fcd6b0d",
+        ),
+        (
+            "deleted-key",
+            616.,
+            416.,
+            "4a725f7fd21fc0209f72ddc0632ddffefe05879feee4747f0f73cd69d8f121fe",
+        ),
+        (
+            "reordered-array",
+            616.,
+            416.,
+            "34b507d951e62c08728180b245957420d95a4ab6aa6aa58f40f21b5efaeba2ef",
+        ),
+        (
+            "replaced-node",
+            616.,
+            416.,
+            "4f31a5a0d4ff773832a477b54b8eee46a87bba27d087277ffc18a66e1b6d5d77",
+        ),
+        (
+            "cache-alias",
+            616.,
+            416.,
+            "745ff65bac1789ab6b328e4dd638e2e55093e6137c107aa866c43a5ca9e1fb9c",
+        ),
+        (
+            "undefined-cache",
+            616.,
+            416.,
+            "eed39185a45451feb72be09530d9305906b99e1e2bd151adf739a3be8885a03a",
+        ),
+        (
+            "isolated",
+            616.,
+            427.,
+            "b61504640af9cd536468efa51d9abf324e6c03951db1bb7497f0cd1da38b4544",
+        ),
+        (
+            "value-negative",
+            616.,
+            416.,
+            "7a82d7b1ad65ac6d1ba48d15484c20619502064fc4cafafaedcafe3b37d0566f",
+        ),
+        (
+            "value-nan",
+            616.,
+            416.,
+            "7a82d7b1ad65ac6d1ba48d15484c20619502064fc4cafafaedcafe3b37d0566f",
+        ),
+        (
+            "value-infinity",
+            616.,
+            416.,
+            "7a82d7b1ad65ac6d1ba48d15484c20619502064fc4cafafaedcafe3b37d0566f",
+        ),
+        (
+            "value-negative-infinity",
+            616.,
+            416.,
+            "7a82d7b1ad65ac6d1ba48d15484c20619502064fc4cafafaedcafe3b37d0566f",
+        ),
+        (
+            "value-negative-zero",
+            616.,
+            416.,
+            "7a82d7b1ad65ac6d1ba48d15484c20619502064fc4cafafaedcafe3b37d0566f",
+        ),
+        (
+            "value-false",
+            616.,
+            416.,
+            "7a82d7b1ad65ac6d1ba48d15484c20619502064fc4cafafaedcafe3b37d0566f",
+        ),
+        (
+            "value-string",
+            616.,
+            416.,
+            "7a82d7b1ad65ac6d1ba48d15484c20619502064fc4cafafaedcafe3b37d0566f",
+        ),
+        (
+            "value-undefined",
+            616.,
+            416.,
+            "7a82d7b1ad65ac6d1ba48d15484c20619502064fc4cafafaedcafe3b37d0566f",
+        ),
+        (
+            "value-null",
+            616.,
+            416.,
+            "7a82d7b1ad65ac6d1ba48d15484c20619502064fc4cafafaedcafe3b37d0566f",
+        ),
+    ];
+    for (name, width, height, expected) in vectors {
+        let mut engine = PublicEngine::empty();
+        engine.register(Sankey);
+        let mut doc = engine.parse(SOURCE, &Default::default()).unwrap();
+        let g = doc.snapshot().unwrap();
+        let nodes = reference(g.field("nodes").unwrap().unwrap());
+        let lookup = reference(g.field("lookup").unwrap().unwrap());
+        let ids = array(&g, nodes);
+        let mut a = reference(&ids[0]);
+        let c = reference(&ids[2]);
+        match name {
+            "builder" => {
+                let d = find_label(&mut doc, "D");
+                assert!(matches!(
+                    invoke(
+                        &mut doc,
+                        "addLink",
+                        None,
+                        vec![ids[1].clone(), Atom::Ref(d), Atom::Number(4.)]
+                    )
+                    .result,
+                    Ok(Atom::Undefined)
+                ));
+            }
+            "raw-label" => {
+                let d = find_label(&mut doc, "  D & \"x\"\n<em>raw</em>  ");
+                invoke(
+                    &mut doc,
+                    "addLink",
+                    None,
+                    vec![Atom::Ref(a), Atom::Ref(d), Atom::Number(4.)],
+                );
+            }
+            "deleted-key" => {
+                let mut g = doc.snapshot().unwrap();
+                if let Node::Map { entries, .. } = &mut g.nodes[lookup as usize] {
+                    entries.remove(0);
+                }
+                apply_graph(&mut doc, g);
+                a = find_label(&mut doc, "A");
+                invoke(
+                    &mut doc,
+                    "addLink",
+                    None,
+                    vec![Atom::Ref(c), Atom::Ref(a), Atom::Number(1.)],
+                );
+            }
+            "reordered-array" => {
+                let mut g = doc.snapshot().unwrap();
+                for (i, id) in ids.iter().rev().enumerate() {
+                    property(&mut g, nodes, &i.to_string(), id.clone())
+                }
+                apply_graph(&mut doc, g);
+                let d = find_label(&mut doc, "D");
+                let a = find_label(&mut doc, "A");
+                invoke(
+                    &mut doc,
+                    "addLink",
+                    None,
+                    vec![Atom::Ref(a), Atom::Ref(d), Atom::Number(4.)],
+                );
+            }
+            "replaced-node" => {
+                let mut g = doc.snapshot().unwrap();
+                let name = string(&mut g, "Replacement");
+                let replacement =
+                    push_object(&mut g, vec![("id", name), ("index", Atom::Number(9999.))]);
+                property(&mut g, nodes, "0", Atom::Ref(replacement));
+                apply_graph(&mut doc, g);
+                let d = find_label(&mut doc, "D");
+                let a = find_label(&mut doc, "A");
+                invoke(
+                    &mut doc,
+                    "addLink",
+                    None,
+                    vec![Atom::Ref(a), Atom::Ref(d), Atom::Number(4.)],
+                );
+            }
+            "cache-alias" | "undefined-cache" => {
+                let mut g = doc.snapshot().unwrap();
+                if let Node::Map { entries, .. } = &mut g.nodes[lookup as usize] {
+                    entries[0].1 = if name == "cache-alias" {
+                        Atom::Ref(c)
+                    } else {
+                        Atom::Undefined
+                    }
+                }
+                apply_graph(&mut doc, g);
+                let a = find_label(&mut doc, "A");
+                let d = find_label(&mut doc, "D");
+                invoke(
+                    &mut doc,
+                    "addLink",
+                    None,
+                    vec![Atom::Ref(a), Atom::Ref(d), Atom::Number(4.)],
+                );
+            }
+            "isolated" => {
+                find_label(&mut doc, "D");
+            }
+            _ => {
+                let d = find_label(&mut doc, "D");
+                let value = match name {
+                    "value-negative" => Atom::Number(-3.),
+                    "value-nan" => Atom::Number(f64::NAN),
+                    "value-infinity" => Atom::Number(f64::INFINITY),
+                    "value-negative-infinity" => Atom::Number(f64::NEG_INFINITY),
+                    "value-negative-zero" => Atom::Number(-0.),
+                    "value-false" => Atom::Bool(false),
+                    "value-string" => {
+                        let mut g = doc.snapshot().unwrap();
+                        let value = string(&mut g, "4");
+                        apply_graph(&mut doc, g);
+                        value
+                    }
+                    "value-undefined" => Atom::Undefined,
+                    "value-null" => Atom::Null,
+                    _ => panic!("case"),
+                };
+                assert!(matches!(
+                    invoke(
+                        &mut doc,
+                        "addLink",
+                        None,
+                        vec![Atom::Ref(a), Atom::Ref(d), value]
+                    )
+                    .result,
+                    Ok(Atom::Undefined)
+                ));
+            }
+        }
+        let rendered = doc
+            .render(&Default::default(), &mut MetricsResources)
+            .unwrap();
+        assert_eq!(
+            (rendered.rendered.width, rendered.rendered.height),
+            (width, height),
+            "{name}"
+        );
+        assert_eq!(
+            format!("{:x}", Sha256::digest(rendered.rendered.svg.as_bytes())),
+            expected,
+            "{name}"
+        );
+    }
+}
+
+#[test]
+fn sankey_mutable_repeated_long_labels_reject_native_expansion_and_recover() {
+    let mut engine = PublicEngine::empty();
+    engine.register(Sankey);
+    let mut doc = engine.parse(SOURCE, &Default::default()).unwrap();
+    let original = doc.snapshot().unwrap();
+    let mut g = original.clone();
+    let root = root(&g);
+    let nodes = reference(g.field("nodes").unwrap().unwrap());
+    let a = reference(&array(&g, nodes)[0]);
+    let long = string(&mut g, &"x".repeat(65536));
+    property(&mut g, a, "id", long);
+    let repeated = push_array(&mut g, vec![Atom::Ref(a); 2049]);
+    let empty = push_array(&mut g, vec![]);
+    property(&mut g, root, "nodes", Atom::Ref(repeated));
+    property(&mut g, root, "links", Atom::Ref(empty));
+    let expected = fingerprint(&g);
+    apply_graph(&mut doc, g);
+    let error = doc
+        .render(&Default::default(), &mut MetricsResources)
+        .unwrap_err();
+    assert_eq!(error.code, ErrorCode::Limit);
+    assert_eq!(
+        error.message,
+        "Sankey imported text exceeds native allocation budget"
+    );
+    assert_eq!(expected, fingerprint(&doc.snapshot().unwrap()));
+    apply_graph(&mut doc, original);
+    same_source(&mut doc, SOURCE);
 }

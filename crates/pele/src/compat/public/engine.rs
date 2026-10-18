@@ -1,5 +1,6 @@
 use super::{
-    Atom, InvocationOutcome, MethodCall, ModelGraph, ModelSchema, PublicError, OPAQUE_MODEL_SCHEMA,
+    Atom, InvocationOutcome, MethodCall, ModelGraph, ModelSchema, ModelSchemaView, PublicError,
+    SharedFunction, OPAQUE_MODEL_SCHEMA,
 };
 use crate::compat::{
     DiagramId, DiagramModule, Engine, ErrorCode, ModuleDescriptor, Object, ParseContext,
@@ -12,6 +13,9 @@ pub trait PublicDiagramModule: DiagramModule {
     type PublicState: Send + 'static;
     fn model_schema(&self) -> &'static ModelSchema {
         &OPAQUE_MODEL_SCHEMA
+    }
+    fn shared_functions(&self) -> &'static [SharedFunction] {
+        &[]
     }
     /// Method IDs, receiver identity and arguments come from this document's
     /// current arena. The module owns native behavior, including partial edits.
@@ -131,6 +135,7 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
 struct Registration {
     descriptor: ModuleDescriptor,
     schema: &'static ModelSchema,
+    shared_functions: &'static [SharedFunction],
     codec: Box<dyn Erased>,
 }
 #[derive(Default)]
@@ -145,6 +150,7 @@ impl PublicEngine {
     pub fn register<D: PublicDiagramModule>(&mut self, module: D) {
         let descriptor = module.descriptor();
         let schema = module.model_schema();
+        let shared_functions = module.shared_functions();
         let shared = Arc::new(module);
         self.engine.register(Shared {
             module: shared.clone(),
@@ -153,6 +159,7 @@ impl PublicEngine {
         let registration = Arc::new(Registration {
             descriptor,
             schema,
+            shared_functions,
             codec: Box::new(Codec(shared)),
         });
         if let Some(slot) = self
@@ -187,7 +194,11 @@ impl PublicEngine {
             .find(|m| m.descriptor.id == *document.diagram_type())
             .expect("paired public registration")
             .clone();
-        registration.schema.validate()?;
+        ModelSchemaView {
+            model: registration.schema,
+            shared_functions: registration.shared_functions,
+        }
+        .validate()?;
         let state = registration.codec.create(&document)?;
         Ok(PublicDocument {
             registration,
@@ -214,12 +225,18 @@ impl PublicDocument {
     ) -> Result<Self, PeleError> {
         let descriptor = module.descriptor();
         let schema = module.model_schema();
-        schema.validate()?;
+        let shared_functions = module.shared_functions();
+        ModelSchemaView {
+            model: schema,
+            shared_functions,
+        }
+        .validate()?;
         let state: State = Box::new(module.create_public(model)?);
         Ok(Self {
             registration: Arc::new(Registration {
                 descriptor,
                 schema,
+                shared_functions,
                 codec: Box::new(Codec(Arc::new(module))),
             }),
             state,
@@ -232,6 +249,12 @@ impl PublicDocument {
     }
     pub fn model_schema(&self) -> &'static ModelSchema {
         self.registration.schema
+    }
+    pub fn schema_view(&self) -> ModelSchemaView {
+        ModelSchemaView {
+            model: self.registration.schema,
+            shared_functions: self.registration.shared_functions,
+        }
     }
     pub fn revision(&self) -> u64 {
         self.revision
