@@ -60,5 +60,5 @@ impl DiagramModule for Sequence {
 }
 
 mod public_model;
-pub use public_model::SequencePublicState;
 pub use model::SequencePublicOrigin;
+pub use public_model::SequencePublicState;

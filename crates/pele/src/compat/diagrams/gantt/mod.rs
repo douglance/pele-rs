@@ -3,9 +3,9 @@ mod axis;
 mod dates;
 mod lexer;
 mod model;
-mod scheduler;
 mod parser;
 mod render;
+mod scheduler;
 mod tokens;
 use crate::compat::{
     DiagramModule, DiagramType, ModuleDescriptor, Object, ParseContext, PeleError, RenderResources,

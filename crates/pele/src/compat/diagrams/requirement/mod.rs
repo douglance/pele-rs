@@ -31,5 +31,5 @@ impl DiagramModule for RequirementDiagram {
 }
 
 mod public_model;
-pub use public_model::RequirementPublicState;
 pub use model::RequirementProvenance;
+pub use public_model::RequirementPublicState;
