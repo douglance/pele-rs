@@ -47,3 +47,6 @@ impl DiagramModule for Flowchart {
         render::render(model, config, options, resources)
     }
 }
+
+mod public_model;
+pub use public_model::{FlowchartPublicOrigin, FlowchartPublicState};

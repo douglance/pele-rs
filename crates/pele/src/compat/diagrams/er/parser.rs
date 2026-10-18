@@ -157,16 +157,17 @@ impl Reader<'_> {
     fn char(&self, c: &str) -> bool {
         self.t() == T::CHAR && self.tokens[self.i].text == c
     }
-    fn block(&mut self) -> Result<Vec<ErAttribute>, PeleError> {
+    fn block(&mut self) -> Result<(Vec<ErAttribute>, Vec<bool>), PeleError> {
         if self.t() != T::BLOCK_START {
-            return Ok(vec![]);
+            return Ok((vec![], vec![]));
         }
         self.i += 1;
         if self.t() == T::BLOCK_STOP {
             self.i += 1;
-            return Ok(vec![]);
+            return Ok((vec![], vec![]));
         }
         let mut attrs = vec![];
+        let mut order = vec![];
         loop {
             let mut ty = self.expect(T::ATTRIBUTE_WORD)?;
             if self.char("?") {
@@ -188,12 +189,14 @@ impl Reader<'_> {
                     keys.push(self.expect(T::ATTRIBUTE_KEY)?);
                 }
             }
+            let comment_first = keys.is_empty() && self.t() == T::COMMENT;
             let comment = if self.t() == T::COMMENT {
                 let s = self.take();
                 s[1..s.len() - 1].into()
             } else {
                 String::new()
             };
+            order.push(comment_first);
             attrs.push(ErAttribute {
                 r#type: ty,
                 name,
@@ -205,7 +208,7 @@ impl Reader<'_> {
             }
         }
         self.i += 1;
-        Ok(attrs)
+        Ok((attrs, order))
     }
     fn entity(&mut self) -> Result<Vec<String>, PeleError> {
         let a = self.name()?;
@@ -219,8 +222,9 @@ impl Reader<'_> {
             } else {
                 vec![]
             };
-            let attrs = self.block()?;
-            self.db.add_entity(&a, &alias).attributes.extend(attrs);
+            let (attrs, order) = self.block()?;
+            self.db.add_entity(&a, &alias);
+            self.db.append_parsed_attributes(&a, attrs, order);
             self.db.set_class(std::slice::from_ref(&a), &classes);
             return Ok(vec![a]);
         }
@@ -248,8 +252,8 @@ impl Reader<'_> {
             self.db.set_class(std::slice::from_ref(&b), &classes_b);
             Ok(vec![a, b])
         } else {
-            let attrs = self.block()?;
-            self.db.add_entity(&a, "").attributes.extend(attrs);
+            let (attrs, order) = self.block()?;
+            self.db.append_parsed_attributes(&a, attrs, order);
             self.db.set_class(std::slice::from_ref(&a), &classes);
             Ok(vec![a])
         }

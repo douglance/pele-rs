@@ -34,3 +34,6 @@ impl DiagramModule for Er {
         render::render(model, config, options, resources)
     }
 }
+
+mod public_model;
+pub use public_model::ErPublicState;

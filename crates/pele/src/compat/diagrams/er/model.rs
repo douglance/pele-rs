@@ -1,6 +1,6 @@
 //! Pele er/{types,db}.ts, 458322a5 (MIT, kepano).
 use serde::Serialize;
-use std::collections::HashSet;
+use std::collections::{HashMap, HashSet};
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct ErAttribute {
@@ -97,6 +97,10 @@ pub struct ErModel {
     pub acc_descr: Option<String>,
     #[serde(skip)]
     claimed: HashSet<String>,
+    #[serde(skip)]
+    claimed_order: Vec<String>,
+    #[serde(skip)]
+    attribute_comment_first: HashMap<String, Vec<bool>>,
 }
 pub(super) enum DocItem {
     Text(String),
@@ -115,7 +119,31 @@ impl ErModel {
             acc_title: None,
             acc_descr: None,
             claimed: HashSet::new(),
+            claimed_order: vec![],
+            attribute_comment_first: HashMap::new(),
         }
+    }
+    pub(super) fn public_claimed(&self) -> &[String] {
+        &self.claimed_order
+    }
+    pub(super) fn public_attribute_comment_first(&self, name: &str, index: usize) -> bool {
+        self.attribute_comment_first
+            .get(name)
+            .and_then(|v| v.get(index))
+            .copied()
+            .unwrap_or(false)
+    }
+    pub(super) fn append_parsed_attributes(
+        &mut self,
+        name: &str,
+        attributes: Vec<ErAttribute>,
+        order: Vec<bool>,
+    ) {
+        let old = self.add_entity(name, "").attributes.len();
+        let provenance = self.attribute_comment_first.entry(name.into()).or_default();
+        provenance.resize(old, false);
+        provenance.extend(order);
+        self.add_entity(name, "").attributes.extend(attributes);
     }
     pub(super) fn add_entity(&mut self, name: &str, alias: &str) -> &mut ErEntity {
         let i = if let Some(i) = self.entities.iter().position(|(k, _)| k == name) {
@@ -224,7 +252,11 @@ impl ErModel {
                 }
             }
         }
-        self.claimed.extend(nodes.iter().cloned());
+        for node in &nodes {
+            if self.claimed.insert(node.clone()) {
+                self.claimed_order.push(node.clone());
+            }
+        }
         let id = id.trim_matches(crate::compat::source::space).to_owned();
         self.subgraphs.push(ErSubgraph {
             id: id.clone(),

@@ -137,3 +137,6 @@ impl DiagramModule for Swimlane {
         render_flowchart(m, c, o, r, Some(self))
     }
 }
+
+mod public_model;
+pub use public_model::SwimlanePublicState;

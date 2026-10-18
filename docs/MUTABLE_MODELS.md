@@ -7,7 +7,9 @@ Journey's six, Quadrant's thirteen and XYChart's thirteen real native methods
 are available in this checkpoint. Other method-bearing families remain in progress.
 Rust additionally exposes Kanban, Mindmap and Timeline mutable codecs, with
 shared outline-helper identity metadata; Sankey exposes two native methods.
-Their Swift/web adapter checkpoint remains in progress.
+Rust also exposes Flowchart, Swimlane, ER and Architecture, bringing native
+mutable coverage to sixteen families. Their Swift/web adapter checkpoint remains
+in progress.
 The published v0.1.0 binary remains the earlier flowchart subset.
 
 ## Browser

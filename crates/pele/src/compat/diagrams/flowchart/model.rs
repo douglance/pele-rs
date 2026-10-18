@@ -101,6 +101,8 @@ pub struct FlowSubgraph {
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct FlowchartModel {
+    #[serde(skip)]
+    pub public_origin: super::public_model::FlowchartPublicOrigin,
     #[serde(rename = "type")]
     pub diagram_type: DiagramType,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -232,6 +234,16 @@ impl FlowDb {
         Self {
             model: FlowchartModel {
                 diagram_type: DiagramType::Flowchart,
+                public_origin: super::public_model::FlowchartPublicOrigin {
+                    max_edges: context.max_edges,
+                    inherit_dir: context
+                        .config
+                        .get("flowchart")
+                        .and_then(Value::as_object)
+                        .and_then(|o| o.get("inheritDir"))
+                        == Some(&Value::Bool(true)),
+                    ..Default::default()
+                },
                 direction: None,
                 nodes: Vec::new(),
                 edges: Vec::new(),
@@ -303,13 +315,17 @@ impl FlowDb {
         if let Some(&i) = self.edge_by_id.get(id) {
             if let Some(doc) = doc {
                 let e = &mut self.model.edges[i];
+                let keys = &mut self.model.public_origin.edges[i];
                 if let Some(v) = doc.get("animate") {
+                    super::public_model::FlowchartPublicOrigin::key(keys, "animate");
                     e.animate = Some(v.clone())
                 }
                 if let Some(v) = doc.get("animation") {
+                    super::public_model::FlowchartPublicOrigin::key(keys, "animation");
                     e.animation = Some(v.clone())
                 }
                 if let Some(v) = doc.get("curve") {
+                    super::public_model::FlowchartPublicOrigin::key(keys, "interpolate");
                     e.interpolate = Some(v.clone())
                 }
             }
@@ -320,6 +336,10 @@ impl FlowDb {
         } else {
             let i = self.model.nodes.len();
             self.nodes.insert(id.into(), i);
+            self.model
+                .public_origin
+                .nodes
+                .push(vec!["id", "labelType", "styles", "classes"]);
             self.model.nodes.push((
                 id.into(),
                 FlowNode {
@@ -344,6 +364,18 @@ impl FlowDb {
             ));
             i
         };
+        let keys = &mut self.model.public_origin.nodes[i];
+        let key =
+            |keys: &mut Vec<_>, name| super::public_model::FlowchartPublicOrigin::key(keys, name);
+        if text.is_some() || self.model.nodes[i].1.text.is_none() {
+            key(keys, "text")
+        }
+        if shape.is_some() {
+            key(keys, "type")
+        }
+        if self.model.nodes[i].1.props.is_none() {
+            key(keys, "props")
+        }
         let v = &mut self.model.nodes[i].1;
         if let Some(text) = text {
             v.label_type = text.kind;
@@ -365,6 +397,21 @@ impl FlowDb {
             }
         }
         let Some(doc) = doc else { return Ok(()) };
+        for (input, output) in [
+            ("shape", "type"),
+            ("label", "text"),
+            ("icon", "icon"),
+            ("form", "form"),
+            ("pos", "pos"),
+            ("img", "img"),
+            ("constraint", "constraint"),
+            ("w", "assetWidth"),
+            ("h", "assetHeight"),
+        ] {
+            if doc.get(input).is_some_and(Value::truthy) {
+                key(keys, output);
+            }
+        }
         if let Some(shape) = doc.get("shape").filter(|v| v.truthy()) {
             let shape = shape.js_string();
             if shape.to_lowercase() != shape || shape.contains('_') {
@@ -466,6 +513,20 @@ impl FlowDb {
                         ErrorCode::Limit,
                     ));
                 }
+                self.model.public_origin.edges.push(vec![
+                    "start",
+                    "end",
+                    "type",
+                    "text",
+                    "labelType",
+                    "classes",
+                    "isUserDefinedId",
+                    "interpolate",
+                    "stroke",
+                    "length",
+                    "id",
+                ]);
+                self.model.public_origin.edge_styles.push(None);
                 self.model.edges.push(edge);
                 self.pair_count.insert(pair, existing + 1);
                 self.edge_by_id.entry(id).or_insert(len);
@@ -529,6 +590,14 @@ impl FlowDb {
         };
         for id in ids.split(',') {
             if let Some(&i) = self.nodes.get(id) {
+                super::public_model::FlowchartPublicOrigin::key(
+                    &mut self.model.public_origin.nodes[i],
+                    "link",
+                );
+                super::public_model::FlowchartPublicOrigin::key(
+                    &mut self.model.public_origin.nodes[i],
+                    "linkTarget",
+                );
                 self.model.nodes[i].1.link = url.clone();
                 self.model.nodes[i].1.link_target = target.clone()
             }
@@ -574,11 +643,14 @@ impl FlowDb {
         mut styles: Vec<String>,
         interpolate: Option<&str>,
     ) -> Result<(), PeleError> {
+        let style_group = self.model.public_origin.next_style;
+        self.model.public_origin.next_style += 1;
         for pos in positions {
             if pos == "default" {
                 if let Some(interpolate) = interpolate {
                     self.model.default_interpolate = Some(Value::String(interpolate.into()))
                 } else {
+                    self.model.public_origin.default_style = Some(style_group);
                     self.model.default_edge_style = Some(styles.clone())
                 }
                 continue;
@@ -591,6 +663,11 @@ impl FlowDb {
                 if !styles.is_empty() && !styles.iter().any(|s| s.starts_with("fill")) {
                     styles.push("fill:none".into())
                 }
+                super::public_model::FlowchartPublicOrigin::key(
+                    &mut self.model.public_origin.edges[i],
+                    "style",
+                );
+                self.model.public_origin.edge_styles[i] = Some(style_group);
                 e.style = Some(styles.clone())
             }
         }
@@ -648,8 +725,13 @@ impl FlowDb {
         }
         let id = name.unwrap_or_else(|| format!("subGraph{}", self.sub_count));
         self.sub_count += 1;
+        self.model.public_origin.sub_count = self.sub_count;
         nodes.retain(|node| node != &id && !self.members.contains(node));
         self.members.extend(nodes.iter().cloned());
+        self.model
+            .public_origin
+            .members
+            .extend(nodes.iter().cloned());
         if let Some(&i) = self.subgraphs.get(&id) {
             self.model.subgraphs[i].nodes.extend(nodes)
         } else {

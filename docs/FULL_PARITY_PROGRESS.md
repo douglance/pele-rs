@@ -429,3 +429,19 @@ eleven targets, including all four affected historical corpora and shared
 registration contracts. Native mutation SVG vectors and bounded-work recovery
 are included. Constructors, active lone-surrogate rendering, arbitrary callback/
 coercion behavior and each codec's documented collection limits remain open.
+
+
+## Sixteen mutable native codecs
+
+Flowchart, Swimlane, ER and Architecture add four more native codecs. Flowchart's
+nineteen actual methods and private caches are reused by Swimlane with the real
+shared schema, prototype identity and lane renderer. ER exposes ten methods with
+entity/attribute/relationship aliases and ordered private group claims; Architecture
+exposes six with real Map values, copied records and retained layout-hint arguments.
+
+The frozen native batch passes 41 release-profile integration tests across eight
+targets, including the complete affected source/render corpora, Flowchart and
+Swimlane's pinned full graph/method vectors and native raster checks. All sixteen
+codecs remain subject to their explicit constructor, callback/coercion, UTF-16
+rendering and work-budget limits. The separately verified foreign adapter
+checkpoint remains nine families while the expanded host checks run.
