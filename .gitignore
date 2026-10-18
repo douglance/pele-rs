@@ -20,3 +20,5 @@
 *.png
 *.svg
 !fixtures/**/*.svg
+
+/bindings/web/FDLIBM-LICENSE

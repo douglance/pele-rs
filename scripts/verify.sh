@@ -9,6 +9,8 @@ cargo run --locked --manifest-path tests/rust-consumer/Cargo.toml
 scripts/build-native.sh
 cc -Wall -Wextra -Werror -I include tests/ffi.c target/release/libpele_ffi.a -o target/ffi-integration
 target/ffi-integration
+cc -Wall -Wextra -Werror -I include tests/ffi-public.c target/release/libpele_ffi.a -o target/ffi-public-integration
+target/ffi-public-integration
 if [[ "$(uname -s)" == Darwin ]]; then
     swift test --package-path bindings/swift
     swift run --package-path bindings/swift pele-smoke "$repo_dir" "$repo_dir/dist/evidence"

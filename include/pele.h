@@ -66,6 +66,28 @@ PeleResult *pele_render_document_with_resources_v3(const PeleResult *, const uin
 /* NULL-safe accessors: status 3, data NULL, length 0. Status: 0 success,
  * 1 input error, 2 resource limit, 3 internal error. Bytes contain versioned JSON,
  * not a NUL-terminated string; data remains valid until result_free. */
+/* Mutable public documents: synchronize destruction with all operations.
+ * Graph JSON preserves UTF-16 code units, IEEE number bits and object identity.
+ * Operation results use existing owned version-2 envelopes. Revisions are decimal
+ * strings in results; apply accepts the exact uint64 value. Graph input <=64 MiB.
+ * NULL resources select default native resources. Parse sets *out_document=NULL
+ * before work; a successful handle must be freed once. Recursive/concurrent
+ * operations on one handle return an error; never free during an active call. */
+typedef struct PelePublicDocument PelePublicDocument;
+PeleResult *pele_public_parse_v4(const uint8_t *, size_t, const uint8_t *, size_t, PelePublicDocument **out_document);
+PeleResult *pele_public_snapshot_v4(const PelePublicDocument *);
+/* Native schema and method operations. invoke returns an operation outcome with
+ * graph/revision/result even when the method throws, subject to output budgets.
+ * Outer errors include preflight rejection and export/transport failure after
+ * dispatch; state may advance in the latter case. call JSON is bounded to 64 MiB. */
+PeleResult *pele_public_schema_v4(const PelePublicDocument *document);
+PeleResult *pele_public_invoke_v4(PelePublicDocument *document, uint64_t expected_revision,
+                                const uint8_t *call, size_t call_length,
+                                const PeleHostResourcesV3 *resources);
+PeleResult *pele_public_apply_v4(PelePublicDocument *, uint64_t expected_revision, const uint8_t *, size_t);
+PeleResult *pele_public_render_v4(PelePublicDocument *, const uint8_t *, size_t, const PeleHostResourcesV3 *);
+void pele_public_document_free_v4(PelePublicDocument *);
+
 uint32_t pele_result_status(const PeleResult *result);
 const uint8_t *pele_result_data(const PeleResult *result);
 size_t pele_result_len(const PeleResult *result);

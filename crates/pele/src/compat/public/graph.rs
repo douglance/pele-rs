@@ -64,6 +64,9 @@ pub enum Node {
     Object {
         properties: Vec<Property>,
     },
+    /// Array length is implicit with its default writable descriptor. A
+    /// nondefault own `length` Property preserves readonly length (flags 0);
+    /// its numeric value agrees with the scalar length.
     Array {
         length: u32,
         properties: Vec<Property>,

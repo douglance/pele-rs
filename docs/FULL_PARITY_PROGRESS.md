@@ -381,3 +381,28 @@ Swift/C and WASM mutable adapters are a separately verified layer in progress.
 The frozen nine-codec native batch passes 57 release-profile integration tests
 across 14 targets, including retained extension contracts and Packet/Quadrant
 source-corpus regressions. Rust formatting and staged whitespace checks pass.
+
+
+## Mutable host adapters checkpoint
+
+The same nine native codecs now have additive C v4 owned handles, Swift
+`parseMutable`/graph/schema/invoke APIs and browser arena hydration with real
+prototype methods. Swift's six mutable-document integration tests pass, including
+actual native method calls, partial errors, lossless extra values, nine edited
+family SVG decoders and callback recovery. Strict C linkage/ownership tests pass
+with 200 repeated documents, revision/input rejection and callback reentry.
+
+Across Chrome, Firefox and WebKit, the 51 selected browser checks are covered by
+the initial batch plus an 18-check focused correction run. Full nine-family source
+and model corpora, changed model fields, method prototypes/arity/function shape,
+shared function identity, partial failures, retained aliases, native SVG pixels
+and browser Canvas resources are exercised. The corrections preserve Pele's
+RangeError-to-limit guard, retain falsy host throws, align Firefox function key
+order and render Packet's formerly oversized model through the flat graph.
+Treemap's previous projection exception also renders through the new flat model.
+
+JSON serialization bounds public output while writing, rather than allocating an
+intermediary tree first. Native transport and post-call export limits remain
+explicit boundaries. The TypeScript consumer slice passes strict checking with
+TypeScript 4.9.5; this is a recorded local consumer check, not a CI compiler claim.
+No full mutable API/release parity claim is made; see `MUTABLE_MODELS.md`.

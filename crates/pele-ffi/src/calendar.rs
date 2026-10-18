@@ -26,6 +26,21 @@ struct Resources<'a> {
     inner: NativeResources<'a>,
     host: Option<&'a PeleHostResourcesV3>,
 }
+/// Share the complete v3 calendar/text/icon session with additive native APIs.
+/// The caller must keep the supplied host and callback context live for the call.
+pub(crate) unsafe fn with_resources<T>(
+    host: *const PeleHostResourcesV3,
+    run: impl FnOnce(&mut dyn RenderResources) -> T,
+) -> T {
+    let host = unsafe { host.as_ref() };
+    let mut resources = Resources {
+        inner: NativeResources {
+            host: host.map(|h| &h.base),
+        },
+        host,
+    };
+    run(&mut resources)
+}
 impl Resources<'_> {
     fn offset(&self, instant: f64) -> Result<Option<i32>, PeleError> {
         let host = self.host.unwrap();

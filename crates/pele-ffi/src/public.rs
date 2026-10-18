@@ -1,0 +1,259 @@
+//! Additive mutable document ABI. Graph JSON preserves UTF-16 units and IEEE bits.
+//! This bounded UTF-8 source/JSON lane is not the complete lossless source/options ABI.
+use super::{calendar, compatibility_call, compatibility_input, PeleHostResourcesV3, PeleResult};
+use pele::compat::{
+    diagrams::{
+        info::Info, journey::Journey, packet::Packet, pie::Pie, quadrant_chart::QuadrantChart,
+        radar::Radar, sankey::Sankey, treemap::Treemap, xychart::XyChart,
+    },
+    public::{ModelGraph, PublicDocument, PublicEngine},
+    ErrorCode, PeleError,
+};
+use serde::Serialize;
+use std::{
+    io::Write,
+    panic::{catch_unwind, AssertUnwindSafe},
+    sync::{Mutex, MutexGuard, TryLockError},
+};
+const GRAPH_JSON_BUDGET: usize = 64 * 1024 * 1024;
+/// Opaque owner. Operations serialize; callers must not free while an operation is active.
+pub struct PelePublicDocument {
+    document: Mutex<PublicDocument>,
+}
+fn invalid(message: &str) -> PeleError {
+    PeleError::new(message, ErrorCode::Semantic)
+}
+unsafe fn document<'a>(
+    handle: *const PelePublicDocument,
+) -> Result<MutexGuard<'a, PublicDocument>, PeleError> {
+    let owner = unsafe { handle.as_ref() }
+        .ok_or_else(|| invalid("Native public transport: null document"))?;
+    owner.document.try_lock().map_err(|error| match error {
+        TryLockError::WouldBlock => invalid("Native public document is already in use"),
+        TryLockError::Poisoned(_) => {
+            invalid("Native public document is unavailable after an engine panic")
+        }
+    })
+}
+struct Output {
+    bytes: Vec<u8>,
+    exceeded: bool,
+}
+impl Write for Output {
+    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+        if bytes.len() > GRAPH_JSON_BUDGET - self.bytes.len() {
+            self.exceeded = true;
+            return Err(std::io::Error::other("public result budget"));
+        }
+        self.bytes.extend_from_slice(bytes);
+        Ok(bytes.len())
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+}
+fn success(value: impl Serialize) -> Result<PeleResult, PeleError> {
+    #[derive(Serialize)]
+    struct Envelope<T> {
+        version: u32,
+        ok: bool,
+        result: T,
+    }
+    let mut output = Output {
+        bytes: vec![],
+        exceeded: false,
+    };
+    let encoded = serde_json::to_writer(
+        &mut output,
+        &Envelope {
+            version: 2,
+            ok: true,
+            result: value,
+        },
+    );
+    if output.exceeded {
+        return Err(PeleError::new(
+            "Native public transport: result exceeds 64 MiB JSON budget",
+            ErrorCode::Limit,
+        ));
+    }
+    encoded.map_err(|_| invalid("Native public transport: result cannot be encoded"))?;
+    Ok(PeleResult {
+        status: 0,
+        data: output.bytes,
+        document: None,
+    })
+}
+/// Parse an opted-in built-in. On every error `*out_document` is null; success transfers ownership.
+/// # Safety
+/// out_document must be a valid writable pointer. Other non-null inputs must name readable
+/// byte lengths. Source is well-formed UTF-8 (16 MiB), options JSON at most 1 MiB.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_parse_v4(
+    source: *const u8,
+    source_len: usize,
+    options: *const u8,
+    options_len: usize,
+    out_document: *mut *mut PelePublicDocument,
+) -> *mut PeleResult {
+    compatibility_call(|| {
+        let out = unsafe { out_document.as_mut() }
+            .ok_or_else(|| invalid("Native public transport: null document output"))?;
+        *out = std::ptr::null_mut();
+        let source = unsafe { compatibility_input(source, source_len, 16 * 1024 * 1024) }?;
+        let options = unsafe { compatibility_input(options, options_len, 1024 * 1024) }?;
+        let options = pele::compat::parse_options(options)?;
+        let mut registry = PublicEngine::empty();
+        registry.register(Pie);
+        registry.register(Info);
+        registry.register(Sankey);
+        registry.register(Packet);
+        registry.register(Radar);
+        registry.register(QuadrantChart);
+        registry.register(Treemap);
+        registry.register(Journey);
+        registry.register(XyChart);
+
+        let document = registry.parse(source, &options).map_err(|mut error| {
+            if error.code == ErrorCode::UnsupportedDiagram {
+                if let Some(kind) = &error.diagram_type {
+                    error.message = format!(
+                        "Mutable public model codec for diagram type \"{kind}\" is unavailable."
+                    );
+                }
+            }
+            error
+        })?;
+        let result = success(
+            serde_json::json!({"type":document.diagram_type(),"revision":document.revision().to_string()}),
+        )?;
+        *out = Box::into_raw(Box::new(PelePublicDocument {
+            document: Mutex::new(document),
+        }));
+        Ok(result)
+    })
+}
+/// Flat graph schema 1 plus decimal-string revision. Result JSON is limited to 64 MiB.
+/// # Safety
+/// handle must be null or a live owned document, not concurrently freed.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_snapshot_v4(
+    handle: *const PelePublicDocument,
+) -> *mut PeleResult {
+    compatibility_call(|| {
+        let document = unsafe { document(handle) }?;
+        #[derive(Serialize)]
+        struct Snapshot<'a> {
+            r#type: &'a pele::compat::DiagramId,
+            revision: String,
+            graph: ModelGraph,
+        }
+        success(Snapshot {
+            r#type: document.diagram_type(),
+            revision: document.revision().to_string(),
+            graph: document.snapshot()?,
+        })
+    })
+}
+/// Schema-declared fields, prototypes and native method IDs for this document.
+/// # Safety
+/// handle must be null or live and not concurrently freed.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_schema_v4(
+    handle: *const PelePublicDocument,
+) -> *mut PeleResult {
+    compatibility_call(|| {
+        let document = unsafe { document(handle) }?;
+        success(document.model_schema())
+    })
+}
+/// Publish post-call graph and revision on both return and operation error.
+/// Preflight errors (stale revision, bad method/refs/JSON) do not dispatch.
+/// Export/transport budget errors can occur after mutation; an operation result
+/// is only delivered when its post-call graph fits the transport budget.
+/// # Safety
+/// handle must be null or live, call names readable UTF-8 JSON up to 64 MiB;
+/// resources/callbacks obey the same lifetime rules as render v3.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_invoke_v4(
+    handle: *mut PelePublicDocument,
+    expected_revision: u64,
+    call: *const u8,
+    call_len: usize,
+    resources: *const PeleHostResourcesV3,
+) -> *mut PeleResult {
+    compatibility_call(|| {
+        let call = unsafe { compatibility_input(call, call_len, GRAPH_JSON_BUDGET) }?;
+        let call: pele::compat::public::MethodCall =
+            serde_json::from_str(call).map_err(|_| invalid("Invalid public model method call"))?;
+        let mut document = unsafe { document(handle) }?;
+        let outcome = unsafe {
+            calendar::with_resources(resources, |host| {
+                document.invoke(expected_revision, call, host)
+            })
+        }?;
+        success(outcome)
+    })
+}
+/// Apply a full flat graph without reparsing source. A stale revision leaves state unchanged.
+/// # Safety
+/// handle must be null or live; graph must name readable UTF-8 JSON bytes (at most 64 MiB).
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_apply_v4(
+    handle: *mut PelePublicDocument,
+    expected_revision: u64,
+    graph: *const u8,
+    graph_len: usize,
+) -> *mut PeleResult {
+    compatibility_call(|| {
+        let graph = unsafe { compatibility_input(graph, graph_len, GRAPH_JSON_BUDGET) }?;
+        let graph: ModelGraph = serde_json::from_str(graph)
+            .map_err(|_| invalid("Native public transport: invalid model graph JSON"))?;
+        let mut document = unsafe { document(handle) }?;
+        document.apply(expected_revision, graph)?;
+        success(serde_json::json!({"revision":document.revision().to_string()}))
+    })
+}
+/// Render the retained mutable Rust model with the existing v3 callback contract.
+/// # Safety
+/// handle must be null or live; options/host/context/callback borrows remain valid synchronously.
+/// Reentrant operations on this same document return an error instead of blocking.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_render_v4(
+    handle: *mut PelePublicDocument,
+    options: *const u8,
+    options_len: usize,
+    host: *const PeleHostResourcesV3,
+) -> *mut PeleResult {
+    compatibility_call(|| {
+        let options = unsafe { compatibility_input(options, options_len, 1024 * 1024) }?;
+        let options = pele::compat::render_options(options)?;
+        let mut document = unsafe { document(handle) }?;
+        let result = unsafe {
+            calendar::with_resources(host, |resources| document.render(&options, resources))
+        }?;
+        // Existing dimension envelope preserves nonfinite/negative-zero result bits.
+        let bytes = pele::compat::render_result_envelope(&result).into_bytes();
+        if bytes.len() > GRAPH_JSON_BUDGET {
+            return Err(PeleError::new(
+                "Native public transport: result exceeds 64 MiB JSON budget",
+                ErrorCode::Limit,
+            ));
+        }
+        Ok(PeleResult {
+            status: 0,
+            data: bytes,
+            document: None,
+        })
+    })
+}
+/// # Safety
+/// Free null or one live owned handle exactly once, after all operations and callbacks return.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_document_free_v4(handle: *mut PelePublicDocument) {
+    let _ = catch_unwind(AssertUnwindSafe(|| {
+        if !handle.is_null() {
+            drop(unsafe { Box::from_raw(handle) });
+        }
+    }));
+}

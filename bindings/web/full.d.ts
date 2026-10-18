@@ -9,7 +9,7 @@ export interface RenderOptions extends ParseOptions {
   padding?: number; outputLimit?: number; linkSchemes?: string[]; imageSchemes?: string[];
   links?: boolean; images?: boolean; linkRel?: string; now?: number;
 }
-export interface PieModel { type: 'pie'; title?: string; accTitle?: string; accDescr?: string; showData: boolean; sections: ReadonlyMap<string, number> }
+export interface PieModel { type: 'pie'; title?: string; accTitle?: string; accDescr?: string; showData: boolean; sections: Map<string, number> }
 export interface AccessibleModel { title?: string; accTitle?: string; accDescr?: string }
 export interface PacketBlock { start: number; end: number; bits: number; label: string }
 export interface PacketModel extends AccessibleModel { type: 'packet'; bitsPerRow: number; rows: PacketBlock[][] }
@@ -19,11 +19,19 @@ export interface RadarModel extends AccessibleModel { type: 'radar'; axes: Radar
 export interface QuadrantText { text: string; type: string }
 export interface PointStyle { radius?: number; color?: string; strokeColor?: string; strokeWidth?: string }
 export interface QuadrantPoint extends PointStyle { x: number; y: number; text: QuadrantText; className: string }
-export interface QuadrantModel extends AccessibleModel { type: 'quadrantChart'; quadrants: [QuadrantText | null, QuadrantText | null, QuadrantText | null, QuadrantText | null]; xAxisLeft?: QuadrantText; xAxisRight?: QuadrantText; yAxisBottom?: QuadrantText; yAxisTop?: QuadrantText; points: QuadrantPoint[]; classes: ReadonlyMap<string, PointStyle> }
+export interface QuadrantModel extends AccessibleModel {
+ setQuadrant1Text(label:QuadrantText):void;setQuadrant2Text(label:QuadrantText):void;setQuadrant3Text(label:QuadrantText):void;setQuadrant4Text(label:QuadrantText):void;
+ setXAxisLeftText(label:QuadrantText):void;setXAxisRightText(label:QuadrantText):void;setYAxisBottomText(label:QuadrantText):void;setYAxisTopText(label:QuadrantText):void;
+ addPoint(label:QuadrantText,className:string,x:string,y:string,styles:string[]):void;addClass(className:string,styles:string[]):void;
+ setDiagramTitle(text:string):void;setAccTitle(text:string):void;setAccDescription(text:string):void;
+ type: 'quadrantChart'; quadrants: [QuadrantText | undefined, QuadrantText | undefined, QuadrantText | undefined, QuadrantText | undefined]; xAxisLeft?: QuadrantText; xAxisRight?: QuadrantText; yAxisBottom?: QuadrantText; yAxisTop?: QuadrantText; points: QuadrantPoint[]; classes: Map<string, PointStyle> }
 export interface TimelinePeriod { text: string; events: string[]; section: string; sectionIndex: number }
 export interface TimelineModel extends AccessibleModel { type: 'timeline'; direction: string; sections: string[]; periods: TimelinePeriod[]; currentSection: string }
 export interface JourneyTask { task: string; score: number; people: string[]; section: string }
-export interface JourneyModel extends AccessibleModel { type: 'journey'; sections: string[]; tasks: JourneyTask[]; currentSection: string }
+export interface JourneyModel extends AccessibleModel {
+ setDiagramTitle(text:string):void;setAccTitle(text:string):void;setAccDescription(text:string):void;
+ addSection(text:string):void;addTask(task:string,scoreAndPeople:string):void;getActors():string[];
+ type: 'journey'; sections: string[]; tasks: JourneyTask[]; currentSection: string }
 export interface FlowNode { id: string; text?: string; labelType: string; type?: string; styles: string[]; classes: string[]; dir?: string; props?: { [key: string]: ConfigValue }; link?: string; linkTarget?: string; icon?: string; form?: string; pos?: string; img?: string; constraint?: string; assetWidth?: ConfigValue; assetHeight?: ConfigValue }
 export interface FlowEdge { start: string; end: string; type?: string; text: string; labelType: string; stroke?: string; length?: ConfigValue; style?: string[]; classes: string[]; id?: string; isUserDefinedId: boolean; interpolate?: ConfigValue; animate?: ConfigValue; animation?: ConfigValue }
 export interface FlowClassDef { id: string; styles: string[]; textStyles: string[] }
@@ -49,7 +57,13 @@ export interface ErModel extends AccessibleModel { type: 'er'; direction: string
 export interface XyLinearAxis { type: 'linear'; title: string; min: number | null; max: number | null }
 export interface XyBandAxis { type: 'band'; title: string; categories: string[] }
 export interface XyPlot { type: 'line' | 'bar'; title: string; data: [string, number | null][]; pointLabels?: string[] }
-export interface XyChartModel extends AccessibleModel { type: 'xychart'; orientation?: 'vertical' | 'horizontal'; xAxis: XyLinearAxis | XyBandAxis; yAxis: XyLinearAxis; hasSetXAxis: boolean; hasSetYAxis: boolean; plots: XyPlot[] }
+export interface XyChartModel extends AccessibleModel {
+ setOrientation(orientation:string):void;setXAxisTitle(title:QuadrantText):void;setXAxisRangeData(min:number,max:number):void;setXAxisBand(categories:QuadrantText[]):void;
+ setYAxisTitle(title:QuadrantText):void;setYAxisRangeData(min:number,max:number):void;
+ plotData(values:number[]):[string,number|undefined][];addPlot(type:'line'|'bar',title:QuadrantText,data:{value:number;label:string}[]):void;
+ setLineData(title:QuadrantText,data:{value:number;label:string}[]):void;setBarData(title:QuadrantText,data:{value:number;label:string}[]):void;
+ setDiagramTitle(text:string):void;setAccTitle(text:string):void;setAccDescription(text:string):void;
+ type: 'xychart'; orientation?: 'vertical' | 'horizontal'; xAxis: XyLinearAxis | XyBandAxis; yAxis: XyLinearAxis; hasSetXAxis: boolean; hasSetYAxis: boolean; plots: XyPlot[] }
 export interface StateDeclaration { stmt: 'state'; id: string; type?: string; description?: string | string[]; descriptions?: string[]; doc?: StateStatement[]; note?: { position?: string; text: string }; start?: boolean; classes?: string[]; styles?: string[]; textStyles?: string[] }
 export type StateStatement = string | StateDeclaration | { stmt: string; [key: string]: unknown };
 export interface StateNode { id: string; shape?: string; label?: string; description: string[]; cssClasses: string; cssCompiledStyles: string[]; cssStyles: string[]; type?: string; isGroup?: boolean; parentId?: string; dir?: string; position?: string; noteFor?: string; colorIndex?: number }
@@ -70,9 +84,9 @@ export interface ArchitectureGroup { id: string; icon?: string; title?: string; 
 export interface ArchitectureEdge { lhsId: string; lhsDir: string; lhsInto: boolean; lhsGroup: boolean; rhsId: string; rhsDir: string; rhsInto: boolean; rhsGroup: boolean; title?: string }
 export interface ArchitectureModel extends AccessibleModel { type: 'architecture'; nodes: ReadonlyMap<string, ArchitectureNode>; groups: ReadonlyMap<string, ArchitectureGroup>; edges: ArchitectureEdge[]; layoutHints: { direction: string; members: string[] }[]; registered: ReadonlyMap<string, string> }
 export interface SankeyNode { id: string; index: number }
-export interface SankeyModel extends AccessibleModel { type: 'sankey'; nodes: SankeyNode[]; links: { source: SankeyNode; target: SankeyNode; value: number }[] }
+export interface SankeyModel extends AccessibleModel { type: 'sankey'; lookup: Map<string,SankeyNode>; nodes: SankeyNode[]; links: { source: SankeyNode; target: SankeyNode; value: number }[] }
 export interface TreemapNode { name: string; children?: TreemapNode[]; value?: number; classSelector?: string; cssCompiledStyles?: string[] }
-export interface TreemapModel extends AccessibleModel { type: 'treemap'; roots: TreemapNode[]; classes: ReadonlyMap<string, string[]> }
+export interface TreemapModel extends AccessibleModel { type: 'treemap'; roots: TreemapNode[]; classes: Map<string, string[]> }
 export interface InfoModel extends AccessibleModel { type: 'info' }
 export interface C4Named { key: string; value: string }
 export interface C4Element { alias: string; label: string; aliasAttr?: C4Named; labelAttr?: C4Named; parent?: C4Element; type?: string; descr?: string; techn?: string; sprite?: string; tags?: string; link?: string; bgColor?: string; fontColor?: string; borderColor?: string; shadowing?: string; shape?: string; legendText?: string; legendSprite?: string; extra?: ReadonlyMap<string,string> }

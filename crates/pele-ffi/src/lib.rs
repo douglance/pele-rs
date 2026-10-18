@@ -1,4 +1,6 @@
 //! Opaque, immutable owned results. Unsafe code is confined to the C adapter.
+mod public;
+pub use public::*;
 mod calendar;
 pub use calendar::PeleHostResourcesV3;
 use pele::Error;

@@ -27,6 +27,47 @@ pub struct ParsedDocument {
 }
 #[wasm_bindgen]
 impl ParsedDocument {
+    /// Convert a supported typed model without parsing its source a second time.
+    pub fn to_public(&self) -> Result<Option<MutableDocument>, JsValue> {
+        use pele::compat::{
+            diagrams::{
+                info::{Info, InfoModel},
+                journey::{Journey, JourneyModel},
+                packet::{Packet, PacketModel},
+                pie::{Pie, PieModel},
+                quadrant_chart::{QuadrantChart, QuadrantModel},
+                radar::{Radar, RadarModel},
+                sankey::{Sankey, SankeyModel},
+                treemap::{Treemap, TreemapModel},
+                xychart::{XyChart, XyChartModel},
+            },
+            public::PublicDocument,
+        };
+        let document = if let Some(model) = self.inner.model::<PieModel>() {
+            PublicDocument::from_module(Pie, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<InfoModel>() {
+            PublicDocument::from_module(Info, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<SankeyModel>() {
+            PublicDocument::from_module(Sankey, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<PacketModel>() {
+            PublicDocument::from_module(Packet, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<RadarModel>() {
+            PublicDocument::from_module(Radar, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<QuadrantModel>() {
+            PublicDocument::from_module(QuadrantChart, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<TreemapModel>() {
+            PublicDocument::from_module(Treemap, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<JourneyModel>() {
+            PublicDocument::from_module(Journey, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<XyChartModel>() {
+            PublicDocument::from_module(XyChart, model, self.inner.config().clone())
+        } else {
+            return Ok(None);
+        };
+        document
+            .map(|inner| Some(MutableDocument { inner }))
+            .map_err(|e| JsValue::from_str(&pele::compat::error_envelope(&e)))
+    }
     pub fn query(&self, operation: &str, arguments_json: &str) -> String {
         let run = || -> Result<pele::compat::Value, pele::compat::PeleError> {
             use pele::compat::{ErrorCode, PeleError};
@@ -62,6 +103,147 @@ impl ParsedDocument {
         }) {
             Ok(rendered) => pele::compat::render_result_envelope(&rendered),
             Err(e) => pele::compat::error_envelope(&e),
+        }
+    }
+}
+
+/// Public arenas are flat but can still serialize many properties. Bound bytes
+/// while writing, before constructing a transport String or intermediary Value.
+fn public_result<T: serde::Serialize>(result: &T) -> String {
+    use std::io::Write;
+    struct Bounded(Vec<u8>);
+    impl Write for Bounded {
+        fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+            if self.0.len().saturating_add(bytes.len()) > 64 * 1024 * 1024 {
+                return Err(std::io::Error::other("Public JSON result budget"));
+            }
+            self.0.extend_from_slice(bytes);
+            Ok(bytes.len())
+        }
+        fn flush(&mut self) -> std::io::Result<()> {
+            Ok(())
+        }
+    }
+    #[derive(serde::Serialize)]
+    struct Envelope<'a, T> {
+        version: u8,
+        ok: bool,
+        result: &'a T,
+    }
+    let mut output = Bounded(Vec::new());
+    match serde_json::to_writer(
+        &mut output,
+        &Envelope {
+            version: 2,
+            ok: true,
+            result,
+        },
+    ) {
+        Ok(()) => String::from_utf8(output.0).expect("serde JSON is UTF-8"),
+        Err(_) => pele::compat::error_envelope(&pele::compat::PeleError::new(
+            "Public result JSON exceeds 64 MiB transport budget",
+            pele::compat::ErrorCode::Limit,
+        )),
+    }
+}
+#[wasm_bindgen(js_name=MutableDocument)]
+pub struct MutableDocument {
+    inner: pele::compat::public::PublicDocument,
+}
+#[wasm_bindgen]
+impl MutableDocument {
+    pub fn schema(&self) -> String {
+        public_result(self.inner.model_schema())
+    }
+    /// Dispatch edits through the retained native module and return post-call
+    /// graph even when the operation throws. Revision uses decimal text in JS.
+    pub fn invoke(&mut self, revision: &str, call_json: &str) -> String {
+        let mut run = || -> Result<_, pele::compat::PeleError> {
+            use pele::compat::{public::MethodCall, ErrorCode, PeleError};
+            if call_json.len() > 64 * 1024 * 1024 {
+                return Err(PeleError::new(
+                    "Public method JSON exceeds 64 MiB transport budget",
+                    ErrorCode::Limit,
+                ));
+            }
+            let revision = revision.parse::<u64>().map_err(|_| {
+                PeleError::new("Invalid public model revision", ErrorCode::Semantic)
+            })?;
+            let call: MethodCall = serde_json::from_str(call_json).map_err(|_| {
+                PeleError::new("Invalid public model method call", ErrorCode::Semantic)
+            })?;
+            self.inner
+                .invoke(revision, call, &mut pele::compat::text::MetricsResources)
+        };
+        match run() {
+            Ok(outcome) => {
+                #[derive(serde::Serialize)]
+                struct Outcome {
+                    revision: String,
+                    graph: pele::compat::public::ModelGraph,
+                    result: Result<pele::compat::public::Atom, pele::compat::public::PublicError>,
+                }
+                public_result(&Outcome {
+                    revision: outcome.revision.to_string(),
+                    graph: outcome.graph,
+                    result: outcome.result,
+                })
+            }
+            Err(error) => pele::compat::error_envelope(&error),
+        }
+    }
+    pub fn snapshot(&self) -> String {
+        match self.inner.snapshot() {
+            Ok(graph) => {
+                #[derive(serde::Serialize)]
+                struct Snapshot {
+                    graph: pele::compat::public::ModelGraph,
+                    revision: String,
+                }
+                public_result(&Snapshot {
+                    graph,
+                    revision: self.inner.revision().to_string(),
+                })
+            }
+            Err(error) => pele::compat::error_envelope(&error),
+        }
+    }
+    pub fn apply(&mut self, revision: &str, graph_json: &str) -> String {
+        let mut apply = || -> Result<u64, pele::compat::PeleError> {
+            use pele::compat::{public::ModelGraph, ErrorCode, PeleError};
+            if graph_json.len() > 64 * 1024 * 1024 {
+                return Err(PeleError::new(
+                    "Public graph JSON exceeds 64 MiB transport budget",
+                    ErrorCode::Limit,
+                ));
+            }
+            let revision = revision.parse::<u64>().map_err(|_| {
+                PeleError::new("Invalid public model revision", ErrorCode::Semantic)
+            })?;
+            let graph: ModelGraph = serde_json::from_str(graph_json)
+                .map_err(|_| PeleError::new("Invalid public model graph", ErrorCode::Semantic))?;
+            self.inner.apply(revision, graph)?;
+            Ok(self.inner.revision())
+        };
+        match apply() {
+            Ok(revision) => {
+                serde_json::json!({"version":2,"ok":true,"result":revision.to_string()}).to_string()
+            }
+            Err(error) => pele::compat::error_envelope(&error),
+        }
+    }
+    pub fn render_with_resources(
+        &mut self,
+        options_json: &str,
+        width: Option<js_sys::Function>,
+        icons: Option<js_sys::Function>,
+    ) -> String {
+        match pele::compat::render_options(options_json).and_then(|options| {
+            self.inner
+                .render(&options, &mut BrowserResources { width, icons })
+        }) {
+            Ok(result) => pele::compat::render_result_envelope(&result),
+            Err(error) => pele::compat::error_envelope(&error),
         }
     }
 }

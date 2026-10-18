@@ -1,5 +1,6 @@
 import initialize, { parse_v2, render_with_resources, builtin_capabilities } from './pkg/pele.js';
 import { PeleCompatibilityError } from './core.js';
+import { ModelBridge, ModelRegistry, stringValue } from './graph.js';
 import { defaultMeasurer } from './resources.js';
 export { canvasMeasurer, metricsMeasurer, forgetTextWidths } from './resources.js';
 function result(json) {
@@ -17,10 +18,27 @@ function result(json) {
   }
   return value;
 }
+function operationError(error, bridge) {
+  if (error.kind === 'pele') return new PeleCompatibilityError(error.value);
+  if (error.kind === 'peleUtf16') {
+    const value = error.value;
+    return new PeleCompatibilityError({...value, message: stringValue(value.message),
+      type: value.type == null ? null : stringValue(value.type), snippet: stringValue(value.snippet)});
+  }
+  if (error.kind === 'javaScript') {
+    const classes = {Error, TypeError, RangeError, ReferenceError, SyntaxError, EvalError, URIError};
+    const constructor = classes[error.value.name];
+    if (!constructor) throw new TypeError('Unknown native JavaScript exception class');
+    return new constructor(stringValue(error.value.message));
+  }
+  if (error.kind === 'hostException') return bridge.hostValues[error.value];
+  return new TypeError('Unknown native method exception');
+}
 /** Implemented built-ins. Core rendering remains Rust; this adapter owns model lifetimes only. */
 export async function loadRenderer(moduleOrPath) {
   await initialize(moduleOrPath === undefined ? undefined : { module_or_path: moduleOrPath });
-  const documents = new WeakMap();
+  const documents = new WeakMap(), registry = new ModelRegistry();
+  const finalizer = typeof FinalizationRegistry === 'function' ? new FinalizationRegistry(handle => handle.free()) : null;
   const renderer = {
     capabilities() { return result(builtin_capabilities()); },
     parse(source, options = {}) {
@@ -28,6 +46,27 @@ export async function loadRenderer(moduleOrPath) {
       try { document = parse_v2(source, JSON.stringify(options)); }
       catch (error) { if (typeof error === 'string') return result(error); throw error; }
       try {
+        const mutable = document.to_public();
+        if (mutable) {
+          document.free(); document = mutable;
+          const snapshot = result(mutable.snapshot()), schema = result(mutable.schema());
+          const entry = {handle: mutable, revision: snapshot.revision, disposed: false};
+          const bridge = new ModelBridge(snapshot.graph, schema, registry, (method, receiver, argumentsValue) => {
+            if (entry.disposed) throw new TypeError('Public model document is disposed');
+            const input = bridge.snapshot([receiver, ...argumentsValue]);
+            entry.revision = result(mutable.apply(entry.revision, JSON.stringify(input.graph)));
+            const outcome = result(mutable.invoke(entry.revision, JSON.stringify({method, receiver: input.values[0], arguments: input.values.slice(1)})));
+            entry.revision = outcome.revision;
+            bridge.reconcile(outcome.graph);
+            if (Object.hasOwn(outcome.result, 'Err')) throw operationError(outcome.result.Err, bridge);
+            return bridge.value(outcome.result.Ok);
+          });
+          entry.bridge = bridge;
+          const model = bridge.root;
+          documents.set(model, entry);
+          finalizer?.register(model, mutable, model);
+          return model;
+        }
         const projection = result(document.model());
         const model = projection.model;
         if (projection.type === 'gitGraph') {
@@ -80,23 +119,27 @@ export async function loadRenderer(moduleOrPath) {
           model.namespaces = namespaces(model.namespaces);
         }
         if ((projection.type === 'flowchart' || projection.type === 'swimlane')) for (const key of ['nodes', 'classes', 'tooltips']) model[key] = new Map(model[key]);
-        documents.set(model, document);
+        documents.set(model, {handle: document, root: model});
+        finalizer?.register(model, document, model);
         return model;
-      } catch (error) { document.free(); throw error; }
+      } catch (error) { document.free(); if (typeof error === 'string') return result(error); throw error; }
     },
     render(input, options = {}) {
       const measurer = options.measurer ?? defaultMeasurer(options.fontFamily);
-      let callbackError;
-      const width = (text, size, style) => { try { return measurer.width(text, size, style); } catch (e) { callbackError = e; throw e; } };
-      const icons = options.icons && (name => { try { return options.icons(name); } catch (e) { callbackError = e; throw e; } });
+      let callbackError, callbackFailed = false;
+      const width = (text, size, style) => { try { return measurer.width(text, size, style); } catch (e) { callbackFailed = true; callbackError = e; throw e; } };
+      const icons = options.icons && (name => { try { return options.icons(name); } catch (e) { callbackFailed = true; callbackError = e; throw e; } });
       let json;
       if (typeof input === 'string') json = render_with_resources(input, JSON.stringify(options), width, icons);
       else {
         const document = documents.get(input);
         if (!document) throw new TypeError('render() takes diagram text or a model that parse() returned.');
-        json = document.render_with_resources(JSON.stringify(options), width, icons);
+        if (document.bridge) document.revision = result(document.handle.apply(document.revision, JSON.stringify(document.bridge.snapshot().graph)));
+        json = document.handle.render_with_resources(JSON.stringify(options), width, icons);
       }
-      if (callbackError) {
+      if (callbackFailed) {
+        // Pele's public render guard turns every RangeError into this limit;
+        // other thrown values retain their original host identity.
         if (callbackError instanceof RangeError) throw new PeleCompatibilityError({name:'PeleError',message:'Diagram is nested too deeply.',code:'limit',type:null,line:0,column:0,snippet:''});
         throw callbackError;
       }
@@ -110,7 +153,7 @@ export async function loadRenderer(moduleOrPath) {
     },
     dispose(model) {
       const document = documents.get(model);
-      if (document) { documents.delete(model); document.free(); }
+      if (document) { documents.delete(model); document.disposed = true; finalizer?.unregister(model); document.handle.free(); }
     }
   };
   return renderer;

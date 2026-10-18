@@ -11,7 +11,10 @@ for(const family of ['packet','radar','quadrant','timeline','journey','flowchart
       const canonical=value=>JSON.stringify(value,(_,v)=>v instanceof Map?[...v]:v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.entries(v).sort(([a],[b])=>a.localeCompare(b))):v);
       const mismatches=[];
       const oracle=family==='gantt'?await import('/dist/evidence/pele-oracle.js'):null;
-      let runtimeDateCases=0;
+      let runtimeDateCases=0, flatProjectionCases=0;
+      // The old corpus omits this declared private lookup. Raw public ownership
+      // and alias identity have their own mutable-model E2E proof.
+      const comparedModel=model=>model?.type==='sankey'?Object.fromEntries(Object.entries(model).filter(([key])=>key!=='lookup')):model;
       for(const c of fixture.cases) {
         let actual,model,semanticModel,projectionBounded=false;
         const host=c.host??{},options={...c.options,measurer:host.measure==='fixed'?{width:(text,size,style)=>text.length*size*(style&1?.71:.6)}:metricsMeasurer,...(host.allIcons?{icons:()=>'<path d="M0,0"/>'}:host.icons?{icons:n=>Object.hasOwn(host.icons,n)&&typeof host.icons[n]==='string'?host.icons[n]:undefined}:{})};
@@ -34,27 +37,41 @@ for(const family of ['packet','radar','quadrant','timeline','journey','flowchart
         }
         try {
           if((host.modelProjection==='excluded'||expected.modelProjectionLimit)) {
-            let bounded=false;
-            try {const projected=engine.parse(c.source,c.options);engine.dispose(projected)} catch(e){bounded=e.code==='limit'&&e.type===publicType}
-            projectionBounded=bounded;
-            if(!bounded)mismatches.push(`${c.id}: projection was not bounded`);
-            actual={...(expected.modelProjectionLimit?{modelProjectionLimit:true}:{}),result:engine.render(c.source,options)};
+            let bounded=false, projected;
+            try {projected=engine.parse(c.source,c.options)} catch(e){bounded=e.code==='limit'&&e.type===publicType}
+            projectionBounded=bounded||!!projected;
+            if(!projectionBounded)mismatches.push(`${c.id}: projection failed outside declared bounds`);
+            let rendered;
+            try {
+              if(projected) {
+                flatProjectionCases++;
+                rendered=engine.render(projected,options);
+                if(canonical(rendered)!==canonical(engine.render(c.source,options)))mismatches.push(`${c.id}: flat/source differ`);
+              } else rendered=engine.render(c.source,options);
+            } finally {if(projected)engine.dispose(projected)}
+            actual={...(expected.modelProjectionLimit?{modelProjectionLimit:true}:{}),result:rendered};
           } else {
             model=engine.parse(c.source,c.options);
             semanticModel=expected.semanticModel?engine.query(model,"semanticModel"):undefined;
-            actual={model,...(semanticModel!==undefined?{semanticModel}:{}),result:engine.render(model,options)};
+            actual={model:comparedModel(model),...(semanticModel!==undefined?{semanticModel}:{}),result:engine.render(model,options)};
           }
           if(!(host.modelProjection==='excluded'||expected.modelProjectionLimit)&&canonical(actual.result)!==canonical(engine.render(c.source,options)))mismatches.push(`${c.id}: source/model differ`);
           if(expected.result?.svgSha256){const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(actual.result.svg));delete actual.result.svg;actual.result.svgSha256=[...new Uint8Array(hash)].map(v=>v.toString(16).padStart(2,'0')).join('');}
-        } catch(e) { actual={...(projectionBounded&&expected.modelProjectionLimit?{modelProjectionLimit:true}:{}),...(expected.model&&model?{model}:{}),...(semanticModel!==undefined?{semanticModel}:{}),error:{name:e.name,message:e.message,code:e.code,type:e.type,line:e.line,column:e.column,snippet:e.snippet}}; }
+        } catch(e) { actual={...(projectionBounded&&expected.modelProjectionLimit?{modelProjectionLimit:true}:{}),...(expected.model&&model?{model:comparedModel(model)}:{}),...(semanticModel!==undefined?{semanticModel}:{}),error:{name:e.name,message:e.message,code:e.code,type:e.type,line:e.line,column:e.column,snippet:e.snippet}}; }
         finally { if(model)engine.dispose(model); }
         if(canonical(actual)!==canonical(expected))mismatches.push(c.id);
       }
       // Rust checks the typed shared-string model without a 400 MB JSON projection.
       for(const c of [...(fixture.stress??[]),...(fixture.typedCases??[])]) {
-        let bounded=false;try {const model=engine.parse(c.source,c.options);engine.dispose(model)}catch(e){bounded=e.code==='limit'&&e.type===publicType}
-        if(!bounded)mismatches.push(`stress/${c.id}: model projection was not bounded`);
+        let bounded=false, projected;
+        try {projected=engine.parse(c.source,c.options)}catch(e){bounded=e.code==='limit'&&e.type===publicType}
+        if(!bounded&&!projected)mismatches.push(`stress/${c.id}: model did not project or reject with declared limit`);
         const actual=engine.render(c.source,{...c.options,measurer:metricsMeasurer});
+        if(projected) {
+          flatProjectionCases++;
+          try {if(canonical(engine.render(projected,{...c.options,measurer:metricsMeasurer}))!==canonical(actual))mismatches.push(`stress/${c.id}: flat/source differ`)}
+          finally {engine.dispose(projected)}
+        }
         const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(actual.svg));delete actual.svg;actual.svgSha256=[...new Uint8Array(hash)].map(v=>v.toString(16).padStart(2,'0')).join('');
         if(canonical(actual)!==canonical(c.expected.result))mismatches.push(`stress/${c.id}`);
       }
@@ -64,8 +81,9 @@ for(const family of ['packet','radar','quadrant','timeline','journey','flowchart
           if(model.nodes.size!==c.expected.nodes||model.edges.length!==c.expected.edges||model.edges[0].type!==c.expected.firstEdgeType)mismatches.push(`generated/${c.id}`);
         } finally {if(model)engine.dispose(model)}
       }
-      return {count:fixture.cases.length,runtimeDateCases,mismatches};
+      return {count:fixture.cases.length,runtimeDateCases,flatProjectionCases,mismatches};
     },family);
+    if(report.flatProjectionCases)console.log(`${family}: ${report.flatProjectionCases} previous projection exceptions now exercised through flat public models`);
     if(report.runtimeDateCases)console.log(`${family}: ${report.runtimeDateCases} browser Date.parse cases checked against pinned same-browser Pele`);
     expect(report.count).toBeGreaterThan(100);
     expect(report.mismatches).toEqual([]);
