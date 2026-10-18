@@ -4,7 +4,7 @@ mod engine;
 mod graph;
 mod schema;
 pub use engine::{PublicDiagramModule, PublicDocument, PublicEngine};
-pub use graph::{Atom, GraphWriter, JsString, ModelGraph, Node, Property};
+pub use graph::{Atom, ErrorObjectKind, GraphWriter, JsString, ModelGraph, Node, Property};
 
 pub use schema::{
     FieldKind, FieldSchema, FunctionShape, HostExceptionToken, InvocationOutcome,

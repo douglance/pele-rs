@@ -326,8 +326,11 @@ fn canonical(g: &ModelGraph) -> Json {
     let mut nodes = Vec::new();
     while let Some(id) = queue.pop_front() {
         let n = &g.nodes[id as usize];
-        let mut out = serde_json::json!({"kind":match n{Node::Instance{..}=>"instance",Node::Object{..}=>"object",Node::Array{..}=>"array",Node::Map{..}=>"map",Node::Set{..}=>"set",Node::Date{..}=>"date"}});
+        let mut out = serde_json::json!({"kind":match n{Node::Error{..}=>"error",Node::Instance{..}=>"instance",Node::Object{..}=>"object",Node::Array{..}=>"array",Node::Map{..}=>"map",Node::Set{..}=>"set",Node::Date{..}=>"date"}});
         match n {
+            Node::Error { error_type, .. } => {
+                out["errorType"] = serde_json::to_value(error_type).unwrap();
+            }
             Node::Instance { prototype, .. } => out["prototype"] = prototype.0.into(),
             Node::Array { length, .. } => out["length"] = (*length).into(),
             Node::Map { entries, .. } => {
@@ -875,9 +878,15 @@ fn agentflow_native_method_expansion_bounds_and_explicit_error_return_boundary()
     doc.render(&Default::default(), &mut MetricsResources)
         .unwrap();
     let outcome = call(&mut doc, "shapeError", |g| vec![string(g, "invalid")]);
-    assert!(
-        matches!(outcome.result, Err(PublicError::Pele(ref e)) if e.message.contains("Error graph"))
-    );
+    let id = reference(&outcome.result.unwrap());
+    assert!(matches!(
+        outcome.graph.nodes[id as usize],
+        Node::Error {
+            error_type: ErrorObjectKind::Pele,
+            ..
+        }
+    ));
+    assert!(outcome.graph.strings.iter().any(|s| s.is("invalid")));
     let outcome = call(&mut doc, "addClass", |g| {
         let name = string(g, "large");
         let text = string(g, &"x".repeat(1_000_000));

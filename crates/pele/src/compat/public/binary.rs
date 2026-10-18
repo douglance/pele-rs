@@ -1,6 +1,6 @@
 //! Bounded little-endian identity-graph transport, independent of diagram codecs.
 //! JSON remains a diagnostic/legacy lane; strings and numbers retain exact bits.
-use super::{Atom, JsString, ModelGraph, Node, Property, PrototypeId};
+use super::{Atom, ErrorObjectKind, JsString, ModelGraph, Node, Property, PrototypeId};
 use crate::compat::{ErrorCode, PeleError};
 
 const MAGIC: &[u8; 8] = b"PELGBIN1";
@@ -89,6 +89,19 @@ impl Writer {
     }
     fn node(&mut self, node: &Node) -> Result<(), PeleError> {
         match node {
+            Node::Error { error_type, .. } => {
+                self.byte(6)?;
+                self.byte(match error_type {
+                    ErrorObjectKind::Error => 0,
+                    ErrorObjectKind::Pele => 1,
+                    ErrorObjectKind::Type => 2,
+                    ErrorObjectKind::Range => 3,
+                    ErrorObjectKind::Syntax => 4,
+                    ErrorObjectKind::Reference => 5,
+                    ErrorObjectKind::Eval => 6,
+                    ErrorObjectKind::Uri => 7,
+                })?;
+            }
             Node::Object { .. } => self.byte(0)?,
             Node::Instance { prototype, .. } => {
                 self.byte(1)?;
@@ -227,6 +240,20 @@ impl<'a> Reader<'a> {
     fn node(&mut self) -> Result<Node, PeleError> {
         let tag = self.byte()?;
         let mut node = match tag {
+            6 => Node::Error {
+                error_type: match self.byte()? {
+                    0 => ErrorObjectKind::Error,
+                    1 => ErrorObjectKind::Pele,
+                    2 => ErrorObjectKind::Type,
+                    3 => ErrorObjectKind::Range,
+                    4 => ErrorObjectKind::Syntax,
+                    5 => ErrorObjectKind::Reference,
+                    6 => ErrorObjectKind::Eval,
+                    7 => ErrorObjectKind::Uri,
+                    _ => return Err(invalid()),
+                },
+                properties: vec![],
+            },
             0 => Node::Object { properties: vec![] },
             1 => Node::Instance {
                 prototype: PrototypeId(self.u32()?),

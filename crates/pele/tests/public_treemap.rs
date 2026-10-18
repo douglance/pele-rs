@@ -37,7 +37,8 @@ fn properties(node: &mut Node) -> &mut Vec<Property> {
         | Node::Array { properties, .. }
         | Node::Map { properties, .. }
         | Node::Set { properties, .. }
-        | Node::Date { properties, .. } => properties,
+        | Node::Date { properties, .. }
+        | Node::Error { properties, .. } => properties,
     }
 }
 fn property(g: &mut ModelGraph, id: u32, key: &str, value: Atom) {

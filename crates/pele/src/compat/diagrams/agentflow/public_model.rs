@@ -2658,10 +2658,62 @@ fn invoke_agent(a: &mut Arena, call: MethodCall) -> Result<Atom, PublicError> {
     let root = a.id(&call.receiver)?;
     match call.method.0 {
         1 => a.metadata(root, &arg(&call, 0), &arg(&call, 1), &arg(&call, 2)),
-        2 => Err(error(
-            "Returning an AgentFlow PeleError instance requires the pending Error graph seam",
-        )
-        .into()),
+        2 => {
+            fn scalar(a: &mut Arena<'_>, v: &Atom) -> Result<JsString, PublicError> {
+                if let Atom::String(i) = v {
+                    return Ok(a.g.strings[*i as usize].clone());
+                }
+                Ok(js_string(a.g, v)?.as_str().into())
+            }
+            fn plus(a: &mut Arena<'_>, left: Atom, right: Atom) -> Result<Atom, PublicError> {
+                if matches!(left, Atom::String(_)) || matches!(right, Atom::String(_)) {
+                    let mut value = scalar(a, &left)?.0;
+                    value.extend(scalar(a, &right)?.0);
+                    a.string(JsString(value))
+                } else {
+                    Ok(Atom::Number(number(a.g, &left)? + number(a.g, &right)?))
+                }
+            }
+            let loc = arg(&call, 1);
+            let (line, column) = if truthy(a.g, &loc) {
+                let (line, column) = if let Atom::Ref(id) = loc {
+                    (a.field(id, "first_line"), a.field(id, "first_column"))
+                } else {
+                    (Atom::Undefined, Atom::Undefined)
+                };
+                let offset = a.field(root, "lineOffset");
+                (plus(a, line, offset)?, plus(a, column, Atom::Number(1.))?)
+            } else {
+                (Atom::Number(0.), Atom::Number(0.))
+            };
+            // Error constructor stringifies its message before adding own fields.
+            let message = arg(&call, 0);
+            let mut fields = vec![];
+            if !matches!(message, Atom::Undefined) {
+                let message = scalar(a, &message)?;
+                fields.push(("message", a.string(message)?));
+            }
+            fields.extend([
+                ("code", a.string("semantic")?),
+                ("type", a.string("agentflow")?),
+                ("line", line),
+                ("column", column),
+                ("snippet", a.string("")?),
+                ("name", a.string("PeleError")?),
+            ]);
+            let id = a.node(Node::Error {
+                error_type: ErrorObjectKind::Pele,
+                properties: vec![],
+            })?;
+            for (key, value) in fields {
+                a.assign(id, key, value)?;
+                if key == "message" {
+                    let key = a.property_position(id, key).unwrap();
+                    a.g.nodes[id as usize].properties_mut()[key].flags = 6;
+                }
+            }
+            Ok(Atom::Ref(id))
+        }
         3..=17 => invoke_common(a, call),
         18 => {
             a.add_global(root, &arg(&call, 0))?;

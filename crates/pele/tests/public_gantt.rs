@@ -70,7 +70,8 @@ fn properties_mut(node: &mut Node) -> &mut Vec<Property> {
         | Node::Array { properties, .. }
         | Node::Map { properties, .. }
         | Node::Set { properties, .. }
-        | Node::Date { properties, .. } => properties,
+        | Node::Date { properties, .. }
+        | Node::Error { properties, .. } => properties,
     }
 }
 fn field<'a>(g: &'a ModelGraph, id: u32, key: &str) -> &'a Atom {
@@ -478,8 +479,11 @@ fn canonical(g: &ModelGraph, roots: &[Atom]) -> J {
     while i < queue.len() {
         let node = &g.nodes[queue[i] as usize];
         let props=node.properties().iter().map(|p|json!({"key":g.strings[p.key as usize].0,"value":atom(g,&p.value,&mut ids,&mut queue),"flags":p.flags})).collect::<Vec<_>>();
-        let mut out = json!({"kind":match node{Node::Instance{..}=>"instance",Node::Object{..}=>"object",Node::Date{..}=>"date",Node::Array{..}=>"array",Node::Map{..}=>"map",Node::Set{..}=>"set"},"properties":props});
+        let mut out = json!({"kind":match node{Node::Error{..}=>"error",Node::Instance{..}=>"instance",Node::Object{..}=>"object",Node::Date{..}=>"date",Node::Array{..}=>"array",Node::Map{..}=>"map",Node::Set{..}=>"set"},"properties":props});
         match node {
+            Node::Error { error_type, .. } => {
+                out["errorType"] = serde_json::to_value(error_type).unwrap();
+            }
             Node::Instance { .. } => out["prototype"] = "GanttDb".into(),
             Node::Date { milliseconds, .. } => {
                 out["milliseconds"] = format!("{:016x}", milliseconds.to_bits()).into()
