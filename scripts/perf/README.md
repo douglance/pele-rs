@@ -60,3 +60,9 @@ all 21 workloads. Runtime adoption is held: ER/Railroad allocations improve,
 while small Pie workloads and unique-key memory regress. Its source-only replay
 bundle preserves the experiment without changing the production library or
 claiming a latency improvement.
+
+The [actual Swift API consumer](swift/README.md) crosses the production C/binary
+interface and records parse, snapshot, apply, render and lifetime costs. Its
+[first verified local results](results/2026-10-18-swift-api.md) include all 21
+correctness workloads, bounded three-workload timings, exact SDK provenance and
+explicit ownership/scheduling history. These costs are not isolated FFI overhead.

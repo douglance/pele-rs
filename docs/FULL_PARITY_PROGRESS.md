@@ -897,3 +897,19 @@ generated binaries remain excluded from Git. CI now requests these consolidated
 Rust and Swift checks in release configuration. A final green hosted CI run,
 new browser mutable adapters and the documented full-runtime/API release gates
 remain separate from this native/Swift checkpoint.
+
+After the three mechanical module/import ordering fixes at `9259e35`, both
+explicit-target release builds succeed and produce byte-identical universal
+archives/slices. The current unchanged 33-family consumer passes again on arm64
+and Intel Rosetta. Existing full corpus and per-architecture SDK checks therefore
+retain the exact same library bytes. `cargo fmt --all --check` also passes.
+
+The separate Swift performance consumer now passes 105 correctness checks
+(21 shared workloads × five actual API stages), exact pinned output fingerprints
+and raw UTF-16/cycle graph checks. A short coordinated timing window records
+parse/snapshot/apply/render/lifetime costs for three medium workloads. It keeps
+intrinsic C/binary/publication/disposal costs inside each API measurement and
+records shared-host load and Gantt's retained Date history. Source, executable
+and SDK hashes match before/after. A controlled OS process check verifies the
+build/test guard rejects an active owned process; provisional samples from an
+earlier process-name parser are excluded. See `scripts/perf/results/2026-10-18-swift-api.md`.
