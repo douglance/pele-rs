@@ -890,7 +890,16 @@ impl Arena<'_> {
             ("actorKeys", Atom::Ref(actors)),
         ])?;
         self.assign(root, "currentBox", Atom::Ref(box_id))?;
-        let boxes = self.field_id(root, "boxes")?;
+        let boxes = self.field(root, "boxes");
+        let boxes = match boxes {
+            Atom::Null => {
+                return Err(ty("Cannot read properties of null (reading 'push')"));
+            }
+            Atom::Undefined => {
+                return Err(ty("Cannot read properties of undefined (reading 'push')"));
+            }
+            _ => self.id(&boxes)?,
+        };
         self.push(boxes, Atom::Ref(box_id))
     }
     fn add_actor(
