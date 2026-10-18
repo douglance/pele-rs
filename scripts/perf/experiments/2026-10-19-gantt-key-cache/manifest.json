@@ -1,0 +1,13 @@
+{
+  "README.md": "98e354c8929cf567778bb7f14912eda55baf2234c53eaa0488ef599632e955f9",
+  "baseline-allocations.json": "1371f83ebe8ce461dfcbd5c617910322a2ab2b141a93035a838a985bb90dffc1",
+  "build-allocation.mjs": "59bfae7a8f349e8efc395f7bd91eb27211992d6bd51b06dced7d49a0ebd40fc5",
+  "candidate-allocations.json": "09271df7c9ed52470e3ed8e63d43c00b727034df5e8c3c0f94be87005229a2ae",
+  "capture.mjs": "f3969f03e6c55b33b2f355b8a5c3fbaa9a6ce42081f067816f06476d502c5fff",
+  "compare.mjs": "3ffb7c34ca95df6f93660be4c81873b457c9ee6d5b5541910a053e57318dc7e2",
+  "evidence.json": "909176ea303e1190324e1eabed3adbd69d2c79ad6204b4921ccab505303b32df",
+  "harness.patch": "98e98ebb494c4aae0d26a6948120bbaa48fa632e4c7a1b698b98bc0ce5b93c1b",
+  "integration.log": "7b87e753bc03d4ab195e7e19f562af5b46723f11c1fca61aeb4f4240a06bc5cf",
+  "reproduce.sh": "3d27b895ac13a8c9f915ea896ac094c7258540b4708e9e400b16c0c531470ed0",
+  "runtime.patch": "6fbc2b2402ef3954be7b27d576cb1b0815fe553a025f2c7a1cebf6f1fef29168"
+}

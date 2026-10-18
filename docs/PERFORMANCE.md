@@ -50,6 +50,14 @@ this still excludes SVG materialization by a DOM renderer.
 
 ## Where improvement could come from
 
+An isolated [Gantt field-ID cache experiment](../scripts/perf/experiments/2026-10-19-gantt-key-cache/README.md)
+removes 802 allocations (12.5%) and 21,410 requested bytes from a medium mutable
+core render. It adds 64 inline bytes per operation context, with no additional
+heap peak or changes to Pie/unique-key controls. All 21 workload outputs and
+complete graph fingerprints match; nine release integrations include the full
+18,994-case Gantt corpus. This is allocation evidence, not latency evidence.
+The runtime patch remains isolated pending matched timing checks.
+
 The next performance work needs profiles of parsing, preparation, text callbacks,
 allocation/string building, model projection and serialization. Their costs are
 different from browser SVG layout and paint. Candidate improvements include fewer
