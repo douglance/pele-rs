@@ -32,7 +32,7 @@ final class AdditionalDiagramTests: XCTestCase {
     func testPinnedDiagramsThroughNativeDocuments() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent("../../../..").standardizedFileURL
         let decoder = JSONDecoder(), encoder = JSONEncoder(), engine = Pele.Engine()
-        for family in ["packet", "radar", "quadrant", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence", "git-graph", "architecture", "sankey", "treemap", "c4", "info", "requirement", "block", "railroad", "cynefin", "treeview", "agentflow"] {
+        for family in ["packet", "radar", "quadrant", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence", "git-graph", "architecture", "sankey", "treemap", "c4", "info", "requirement", "block", "railroad", "cynefin", "treeview", "agentflow", "wardley", "eventmodeling", "usecase"] {
             if let families = ProcessInfo.processInfo.environment["PELE_FAMILIES"], !families.split(separator: ",").contains(Substring(family)) { continue }
             try autoreleasepool {
             FileHandle.standardError.write(Data("Swift corpus: \(family)\n".utf8))
@@ -142,7 +142,7 @@ final class AdditionalDiagramTests: XCTestCase {
             }
         }
         let capabilities = try engine.capabilities()
-        XCTAssertEqual(Set(capabilities.filter { $0.registered }.map(\.type)), Set(["pie", "packet", "radar", "quadrantChart", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence", "gitGraph", "architecture", "sankey", "treemap", "c4", "info", "requirement", "block", "railroad", "cynefin", "treeView", "agentflow"]))
+        XCTAssertEqual(Set(capabilities.filter { $0.registered }.map(\.type)), Set(["pie", "packet", "radar", "quadrantChart", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence", "gitGraph", "architecture", "sankey", "treemap", "c4", "info", "requirement", "block", "railroad", "cynefin", "treeView", "agentflow", "wardley", "eventmodeling", "usecase"]))
     }
 }
 

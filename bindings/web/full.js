@@ -38,6 +38,10 @@ export async function loadRenderer(moduleOrPath) {
         if (projection.type === 'sankey') for(const link of model.links) {
           link.source=model.nodes[link.source.index];link.target=model.nodes[link.target.index];
         }
+        if (projection.type === 'usecase') {
+          for(const key of ['actors','useCases','systemBoundaries','notes','jsonNodes','classDefs'])model[key]=new Map(model[key]);
+          for(const node of model.jsonNodes.values())node.propertyOrder=new Map(node.propertyOrder);
+        }
         if (projection.type === 'cynefin') model.domains = new Map(model.domains);
         if (projection.type === 'agentflow') for(const key of ['nodes','connectors','classes','tooltips'])model[key]=new Map(model[key]);
         if (projection.type === 'requirement') for(const key of ['requirements','elements','classes'])model[key]=new Map(model[key]);

@@ -149,6 +149,9 @@ impl Engine {
     /// Registers implemented built-ins only; consult capabilities for parity status.
     pub fn with_builtins() -> Self {
         let mut engine = Self::empty();
+        engine.register(super::diagrams::wardley::Wardley);
+        engine.register(super::diagrams::event_modeling::EventModeling);
+        engine.register(super::diagrams::usecase::Usecase);
         engine.register(super::diagrams::cynefin::Cynefin);
         engine.register(super::diagrams::tree_view::TreeView);
         engine.register(super::diagrams::agentflow::AgentFlow);

@@ -6,7 +6,7 @@ release or new GIF has been published from this branch.
 
 ## Implemented renderers
 
-`Engine::with_builtins()` currently registers twenty-seven actual Rust diagram modules.
+`Engine::with_builtins()` currently registers thirty actual Rust diagram modules.
 `Engine::empty()` and typed `DiagramModule<Model>` remain extension interfaces.
 Registration never certifies a global parity flag; all public API gates remain open.
 
@@ -39,9 +39,12 @@ Registration never certifies a global parity flag; all public API gates remain o
 | cynefin | 7,209 | 3,011 | 4,198 |
 | treeView | 6,800 | 4,301 | 2,499 |
 | agentflow | 14,990 | 5,372 | 9,618 |
-| Total | 353,294 | 136,842 | 216,452 |
+| wardley | 7,730 | 3,205 | 4,525 |
+| eventmodeling | 6,953 | 2,437 | 4,516 |
+| usecase | 16,744 | 3,424 | 13,320 |
+| Total | 384,721 | 145,908 | 238,813 |
 
-There are 141,608 complete model comparisons. Parsed models are retained when a
+There are 150,676 complete model comparisons. Parsed models are retained when a
 subsequent render fails. Six class stress cases explicitly exceed the JSON
 projection depth/size budget; their typed models and exact source renders/errors
 remain covered. These transport exceptions do not earn full public API parity.
@@ -116,6 +119,9 @@ only to raster evidence, while exported diagrams retain SVG transparency.
 
 | Diagram | Native pixels | Additional text proof |
 | --- | --- | --- |
+| wardley | 846 x 610; 7,521 painted | Map, dependencies and 507 title pixels |
+| eventmodeling | 418 x 263; 12,858 painted | Workflow lanes and 530 title pixels |
+| usecase | 344 x 164; 4,207 painted | Actor, boundary and 362 title pixels |
 | cynefin | 656 x 492; 77,124 painted | Five domains and 496 title pixels |
 | treeView | 199 x 276; 4,477 painted | Files, nesting guides and 301 title pixels |
 | agentflow | 620 x 100; 11,164 painted | Semantic workflow and 488 title pixels |
@@ -243,6 +249,23 @@ and twenty-seven isolated UTF-16 input mutations remain explicit ledger entries.
 AgentFlow records four metadata surrogate exceptions; Cynefin has none. These
 exceptions are not counted as completed public string/API cases.
 
+## Wardley, EventModeling and Usecase checkpoint
+
+Nine new release Rust integration tests pass. The three complete host corpora
+pass the native Swift/C source and retained-document paths, plus twelve
+cumulative browser checks across Chrome, Firefox and WebKit. AppKit also paints
+all three native exports. EventModeling preserves its required source comments;
+Usecase Map fields and JSON property-order maps are restored in the web adapter.
+
+Four Usecase projections exceed JSON byte/depth budgets. The foreign checks
+require those projection limits, then separately verify successful source renders
+or the exact expected render-output limit. Projection-budget labels are diagnostic
+fixture metadata, not render-result fields. No case is skipped. Usecase keeps one
+JSON isolated-surrogate exception; EventModeling keeps two isolated output
+surrogate exceptions from otherwise valid source. Those remain full-API gates.
+Usecase JSON error text follows the pinned Node/V8 oracle; browser-engine-specific
+JSON.parse wording is not separately certified by these canonical fixture checks.
+
 ## Calendar and deep models
 
 Gantt uses the translated V8 date parser for native fallback strings, attributed
@@ -270,7 +293,7 @@ architecture is [LLD_PUBLIC_MODELS.md](LLD_PUBLIC_MODELS.md).
 
 ## Remaining acceptance work
 
-- Six family integrations, remaining shared behavior and the complete
+- Three family integrations, remaining shared behavior and the complete
   registration/lazy/mount/zoom/public model interface remain required.
 - JavaScript model projections currently do not apply mutations back into the
   retained Rust document. Prototype methods/private enumerable state also need

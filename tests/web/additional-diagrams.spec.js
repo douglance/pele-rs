@@ -1,6 +1,6 @@
 import {test,expect} from '@playwright/test';
 
-for(const family of ['packet','radar','quadrant','timeline','journey','flowchart','kanban','mindmap','class','er','xychart','state','gantt','sequence','git-graph','architecture','sankey','treemap','c4','info','requirement','block','railroad','cynefin','treeview','agentflow']) {
+for(const family of ['packet','radar','quadrant','timeline','journey','flowchart','kanban','mindmap','class','er','xychart','state','gantt','sequence','git-graph','architecture','sankey','treemap','c4','info','requirement','block','railroad','cynefin','treeview','agentflow','wardley','eventmodeling','usecase']) {
   test(`${family} pinned corpus through WASM source and owned model APIs`, async({page})=>{
     test.setTimeout(120_000);
     await page.goto('/examples/web/');
@@ -13,11 +13,12 @@ for(const family of ['packet','radar','quadrant','timeline','journey','flowchart
       const oracle=family==='gantt'?await import('/dist/evidence/pele-oracle.js'):null;
       let runtimeDateCases=0;
       for(const c of fixture.cases) {
-        let actual,model,semanticModel;
+        let actual,model,semanticModel,projectionBounded=false;
         const host=c.host??{},options={...c.options,measurer:host.measure==='fixed'?{width:(text,size,style)=>text.length*size*(style&1?.71:.6)}:metricsMeasurer,...(host.allIcons?{icons:()=>'<path d="M0,0"/>'}:host.icons?{icons:n=>Object.hasOwn(host.icons,n)&&typeof host.icons[n]==='string'?host.icons[n]:undefined}:{})};
         let expected={...c.expected};
         // Diagnostic provenance is not part of the public parse/render envelope.
         delete expected.upstreamModelSha256;
+        delete expected.projectionBudget;
         // Date.parse is a host resource. Compare divergent legacy inputs against
         // the pinned upstream library in this same browser, without fixture injection.
         if(oracle&&Object.entries(host.oracleDateParse??{}).some(([text,value])=>{
@@ -35,6 +36,7 @@ for(const family of ['packet','radar','quadrant','timeline','journey','flowchart
           if((host.modelProjection==='excluded'||expected.modelProjectionLimit)) {
             let bounded=false;
             try {const projected=engine.parse(c.source,c.options);engine.dispose(projected)} catch(e){bounded=e.code==='limit'&&e.type===publicType}
+            projectionBounded=bounded;
             if(!bounded)mismatches.push(`${c.id}: projection was not bounded`);
             actual={...(expected.modelProjectionLimit?{modelProjectionLimit:true}:{}),result:engine.render(c.source,options)};
           } else {
@@ -44,7 +46,7 @@ for(const family of ['packet','radar','quadrant','timeline','journey','flowchart
           }
           if(!(host.modelProjection==='excluded'||expected.modelProjectionLimit)&&canonical(actual.result)!==canonical(engine.render(c.source,options)))mismatches.push(`${c.id}: source/model differ`);
           if(expected.result?.svgSha256){const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(actual.result.svg));delete actual.result.svg;actual.result.svgSha256=[...new Uint8Array(hash)].map(v=>v.toString(16).padStart(2,'0')).join('');}
-        } catch(e) { actual={...(expected.model&&model?{model}:{}),...(semanticModel!==undefined?{semanticModel}:{}),error:{name:e.name,message:e.message,code:e.code,type:e.type,line:e.line,column:e.column,snippet:e.snippet}}; }
+        } catch(e) { actual={...(projectionBounded&&expected.modelProjectionLimit?{modelProjectionLimit:true}:{}),...(expected.model&&model?{model}:{}),...(semanticModel!==undefined?{semanticModel}:{}),error:{name:e.name,message:e.message,code:e.code,type:e.type,line:e.line,column:e.column,snippet:e.snippet}}; }
         finally { if(model)engine.dispose(model); }
         if(canonical(actual)!==canonical(expected))mismatches.push(c.id);
       }
@@ -75,6 +77,9 @@ test('new families paint resolved SVG through real browser decoders',async({page
   const report=await page.evaluate(async()=>{
     const {loadRenderer}=await import('/dist/package-web/package/full.js'),engine=await loadRenderer(),proof=[];
     for(const [type,source] of [
+      ["wardley","wardley-beta\ntitle Dependency map\nevolution Genesis -> Custom -> Product -> Commodity\ncomponent App [0.8, 0.3]\ncomponent Core [0.4, 0.7]\nApp -> Core"],
+      ["eventmodeling","---\ntitle: Command lifecycle\n---\neventmodeling\n    tf 01 ui UI\n    tf 02 cmd RunAction\n    tf 03 evt ActionExecuted"],
+      ["usecase","---\ntitle: User journeys\n---\nusecase-beta\ndirection LR\nactor Customer(\"Customer\")\nsystemBoundary \"Order system\"\n  Checkout(\"Place order\")\nend\nCustomer --> Checkout"],
       ['cynefin','cynefin-beta\n  complex\n    "Emergent practice"\n  clear\n    "Best practice"'],
       ['treeView','treeView-beta\nroot/\n    src/\n        index.js\n        App.tsx\n    tests/\n        RendererTests.swift\n    Package.swift\n    README.md'],
       ['agentflow','agentflow-beta LR\nbrief["Brief"]@{ shape: input }\ndraft["Draft"]@{ shape: task }\ncheck["Check"]@{ shape: tool }\nbrief --> draft --> check'],
