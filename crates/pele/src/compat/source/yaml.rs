@@ -710,7 +710,7 @@ fn block(r: &mut Reader, min_indent: usize, depth: usize) -> Result<Value> {
     }
     Ok(Value::Object(out))
 }
-pub(super) fn parse(src: &str) -> std::result::Result<Value, String> {
+pub(crate) fn parse(src: &str) -> std::result::Result<Value, String> {
     let run = || -> Result<Value> {
         let trimmed = trim(src);
         if trimmed.starts_with(['{', '[']) {

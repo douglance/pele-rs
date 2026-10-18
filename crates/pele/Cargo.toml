@@ -16,7 +16,9 @@ serde_json.workspace = true
 rustybuzz = "=0.20.1"
 ryu-js = "=1.0.2"
 regex = "=1.13.1"
+url = "=2.5.8"
 
 [dev-dependencies]
+sha2 = "=0.10.7"
 roxmltree = "0.21"
 resvg = { version = "0.48", default-features = false }
