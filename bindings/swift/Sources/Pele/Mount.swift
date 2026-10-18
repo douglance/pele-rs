@@ -1,5 +1,12 @@
 import AppKit
 
+// Both retained native model lanes share presentation without exporting a graph.
+internal protocol MountedDocument: AnyObject {
+    func render(outputLimit: Pele.OutputLimit, options: Pele.Engine.Options, resources: Pele.HostResources) throws -> FullRenderedDiagram
+}
+extension Pele.MutableDocument: MountedDocument {}
+extension Pele.ProviderDocument: MountedDocument {}
+
 extension Pele {
     /// Native presentation hooks run on MainActor. Parsing and geometry stay in Rust.
     @MainActor public struct MountOptions {
@@ -119,7 +126,12 @@ extension Pele {
     /// not select additional diagram families. Retained models keep their owner.
     @MainActor public static func mount(_ view: DiagramView, source: String, registry: Registry, options: MountOptions = .init()) throws -> Mounted {
         try mount(view, source: source, options: options, parse: { source, limits, options in
-            try registry.parseMutable(source, limits: limits, options: options)
+            // Detection chooses the owned document lane; the selected native parser
+            // remains authoritative for source limits and preparation failures.
+            if let type = try? registry.detectType(source), registry.providerTypes.contains(type) {
+                return try registry.parseProvider(source, as: AnyObject.self, limits: limits, options: options)
+            }
+            return try registry.parseMutable(source, limits: limits, options: options)
         })
     }
 
@@ -146,11 +158,11 @@ extension Pele {
         private var zoomPolicy: ZoomPolicy?
         private weak var view: DiagramView?
         private var settings: MountOptions
-        fileprivate typealias Parse = (String, ParseLimits, Engine.ParseOptions) throws -> MutableDocument
+        fileprivate typealias Parse = (String, ParseLimits, Engine.ParseOptions) throws -> any MountedDocument
         private let parse: Parse
         private let idPrefix = "pele-native-" + UUID().uuidString.lowercased()
-        private var model: MutableDocument?
-        private var drawnModel: MutableDocument?
+        private var model: (any MountedDocument)?
+        private var drawnModel: (any MountedDocument)?
         private var parsedKey: Data?
         private var natural: FullRenderedDiagram?
         private var adapts: Bool?
@@ -270,7 +282,7 @@ extension Pele {
             do { try refresh() } catch { unhandledCallbackError = error }
         }
         private func publishDiagnostic() { view?.install(image, error: error) }
-        private func render(_ document: MutableDocument, width: Double?) throws -> FullRenderedDiagram {
+        private func render(_ document: any MountedDocument, width: Double?) throws -> FullRenderedDiagram {
             var options = settings.render; options.maxWidth = width
             options.limit = nil; options.maxEdges = nil; options.config = [:]
             if options.idPrefix == nil { options.idPrefix = idPrefix }

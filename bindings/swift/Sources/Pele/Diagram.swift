@@ -160,7 +160,8 @@ extension Pele.Registry {
     /// Captures the current type as the registration key. All other provider
     /// properties remain live; replacements affect future parses only.
     public func register<Model: AnyObject>(_ diagram: Pele.Diagram<Model>) throws {
-        let provider = ProviderBox(diagram), id = Data(diagram.type.utf8)
+        let type = diagram.type
+        let provider = ProviderBox(diagram), id = Data(type.utf8)
         var table = PeleDiagramProviderV10()
         table.version = 10; table.struct_size = UInt32(MemoryLayout<PeleDiagramProviderV10>.size)
         table.context = Unmanaged.passUnretained(provider).toOpaque()
@@ -169,6 +170,7 @@ extension Pele.Registry {
         try withHandle { handle in try withExtendedLifetime(provider) { try id.withUnsafeBytes { input in
             let _: Bool = try Pele.compatibilityResult(pele_registry_register_provider_v10(handle,
                 input.bindMemory(to: UInt8.self).baseAddress, input.count, &table), as: Bool.self)
+            providerTypes.insert(type)
         }}}
     }
     /// Parses the effective Swift-authored provider. Built-ins use parseMutable.

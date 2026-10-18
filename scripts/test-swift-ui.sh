@@ -28,7 +28,9 @@ if sys.platform != "darwin" or not 1 <= args.timeout <= 300:
 evidence = root / "dist/evidence/native-ui"
 evidence.mkdir(parents=True, exist_ok=True)
 run = Path(tempfile.mkdtemp(prefix="run-", dir=evidence))
-scratch = args.scratch_path.expanduser().resolve()
+# Keep the caller's path spelling: Xcode treats /tmp and /private/tmp as
+# different allowed roots and may discard cached generated C module maps.
+scratch = Path(os.path.abspath(args.scratch_path.expanduser()))
 safe = {"PATH": "/usr/bin:/bin:/usr/sbin:/sbin", "HOME": str(Path.home()), "LANG": "C", "LC_ALL": "C", "TZ": "UTC", "MACOSX_DEPLOYMENT_TARGET": "14.0"}
 commands = []
 qa_pid = None

@@ -55,6 +55,14 @@ close. Cancellation before dispatch leaves selection and the existing view
 untouched. AppKit work stays on MainActor. `AsyncEngine` is the separate actor-owned
 background rendering API; native selection does not download code.
 
+The same registry mount path supports Swift-authored `Pele.Diagram<Model>`
+providers. It retains the original reference model directly, alongside the normal
+graph-backed built-in document lane. Refresh uses the existing model and live
+provider renderer; replacing a registration affects future parses. Restoring a
+built-in through `registerBuiltin` restores native parsing for future updates.
+Provider errors retain their original Swift identity and the last good drawing.
+Both lanes use the same sizing, zoom, callback and teardown lifecycle.
+
 Zoom exposes `scale`, `fit`, `zoomBy`, `zoomTo`, `reset`, `refresh` and `destroy`.
 Mount policies are `.automatic`, `.disabled`, `.always` or `.custom(options)`;
 standalone callers can use `Pele.enableZoom(view)`. Mouse pan/double click,

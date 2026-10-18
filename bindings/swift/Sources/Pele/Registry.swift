@@ -7,6 +7,7 @@ extension Pele {
     public final class Registry {
         private var handle: OpaquePointer?
         private var active = false
+        internal var providerTypes = Set<String>()
         private init(handle: OpaquePointer) { self.handle = handle }
         deinit { if let handle { pele_registry_free_v8(handle) } }
         private static func create(_ mode: UInt32) throws -> Registry {
@@ -26,7 +27,7 @@ extension Pele {
         public func close() throws {
             guard !active else { throw PeleError(code: "semantic", message: "Registry is already in use") }
             if let handle {
-                self.handle = nil; active = true; defer { active = false }
+                self.handle = nil; providerTypes.removeAll(); active = true; defer { active = false }
                 pele_registry_free_v8(handle)
             }
         }
@@ -50,6 +51,7 @@ extension Pele {
             try withHandle { handle in try bytes.withUnsafeBytes { input in
                 let registered = try Pele.compatibilityResult(pele_registry_register_builtin_v8(handle, input.bindMemory(to: UInt8.self).baseAddress, input.count), as: Bool.self)
                 guard registered else { throw PeleError(code: "internal", message: "Invalid registry registration result") }
+                providerTypes.remove(id)
             }}
         }
         /// Select an already linked built-in on demand. Existing registrations
