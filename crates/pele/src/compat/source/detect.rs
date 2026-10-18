@@ -105,10 +105,10 @@ pub const DIAGRAM_TYPES: [DiagramType; 33] = [
     DiagramType::Ishikawa,
     DiagramType::Swimlane,
 ];
-pub(super) fn space(c: char) -> bool {
+pub(crate) fn space(c: char) -> bool {
     matches!(c,'\t'..='\r'|' '| '\u{a0}'|'\u{1680}'|'\u{2000}'..='\u{200a}'|'\u{2028}'|'\u{2029}'|'\u{202f}'|'\u{205f}'|'\u{3000}'|'\u{feff}')
 }
-pub(super) fn word(c: char) -> bool {
+pub(crate) fn word(c: char) -> bool {
     c.is_ascii_alphanumeric() || c == '_'
 }
 fn boundary(s: &str, n: usize) -> bool {

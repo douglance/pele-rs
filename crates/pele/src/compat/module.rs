@@ -2,7 +2,7 @@
 use super::{
     DiagramId, Object, PeleError, PrepareOptions, DEFAULT_MAX_EDGES, DEFAULT_OUTPUT_LIMIT,
 };
-use serde::{Deserialize, Serialize};
+use serde::{Deserialize, Serialize, Serializer};
 
 #[derive(Clone, Debug)]
 pub struct ModuleDescriptor {
@@ -53,6 +53,8 @@ pub struct RenderSettings {
     pub images: Option<bool>,
     pub link_rel: Option<String>,
     pub now: Option<f64>,
+    /// Rust extension: resolve CSS tokens for native SVG decoders.
+    pub native_theme: Option<super::NativeTheme>,
 }
 impl RenderSettings {
     pub fn output_limit(&self) -> usize {
@@ -95,7 +97,9 @@ pub struct LinkInfo {
 #[derive(Clone, Debug, Serialize, Deserialize, PartialEq)]
 pub struct Rendered {
     pub svg: String,
+    #[serde(serialize_with = "js_number")]
     pub width: f64,
+    #[serde(serialize_with = "js_number")]
     pub height: f64,
     pub links: Vec<LinkInfo>,
 }
@@ -152,4 +156,8 @@ pub trait DiagramModule: Send + Sync + 'static {
         options: &RenderSettings,
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError>;
+}
+
+fn js_number<S: Serializer>(value: &f64, s: S) -> Result<S::Ok, S::Error> {
+    super::Value::Number(*value).serialize(s)
 }

@@ -14,3 +14,5 @@ pub fn encode_entities(text: &str) -> String {
 pub fn decode_entities(text: &str) -> Result<String, crate::compat::PeleError> {
     decode::decode(text)
 }
+
+pub(crate) use detect::{space, word};

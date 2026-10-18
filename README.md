@@ -31,12 +31,16 @@ The development compatibility interface adds typed `DiagramModule` and
 capability discovery. Its separate v2 contract preserves the released v1 renderer.
 Open extension IDs and `parse_as` allow additional languages without editing the
 built-in detector. New modules retain their concrete model types; parsed documents keep the
-handler/config that created them, including after registry replacement. No built-in
-full-compatibility diagram renderer is registered yet.
+handler/config that created them, including after registry replacement. Pie is the
+first implemented compatibility renderer: its models, errors and complete SVG match
+3,670 pinned upstream scenarios through Rust, Swift/C and browser WASM. The other
+32 families and the remaining public APIs still require implementation/verification.
 
 Source preparation is checked against pinned upstream examples and generated cases.
 Build native/WASM artifacts from source to use the development Swift `Pele.inspect`
-and web `@unlocalhosted/pele-rs/core` APIs. The released Swift binary remains v0.1;
+and web `@unlocalhosted/pele-rs/core` APIs. The development `Pele.Engine` and web
+`@unlocalhosted/pele-rs/full` APIs add owned parsed documents, host measurement/icon
+callbacks, and native SVG palette resolution. The released Swift binary remains v0.1;
 its matching legacy API stays available without a local build. See
 [development verification](docs/FULL_PARITY_PROGRESS.md) for current evidence and
 remaining work. Detection alone does not imply parsing/rendering support.

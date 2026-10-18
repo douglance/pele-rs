@@ -46,12 +46,23 @@ origin and SHA-256 are in `crates/pele/assets/fonts/README.md`.
 | `compat/source/{entities,decode}.rs` | `src/preprocess.ts`, `src/text/entities.ts` | Entity encoding/decoding and bounded color-semicolon scan |
 | `compat/{value,error}.rs` | `src/{preprocess,errors}.ts`, `src/util/chars.ts` | Ordered JS-compatible config values, scalar formatting and UTF-16 diagnostics |
 | `compat/{engine,module}.rs` | `src/core.ts`, `src/types.ts` | Typed Rust module/resource interfaces and parse provenance; full built-ins pending |
+| `compat/diagrams/pie/` | `src/diagrams/pie/{parser,model,render}.ts`, `src/diagrams/common/{tokens,fit-width}.ts` | Pie parser, ordered model, sectors/donut layout, legends, width fitting and exact SVG translation |
+| `compat/text/` | `src/text/{label,measurer,metrics}.ts` | Rich labels, wrapping, style spans and deterministic Arial fallback metrics |
+| `compat/svg/` | `src/svg/{builder,root,theme}.ts` | Escaping, labels, SVG root and theme tokens; native palette resolution is a Rust extension |
+| `bindings/web/resources.js` | `src/text/measurer.ts` | Browser-only Canvas measurement/cache adapter; fallback advances execute in Rust |
 
 `fixtures/pele/source.json` records exact upstream input-file hashes and revision.
 `scripts/parity/extract-source.mjs` regenerates expected data from a clean pinned
 checkout using Node's development-only TypeScript transformation. Its 34 source
 corpora include 761 examples across every family and agentflow reference cases.
 Mermaid fixture licensing is retained in `third_party/MERMAID-LICENSE`.
+
+`fixtures/pele/pie.json` and `scripts/parity/extract-pie.mjs` pin 11 source-file
+hashes and 3,670 public parse/render scenarios: 1,175 complete SVG results and 2,495
+errors. The oracle JavaScript is a development dependency only. Pie has identical
+model/error/SVG checks in Rust, Swift/C and three real browser engines. This does
+not certify all public API behavior: JavaScript model mutations are not yet applied
+to retained Rust documents, and lazy registration/mount/zoom remain pending.
 
 The full-parity inventory remains the acceptance gate. Passing preparation cases
 is not complete grammar/model/render compatibility. In particular, Rust/Swift UTF-8

@@ -34,3 +34,29 @@ guard painted > 100, let png = bitmap.representation(using: .png, properties: [:
 }
 try png.write(to: output.appendingPathComponent("swift-flowchart.png"))
 print("Swift C ABI + AppKit SVG: \(width)x\(height), \(painted) painted pixels; \(output.path)")
+
+// Source-built v2 path: actual native SVG with resolved palette and owned document reuse.
+let engine = Pele.Engine()
+let pieDocument = try engine.parse("pie title Shared Rust\n\"Capture\":2\n\"Keep\":5\n\"Use\":3")
+var nativeOptions = Pele.Engine.Options(); nativeOptions.nativeTheme = .init()
+let pie = try engine.render(pieDocument, options: nativeOptions)
+try Data(pie.svg.utf8).write(to: output.appendingPathComponent("swift-pie.svg"))
+guard let pieImage = NSImage(data: Data(pie.svg.utf8)), pieImage.size.width > 0 else { fatalError("AppKit failed to decode native pie SVG") }
+let pieWidth = Int(ceil(pie.width)), pieHeight = Int(ceil(pie.height))
+guard let pieBitmap = NSBitmapImageRep(bitmapDataPlanes: nil, pixelsWide: pieWidth, pixelsHigh: pieHeight,
+    bitsPerSample: 8, samplesPerPixel: 4, hasAlpha: true, isPlanar: false, colorSpaceName: .deviceRGB, bytesPerRow: 0, bitsPerPixel: 0),
+    let pieContext = NSGraphicsContext(bitmapImageRep: pieBitmap) else { fatalError("Pie raster allocation failed") }
+NSGraphicsContext.saveGraphicsState(); NSGraphicsContext.current = pieContext
+NSColor.white.setFill(); NSRect(x: 0, y: 0, width: pieWidth, height: pieHeight).fill()
+pieImage.draw(in: NSRect(x: 0, y: 0, width: pieWidth, height: pieHeight))
+NSGraphicsContext.restoreGraphicsState()
+var colored = 0
+for y in 0..<pieHeight { for x in 0..<pieWidth {
+    if let color = pieBitmap.colorAt(x: x, y: y)?.usingColorSpace(.deviceRGB), color.alphaComponent > 0.5 {
+        let channels = [color.redComponent, color.greenComponent, color.blueComponent]
+        if channels.max()! - channels.min()! > 0.15 { colored += 1 }
+    }
+}}
+guard colored > 10_000, let piePNG = pieBitmap.representation(using: .png, properties: [:]) else { fatalError("Native pie palette did not paint") }
+try piePNG.write(to: output.appendingPathComponent("swift-pie.png"))
+print("Swift owned pie + AppKit: \(pieWidth)x\(pieHeight), \(colored) colored pixels")

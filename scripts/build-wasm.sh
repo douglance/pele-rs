@@ -9,7 +9,9 @@ fi
 DYLD_FALLBACK_LIBRARY_PATH="$rust_bin/../lib:${DYLD_FALLBACK_LIBRARY_PATH:-/usr/local/lib:/usr/lib}" \
 CARGO_PROFILE_RELEASE_PANIC=abort CARGO_PROFILE_RELEASE_OPT_LEVEL=s \
   cargo build --locked --release -p pele-wasm --target wasm32-unknown-unknown
-mkdir -p dist/wasm
+mkdir -p dist/wasm dist/evidence
+# Test oracle only, never included in the distributed WASM package.
+cp node_modules/pele/dist/pele.js dist/evidence/pele-oracle.js
 wasm-bindgen target/wasm32-unknown-unknown/release/pele_wasm.wasm \
   --target web --out-dir dist/wasm --out-name pele
 mkdir -p bindings/web/pkg

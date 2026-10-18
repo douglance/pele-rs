@@ -40,6 +40,21 @@ int main(void) {
     assert(pele_result_status(result) == 1); pele_result_free(result);
     result = pele_capabilities();
     assert(pele_result_status(result) == 0); pele_result_free(result);
-    puts("C ABI ownership/error integration passed (400 success/error lifetimes)");
+    const char *pie = "pie title Native; \n\"One\":1\n\"Two\":2";
+    for (int i=0; i<200; i++) {
+        PeleResult *document = pele_parse_v2((const uint8_t *)pie, strlen(pie), NULL, 0);
+        assert(document && pele_result_status(document) == 0);
+        const char *ignored = "{\"limit\":0}";
+        result = pele_render_document_with_resources_v2(document, (const uint8_t *)ignored, strlen(ignored), NULL);
+        assert(result && pele_result_status(result) == 0);
+        pele_result_free(document); /* rendered result owns bytes independently */
+        assert(pele_result_data(result) && pele_result_len(result) > 100);
+        pele_result_free(result);
+    }
+    result = pele_render_document_v2(NULL, NULL, 0);
+    assert(pele_result_status(result) == 1); pele_result_free(result);
+    result = pele_parse_v2(invalid, 1, NULL, 0);
+    assert(pele_result_status(result) == 1); pele_result_free(result);
+    puts("C ABI ownership/error integration passed (400 legacy lifetimes + 200 owned pie documents)");
     return 0;
 }

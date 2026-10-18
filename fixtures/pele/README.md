@@ -14,6 +14,13 @@ node scripts/parity/extract-source.mjs /path/to/pele
 The script verifies the checkout revision, records source SHA-256 digests, and
 uses the pinned TypeScript preprocessing code solely to produce expected data.
 `entity-links.json` adds public extension-link scenarios for entity decoding.
+`pie.json` adds 3,670 complete public pie model/render/error scenarios, including
+upstream examples, layout/configuration, host resources, rich labels, inaccessible
+inputs and fixed-seed malformed sources. Regenerate with:
+
+```sh
+node scripts/parity/extract-pie.mjs /path/to/pele
+```
 
 No oracle JavaScript ships in Rust, Swift, or WASM packages.
 

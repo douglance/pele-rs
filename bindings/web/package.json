@@ -18,6 +18,10 @@
     "./core": {
       "types": "./core.d.ts",
       "import": "./core.js"
+    },
+    "./full": {
+      "types": "./full.d.ts",
+      "import": "./full.js"
     }
   },
   "files": [
@@ -31,7 +35,10 @@
     "README.md",
     "core.js",
     "core.d.ts",
-    "MERMAID-LICENSE"
+    "MERMAID-LICENSE",
+    "full.js",
+    "full.d.ts",
+    "resources.js"
   ],
   "publishConfig": {
     "access": "public"

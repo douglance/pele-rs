@@ -1,8 +1,12 @@
 //! Full Pele compatibility interface, under construction. Legacy v1 remains separate.
 //! Detection recognizes all pinned families; capabilities never imply an absent renderer.
+pub mod diagrams;
 mod engine;
 mod error;
 mod id;
+mod svg;
+pub use svg::NativeTheme;
+pub mod text;
 pub use id::DiagramId;
 mod module;
 pub use engine::{Engine, ParsedDocument};
@@ -85,7 +89,7 @@ struct ErrorEnvelope<'a> {
     ok: bool,
     error: &'a PeleError,
 }
-fn success_envelope<T: Serialize>(result: &T) -> String {
+pub fn success_envelope<T: Serialize>(result: &T) -> String {
     serde_json::to_string(&SuccessEnvelope {
         version: 2,
         ok: true,
@@ -103,4 +107,58 @@ pub fn error_envelope(error: &PeleError) -> String {
 }
 pub fn capabilities_json() -> String {
     success_envelope(&Engine::empty().capabilities())
+}
+
+pub fn parse_options(json: &str) -> Result<ParseOptions, PeleError> {
+    if json.len() > 1024 * 1024 {
+        return Err(PeleError::new(
+            "Transport options exceed 1 MiB",
+            ErrorCode::Limit,
+        ));
+    }
+    if json.trim().is_empty() {
+        return Ok(ParseOptions::default());
+    }
+    serde_json::from_str(json)
+        .map_err(|e| PeleError::new(format!("Invalid parse options: {e}"), ErrorCode::Semantic))
+}
+pub fn render_options(json: &str) -> Result<RenderOptions, PeleError> {
+    if json.len() > 1024 * 1024 {
+        return Err(PeleError::new(
+            "Transport options exceed 1 MiB",
+            ErrorCode::Limit,
+        ));
+    }
+    if json.trim().is_empty() {
+        return Ok(RenderOptions::default());
+    }
+    serde_json::from_str(json)
+        .map_err(|e| PeleError::new(format!("Invalid render options: {e}"), ErrorCode::Semantic))
+}
+pub fn document_envelope(document: &ParsedDocument) -> Result<String, PeleError> {
+    #[derive(Serialize)]
+    struct Projection<'a> {
+        #[serde(rename = "type")]
+        kind: &'a DiagramId,
+        model: Value,
+    }
+    Ok(success_envelope(&Projection {
+        kind: document.diagram_type(),
+        model: document.model_view()?,
+    }))
+}
+pub fn render_envelope(source: &str, options_json: &str) -> (u32, String) {
+    let result = render_options(options_json).and_then(|options| {
+        Engine::with_builtins().render_source(source, &options, &mut text::MetricsResources)
+    });
+    match result {
+        Ok(result) => (0, success_envelope(&result)),
+        Err(error) => (
+            if error.code == ErrorCode::Limit { 2 } else { 1 },
+            error_envelope(&error),
+        ),
+    }
+}
+pub fn builtin_capabilities_json() -> String {
+    success_envelope(&Engine::with_builtins().capabilities())
 }

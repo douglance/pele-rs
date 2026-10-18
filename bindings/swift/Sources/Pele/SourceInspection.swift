@@ -65,9 +65,9 @@ private struct CompatibilityEnvelope<T: Decodable>: Decodable {
     let version: Int; let ok: Bool; let result: T?; let error: CompatibilityError?
 }
 extension Pele {
-    private static func compatibilityResult<T: Decodable>(_ handle: OpaquePointer?, as: T.Type) throws -> T {
+    static func compatibilityResult<T: Decodable>(_ handle: OpaquePointer?, as: T.Type, release: Bool = true) throws -> T {
         guard let handle else { throw PeleError(code: "internal", message: "Native result allocation failed") }
-        defer { pele_result_free(handle) }
+        defer { if release { pele_result_free(handle) } }
         let count = pele_result_len(handle)
         guard count <= 64 * 1024 * 1024, let bytes = pele_result_data(handle) else {
             throw PeleError(code: "internal", message: "Invalid native compatibility result")

@@ -80,6 +80,12 @@ pub struct Engine {
     modules: Vec<Arc<Registration>>,
 }
 impl Engine {
+    /// Registers implemented built-ins only; consult capabilities for parity status.
+    pub fn with_builtins() -> Self {
+        let mut engine = Self::empty();
+        engine.register(super::diagrams::pie::Pie);
+        engine
+    }
     pub fn empty() -> Self {
         Self::default()
     }
@@ -269,6 +275,9 @@ impl Engine {
             &settings,
             &mut session,
         )?;
+        if let Some(theme) = &settings.native_theme {
+            rendered.svg = super::svg::resolved_svg(&rendered.svg, theme)?;
+        }
         if rendered.svg.encode_utf16().count() > settings.output_limit() {
             let mut e = PeleError::new(
                 format!(

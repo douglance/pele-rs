@@ -23,8 +23,15 @@ or new GIF has been published from this work.
   internally), unsafe-key filtering, integer-key enumeration and JSON scalar
   formatting. Frontmatter/directives use document deep merge and host shallow
   precedence. Compatibility locations/source limits use UTF-16 units.
-- Detector knows all 33 families. The empty core has zero registered built-in
-  renderers and advertises no completed family parity gates.
+- Detector knows all 33 families. `Engine::with_builtins()` registers pie;
+  `Engine::empty()` remains available for consumer modules. No global family/API
+  parity gates are certified merely from registration.
+- Pie parser, ordered model, real sector/donut geometry, labels, accessibility,
+  legends and width fitting are translated from pinned source. Shared rich-label,
+  fallback metrics and SVG primitives support the actual pie renderer.
+- C/Swift and WASM own immutable parsed documents. Per-call text/icon callbacks
+  remain host resources; the Rust engine retains parsing/configuration authority.
+  Optional native palette resolution enables native SVG decoders without CSS vars.
 
 ## Verification corpus
 
@@ -50,15 +57,41 @@ fixes. Host: macOS 26.6 arm64, Rust 1.98.1, Swift 6.4, Node 25.9.0.
 
 Source-preparation scenarios run through Rust, C/Swift and real browser WASM; the
 extension module/resource/link scenarios currently run through the Rust interface.
-This does not claim complete callback/module hosting in Swift or JavaScript. No
-new CI run, Intel execution or full-parity release is asserted for this branch.
+No new CI run, Intel execution or full-parity release is asserted for this branch.
+
+## Pie verification (2026-10-18)
+
+`fixtures/pele/pie.json`: 3,670 scenarios generated from the clean pinned upstream
+revision with source hashes. Includes documentation/spec sources, 1,175 rendered
+results and 2,495 errors, rich labels, configuration/legend placement, donuts,
+width fitting, metadata, host icons/measurement, hostile inputs and mutations.
+
+- Both Rust pie integration tests pass: every model/error/complete SVG plus native
+  palette export and real rasterization. Fourteen Rust integration tests pass
+  across pie, legacy, preparation and extension feature slices.
+- Swift/C runs every pie fixture through owned documents and host callbacks.
+  C ownership checks pass for 400 legacy and 200 parsed pie document lifetimes.
+- Nine pie browser tests pass from the extracted npm package: complete corpus,
+  native SVG pixels and upstream browser Canvas/font/callback comparisons in
+  Chrome, Firefox and WebKit, with one worker.
+- Swift AppKit decodes and paints the current pie SVG: 358 x 296, 44,733 colored
+  pixels. Legacy AppKit proof remains 416 x 789, 6,846 painted pixels.
+- The packaged Rust crate and separate downstream Cargo consumer pass. Formatting
+  and Git whitespace checks pass. These checks do not publish a release.
 
 ## Remaining acceptance work
 
-Every full family parser/model/renderer, shared layout/text/shape/theme behavior,
-complete resource adapters and DOM mount/zoom/lazy APIs remain required. Shared
-preparation is not the grammar for 33 diagrams. Follow the LLD's one-complete-family
-sequence, beginning with pie, then full flowchart and its shared layout consumers.
+The other 32 family parsers/models/renderers, remaining shared layout/text/shape/
+theme behavior and DOM mount/zoom/lazy APIs remain required. Shared preparation
+is not the grammar for 33 diagrams. User authorized three parallel module ports:
+quadrantChart, packet and radar, with separate file ownership and parent integration.
+Full flowchart and its shared layout consumers remain required.
+
+JavaScript models currently project retained immutable Rust documents: mutating
+the projection does not update rendered content. Full public API parity requires
+an explicit solution. Non-finite/negative numeric budgets across host transports
+also require further conformance before release. Current finite-budget corpus
+evidence does not close those gaps.
 
 Known preparation gaps remain explicit: lone UTF-16 surrogates across UTF-8
 transports/unpaired YAML escapes, the explicit 64-level init-JSON work cap, and extreme

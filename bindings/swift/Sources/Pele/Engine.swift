@@ -1,0 +1,97 @@
+import Foundation
+import CPele
+
+public struct DiagramLink: Codable, Sendable { public let id: String; public let href: String; public let `internal`: Bool }
+public struct FullRenderedDiagram: Codable, Sendable {
+    public let type: String
+    public let svg: String
+    public let width: Double
+    public let height: Double
+    public let links: [DiagramLink]
+}
+private struct DocumentProjection: Decodable { let type: String; let model: ConfigValue }
+
+extension Pele {
+    /// Owned immutable parse result. Rust registration/config/model survive until deinit.
+    public final class Document: @unchecked Sendable {
+        fileprivate let handle: OpaquePointer
+        public let type: String
+        public let model: ConfigValue
+        fileprivate init(handle: OpaquePointer, projection: DocumentProjection) {
+            self.handle = handle; self.type = projection.type; self.model = projection.model
+        }
+        deinit { pele_result_free(handle) }
+        public func decodeModel<T: Decodable>(as: T.Type) throws -> T {
+            try JSONDecoder().decode(T.self, from: JSONEncoder().encode(model))
+        }
+    }
+    /// Source-built compatibility entry; capabilities identify the implemented built-ins.
+    public struct NativeTheme: Codable, Sendable {
+        public var background = "#ffffff", foreground = "#1f1f1f", muted = "#6e6e6e", line = "#1f1f1f"
+        public var surface = "#f3f3f3", surfaceAlt = "#e6e6e6", border = "#8a8a8a", accent = "#5b7bd5"
+        public var series = ["#4c78a8", "#f58518", "#54a24b", "#e45756", "#72b7b2", "#eeca3b", "#b279a2", "#9d755d"]
+        public init() {}
+    }
+    public struct Engine: Sendable {
+        public struct ParseOptions: Codable, Sendable {
+            public var limit = 50_000
+            public var maxEdges = 5_000
+            public var config: [String: ConfigValue] = [:]
+            public init() {}
+        }
+        public struct Options: Codable, Sendable {
+            public var limit: Int?
+            public var maxEdges: Int?
+            public var config: [String: ConfigValue] = [:]
+            public var fontFamily: String?
+            public var fontFamilyMono: String?
+            public var fontSize: Double?
+            public var idPrefix: String?
+            public var responsive: Bool?
+            public var maxWidth: Double?
+            public var autoDirection: Bool?
+            public var directionBreakpoint: Double?
+            public var padding: Double?
+            public var outputLimit: Int?
+            public var linkSchemes: [String]?
+            public var imageSchemes: [String]?
+            public var links: Bool?
+            public var images: Bool?
+            public var linkRel: String?
+            public var now: Double?
+            public var nativeTheme: NativeTheme?
+            public init() {}
+        }
+        public init() {}
+        public func capabilities() throws -> [DiagramCapability] {
+            try Pele.compatibilityResult(pele_builtin_capabilities(), as: [DiagramCapability].self)
+        }
+        public func parse(_ source: String, options: ParseOptions = .init()) throws -> Document {
+            let bytes = Data(source.utf8), settings = try JSONEncoder().encode(options)
+            let handle = bytes.withUnsafeBytes { input in settings.withUnsafeBytes { output in
+                pele_parse_v2(input.bindMemory(to: UInt8.self).baseAddress, input.count,
+                              output.bindMemory(to: UInt8.self).baseAddress, output.count)
+            }}
+            guard let handle else { throw PeleError(code: "internal", message: "Native document allocation failed") }
+            do {
+                let projection = try Pele.compatibilityResult(handle, as: DocumentProjection.self, release: false)
+                return Document(handle: handle, projection: projection)
+            } catch { pele_result_free(handle); throw error }
+        }
+        public func render(_ source: String, options: Options = .init(), resources: HostResources = .init()) throws -> FullRenderedDiagram {
+            let bytes = Data(source.utf8), settings = try JSONEncoder().encode(options)
+            let handle = try resources.withNativeResources { host in bytes.withUnsafeBytes { input in settings.withUnsafeBytes { output in
+                pele_render_with_resources_v2(input.bindMemory(to: UInt8.self).baseAddress, input.count,
+                                              output.bindMemory(to: UInt8.self).baseAddress, output.count, host)
+            }}}
+            return try Pele.compatibilityResult(handle, as: FullRenderedDiagram.self)
+        }
+        public func render(_ document: Document, options: Options = .init(), resources: HostResources = .init()) throws -> FullRenderedDiagram {
+            let settings = try JSONEncoder().encode(options)
+            let handle = try resources.withNativeResources { host in withExtendedLifetime(document) { settings.withUnsafeBytes { output in
+                pele_render_document_with_resources_v2(document.handle, output.bindMemory(to: UInt8.self).baseAddress, output.count, host)
+            }}}
+            return try Pele.compatibilityResult(handle, as: FullRenderedDiagram.self)
+        }
+    }
+}
