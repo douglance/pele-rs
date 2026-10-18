@@ -1,0 +1,222 @@
+diff --git a/scripts/perf/native/src/workload.rs b/scripts/perf/native/src/workload.rs
+--- a/scripts/perf/native/src/workload.rs
++++ b/scripts/perf/native/src/workload.rs
+@@ -16,6 +16,7 @@
+     source: String,
+     options: J,
+     resources: String,
++    units: usize,
+ }
+ struct Host {
+     fixed: bool,
+@@ -45,7 +46,71 @@
+     graph: ModelGraph,
+     binary: Vec<u8>,
+     result: RenderResult,
++    repeated_keys: Vec<Vec<String>>,
++    unique_keys: Vec<Vec<String>>,
++}
++// Public graph consumer workloads: keys allocated before timed/counted region.
++fn property_keys(count: usize, unique: bool) -> Vec<Vec<String>> {
++    (0..count)
++        .map(|row| {
++            (0..16)
++                .map(|field| {
++                    if unique {
++                        format!("key_{row}_{field}")
++                    } else {
++                        format!("field_{field}")
++                    }
++                })
++                .collect()
++        })
++        .collect()
++}
++fn property_graph(keys: &[Vec<String>]) -> Result<ModelGraph, String> {
++    let mut w = GraphWriter::default();
++    // Existing raw UTF16 intern IDs interleave with property-key lookups.
++    let seed = w.string(JsString(vec![0xd800]));
++    let shared = w.string("field_0");
++    let mut records = vec![];
++    for row in keys {
++        let properties = row
++            .iter()
++            .map(|key| w.property(key, Atom::String(shared)))
++            .collect();
++        records.push(Atom::Ref(w.node(Node::Object { properties })));
++    }
++    // Raw string insertion after cached property lookup must reuse exact ID.
++    assert_eq!(
++        w.string(JsString("field_0".encode_utf16().collect())),
++        shared
++    );
++    let late = w.string("\u{fffd}");
++    assert_ne!(late, seed);
++    let mut properties = vec![
++        w.property("", Atom::String(seed)),
++        w.property("\u{fffd}", Atom::String(late)),
++    ];
++    // Exercise keys exceeding cache byte/entry bounds, with no scalar coercion.
++    properties.push(w.property(&"é".repeat(40), Atom::String(shared)));
++    properties.push(w.property("field_0", Atom::String(shared)));
++    let values = records;
++    for (index, value) in values.iter().enumerate() {
++        properties.push(w.property(&index.to_string(), value.clone()));
++    }
++    let root = w.node(Node::Array {
++        length: values.len() as u32,
++        properties,
++    });
++    w.finish(Atom::Ref(root)).map_err(error)
+ }
++fn property_summaries(repeated: &[Vec<String>], unique: &[Vec<String>]) -> Result<J, String> {
++    let mut result = serde_json::Map::new();
++    for (name, keys) in [("repeated", repeated), ("unique", unique)] {
++        let g = property_graph(keys)?;
++        let bytes = serde_json::to_vec(&g).map_err(error)?;
++        result.insert(name.into(),json!({"sha256":format!("{:x}",Sha256::digest(bytes)),"nodes":g.nodes.len(),"strings":g.strings.len(),"properties":g.nodes.iter().map(|n|n.properties().len()).sum::<usize>()}));
++    }
++    Ok(J::Object(result))
++}
+ fn error(e: impl std::fmt::Debug) -> String {
+     format!("{e:?}")
+ }
+@@ -86,6 +151,8 @@
+             graph,
+             binary,
+             result,
++            repeated_keys: property_keys(c.units, false),
++            unique_keys: property_keys(c.units, true),
+         })
+     }
+     fn reset(&mut self, public: &PublicEngine) -> Result<(), String> {
+@@ -109,6 +176,10 @@
+             )
+         };
+         Ok(match stage {
++            "property-repeated" => {
++                black_box(property_graph(&self.repeated_keys)?.nodes.len() as u64)
++            }
++            "property-unique" => black_box(property_graph(&self.unique_keys)?.nodes.len() as u64),
+             "registry" => {
+                 let e = Engine::with_builtins();
+                 black_box(&e);
+@@ -224,8 +295,10 @@
+         let case: Case = serde_json::from_value(command["case"].clone()).map_err(error)?;
+         let id = case.id.clone();
+         let state = State::new(case, engine, public)?;
+-        let result = json!({"output":summary(&state.result),"graphNodes":state.graph.nodes.len(),"graphStrings":state.graph.strings.len(),
++        let result = json!({"output":summary(&state.result),"revision":state.public.revision().to_string(),"graphNodes":state.graph.nodes.len(),"graphStrings":state.graph.strings.len(),
+             "graphUtf16Units":state.graph.strings.iter().map(|s|s.0.len()).sum::<usize>(),
++            "graphWriterBytes":std::mem::size_of::<GraphWriter>(),"graphSha256":format!("{:x}",Sha256::digest(serde_json::to_vec(&state.graph).map_err(error)?)),
++            "propertyGraphs":property_summaries(&state.repeated_keys,&state.unique_keys)?,
+             "graphJsonBytes":serde_json::to_vec(&state.graph).map_err(error)?.len(),"graphBinaryBytes":state.binary.len()});
+         states.insert(id, state);
+         return Ok(result);
+@@ -256,6 +329,76 @@
+             json!({"outputs":outputs,"graphNodes":state.public.snapshot().map_err(error)?.nodes.len()}),
+         );
+     }
++    if op == "warm" || op == "sample" {
++        let stage=command["stage"].as_str().ok_or("Missing stage")?;
++        if !["render-mutable-core","render-mutable-publish","property-unique"].contains(&stage) {return Err("Invalid matched stage".into());}
++        let measured=op=="warm" || command["measured"].as_bool().unwrap_or(false);
++        if measured && (crate::ALLOCATION_BUILD || std::env::var("PELE_PERF_ALLOW_TIMING").as_deref()!=Ok("1")) {return Err("Matched timing needs uninstrumented binary and explicit quiet window".into());}
++        state.reset(public)?;
++        if op=="warm" {
++            let mut nanos=0u128;let mut operations=0u64;let mut setups=1u64;
++            while operations<512 && (operations<6 || nanos<100_000_000) {
++                if operations>0 && operations%16==0 && state.result.diagram_type.as_str()=="gantt" {state.reset(public)?;setups+=1;}
++                let start=Instant::now();black_box(state.once(stage,engine,public)?);nanos+=start.elapsed().as_nanos();operations+=1;
++            }
++            return Ok(json!({"operations":operations,"workNs":nanos,"setups":setups,"capped":nanos<100_000_000}));
++        }
++        let count=command["count"].as_u64().unwrap_or(1);
++        let history=command["history"].as_u64().unwrap_or(1);
++        if count==0 || count>128 || ![1,16,128].contains(&history) {return Err("Invalid matched batch/history".into());}
++        let gantt=state.result.diagram_type.as_str()=="gantt" && stage!="property-unique";
++        if gantt && count!=1 || !gantt && history!=1 {return Err("Fixed Gantt history requires one measured operation".into());}
++        for _ in 1..history {black_box(state.once("render-mutable-publish",engine,public)?);}
++        let revision_before=state.public.revision();
++        let before=state.public.snapshot().map_err(error)?;
++        let before_nodes=before.nodes.len();let before_strings=before.strings.len();
++        let before_hash=format!("{:x}",Sha256::digest(serde_json::to_vec(&before).map_err(error)?));drop(before);
++        state.host.calls=0;
++        let mut result=None;let mut returned_graph=None;let mut control=None;let mut checksum=0u64;
++        let start=if measured {Some(Instant::now())} else {None};
++        for _ in 0..count {
++            match stage {
++                "property-unique"=>{let graph=property_graph(&state.unique_keys)?;checksum=checksum.wrapping_add(graph.nodes.len() as u64);control=Some(graph);}
++                "render-mutable-core"=>{result=Some(state.public.render(&state.options,&mut state.host).map_err(error)?);}
++                "render-mutable-publish"=>{let outcome=state.public.render_operation(state.public.revision(),&state.options,&mut state.host).map_err(error)?;returned_graph=Some(outcome.graph);result=Some(outcome.result.map_err(error)?);}
++                _=>unreachable!(),
++            }
++        }
++        let elapsed=start.map(|clock|clock.elapsed().as_nanos());
++        let after=state.public.snapshot().map_err(error)?;
++        let after_hash=format!("{:x}",Sha256::digest(serde_json::to_vec(&after).map_err(error)?));
++        let returned_hash=returned_graph.as_ref().map(|graph|serde_json::to_vec(graph).map(|bytes|format!("{:x}",Sha256::digest(bytes))).map_err(error)).transpose()?;
++        if stage=="render-mutable-publish" && returned_hash.as_deref()!=Some(after_hash.as_str()) {return Err("Published graph differs from snapshot".into());}
++        let control_hash=control.as_ref().map(|graph|serde_json::to_vec(graph).map(|bytes|format!("{:x}",Sha256::digest(bytes))).map_err(error)).transpose()?;
++        return Ok(json!({"elapsedNs":elapsed,"count":count,"history":history,"setupOperations":history,"revisionBefore":revision_before.to_string(),"revisionAfter":state.public.revision().to_string(),"beforeGraphSha256":before_hash,"afterGraphSha256":after_hash,"beforeNodes":before_nodes,"afterNodes":after.nodes.len(),"beforeStrings":before_strings,"afterStrings":after.strings.len(),"publishedGraphSha256":returned_hash,"controlGraphSha256":control_hash,"checksum":checksum.to_string(),"textMeasurements":state.host.calls,"output":summary(result.as_ref().unwrap_or(&state.result))}));
++    }
++    if op == "mutation" {
++        let mode = command["mutation"].as_str().ok_or("Missing mutation")?;
++        let mut graph = state.public.snapshot().map_err(error)?;
++        let root = graph.root.clone();
++        let key_name = match mode {"duplicate-utf16-id" => "startTime", "deleted-recreated" => "task", "readonly" => "processed", "first-intern" => "renderEndTime", _ => return Err("Unknown mutation".into())};
++        if mode == "first-intern" {
++            for node in &mut graph.nodes { node.properties_mut().retain(|p| !graph.strings[p.key as usize].is(key_name)); }
++            for text in &mut graph.strings { if text.is(key_name) { *text = JsString::from("__removed_renderEndTime"); } }
++        } else {
++            let index = graph.nodes.iter().position(|node| node.properties().iter().any(|p| graph.strings[p.key as usize].is(key_name))).ok_or("No matching task")?;
++            let at = graph.nodes[index].properties().iter().position(|p| graph.strings[p.key as usize].is(key_name)).unwrap();
++            let id = graph.strings.len() as u32; graph.strings.push(JsString::from(key_name));
++            if mode == "deleted-recreated" { let mut property = graph.nodes[index].properties_mut().remove(at); property.key=id; graph.nodes[index].properties_mut().push(property); }
++            else if mode == "duplicate-utf16-id" { graph.nodes[index].properties_mut()[at].key=id; }
++            else { let p=&mut graph.nodes[index].properties_mut()[at];p.flags=0;p.value=Atom::Bool(false); }
++        }
++        // Full public graph apply, actual operation, publication and recovery.
++        state.public.apply(state.public.revision(), graph).map_err(error)?;
++        let outcome=state.public.render_operation(state.public.revision(), &state.options, &mut state.host).map_err(error)?;
++        let operation=match outcome.result {Ok(result)=>json!({"output":summary(&result)}),Err(e)=>json!({"error":format!("{e:?}")})};
++        let after=state.public.snapshot().map_err(error)?;
++        let fingerprint=format!("{:x}",Sha256::digest(serde_json::to_vec(&after).map_err(error)?));
++        if mode=="first-intern" && !after.strings.iter().any(|s|s.is(key_name)) { return Err("Missing late key interning".into()); }
++        state.reset(public)?;
++        let recovered=state.public.render_operation(state.public.revision(),&state.options,&mut state.host).map_err(error)?.result.map_err(error)?;
++        return Ok(json!({"mutation":mode,"operation":operation,"graphSha256":fingerprint,"nodes":after.nodes.len(),"strings":after.strings.len(),"root":root,"revision":outcome.revision,"recovery":summary(&recovered)}));
++    }
+     if std::env::var("PELE_PERF_ALLOW_TIMING").as_deref() != Ok("1") {
+         return Err(
+             "Timed/profile runs require PELE_PERF_ALLOW_TIMING=1 and a coordinated quiet window"
+@@ -268,17 +411,25 @@
+         .filter(|n| *n > 0 && *n <= 65_536)
+         .ok_or("Invalid batch count")?;
+     state.reset(public)?;
+-    let before = state.public.snapshot().map_err(error)?.nodes.len();
++    let history=command["history"].as_u64().unwrap_or(1); if ![1,16,128].contains(&history) { return Err("Invalid history".into()); }
++    for _ in 1..history {state.once("render-mutable-core",engine,public)?;}
++    let before_graph=state.public.snapshot().map_err(error)?;
++    let before=before_graph.nodes.len();
++    let before_hash=format!("{:x}",Sha256::digest(serde_json::to_vec(&before_graph).map_err(error)?));
+     if op == "allocations" {
+-        return crate::capture_allocations(|| {
++        let allocation = crate::capture_allocations(|| {
+             let mut checksum = 0u64;
+             for _ in 0..count {
+                 checksum = checksum.wrapping_add(state.once(stage, engine, public)?);
+             }
+             Ok(checksum)
+-        });
++        })?;
++        let graph=state.public.snapshot().map_err(error)?;
++        let hash=format!("{:x}",Sha256::digest(serde_json::to_vec(&graph).map_err(error)?));
++        let output=state.public.render_operation(state.public.revision(), &state.options, &mut state.host).map_err(error)?.result.map_err(error)?;
++        return Ok(json!({"allocation":allocation,"history":history,"beforeNodes":before,"afterNodes":graph.nodes.len(),"beforeGraphSha256":before_hash,"afterGraphSha256":hash,"postOutput":summary(&output)}));
+     }
+-    if op != "measure" {
++    if true {
+         return Err("Unknown op".into());
+     }
+     if crate::ALLOCATION_BUILD {

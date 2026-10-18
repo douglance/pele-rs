@@ -56,7 +56,13 @@ core render. It adds 64 inline bytes per operation context, with no additional
 heap peak or changes to Pie/unique-key controls. All 21 workload outputs and
 complete graph fingerprints match; nine release integrations include the full
 18,994-case Gantt corpus. This is allocation evidence, not latency evidence.
-The runtime patch remains isolated pending matched timing checks.
+A separate [matched timing follow-up](../scripts/perf/experiments/2026-10-19-gantt-key-cache-latency/README.md)
+records 161 paired trials at fixed histories against `42abbfb`. Medium/large
+Gantt paired medians improved in that local run, but unchanged controls drifted
+under heavy external load. Five warmups hit their operation cap; small/medium
+history-128 latency was deliberately omitted before execution. The patch remains
+isolated. These observations do not establish regression-free latency or a
+general Rust/Swift/WASM speedup.
 
 The next performance work needs profiles of parsing, preparation, text callbacks,
 allocation/string building, model projection and serialization. Their costs are

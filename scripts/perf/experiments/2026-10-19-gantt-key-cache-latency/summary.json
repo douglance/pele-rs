@@ -1,0 +1,504 @@
+{
+  "schemaVersion": 1,
+  "decision": "HOLD runtime adoption",
+  "scope": "Exploratory native pairs only. Historical allocation evidence remains bound to32e845d; this run is bound to42abbfb. No general speedup/regression-free/Swift/WASM claim.",
+  "commit": "42abbfbead6a8fa0c23bd578b6f09b78c747056e",
+  "pairedTrials": 161,
+  "timedSamples": 322,
+  "ganttConditions": 14,
+  "controls": 9,
+  "allGanttPairedMedianDeltasNegative": true,
+  "warmupCapHits": 5,
+  "omittedConditions": [
+    {
+      "id": "gantt/small",
+      "history": 128,
+      "stage": "render-mutable-core",
+      "count": 1,
+      "kind": "fixed-history"
+    },
+    {
+      "id": "gantt/small",
+      "history": 128,
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "kind": "fixed-history"
+    },
+    {
+      "id": "gantt/medium",
+      "history": 128,
+      "stage": "render-mutable-core",
+      "count": 1,
+      "kind": "fixed-history"
+    },
+    {
+      "id": "gantt/medium",
+      "history": 128,
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "kind": "fixed-history"
+    }
+  ],
+  "groups": [
+    {
+      "id": "gantt/small",
+      "history": 1,
+      "stage": "render-mutable-core",
+      "count": 1,
+      "kind": "fixed-history",
+      "pairs": 7,
+      "baselineMedianNs": 219208,
+      "candidateMedianNs": 160166,
+      "pairedMedianDeltaNs": -13250,
+      "pairedDeltasNs": [
+        392208,
+        -59666,
+        -62876,
+        -12667,
+        -72375,
+        -13250,
+        68459
+      ]
+    },
+    {
+      "id": "gantt/small",
+      "history": 1,
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "kind": "fixed-history",
+      "pairs": 7,
+      "baselineMedianNs": 204500,
+      "candidateMedianNs": 212625,
+      "pairedMedianDeltaNs": -333,
+      "pairedDeltasNs": [
+        3458,
+        -333,
+        -6291,
+        88750,
+        12417,
+        -9250,
+        -7000
+      ]
+    },
+    {
+      "id": "gantt/small",
+      "history": 16,
+      "stage": "render-mutable-core",
+      "count": 1,
+      "kind": "fixed-history",
+      "pairs": 7,
+      "baselineMedianNs": 163750,
+      "candidateMedianNs": 150042,
+      "pairedMedianDeltaNs": -14583,
+      "pairedDeltasNs": [
+        -232375,
+        -161292,
+        41500,
+        -369333,
+        -9833,
+        -14583,
+        2291
+      ]
+    },
+    {
+      "id": "gantt/small",
+      "history": 16,
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "kind": "fixed-history",
+      "pairs": 7,
+      "baselineMedianNs": 202625,
+      "candidateMedianNs": 191458,
+      "pairedMedianDeltaNs": -8000,
+      "pairedDeltasNs": [
+        252167,
+        108542,
+        -28917,
+        -8000,
+        49250,
+        -9208,
+        -18625
+      ]
+    },
+    {
+      "id": "gantt/medium",
+      "history": 1,
+      "stage": "render-mutable-core",
+      "count": 1,
+      "kind": "fixed-history",
+      "pairs": 7,
+      "baselineMedianNs": 765792,
+      "candidateMedianNs": 706000,
+      "pairedMedianDeltaNs": -48083,
+      "pairedDeltasNs": [
+        -62708,
+        -72916,
+        5833,
+        18750,
+        -79625,
+        -40042,
+        -48083
+      ]
+    },
+    {
+      "id": "gantt/medium",
+      "history": 1,
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "kind": "fixed-history",
+      "pairs": 7,
+      "baselineMedianNs": 864750,
+      "candidateMedianNs": 779000,
+      "pairedMedianDeltaNs": -59750,
+      "pairedDeltasNs": [
+        -49709,
+        -613667,
+        28583,
+        -63583,
+        84584,
+        -177083,
+        -59750
+      ]
+    },
+    {
+      "id": "gantt/medium",
+      "history": 16,
+      "stage": "render-mutable-core",
+      "count": 1,
+      "kind": "fixed-history",
+      "pairs": 7,
+      "baselineMedianNs": 816458,
+      "candidateMedianNs": 687459,
+      "pairedMedianDeltaNs": -87583,
+      "pairedDeltasNs": [
+        -141499,
+        213625,
+        209625,
+        -224750,
+        -152376,
+        -87583,
+        -74666
+      ]
+    },
+    {
+      "id": "gantt/medium",
+      "history": 16,
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "kind": "fixed-history",
+      "pairs": 7,
+      "baselineMedianNs": 894375,
+      "candidateMedianNs": 795125,
+      "pairedMedianDeltaNs": -59750,
+      "pairedDeltasNs": [
+        -50376,
+        -382084,
+        -59750,
+        -42334,
+        -109750,
+        -187833,
+        -4500
+      ]
+    },
+    {
+      "id": "gantt/large",
+      "history": 1,
+      "stage": "render-mutable-core",
+      "count": 1,
+      "kind": "fixed-history",
+      "pairs": 7,
+      "baselineMedianNs": 3104875,
+      "candidateMedianNs": 2796875,
+      "pairedMedianDeltaNs": -296500,
+      "pairedDeltasNs": [
+        -522667,
+        -46292,
+        -177625,
+        -296500,
+        -462583,
+        -255292,
+        -607124
+      ]
+    },
+    {
+      "id": "gantt/large",
+      "history": 1,
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "kind": "fixed-history",
+      "pairs": 7,
+      "baselineMedianNs": 3275750,
+      "candidateMedianNs": 3066250,
+      "pairedMedianDeltaNs": -160125,
+      "pairedDeltasNs": [
+        63625,
+        -384958,
+        -160125,
+        -137209,
+        -191375,
+        -272957,
+        -50791
+      ]
+    },
+    {
+      "id": "gantt/large",
+      "history": 16,
+      "stage": "render-mutable-core",
+      "count": 1,
+      "kind": "fixed-history",
+      "pairs": 7,
+      "baselineMedianNs": 3182625,
+      "candidateMedianNs": 3033000,
+      "pairedMedianDeltaNs": -227249,
+      "pairedDeltasNs": [
+        -52583,
+        -28042,
+        -227249,
+        617916,
+        -299250,
+        -428876,
+        -591334
+      ]
+    },
+    {
+      "id": "gantt/large",
+      "history": 16,
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "kind": "fixed-history",
+      "pairs": 7,
+      "baselineMedianNs": 3517000,
+      "candidateMedianNs": 3117792,
+      "pairedMedianDeltaNs": -354958,
+      "pairedDeltasNs": [
+        -276875,
+        -90042,
+        2313292,
+        -437583,
+        -356584,
+        -638333,
+        -354958
+      ]
+    },
+    {
+      "id": "gantt/large",
+      "history": 128,
+      "stage": "render-mutable-core",
+      "count": 1,
+      "kind": "fixed-history",
+      "pairs": 7,
+      "baselineMedianNs": 3303000,
+      "candidateMedianNs": 3161042,
+      "pairedMedianDeltaNs": -237375,
+      "pairedDeltasNs": [
+        882209,
+        -401792,
+        -11083,
+        -237375,
+        -86708,
+        -391375,
+        -437292
+      ]
+    },
+    {
+      "id": "gantt/large",
+      "history": 128,
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "kind": "fixed-history",
+      "pairs": 7,
+      "baselineMedianNs": 5250750,
+      "candidateMedianNs": 4554417,
+      "pairedMedianDeltaNs": -721793,
+      "pairedDeltasNs": [
+        -721793,
+        643624,
+        7376,
+        504291,
+        -2036709,
+        -986958,
+        -1007458
+      ]
+    },
+    {
+      "id": "pie/small",
+      "history": 1,
+      "stage": "render-mutable-core",
+      "count": 1,
+      "kind": "control",
+      "pairs": 7,
+      "baselineMedianNs": 26548.171875,
+      "candidateMedianNs": 30826.828125,
+      "pairedMedianDeltaNs": 3546.8671875,
+      "pairedDeltasNs": [
+        3546.8671875,
+        3441.7265625,
+        1290.6875,
+        -1156.90625,
+        4680.0078125,
+        5320.640625,
+        3772.4609375
+      ]
+    },
+    {
+      "id": "pie/small",
+      "history": 1,
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "kind": "control",
+      "pairs": 7,
+      "baselineMedianNs": 29261.71875,
+      "candidateMedianNs": 29168.9453125,
+      "pairedMedianDeltaNs": 268.2265625,
+      "pairedDeltasNs": [
+        -355.7890625,
+        -3549.8125,
+        268.2265625,
+        632.484375,
+        5956.703125,
+        -1395.5078125,
+        797.5234375
+      ]
+    },
+    {
+      "id": "gantt/small",
+      "history": 1,
+      "stage": "property-unique",
+      "count": 1,
+      "kind": "control",
+      "pairs": 7,
+      "baselineMedianNs": 23114.9140625,
+      "candidateMedianNs": 23243.484375,
+      "pairedMedianDeltaNs": -1973.3125,
+      "pairedDeltasNs": [
+        -4048.828125,
+        1119.7890625,
+        1205.3984375,
+        -1973.3125,
+        -1147.4609375,
+        -3616.2109375,
+        -6870.7734375
+      ]
+    },
+    {
+      "id": "pie/medium",
+      "history": 1,
+      "stage": "render-mutable-core",
+      "count": 1,
+      "kind": "control",
+      "pairs": 7,
+      "baselineMedianNs": 156134.1171875,
+      "candidateMedianNs": 157478.1875,
+      "pairedMedianDeltaNs": 3937.171875,
+      "pairedDeltasNs": [
+        8526.6953125,
+        6708.984375,
+        7205.3984375,
+        -7336.921875,
+        -185.5546875,
+        3592.125,
+        3937.171875
+      ]
+    },
+    {
+      "id": "pie/medium",
+      "history": 1,
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "kind": "control",
+      "pairs": 7,
+      "baselineMedianNs": 155689.453125,
+      "candidateMedianNs": 163827.796875,
+      "pairedMedianDeltaNs": 6534.8359375,
+      "pairedDeltasNs": [
+        3315.1015625,
+        6534.8359375,
+        21882.8125,
+        7328.4453125,
+        8138.34375,
+        -5924.1484375,
+        2714.1875
+      ]
+    },
+    {
+      "id": "gantt/medium",
+      "history": 1,
+      "stage": "property-unique",
+      "count": 1,
+      "kind": "control",
+      "pairs": 7,
+      "baselineMedianNs": 137823.5703125,
+      "candidateMedianNs": 142111.65625,
+      "pairedMedianDeltaNs": 2407.2265625,
+      "pairedDeltasNs": [
+        2662.765625,
+        13085.2890625,
+        -5814.453125,
+        2407.2265625,
+        10936.5234375,
+        -3311.8515625,
+        316.078125
+      ]
+    },
+    {
+      "id": "pie/large",
+      "history": 1,
+      "stage": "render-mutable-core",
+      "count": 1,
+      "kind": "control",
+      "pairs": 7,
+      "baselineMedianNs": 241934.25,
+      "candidateMedianNs": 228730.46875,
+      "pairedMedianDeltaNs": -8326.171875,
+      "pairedDeltasNs": [
+        -21337.90625,
+        38002.609375,
+        -20513.671875,
+        -1093.09375,
+        -13203.78125,
+        -5222.65625,
+        -8326.171875
+      ]
+    },
+    {
+      "id": "pie/large",
+      "history": 1,
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "kind": "control",
+      "pairs": 7,
+      "baselineMedianNs": 253172.515625,
+      "candidateMedianNs": 246285.8125,
+      "pairedMedianDeltaNs": -5987.625,
+      "pairedDeltasNs": [
+        -8466.78125,
+        -16414.046875,
+        -1174.484375,
+        -5987.625,
+        -1773.453125,
+        13836.59375,
+        -6886.703125
+      ]
+    },
+    {
+      "id": "gantt/large",
+      "history": 1,
+      "stage": "property-unique",
+      "count": 1,
+      "kind": "control",
+      "pairs": 7,
+      "baselineMedianNs": 640283.875,
+      "candidateMedianNs": 658962.21875,
+      "pairedMedianDeltaNs": 25234.34375,
+      "pairedDeltasNs": [
+        228760.40625,
+        111033.84375,
+        25234.34375,
+        63940.09375,
+        -86096.3125,
+        -34671.84375,
+        -29395.875
+      ]
+    }
+  ]
+}

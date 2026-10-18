@@ -1,0 +1,2 @@
+PASS: actual owned rustc-name PID41264 rejected
+PASS: normal guard clear after stopping only owned child
