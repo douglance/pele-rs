@@ -43,3 +43,6 @@ pub fn parse(source: &str, options: &ParseOptions) -> Result<RailroadModel, Pele
         max_edges: options.max_edges,
     })
 }
+
+mod public_model;
+pub use public_model::RailroadPublicState;

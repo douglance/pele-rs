@@ -133,13 +133,30 @@ fn boxes(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<(Vec<Boxed>, usize), PeleError> {
-    let mut todo = vec![(root, room, false)];
-    let mut a = vec![];
-    let mut indices = vec![0; model.nodes.len()];
-    while let Some((i, room, done)) = todo.pop() {
-        let node = &model.nodes[i];
-        if !done {
-            todo.push((i, room, true));
+    // The pinned measurer assigns room by object identity in breadth-first
+    // encounter order. A shared IR node uses its last assigned room everywhere.
+    let mut budgets = vec![f64::INFINITY; model.nodes.len()];
+    let mut work = 0usize;
+    let budget_error = || {
+        let mut e = PeleError::new(
+            "Railroad layout exceeds work budget.",
+            crate::compat::ErrorCode::Limit,
+        );
+        e.diagram_type = Some("railroad".into());
+        e
+    };
+    if room != f64::INFINITY {
+        let mut pending = vec![(root, room)];
+        let mut n = 0;
+        while n < pending.len() {
+            work += 1;
+            if work > 4_000_000 {
+                return Err(budget_error());
+            }
+            let (i, width) = pending[n];
+            n += 1;
+            budgets[i] = width;
+            let node = &model.nodes[i];
             let around = match node {
                 N::Choice(_) | N::Optional(_) => 4. * m.arc,
                 N::Repetition { min, .. } => {
@@ -152,13 +169,25 @@ fn boxes(
                 N::Sequence(_) => 6. * m.arc,
                 _ => 0.,
             };
-            let next = if room == f64::INFINITY {
-                room
-            } else {
-                40f64.max(room - around)
-            };
+            for &child in node.children() {
+                pending.push((child, 40_f64.max(width - around)));
+            }
+        }
+    }
+    let mut todo = vec![(root, false)];
+    let mut a = vec![];
+    let mut indices = vec![0; model.nodes.len()];
+    while let Some((i, done)) = todo.pop() {
+        work += 1;
+        if work > 4_000_000 {
+            return Err(budget_error());
+        }
+        let node = &model.nodes[i];
+        let room = budgets[i];
+        if !done {
+            todo.push((i, true));
             for &n in node.children().iter().rev() {
-                todo.push((n, next, false))
+                todo.push((n, false));
             }
             continue;
         }
