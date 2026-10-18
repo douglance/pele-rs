@@ -22,6 +22,14 @@
     "./full": {
       "types": "./full.d.ts",
       "import": "./full.js"
+    },
+    "./registry": {
+      "types": "./registry.d.ts",
+      "import": "./registry.js"
+    },
+    "./lazy": {
+      "types": "./lazy.d.ts",
+      "import": "./lazy.js"
     }
   },
   "files": [
@@ -43,7 +51,17 @@
     "resources.js",
     "graph.js",
     "errors.js",
-    "graph-binary.js"
+    "graph-binary.js",
+    "render-numbers.js",
+    "mount.js",
+    "zoom.js",
+    "window.js",
+    "registry.js",
+    "registry.d.ts",
+    "lazy.js",
+    "lazy.d.ts",
+    "parse-limits.js",
+    "REGISTRY.md"
   ],
   "publishConfig": {
     "access": "public"

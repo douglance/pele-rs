@@ -1,6 +1,7 @@
 # @unlocalhosted/pele-rs
 
-Source-built v0.1.0 WASM package for the documented flowchart subset. Build from repository root with
+Published v0.1.0 covers the documented flowchart subset. Development source builds
+also provide all 33 compatibility diagram families. Build from repository root with
 `scripts/build-wasm.sh`, then `npm pack ./bindings/web`. Available as a GitHub release artifact; not published to npm registry.
 
 ```js
@@ -22,9 +23,9 @@ is SIL OFL 1.1. See included notices. Independent project, not official Pele.
 ## Development full-library interface
 
 Source builds also provide `@unlocalhosted/pele-rs/full`. All 33 renderers have
-pinned Rust/Swift/browser corpus verification. Twenty-three families currently expose
-mutable models and inventoried native methods, including shared Flowchart/Swimlane
-prototypes and Kanban/Mindmap helper identity. Remaining model/API compatibility is still under development. This does
+pinned Rust/Swift/browser corpus verification. All 33 families expose mutable
+models and inventoried native methods, including shared Flowchart/Swimlane
+prototypes and Kanban/Mindmap helper identity. Remaining API compatibility is still under development. This does
 not change the earlier published v0.1.0 release.
 
 ```js
@@ -39,3 +40,10 @@ renderer.dispose(model);
 The full interface uses browser font/resource adapters with Rust processing.
 See the repository's `docs/MUTABLE_MODELS.md` for ownership, method/error behavior
 and the explicit remaining compatibility boundaries.
+
+`renderer.mount(element, source, options)` supplies the retained browser lifecycle;
+`enableZoom(element, options)` adds native DOM input and controls. The `./registry`
+entry creates an independent empty registry, and `./lazy` adds asynchronous family
+selection, rendering and mounting. Native built-ins are linked into one WASM
+artifact; lazy selection does not download smaller binaries. See [registry
+contracts](REGISTRY.md), including the remaining custom-provider/low-level-entry gap.

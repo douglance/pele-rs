@@ -1,4 +1,8 @@
+import {PeleError} from './errors.js';
 // Host values only: diagram state transitions and rendering remain in Rust.
+const errorConstructors={error:Error,pele:PeleError,type:TypeError,range:RangeError,syntax:SyntaxError,reference:ReferenceError,eval:EvalError,uri:URIError};
+const errorDiagnostics=new Set(['stack','fileName','lineNumber','columnNumber','sourceURL']);
+const errorKind=value=>{const proto=Object.getPrototypeOf(value);return Object.keys(errorConstructors).find(key=>proto===errorConstructors[key].prototype);};
 const bits = new DataView(new ArrayBuffer(8));
 function numberBits(value) {
   bits.setFloat64(0, value);
@@ -52,12 +56,16 @@ export class ModelRegistry {
         if (!owner) throw new TypeError('Public method has no live document');
         return owner.invoke(shared?owner.registration.sharedIds.get(identity):method.id, receiver, argumentsValue);
       };
-      // Keep the outline helper's intrinsic arity: rewriting it changes
+      // Keep built-in helpers' intrinsic arity: rewriting it changes
       // Firefox's observed ordering of ordinary function properties.
       const callable=(shared&&shared.callable)||(constructible?
+        method.arity===1?{[method.name]:function(_first){return dispatch(this,Array.from(arguments));}}[method.name]:
         {[method.name]:function(_first,_second){return dispatch(this,Array.from(arguments));}}[method.name]:
         {[method.name](...argumentsValue){return dispatch(this,argumentsValue);}}[method.name]);
-      if(!constructible||method.arity!==2)Object.defineProperty(callable, 'length', {value: method.arity, configurable: true});
+      // Firefox materializes ordinary function properties lazily. Pinned
+      // exported helpers have their prototype before length is first observed.
+      if(constructible)void callable.prototype;
+      if(!constructible||(method.arity!==1&&method.arity!==2))Object.defineProperty(callable, 'length', {value: method.arity, configurable: true});
       if(shared)shared.callable=callable;
       registration.functions.set(method.id, callable);
       registration.functionIds.set(callable, method.id);
@@ -114,6 +122,7 @@ export class ModelBridge {
       const id = this.objects.length, node = graph.nodes[id];
       let value;
       switch (node.kind) {
+        case 'error': {const Constructor=errorConstructors[node.errorType];if(!Constructor)throw new TypeError('Unknown native Error brand');value=new Constructor(node.properties.some(p=>this.strings[p.key]==='message')?'':undefined);break;}
         case 'instance': value = Object.create(this.registration.prototypes.get(node.prototype)); break;
         case 'object': value = {}; break;
         case 'array': value = new Array(node.length); break;
@@ -128,6 +137,7 @@ export class ModelBridge {
       const object = this.objects[id], keys = new Set(node.properties.map(property => this.strings[property.key]));
       for (const key of Object.getOwnPropertyNames(object)) {
         if (node.kind === 'array' && key === 'length') continue;
+        if (node.kind === 'error' && errorDiagnostics.has(key) && !keys.has(key)) continue;
         if (!keys.has(key) && !Reflect.deleteProperty(object, key)) throw new TypeError('Native graph removed a non-configurable property');
       }
       if (node.kind === 'map') {
@@ -202,7 +212,7 @@ export class ModelBridge {
         }
         case 'object': {
           const prototype = Object.getPrototypeOf(value);
-          if (!(Array.isArray(value) || value instanceof Map || value instanceof Set || value instanceof Date || prototype === Object.prototype || this.registration.prototypeIds.has(prototype))) return host(value);
+          if (!(Array.isArray(value) || value instanceof Map || value instanceof Set || value instanceof Date || errorKind(value) || prototype === Object.prototype || this.registration.prototypeIds.has(prototype))) return host(value);
           let id = this.ids.get(value);
           if (id === undefined) {
             id = this.objects.length; if (id >= 1_000_000) budget(); this.objects.push(value); this.ids.set(value, id);
@@ -222,7 +232,10 @@ export class ModelBridge {
         if (Array.isArray(value) && key === 'length') {
           if (descriptor.writable) continue;
         }
-        if (!Object.hasOwn(descriptor, 'value')) throw new TypeError('Accessor properties require an explicit public model codec');
+        if (!Object.hasOwn(descriptor, 'value')) {
+          if(errorKind(value)&&errorDiagnostics.has(key))continue; // Host-generated lazy stack accessors stay local.
+          throw new TypeError('Accessor properties require an explicit public model codec');
+        }
         if (++propertiesCount > 8_000_000) budget();
         properties.push({key: string(key), value: atom(descriptor.value), flags:
           (descriptor.enumerable ? 1 : 0) | (descriptor.writable ? 2 : 0) | (descriptor.configurable ? 4 : 0)});
@@ -242,6 +255,7 @@ export class ModelBridge {
         nodes[id] = {kind:'set', values, properties};
       }
       else if (value instanceof Date) nodes[id] = {kind: 'date', milliseconds: numberBits(Date.prototype.getTime.call(value)), properties};
+      else if (errorKind(value)) nodes[id]={kind:'error',errorType:errorKind(value),properties};
       else if (Array.isArray(value)) nodes[id] = {kind: 'array', length: value.length, properties};
       else {
         const prototype = this.registration.prototypeIds.get(Object.getPrototypeOf(value));

@@ -1,13 +1,9 @@
 # Development mutable model interfaces
 
 The source-built development branch has all 33 diagram renderers. All 33
-families expose mutable public models through Rust and Swift/C. Twenty-three
-also expose browser WASM models: Pie, Info, Sankey, Packet, Radar, Quadrant,
-Treemap, Journey, XYChart, Kanban, Mindmap, Timeline, Flowchart, Swimlane, ER,
-Architecture, GitGraph, AgentFlow, Ishikawa, Class, EventModeling, TreeView and
-State. The ten additional native/Swift families are Venn, Sequence, Gantt, C4,
-Requirement, Usecase, Cynefin, Railroad, Wardley and Block; their browser checkpoint
-remains pending.
+families expose mutable public models through Rust, Swift/C and browser WASM.
+The final browser batch adds Venn, Sequence, Gantt, C4, Requirement, Usecase,
+Cynefin, Railroad, Wardley and Block. Full API release verification remains open.
 Methods are available where inventoried. All thirty-four AgentFlow method
 descriptors now have native implementations, including returned Error values.
 The published v0.1.0 binary remains the earlier flowchart subset.
@@ -39,8 +35,7 @@ result remains `swimlane` while its model type remains `flowchart`. The imported
 outline helper also retains its ordinary constructible-function prototype and
 constructor backlink; class methods remain nonconstructible. Model constructors and mutation of
 prototype definitions report an unavailable capability. Methods require a live
-owned document. Unimplemented family codecs keep the existing immutable owned
-model path; their renderers remain available.
+owned document. Every built-in family uses the mutable owned model path.
 
 `PeleError` is exported by both development entries with the upstream
 message/code/info constructor. `PeleCompatibilityError` aliases the same class;

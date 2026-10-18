@@ -1,5 +1,6 @@
 // PELGBIN1 transports identity tables. Diagram state and behavior stay in Rust.
 import {PeleError} from './errors.js';
+const errorTypes=['error','pele','type','range','syntax','reference','eval','uri'];
 const BUDGET=64*1024*1024,magic=[80,69,76,71,66,73,78,49];
 const invalid=()=>new PeleError('Invalid public binary graph transport','semantic');
 const limit=()=>new PeleError('Public binary graph exceeds transport budget','limit');
@@ -12,6 +13,7 @@ export function encodeGraphBinary(revision,graph,metadata=new Uint8Array()){
   for(const node of graph.nodes){
     size+=1+propertiesSize(node.properties);
     switch(node.kind){
+      case'error':size+=1;break;
       case'instance':case'array':size+=4;break;
       case'date':size+=8;break;
       case'map':size+=4;for(const[k,v]of node.entries)size+=atomSize(k)+atomSize(v);break;
@@ -36,6 +38,7 @@ export function encodeGraphBinary(revision,graph,metadata=new Uint8Array()){
   for(const s of graph.strings){u32(s.length);for(const unit of s){if(!Number.isInteger(unit)||unit<0||unit>65535)throw invalid();view.setUint16(offset,unit,true);offset+=2;}}
   u32(graph.nodes.length);
   for(const node of graph.nodes){switch(node.kind){
+    case'error':{const tag=errorTypes.indexOf(node.errorType);if(tag<0)throw invalid();u8(6);u8(tag);break;}
     case'object':u8(0);break;case'instance':u8(1);u32(node.prototype);break;
     case'array':u8(2);u32(node.length);break;
     case'map':u8(3);u32(node.entries.length);for(const[k,v]of node.entries){atom(k);atom(v);}break;
@@ -69,6 +72,7 @@ export function decodeGraphBinary(bytes){
   n=count(1_000_000,5);
   for(let i=0;i<n;i++){
     let node;switch(u8()){
+      case 6:{const type=u8();if(type>=errorTypes.length)throw invalid();node={kind:'error',errorType:errorTypes[type]};break;}
       case 0:node={kind:'object'};break;
       case 1:node={kind:'instance',prototype:u32()};break;
       case 2:node={kind:'array',length:u32()};break;

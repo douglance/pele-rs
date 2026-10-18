@@ -3,7 +3,8 @@ import {test,expect} from '@playwright/test';
 test('stateful WASM render outcomes retain graph ownership through failure and recovery',async({page})=>{
   await page.goto('/examples/web/');
   const report=await page.evaluate(async()=>{
-    const {loadRenderer,metricsMeasurer}=await import('/dist/package-web/package/full.js');
+    const {loadRenderer,metricsMeasurer,PeleError}=await import('/dist/package-web/package/full.js');
+    const oracle=await import('/dist/evidence/pele-oracle.js');
     const engine=await loadRenderer(),wasm=await import('/dist/package-web/package/pkg/pele.js');
     const parsed=wasm.parse_v2('info title Retained state','{}'),document=parsed.to_public();
     parsed.free();
@@ -15,11 +16,18 @@ test('stateful WASM render outcomes retain graph ownership through failure and r
       const failed=value(document.render_operation_with_resources('2','{}',()=>{throw new Error('host failure');},undefined));
       const snapshot=value(document.snapshot());
       const recovered=value(document.render_operation_with_resources('3','{}',metricsMeasurer.width,undefined));
-      const model=engine.parse('info title Public recovery');
+      const model=engine.parse('info title Public recovery'),reference=oracle.parse('info title Public recovery');
       const failures=[];
       for(const sentinel of [undefined,null,false,new Error('identity'),new RangeError('guard')]) {
+        let expected;
+        try{oracle.render(reference,{measurer:{width(){throw sentinel;}}});}catch(error){expected=error;}
         try{engine.render(model,{measurer:{width(){throw sentinel;}}});failures.push('missing callback throw');}
-        catch(error){if(sentinel instanceof RangeError?error.name!=='PeleError'||error.code!=='limit':error!==sentinel)failures.push('callback value');}
+        catch(error){
+          if(sentinel instanceof RangeError){
+            const fields=e=>({name:e?.name,message:e?.message,code:e?.code,type:e?.type,line:e?.line,column:e?.column,snippet:e?.snippet});
+            if(!(error instanceof PeleError)||error.code!=='limit'||JSON.stringify(fields(error))!==JSON.stringify(fields(expected)))failures.push('pinned RangeError guard');
+          }else if(error!==sentinel||expected!==sentinel)failures.push('callback value');
+        }
         if(!engine.render(model,{measurer:metricsMeasurer}).svg.includes('Public recovery'))failures.push('recovery');
       }
       engine.dispose(model);

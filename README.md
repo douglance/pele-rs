@@ -45,8 +45,7 @@ and web `@unlocalhosted/pele-rs/core` APIs. The development `Pele.Engine` and we
 callbacks, and native SVG palette resolution. The released Swift binary remains v0.1;
 its matching legacy API stays available without a local build. See
 [development verification](docs/FULL_PARITY_PROGRESS.md) for current evidence and
-remaining work. All 33 source-built families now support native Rust and Swift mutable owned models;
-twenty-three also expose browser mutable models. See
+remaining work. All 33 source-built families now support native Rust, Swift and browser mutable owned models. See
 [mutable model APIs](docs/MUTABLE_MODELS.md) for methods, ownership and remaining boundaries. Detection alone does not imply parsing/rendering support.
 The additive native/Swift [source-limit API](docs/SOURCE_LIMITS.md) preserves
 undefined, null and exact IEEE number comparisons before source preparation.

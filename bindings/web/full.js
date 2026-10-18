@@ -1,4 +1,9 @@
-import initialize, { parse_v2, render_with_resources, builtin_capabilities } from './pkg/pele.js';
+import {parseLimitOptions, parseLimitValues} from './parse-limits.js';
+export {loadRegistry} from './registry.js';
+import {mountWith} from './mount.js';
+export {enableZoom} from './zoom.js';
+import initialize, { parse_v2, render_numbers_with_resources, builtin_capabilities, NativeRegistry } from './pkg/pele.js';
+import {renderNumericOptions} from './render-numbers.js';
 import {encodeGraphBinary,decodeGraphBinary} from './graph-binary.js';
 import {fromNativeError} from './errors.js';
 export {PeleError, PeleError as PeleCompatibilityError} from './errors.js';
@@ -10,6 +15,10 @@ function result(json) {
   if (envelope.version !== 2) throw new Error('Unsupported compatibility contract');
   if (!envelope.ok) throw fromNativeError(envelope.error);
   return renderedValue(envelope.result);
+}
+function nativeValue(call) {
+  try { return result(call()); }
+  catch (error) { if (typeof error === 'string') return result(error); throw error; }
 }
 function binaryResult(call) {
   try {const exchange=decodeGraphBinary(call());return {revision:exchange.revision,graph:exchange.graph,result:exchange.metadata};}
@@ -49,18 +58,33 @@ function operationError(error, bridge) {
 /** Implemented built-ins. Core rendering remains Rust; this adapter owns model lifetimes only. */
 export async function loadRenderer(moduleOrPath) {
   await initialize(moduleOrPath === undefined ? undefined : { module_or_path: moduleOrPath });
+  return createRenderer(new NativeRegistry(true));
+}
+
+// Internal host factory: one native registration owner, independent model lifetimes.
+export function createRenderer(nativeRegistry) {
   const documents = new WeakMap(), registry = new ModelRegistry();
   const finalizer = typeof FinalizationRegistry === 'function' ? new FinalizationRegistry(handle => handle.free()) : null;
   const renderer = {
-    capabilities() { return result(builtin_capabilities()); },
+    capabilities() { return nativeRegistry ? nativeValue(() => nativeRegistry.capabilities()) : result(builtin_capabilities()); },
+    registered(type) { return nativeValue(() => nativeRegistry.registered(type)); },
+    registerBuiltin(type) { nativeValue(() => { nativeRegistry.register_builtin(type); return '{"version":2,"ok":true,"result":null}'; }); },
+    detectType(source) { return nativeValue(() => nativeRegistry.detect_type(source)); },
+    supports(source) { return nativeValue(() => nativeRegistry.supports(source)); },
+    close() { nativeRegistry.close(); },
     parse(source, options = {}) {
       let document;
-      try { document = parse_v2(source, JSON.stringify(options)); }
+      try {
+        if (nativeRegistry) {
+          const limits = parseLimitOptions(options);
+          document = nativeRegistry.parse(source, limits.json, limits.sourceKind, limits.sourceValue, limits.edgeKind, limits.edgeValue);
+        } else document = parse_v2(source, JSON.stringify(options));
+      }
       catch (error) { if (typeof error === 'string') return result(error); throw error; }
       try {
-        const mutable = document.to_public();
+        const mutable = nativeRegistry ? document : document.to_public();
         if (mutable) {
-          document.free(); document = mutable;
+          if (document !== mutable) document.free(); document = mutable;
           const snapshot = binaryResult(()=>mutable.snapshot_binary()), schema = result(mutable.schema());
           const entry = {handle: mutable, revision: snapshot.revision, disposed: false};
           const bridge = new ModelBridge(snapshot.graph, schema, registry, (method, receiver, argumentsValue) => {
@@ -137,24 +161,33 @@ export async function loadRenderer(moduleOrPath) {
       } catch (error) { document.free(); if (typeof error === 'string') return result(error); throw error; }
     },
     render(input, options = {}) {
+      let callbackError, callbackFailed = false;
       try {
         const measurer = options.measurer ?? defaultMeasurer(options.fontFamily);
-        let callbackError, callbackFailed = false;
         const width = (text, size, style) => { try { return measurer.width(text, size, style); } catch (e) { callbackFailed = true; callbackError = e; throw e; } };
         const icons = options.icons && (name => { try { return options.icons(name); } catch (e) { callbackFailed = true; callbackError = e; throw e; } });
+        const clock = () => { try { return Date.now(); } catch (e) { callbackFailed = true; callbackError = e; throw e; } };
+        const numeric = renderNumericOptions(typeof input === 'string' ? options : {...options, limit: undefined, maxEdges: undefined, config: undefined});
+        const numericArguments = [numeric.json, numeric.mask, numeric.numbers, numeric.outputKind, numeric.output, width, icons, clock];
         let json, operation, bridge;
-        if (typeof input === 'string') json = render_with_resources(input, JSON.stringify(options), width, icons);
+        if (typeof input === 'string') {
+          if (nativeRegistry) {
+            const limits = parseLimitValues(options);
+            json = nativeRegistry.render_numbers_with_resources(input, numeric.json, numeric.mask, numeric.numbers, numeric.outputKind, numeric.output,
+              limits.sourceKind, limits.sourceValue, limits.edgeKind, limits.edgeValue, width, icons, clock);
+          } else json = render_numbers_with_resources(input, ...numericArguments);
+        }
         else {
           const document = documents.get(input);
           if (!document) throw new TypeError('render() takes diagram text or a model that parse() returned.');
           if (document.bridge) {
             bridge=document.bridge;
             document.revision = result(document.handle.apply_binary(encodeGraphBinary(document.revision,bridge.snapshot().graph)));
-            const outcome=binaryResult(()=>document.handle.render_operation_binary(document.revision,JSON.stringify(options),width,icons));
+            const outcome=binaryResult(()=>document.handle.render_numbers_operation_binary(document.revision,...numericArguments));
             document.revision=outcome.revision;
             bridge.reconcile(outcome.graph);
             operation=outcome.result;
-          } else json = document.handle.render_with_resources(JSON.stringify(options), width, icons);
+          } else json = document.handle.render_numbers_with_resources(...numericArguments);
         }
         // Publish native partial state before restoring the original host throw.
         if (callbackFailed) throw callbackError;
@@ -163,8 +196,9 @@ export async function loadRenderer(moduleOrPath) {
           return renderedValue(operation.Ok);
         }
         return result(json);
-      } catch(error) { throw renderError(error); }
+      } catch(error) { if (callbackFailed) throw renderError(callbackError); throw renderError(error); }
     },
+    mount(element, source, options = {}) { return mountWith(renderer, element, source, options); },
     query(model, operation, argumentsValue = null) {
       const document = documents.get(model);
       if (!document) throw new TypeError('query() takes a model that parse() returned.');

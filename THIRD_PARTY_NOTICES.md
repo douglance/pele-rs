@@ -16,6 +16,9 @@
   exact versions and sources are recorded in `Cargo.lock` and `package-lock.json`.
   Pele's npm package is a development-only compatibility oracle, not a runtime
   dependency or a renderer used by the playground.
+- **Lucide rotate-ccw icon**: Copyright 2026 Lucide Icons and Contributors, ISC.
+  The browser zoom adapter retains the complete notice in `bindings/web/zoom.js`,
+  copied with the pinned Pele host adapter. Its diagram geometry stays in Rust.
 
 The Rust source is MIT licensed under the root [LICENSE](LICENSE). See
 [UPSTREAM.md](UPSTREAM.md) for the implementation relationship and limitations.

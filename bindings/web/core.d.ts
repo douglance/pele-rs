@@ -1,3 +1,4 @@
+export {loadRegistry, type Registry} from './registry.js';
 export type DiagramType = 'flowchart' | 'sequence' | 'class' | 'state' | 'er' | 'pie' | 'gantt' | 'gitGraph' | 'mindmap' | 'timeline' | 'journey' | 'xychart' | 'quadrantChart' | 'requirement' | 'c4' | 'sankey' | 'block' | 'packet' | 'kanban' | 'architecture' | 'radar' | 'treemap' | 'info' | 'agentflow' | 'usecase' | 'railroad' | 'treeView' | 'venn' | 'cynefin' | 'wardley' | 'swimlane' | 'ishikawa' | 'eventmodeling';
 export type DiagramId = DiagramType | (string & {});
 export type ConfigValue = null | boolean | number | string | ConfigValue[] | { [key: string]: ConfigValue };

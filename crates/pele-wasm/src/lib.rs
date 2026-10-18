@@ -1,3 +1,8 @@
+mod parse_limits;
+mod public_remaining_er;
+mod public_remaining_info;
+mod render_numbers;
+mod wasm_registry;
 use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen]
@@ -110,6 +115,10 @@ impl ParsedDocument {
             PublicDocument::from_module(State, model, self.inner.config().clone())
         } else if let Some(model) = self.inner.model::<TreeViewModel>() {
             PublicDocument::from_module(TreeView, model, self.inner.config().clone())
+        } else if let Some(document) = public_remaining_er::convert(&self.inner)
+            .or_else(|| public_remaining_info::convert(&self.inner))
+        {
+            document
         } else {
             return Ok(None);
         };
