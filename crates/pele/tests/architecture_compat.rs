@@ -215,7 +215,8 @@ fn architecture_nested_boundary_ports_icons_narrow_reuse_and_native_pixels() {
                 "architecture-beta\ngroup g\nservice a in g\nservice b in g\na{group}:R -- L:b",
                 &ParseOptions::default()
             )
-            .err().unwrap()
+            .err()
+            .unwrap()
             .code,
         ErrorCode::Semantic
     );

@@ -118,7 +118,11 @@ pub struct Ast {
 fn label_value(s: &str) -> String {
     let mut s = s[1..s.len() - 1].trim_matches(space).to_string();
     if (s.starts_with('"') && s.ends_with('"')) || (s.starts_with('\'') && s.ends_with('\'')) {
-        s = s.get(1..s.len().saturating_sub(1)).unwrap_or("").replace("\\\"", "\"").replace("\\'", "'")
+        s = s
+            .get(1..s.len().saturating_sub(1))
+            .unwrap_or("")
+            .replace("\\\"", "\"")
+            .replace("\\'", "'")
     }
     s.trim_matches(space).into()
 }
