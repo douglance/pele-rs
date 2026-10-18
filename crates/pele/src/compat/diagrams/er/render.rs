@@ -148,7 +148,7 @@ fn text_left(
             if let Some(icon) = &span.icon {
                 let side = label.size * 1.1;
                 let markup = resources
-                    .icon(icon)?
+                    .direct_icon(icon)?
                     .map(|s| s.markup().to_owned())
                     .unwrap_or_default();
                 extra.push_str(&format!("<svg class=\"pele-icon\" data-icon=\"{}\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">{markup}</svg>",esc_text(icon)?,num(sx),num(y-label.size*0.35-side/2.),num(side),num(side)))

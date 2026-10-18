@@ -6,7 +6,7 @@ use wasm_bindgen::prelude::*;
 
 #[wasm_bindgen(js_name = NativeRegistry)]
 pub struct NativeRegistry {
-    inner: Option<PublicEngine>,
+    pub(super) inner: Option<PublicEngine>,
     foreign: HashMap<DiagramType, JsValue>,
 }
 fn closed() -> PeleError {

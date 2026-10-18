@@ -37,7 +37,7 @@ fn method(provider: &JsValue, name: &str) -> Result<Function, JsValue> {
 fn text(value: JsValue, name: &str) -> Result<String, JsValue> {
     value.as_string().ok_or_else(|| native(invalid(name)))
 }
-fn config_json(config: &Object) -> Result<String, PeleError> {
+pub(super) fn config_json(config: &Object) -> Result<String, PeleError> {
     let mut pending: Vec<_> = config
         .entries()
         .into_iter()
@@ -113,6 +113,12 @@ pub(super) fn prepare(
             arguments,
         }),
     })
+}
+pub(super) fn retained_policy(kind: DiagramType) -> ForeignDocument {
+    ForeignDocument {
+        kind,
+        pending: None,
+    }
 }
 #[wasm_bindgen]
 impl ForeignDocument {

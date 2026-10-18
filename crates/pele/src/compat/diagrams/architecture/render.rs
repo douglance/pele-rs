@@ -48,7 +48,7 @@ fn icon_slot(
     r: &mut dyn RenderResources,
 ) -> Result<String, PeleError> {
     let inner = r
-        .icon(name)?
+        .direct_icon(name)?
         .map_or_else(|| builtin(name), |s| s.markup().to_string());
     Ok(format!("<svg class=\"pele-icon\" data-icon=\"{}\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">{inner}</svg>",esc_text(name)?,num(x),num(y),num(side),num(side)))
 }

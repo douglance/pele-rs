@@ -1,3 +1,4 @@
+import {builtinDiagramType,builtinDiagramOrigin,ownRawModel,withBuiltinIcons,builtinInlineIcons} from './builtin-entries.js';
 import {parseLimitOptions, parseLimitValues} from './parse-limits.js';
 export {loadRegistry} from './registry.js';
 import {mountWith} from './mount.js';
@@ -74,11 +75,15 @@ function operationError(error, bridge) {
 /** Implemented built-ins. Core rendering remains Rust; this adapter owns model lifetimes only. */
 export async function loadRenderer(moduleOrPath) {
   await initialize(moduleOrPath === undefined ? undefined : { module_or_path: moduleOrPath });
-  return createRenderer(new NativeRegistry(true));
+  const [{allDiagramEntries},{loadDiagramEntries}] = await Promise.all([import('./all-diagram-entries.js'),import('./diagram-entries.js')]);
+  await loadDiagramEntries(moduleOrPath);
+  return createRenderer(new NativeRegistry(true),allDiagramEntries);
 }
 
 // Internal host factory: one native registration owner, independent model lifetimes.
-export function createRenderer(nativeRegistry) {
+export function createRenderer(nativeRegistry, canonicalProviders = []) {
+  const liveProviders=new Map(canonicalProviders.map(provider=>[provider.type,{provider,native:true}]));
+  function syncProviders(){for(const [type,entry] of liveProviders){const native=builtinDiagramType(entry.provider)===type;if(native!==entry.native){if(native)registryCall(()=>nativeValue(()=>{nativeRegistry.register_builtin(type);return '{"version":2,"ok":true,"result":null}';}));else registryCall(()=>foreignValue(()=>nativeRegistry.register_foreign(type,entry.provider)));entry.native=native;}}}
   const documents = new WeakMap(), registry = new ModelRegistry();
   const finalizer = typeof FinalizationRegistry === 'function' ? new FinalizationRegistry(handle => handle.free()) : null;
   let registryBusy = false;
@@ -87,6 +92,7 @@ export function createRenderer(nativeRegistry) {
     registryBusy = true; try { return operation(); } finally { registryBusy = false; }
   };
   function foreignParse(source, options) {
+    syncProviders();
     if (!nativeRegistry?.has_foreign()) return null;
     const limits = parseLimitOptions(options);
     const handle = registryCall(() => foreignValue(() => nativeRegistry.parse_foreign(source, limits.json,
@@ -108,20 +114,75 @@ export function createRenderer(nativeRegistry) {
       // Passive parse options remain visible to custom renderers. Only their
       // native render-policy decoding is omitted on this retained-model path.
       const numeric = renderNumericOptions({...options, limit: undefined, maxEdges: undefined, config: undefined});
-      return foreignValue(() => entry.handle.render(model, entry.provider, entry.config, finiteConfigJSON(entry.config), callbackOptions,
-        numeric.json, numeric.mask, numeric.numbers, numeric.outputKind, numeric.output));
+      return withBuiltinIcons(callbackOptions.icons,()=>foreignValue(() => (entry.policy??entry.handle).render(model, entry.provider, entry.config, finiteConfigJSON(entry.config), callbackOptions,
+        numeric.json, numeric.mask, numeric.numbers, numeric.outputKind, numeric.output)));
     } finally { entry.busy = false; }
+  }
+  function adoptMutable(mutable, preparedType) {
+          const snapshot = binaryResult(()=>mutable.snapshot_binary()), schema = result(mutable.schema());
+          const rawType=mutable.entry_type(), live=preparedType===undefined?liveProviders.get(rawType):undefined;
+          const entry = {handle: mutable, revision: snapshot.revision, disposed: false, preparedType,rawType,provider:live?.provider};
+          const bridge = new ModelBridge(snapshot.graph, schema, registry, (method, receiver, argumentsValue) => {
+            if (entry.disposed) throw new TypeError('Public model document is disposed');
+            const input = bridge.snapshot([receiver, ...argumentsValue]);
+            entry.revision = result(mutable.apply_binary(encodeGraphBinary(entry.revision,input.graph)));
+            const outcome = binaryResult(()=>mutable.invoke_binary(entry.revision, JSON.stringify({method, receiver: input.values[0], arguments: input.values.slice(1)})));
+            entry.revision = outcome.revision;
+            bridge.reconcile(outcome.graph);
+            if (Object.hasOwn(outcome.result, 'Err')) throw operationError(outcome.result.Err, bridge);
+            return bridge.value(outcome.result.Ok);
+          });
+          entry.bridge = bridge;
+          const model = bridge.root;
+          documents.set(model, entry);
+          ownRawModel(model,rawType,(config,options)=>renderer.renderRaw(rawType,model,config,options));
+          finalizer?.register(model, mutable, model);
+          return model;
   }
   const renderer = {
     capabilities() { return nativeRegistry ? nativeValue(() => nativeRegistry.capabilities()) : result(builtin_capabilities()); },
     registered(type) { return nativeValue(() => nativeRegistry.registered(type)); },
     register(...providers) {
-      for (const provider of providers) registryCall(() => foreignValue(() => nativeRegistry.register_foreign(provider.type, provider)));
+      for (const provider of providers) {
+        const builtin=builtinDiagramType(provider);
+        if(builtin!==undefined){registryCall(()=>nativeValue(()=>{nativeRegistry.register_builtin(builtin);return '{"version":2,"ok":true,"result":null}';}));liveProviders.set(builtin,{provider,native:true});}
+        else {registryCall(() => foreignValue(() => nativeRegistry.register_foreign(provider.type, provider)));if(builtinDiagramOrigin(provider)!==undefined)liveProviders.set(provider.type,{provider,native:false});else liveProviders.delete(provider.type);}
+      }
     },
-    registerBuiltin(type) { registryCall(() => nativeValue(() => { nativeRegistry.register_builtin(type); return '{"version":2,"ok":true,"result":null}'; })); },
+    registerBuiltin(type) { registryCall(() => nativeValue(() => { nativeRegistry.register_builtin(type); return '{"version":2,"ok":true,"result":null}'; }));liveProviders.delete(type); },
     detectType(source) { return nativeValue(() => nativeRegistry.detect_type(source)); },
     supports(source) { return nativeValue(() => nativeRegistry.supports(source)); },
     close() { registryCall(() => nativeRegistry.close()); },
+    // Internal low-level entry adapters. Models stay in their native document;
+    // neither prepared sources nor raw results cross core preprocessing.
+    parsePrepared(type, source, config, title, lineOffset, maxEdges) {
+      const limits=parseLimitValues({maxEdges});
+      const handle=registryCall(()=>{try{return nativeRegistry.parse_prepared(type,source,finiteConfigJSON(config),title,lineOffset,limits.edgeKind,limits.edgeValue);}catch(error){if(typeof error==='string')return result(error);throw error;}});
+      try{return adoptMutable(handle,type);}catch(error){handle.free();throw error;}
+    },
+    renderRaw(type, model, config, options = {}) {
+      const entry=documents.get(model);
+      if(!entry?.bridge||entry.rawType!==type)throw new TypeError('Raw diagram render requires a model returned by this diagram entry');
+      if(entry.disposed)throw new TypeError('Public model document is disposed');
+      let callbackFailed=false,callbackError;
+      const capture=run=>{try{return run();}catch(error){callbackFailed=true;callbackError=error;throw error;}};
+      const measurer=options.measurer??defaultMeasurer(options.fontFamily);
+      const width=(text,size,style)=>capture(()=>measurer.width(text,size,style));
+      const icons=options.icons&&(name=>capture(()=>options.icons(name)));
+      const clock=()=>capture(()=>Date.now());
+      const inherited=builtinInlineIcons(),inline=inherited&&(name=>capture(()=>inherited(name)));
+      // These fields belong to core.parse/core.render and are passive in a raw
+      // built-in renderer. Removing them also avoids traversing unused config.
+      const numeric=renderNumericOptions({...options,limit:undefined,maxEdges:undefined,config:undefined,outputLimit:undefined,nativeTheme:undefined});
+      try {
+        entry.revision=result(entry.handle.apply_binary(encodeGraphBinary(entry.revision,entry.bridge.snapshot().graph)));
+        const outcome=binaryResult(()=>entry.handle.render_raw_operation_binary(entry.revision,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline));
+        entry.revision=outcome.revision;entry.bridge.reconcile(outcome.graph);
+        if(callbackFailed)throw callbackError;
+        if(Object.hasOwn(outcome.result,'Err'))throw operationError(outcome.result.Err,entry.bridge);
+        return renderedValue(outcome.result.Ok);
+      } catch(error){if(callbackFailed)throw callbackError;throw error;}
+    },
     parse(source, options = {}) {
       let foreign;
       try { foreign = foreignParse(source, options); } catch (error) { throw renderError(error); }
@@ -148,23 +209,7 @@ export function createRenderer(nativeRegistry) {
         const mutable = nativeRegistry ? document : document.to_public();
         if (mutable) {
           if (document !== mutable) document.free(); document = mutable;
-          const snapshot = binaryResult(()=>mutable.snapshot_binary()), schema = result(mutable.schema());
-          const entry = {handle: mutable, revision: snapshot.revision, disposed: false};
-          const bridge = new ModelBridge(snapshot.graph, schema, registry, (method, receiver, argumentsValue) => {
-            if (entry.disposed) throw new TypeError('Public model document is disposed');
-            const input = bridge.snapshot([receiver, ...argumentsValue]);
-            entry.revision = result(mutable.apply_binary(encodeGraphBinary(entry.revision,input.graph)));
-            const outcome = binaryResult(()=>mutable.invoke_binary(entry.revision, JSON.stringify({method, receiver: input.values[0], arguments: input.values.slice(1)})));
-            entry.revision = outcome.revision;
-            bridge.reconcile(outcome.graph);
-            if (Object.hasOwn(outcome.result, 'Err')) throw operationError(outcome.result.Err, bridge);
-            return bridge.value(outcome.result.Ok);
-          });
-          entry.bridge = bridge;
-          const model = bridge.root;
-          documents.set(model, entry);
-          finalizer?.register(model, mutable, model);
-          return model;
+          return adoptMutable(mutable);
         }
         const projection = result(document.model());
         const model = projection.model;
@@ -235,6 +280,10 @@ export function createRenderer(nativeRegistry) {
         } else {
           const foreign = documents.get(input);
           if (foreign?.foreign) return foreignRender(foreign, input, options);
+          if(foreign?.provider&&(foreign.policy||builtinDiagramType(foreign.provider)!==foreign.rawType)){
+            if(!foreign.policy){const values=foreignValue(()=>foreign.handle.live_provider_view());foreign.config=values[1];foreign.policy=values[2];}
+            return foreignRender(foreign,input,options);
+          }
         }
         const measurer = options.measurer ?? defaultMeasurer(options.fontFamily);
         const width = (text, size, style) => { try { return measurer.width(text, size, style); } catch (e) { callbackFailed = true; callbackError = e; throw e; } };
@@ -285,7 +334,7 @@ export function createRenderer(nativeRegistry) {
     dispose(model) {
       const document = documents.get(model);
       if (document?.busy) throw new TypeError('Public model document is already in use');
-      if (document) { documents.delete(model); document.disposed = true; if(document.bridge)document.bridge.disposed=true; finalizer?.unregister(model); document.handle.free(); }
+      if (document) { documents.delete(model); document.disposed = true; if(document.bridge)document.bridge.disposed=true; finalizer?.unregister(model); document.handle.free();document.policy?.free(); }
     }
   };
   return renderer;

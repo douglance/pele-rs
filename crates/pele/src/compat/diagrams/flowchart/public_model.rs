@@ -1991,6 +1991,13 @@ impl PublicDiagramModule for Flowchart {
     ) -> Result<Self::PublicState, PeleError> {
         create_state(m, Some(limit))
     }
+    fn create_public_prepared(
+        &self,
+        model: &FlowchartModel,
+        limit: crate::compat::EdgeLimit,
+    ) -> Result<Self::PublicState, PeleError> {
+        crate::compat::public::create_prepared_edge_public(self, model, limit)
+    }
     fn export_public(&self, s: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())
     }

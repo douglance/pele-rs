@@ -561,7 +561,7 @@ fn draw(
             };
             let glyph = bx * 0.6;
             let markup = resources
-                .icon(icon)?
+                .direct_icon(icon)?
                 .map(|v| v.markup().to_owned())
                 .unwrap_or_default();
             format!("{frame}<svg class=\"pele-icon\" data-icon=\"{}\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">{markup}</svg>",esc_text(icon)?,num(-glyph/2.),num(top+(bx-glyph)/2.),num(glyph),num(glyph))

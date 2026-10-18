@@ -22,6 +22,13 @@ impl PublicDiagramModule for Swimlane {
     ) -> Result<Self::PublicState, PeleError> {
         Flowchart.create_public_with_edge_limit(model, limit)
     }
+    fn create_public_prepared(
+        &self,
+        model: &SwimlaneModel,
+        limit: crate::compat::EdgeLimit,
+    ) -> Result<Self::PublicState, PeleError> {
+        crate::compat::public::create_prepared_edge_public(self, model, limit)
+    }
     fn export_public(&self, state: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Flowchart.export_public(state)
     }

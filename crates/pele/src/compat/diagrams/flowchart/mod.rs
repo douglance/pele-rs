@@ -44,6 +44,18 @@ impl DiagramModule for Flowchart {
     ) -> Result<Self::Model, PeleError> {
         parser::parse_with_edge_limit(context, limit)
     }
+    fn parse_prepared(
+        &self,
+        context: ParseContext<'_>,
+        limit: crate::compat::EdgeLimit,
+    ) -> Result<Self::Model, PeleError> {
+        // The raw JavaScript count >= undefined comparison never rejects.
+        let limit = match limit {
+            crate::compat::EdgeLimit::Undefined => crate::compat::EdgeLimit::Number(f64::NAN),
+            other => other,
+        };
+        self.parse_with_edge_limit(context, limit)
+    }
     fn render(
         &self,
         model: &Self::Model,

@@ -11,7 +11,7 @@ pub(crate) fn icon_svg(
     r: &mut dyn RenderResources,
 ) -> Result<String, PeleError> {
     let inner = r
-        .icon(name)?
+        .direct_icon(name)?
         .map(|s| s.markup().to_string())
         .unwrap_or_default();
     Ok(format!(

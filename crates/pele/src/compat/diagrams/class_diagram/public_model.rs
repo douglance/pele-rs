@@ -1503,6 +1503,16 @@ impl PublicDiagramModule for Class {
     ) -> Result<Rendered, PeleError> {
         self.render(s.model.as_ref().map_err(Clone::clone)?, c, o, h)
     }
+    fn render_public_raw_operation(
+        &self,
+        s: &mut ClassPublicState,
+        c: &Object,
+        o: &RenderSettings,
+        h: &mut dyn RenderResources,
+    ) -> Result<Rendered, PublicError> {
+        self.render_raw(s.model.as_ref().map_err(Clone::clone)?, c, o, h)
+            .map_err(Into::into)
+    }
     fn render_public_operation_with_output_limit(
         &self,
         s: &mut ClassPublicState,

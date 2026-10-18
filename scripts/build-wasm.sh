@@ -12,6 +12,8 @@ CARGO_PROFILE_RELEASE_PANIC=abort CARGO_PROFILE_RELEASE_OPT_LEVEL=s \
 mkdir -p dist/wasm dist/evidence
 # Test oracle only, never included in the distributed WASM package.
 cp node_modules/pele/dist/pele.js dist/evidence/pele-oracle.js
+mkdir -p dist/evidence/pele-esm
+cp -R node_modules/pele/dist/esm/. dist/evidence/pele-esm/
 wasm-bindgen target/wasm32-unknown-unknown/release/pele_wasm.wasm \
   --target web --out-dir dist/wasm --out-name pele
 mkdir -p bindings/web/pkg

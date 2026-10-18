@@ -30,6 +30,14 @@
     "./lazy": {
       "types": "./lazy.d.ts",
       "import": "./lazy.js"
+    },
+    "./diagrams": {
+      "types": "./diagram-entries.d.ts",
+      "import": "./diagram-entries.js"
+    },
+    "./diagrams/*": {
+      "types": "./diagrams/*.d.ts",
+      "import": "./diagrams/*.js"
     }
   },
   "files": [
@@ -61,7 +69,12 @@
     "lazy.js",
     "lazy.d.ts",
     "parse-limits.js",
-    "REGISTRY.md"
+    "REGISTRY.md",
+    "diagram-entries.js",
+    "diagram-entries.d.ts",
+    "diagrams/",
+    "builtin-entries.js",
+    "all-diagram-entries.js"
   ],
   "publishConfig": {
     "access": "public"

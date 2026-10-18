@@ -134,6 +134,18 @@ impl DiagramModule for Swimlane {
     ) -> Result<Self::Model, PeleError> {
         flowchart::Flowchart.parse_with_edge_limit(c, limit)
     }
+    fn parse_prepared(
+        &self,
+        context: ParseContext<'_>,
+        limit: crate::compat::EdgeLimit,
+    ) -> Result<Self::Model, PeleError> {
+        // The raw JavaScript count >= undefined comparison never rejects.
+        let limit = match limit {
+            crate::compat::EdgeLimit::Undefined => crate::compat::EdgeLimit::Number(f64::NAN),
+            other => other,
+        };
+        self.parse_with_edge_limit(context, limit)
+    }
     fn render(
         &self,
         m: &Self::Model,

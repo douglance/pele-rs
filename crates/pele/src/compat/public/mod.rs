@@ -5,7 +5,7 @@ mod graph;
 mod host_function;
 pub use host_function::{ActiveModel, HostFunction};
 mod schema;
-pub use engine::{PublicDiagramModule, PublicDocument, PublicEngine};
+pub use engine::{PublicDiagramModule, PublicDocument, PublicEngine, RawRenderOutcome};
 pub use graph::{Atom, ErrorObjectKind, GraphWriter, JsString, ModelGraph, Node, Property};
 
 pub use schema::{
@@ -19,3 +19,5 @@ mod binary;
 pub use binary::{
     decode_binary_exchange, encode_binary_exchange, BinaryExchange, DEFAULT_BINARY_BUDGET,
 };
+
+pub(crate) use engine::create_prepared_edge_public;

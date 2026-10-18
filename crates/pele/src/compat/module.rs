@@ -158,6 +158,11 @@ pub trait RenderResources {
     fn icon(&mut self, _name: &str) -> Result<Option<TrustedSvg>, PeleError> {
         Ok(None)
     }
+    /// An already-established outer core render may supply its inline icon
+    /// lookup to a nested raw diagram call. Standalone raw entries have none.
+    fn raw_inline_icon(&mut self, _name: &str) -> Result<Option<TrustedSvg>, PeleError> {
+        Ok(None)
+    }
     /// Direct host resolver: unlike inline-label icons, repeated calls are not cached.
     fn direct_icon(&mut self, name: &str) -> Result<Option<TrustedSvg>, PeleError> {
         self.icon(name)
@@ -224,6 +229,14 @@ pub trait DiagramModule: Send + Sync + 'static {
     ) -> Result<Self::Model, PeleError> {
         self.parse(context)
     }
+    /// Prepared low-level parsing keeps raw policy presence distinct from core defaults.
+    fn parse_prepared(
+        &self,
+        context: ParseContext<'_>,
+        limit: EdgeLimit,
+    ) -> Result<Self::Model, PeleError> {
+        self.parse_with_edge_limit(context, limit)
+    }
     fn render(
         &self,
         model: &Self::Model,
@@ -231,6 +244,17 @@ pub trait DiagramModule: Send + Sync + 'static {
         options: &RenderSettings,
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError>;
+    /// Raw low-level diagram rendering. Core postprocessing is not applied.
+    /// Override when a module privately enforces a core output threshold.
+    fn render_raw(
+        &self,
+        model: &Self::Model,
+        config: &Object,
+        options: &RenderSettings,
+        resources: &mut dyn RenderResources,
+    ) -> Result<Rendered, PeleError> {
+        self.render(model, config, options, resources)
+    }
     /// Exact post-render output policy. The engine owns the final comparison.
     /// Providers that privately enforce the legacy integer output_limit must
     /// override this hook to avoid rejecting before the exact comparison.

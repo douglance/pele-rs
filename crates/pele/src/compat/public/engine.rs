@@ -41,6 +41,15 @@ pub trait PublicDiagramModule: DiagramModule {
     ) -> Result<Self::PublicState, PeleError> {
         self.create_public(model)
     }
+    /// Prepared parsing preserves raw low-level policy presence. Core's
+    /// undefined default remains unchanged in create_public_with_edge_limit.
+    fn create_public_prepared(
+        &self,
+        model: &Self::Model,
+        limit: EdgeLimit,
+    ) -> Result<Self::PublicState, PeleError> {
+        self.create_public_with_edge_limit(model, limit)
+    }
     fn export_public(&self, state: &Self::PublicState) -> Result<ModelGraph, PeleError>;
     fn apply_public(
         &self,
@@ -58,6 +67,15 @@ pub trait PublicDiagramModule: DiagramModule {
     ) -> Result<Rendered, PublicError> {
         self.render_public(state, config, options, host)
             .map_err(Into::into)
+    }
+    fn render_public_raw_operation(
+        &self,
+        state: &mut Self::PublicState,
+        config: &Object,
+        settings: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<Rendered, PublicError> {
+        self.render_public_operation(state, config, settings, host)
     }
     /// Exact post-render output policy, retaining native JavaScript/host errors.
     /// Override when the provider privately enforces legacy integer output limits.
@@ -78,6 +96,47 @@ pub trait PublicDiagramModule: DiagramModule {
         options: &RenderSettings,
         host: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError>;
+}
+// Opted-in edge builders share the same ordinary options.maxEdges own field.
+pub(crate) fn create_prepared_edge_public<D: PublicDiagramModule>(
+    module: &D,
+    model: &D::Model,
+    limit: EdgeLimit,
+) -> Result<D::PublicState, PeleError> {
+    let mut state = module.create_public_with_edge_limit(model, limit)?;
+    if matches!(limit, EdgeLimit::Undefined) {
+        let mut graph = module.export_public(&state)?;
+        let Atom::Ref(root) = graph.root else {
+            return Err(PeleError::new(
+                "Prepared edge model has no root",
+                ErrorCode::Semantic,
+            ));
+        };
+        let options = graph.nodes[root as usize]
+            .properties()
+            .iter()
+            .find(|p| graph.strings[p.key as usize].is("options"))
+            .and_then(|p| {
+                if let Atom::Ref(id) = p.value {
+                    Some(id)
+                } else {
+                    None
+                }
+            })
+            .ok_or_else(|| {
+                PeleError::new("Prepared edge options are missing", ErrorCode::Semantic)
+            })?;
+        let position = graph.nodes[options as usize]
+            .properties()
+            .iter()
+            .position(|p| graph.strings[p.key as usize].is("maxEdges"))
+            .ok_or_else(|| {
+                PeleError::new("Prepared edge policy is missing", ErrorCode::Semantic)
+            })?;
+        graph.nodes[options as usize].properties_mut()[position].value = Atom::Undefined;
+        module.apply_public(&mut state, graph)?;
+    }
+    Ok(state)
 }
 struct Shared<D> {
     module: Arc<D>,
@@ -106,6 +165,13 @@ impl<D: DiagramModule> DiagramModule for Shared<D> {
     ) -> Result<Self::Model, PeleError> {
         self.module.parse_with_edge_limit(c, limit)
     }
+    fn parse_prepared(
+        &self,
+        c: ParseContext<'_>,
+        limit: EdgeLimit,
+    ) -> Result<Self::Model, PeleError> {
+        self.module.parse_prepared(c, limit)
+    }
     fn validate_model_projection(&self, m: &Self::Model) -> Result<(), PeleError> {
         self.module.validate_model_projection(m)
     }
@@ -117,6 +183,15 @@ impl<D: DiagramModule> DiagramModule for Shared<D> {
         h: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError> {
         self.module.render(m, c, o, h)
+    }
+    fn render_raw(
+        &self,
+        m: &Self::Model,
+        c: &Object,
+        o: &RenderSettings,
+        h: &mut dyn RenderResources,
+    ) -> Result<Rendered, PeleError> {
+        self.module.render_raw(m, c, o, h)
     }
     fn render_with_output_limit(
         &self,
@@ -148,6 +223,13 @@ trait Erased: Send + Sync {
         options: &RenderSettings,
         host: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError>;
+    fn render_raw_operation(
+        &self,
+        state: &mut State,
+        config: &Object,
+        options: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<Rendered, PublicError>;
     fn render_operation_with_output_limit(
         &self,
         state: &mut State,
@@ -168,6 +250,12 @@ struct Codec<D>(Arc<D>);
 impl<D: PublicDiagramModule> Erased for Codec<D> {
     fn create(&self, doc: &crate::compat::ParsedDocument) -> Result<State, PeleError> {
         let model = doc.model::<D::Model>().expect("paired public codec");
+        if doc.is_prepared() {
+            return Ok(Box::new(self.0.create_public_prepared(
+                model,
+                doc.edge_limit().expect("prepared policy"),
+            )?));
+        }
         Ok(Box::new(match doc.edge_limit() {
             Some(limit) => self.0.create_public_with_edge_limit(model, limit)?,
             None => self.0.create_public(model)?,
@@ -199,6 +287,20 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
         host: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
         self.0.render_public_operation(
+            state.downcast_mut().expect("paired public state"),
+            config,
+            options,
+            host,
+        )
+    }
+    fn render_raw_operation(
+        &self,
+        state: &mut State,
+        config: &Object,
+        options: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<Rendered, PublicError> {
+        self.0.render_public_raw_operation(
             state.downcast_mut().expect("paired public state"),
             config,
             options,
@@ -365,6 +467,14 @@ impl PublicEngine {
     ) -> Result<PublicDocument, PeleError> {
         self.create_document(self.engine.parse_with_limits(source, options, limits)?)
     }
+    pub fn parse_prepared_as(
+        &self,
+        id: &DiagramId,
+        context: ParseContext<'_>,
+        edge_limit: EdgeLimit,
+    ) -> Result<PublicDocument, PeleError> {
+        self.create_document(self.engine.parse_prepared_as(id, context, edge_limit)?)
+    }
     /// Render source through this registry with exact parse limits, without
     /// exporting or importing a public model graph solely to produce SVG.
     pub fn render_source_bounded_with_limits(
@@ -442,6 +552,12 @@ impl PublicEngine {
         })
     }
 }
+/// Raw diagram render outcome; dispatched partial mutations are always published.
+pub struct RawRenderOutcome {
+    pub revision: u64,
+    pub graph: ModelGraph,
+    pub result: Result<Rendered, PublicError>,
+}
 /// One serialized mutable operation stream. This type is deliberately not Sync.
 pub struct PublicDocument {
     registration: Arc<Registration>,
@@ -480,6 +596,10 @@ impl PublicDocument {
             config,
             revision: 0,
         })
+    }
+    /// Effective parse configuration owned by this retained document.
+    pub fn retained_config(&self) -> &Object {
+        &self.config
     }
     pub fn diagram_type(&self) -> &DiagramId {
         &self.registration.descriptor.id
@@ -570,6 +690,50 @@ impl PublicDocument {
             }
         }
         Ok(InvocationOutcome {
+            revision: next,
+            graph,
+            result,
+        })
+    }
+    /// Render with the retained low-level handler and supplied config, without
+    /// core defaults or semantic output policy. Independent byte bounds remain.
+    pub fn render_raw_operation(
+        &mut self,
+        expected_revision: u64,
+        config: &Object,
+        settings: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<RawRenderOutcome, PeleError> {
+        if expected_revision != self.revision {
+            return Err(PeleError::new(
+                "Stale public model revision",
+                ErrorCode::Semantic,
+            ));
+        }
+        let next = self
+            .revision
+            .checked_add(1)
+            .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
+        self.snapshot()?;
+        let mut operation_error = None;
+        let result = crate::compat::engine::render_raw_registered(
+            &self.registration.descriptor,
+            settings,
+            host,
+            |session| {
+                self.registration
+                    .codec
+                    .render_raw_operation(&mut self.state, config, settings, session)
+                    .map_err(|error| {
+                        operation_error = Some(error);
+                        PeleError::new("Public raw render operation failed", ErrorCode::Semantic)
+                    })
+            },
+        )
+        .map_err(|error| operation_error.unwrap_or_else(|| error.into()));
+        self.revision = next;
+        let graph = self.snapshot()?;
+        Ok(RawRenderOutcome {
             revision: next,
             graph,
             result,

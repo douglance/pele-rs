@@ -16,8 +16,11 @@ export function withLazy(registry) {
     let promise = pending.get(type);
     if (promise === undefined) {
       if (!known.has(type)) return Promise.resolve(false);
-      promise = Promise.resolve().then(() => {
+      promise = Promise.resolve().then(async () => {
+        const [{default: diagram},{loadDiagramEntries}] = await Promise.all([import('./diagrams/'+type+'.js'),import('./diagram-entries.js')]);
+        await loadDiagramEntries();
         registry.registerBuiltin(type);
+        registry.register(diagram);
         return true;
       }).catch(error => {
         pending.delete(type);

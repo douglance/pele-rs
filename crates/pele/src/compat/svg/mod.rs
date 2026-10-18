@@ -82,7 +82,7 @@ pub(crate) fn label_svg_with_resources(
 ) -> Result<String, PeleError> {
     label_svg_inner(label, cx, cy, attrs, &mut |name| {
         Ok(resources
-            .icon(name)?
+            .direct_icon(name)?
             .map(|svg| svg.markup().to_string())
             .unwrap_or_default())
     })

@@ -55,6 +55,15 @@ impl DiagramModule for Class {
     ) -> Result<Rendered, PeleError> {
         render::render(m, c, o, r)
     }
+    fn render_raw(
+        &self,
+        m: &ClassModel,
+        c: &Object,
+        o: &RenderSettings,
+        r: &mut dyn RenderResources,
+    ) -> Result<Rendered, PeleError> {
+        render::render_exact(m, c, o, r)
+    }
     fn render_with_output_limit(
         &self,
         m: &ClassModel,

@@ -12,6 +12,11 @@ trait ErasedModule: Send + Sync {
         context: ParseContext<'_>,
         limit: EdgeLimit,
     ) -> Result<Model, PeleError>;
+    fn parse_prepared(
+        &self,
+        context: ParseContext<'_>,
+        limit: EdgeLimit,
+    ) -> Result<Model, PeleError>;
     fn render(
         &self,
         model: &Model,
@@ -26,6 +31,13 @@ trait ErasedModule: Send + Sync {
         options: &RenderSettings,
         resources: &mut dyn RenderResources,
         limit: OutputLimit,
+    ) -> Result<Rendered, PeleError>;
+    fn render_raw(
+        &self,
+        model: &Model,
+        config: &Object,
+        options: &RenderSettings,
+        resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError>;
     fn model_view(&self, model: &Model) -> Result<Value, PeleError>;
     fn query(&self, model: &Model, operation: &str, arguments: &Value) -> Result<Value, PeleError>;
@@ -87,6 +99,13 @@ impl<D: DiagramModule> ErasedModule for Module<D> {
     ) -> Result<Model, PeleError> {
         Ok(Box::new(self.0.parse_with_edge_limit(context, limit)?))
     }
+    fn parse_prepared(
+        &self,
+        context: ParseContext<'_>,
+        limit: EdgeLimit,
+    ) -> Result<Model, PeleError> {
+        Ok(Box::new(self.0.parse_prepared(context, limit)?))
+    }
     fn render(
         &self,
         model: &Model,
@@ -95,6 +114,20 @@ impl<D: DiagramModule> ErasedModule for Module<D> {
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError> {
         self.0.render(
+            model.downcast_ref().expect("private module/model pairing"),
+            config,
+            options,
+            resources,
+        )
+    }
+    fn render_raw(
+        &self,
+        model: &Model,
+        config: &Object,
+        options: &RenderSettings,
+        resources: &mut dyn RenderResources,
+    ) -> Result<Rendered, PeleError> {
+        self.0.render_raw(
             model.downcast_ref().expect("private module/model pairing"),
             config,
             options,
@@ -142,10 +175,15 @@ pub struct ParsedDocument {
     model: Model,
     config: Object,
     edge_limit: Option<EdgeLimit>,
+    prepared: bool,
 }
 impl ParsedDocument {
     /// Exact parse override, if supplied. Exported convenience-model Origin
     /// integer fields retain their legacy projection; this records the override.
+    /// Whether this document was parsed from an already-prepared diagram source.
+    pub fn is_prepared(&self) -> bool {
+        self.prepared
+    }
     pub fn edge_limit(&self) -> Option<EdgeLimit> {
         self.edge_limit
     }
@@ -483,7 +521,73 @@ impl Engine {
             model,
             config: pre.config,
             edge_limit,
+            prepared: false,
         })
+    }
+    /// Parse an already-prepared diagram source verbatim. No source limit,
+    /// preprocessing, detection, entity encoding or newline append is performed.
+    /// The independent native source-byte and edge-generation budgets remain.
+    /// Undefined here is the raw low-level policy, not core's default 5,000.
+    pub fn parse_prepared_as(
+        &self,
+        id: &DiagramId,
+        context: ParseContext<'_>,
+        edge_limit: EdgeLimit,
+    ) -> Result<ParsedDocument, PeleError> {
+        SourceLimit::check_bytes(context.source)?;
+        if context
+            .line_offset
+            .checked_add(context.source.len())
+            .is_none()
+        {
+            return Err(PeleError::new(
+                "Prepared source position exceeds native range",
+                ErrorCode::Limit,
+            ));
+        }
+        let registration = self
+            .modules
+            .iter()
+            .find(|m| &m.descriptor.id == id)
+            .cloned()
+            .ok_or_else(|| {
+                let mut e = PeleError::new(
+                    format!("Diagram type \"{id}\" is not supported yet."),
+                    ErrorCode::UnsupportedDiagram,
+                );
+                e.diagram_type = Some(id.to_string());
+                e
+            })?;
+        let config = context.config.clone();
+        let model = registration.module.parse_prepared(context, edge_limit)?;
+        Ok(ParsedDocument {
+            registration,
+            model,
+            config,
+            edge_limit: Some(edge_limit),
+            prepared: true,
+        })
+    }
+    /// Invoke only the retained module's raw renderer with the supplied config.
+    /// Core responsive/output-limit/theme/link-id handling is deliberately absent.
+    pub fn render_document_raw(
+        &self,
+        document: &ParsedDocument,
+        config: &Object,
+        settings: &RenderSettings,
+        resources: &mut dyn RenderResources,
+    ) -> Result<Rendered, PeleError> {
+        render_raw_registered(
+            &document.registration.descriptor,
+            settings,
+            resources,
+            |session| {
+                document
+                    .registration
+                    .module
+                    .render_raw(&document.model, config, settings, session)
+            },
+        )
     }
     pub fn render_source(
         &self,
@@ -700,6 +804,59 @@ pub(crate) fn render_registered_policy(
     })
 }
 
+pub(crate) fn render_raw_registered(
+    descriptor: &ModuleDescriptor,
+    settings: &RenderSettings,
+    host: &mut dyn RenderResources,
+    render: impl FnOnce(&mut dyn RenderResources) -> Result<Rendered, PeleError>,
+) -> Result<Rendered, PeleError> {
+    let mut resources = RawRenderSession {
+        session: RenderSession {
+            presentation_budget: None,
+            presentation: None,
+            host,
+            icons: HashMap::new(),
+            clock: settings.now.filter(|n| n.is_finite()).map(Ok),
+        },
+    };
+    let rendered = render(&mut resources)?;
+    OutputLimit::check_bytes(&rendered.svg, descriptor.id.as_str())?;
+    Ok(rendered)
+}
+struct RawRenderSession<'a> {
+    session: RenderSession<'a>,
+}
+impl RenderResources for RawRenderSession<'_> {
+    fn host_function(
+        &mut self,
+        reference: u32,
+    ) -> Result<std::rc::Rc<dyn super::public::HostFunction>, super::public::PublicError> {
+        self.session.host_function(reference)
+    }
+
+    fn text_width(&mut self, r: TextRequest<'_>) -> Result<f64, PeleError> {
+        self.session.text_width(r)
+    }
+    // The raw entry does not establish core's global inline icon resolver.
+    fn icon(&mut self, name: &str) -> Result<Option<TrustedSvg>, PeleError> {
+        self.session.host.raw_inline_icon(name)
+    }
+    fn direct_icon(&mut self, name: &str) -> Result<Option<TrustedSvg>, PeleError> {
+        self.session.host.icon(name)
+    }
+    fn parse_date(&mut self, s: &str) -> Result<Option<f64>, PeleError> {
+        self.session.parse_date(s)
+    }
+    fn calendar_fields(&mut self, n: f64) -> Result<Option<super::CalendarFields>, PeleError> {
+        self.session.calendar_fields(n)
+    }
+    fn calendar_instant(&mut self, c: super::CivilDateTime) -> Result<Option<f64>, PeleError> {
+        self.session.calendar_instant(c)
+    }
+    fn now_millis(&mut self) -> Result<f64, PeleError> {
+        self.session.now_millis()
+    }
+}
 struct RenderSession<'a> {
     presentation_budget: Option<super::PresentationBudget>,
     presentation: Option<super::PresentationOutcome>,
@@ -722,6 +879,9 @@ impl RenderResources for RenderSession<'_> {
         if self.presentation_budget.is_some() {
             self.presentation = Some(outcome);
         }
+    }
+    fn raw_inline_icon(&mut self, name: &str) -> Result<Option<TrustedSvg>, PeleError> {
+        self.host.raw_inline_icon(name)
     }
     fn text_width(&mut self, request: TextRequest<'_>) -> Result<f64, PeleError> {
         self.host.text_width(request)

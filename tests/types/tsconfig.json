@@ -16,6 +16,7 @@
     "public-remaining-er.mts",
     "public-remaining-info.mts",
     "public-registry-lazy.mts",
+    "diagram-entries.mts",
     "public-foreign-providers.mts"
   ]
 }

@@ -226,7 +226,7 @@ impl Write for Bounded {
         Ok(())
     }
 }
-fn encode(value: &impl Serialize) -> Result<Vec<u8>, PeleError> {
+pub(super) fn encode(value: &impl Serialize) -> Result<Vec<u8>, PeleError> {
     let mut output = Bounded(Vec::new());
     serde_json::to_writer(&mut output, value).map_err(|_| budget())?;
     Ok(output.0)
