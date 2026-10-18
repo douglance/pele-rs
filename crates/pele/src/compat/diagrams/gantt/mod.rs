@@ -3,6 +3,7 @@ mod axis;
 mod dates;
 mod lexer;
 mod model;
+mod scheduler;
 mod parser;
 mod render;
 mod tokens;
@@ -47,3 +48,6 @@ impl DiagramModule for Gantt {
         render::render(m, c, o, r)
     }
 }
+
+mod public_model;
+pub use public_model::GanttPublicState;

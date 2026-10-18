@@ -117,15 +117,35 @@ pub fn normalized(
 pub struct Calendar<'a> {
     pub resources: &'a mut dyn RenderResources,
     pub error: Option<PeleError>,
+    abort_on_error: bool,
 }
 impl<'a> Calendar<'a> {
     pub fn new(resources: &'a mut dyn RenderResources) -> Self {
         Self {
             resources,
             error: None,
+            abort_on_error: false,
         }
     }
+    pub(super) fn public(resources: &'a mut dyn RenderResources) -> Self {
+        Self {
+            resources,
+            error: None,
+            abort_on_error: true,
+        }
+    }
+    pub(super) fn check(&self) -> Result<(), PeleError> {
+        if self.abort_on_error {
+            if let Some(error) = &self.error {
+                return Err(error.clone());
+            }
+        }
+        Ok(())
+    }
     pub fn fields(&mut self, ms: f64) -> Option<CalendarFields> {
+        if self.abort_on_error && self.error.is_some() {
+            return None;
+        }
         if !clip(ms).is_finite() {
             return None;
         }
@@ -140,6 +160,9 @@ impl<'a> Calendar<'a> {
         }
     }
     pub fn local(&mut self, c: CivilDateTime) -> f64 {
+        if self.abort_on_error && self.error.is_some() {
+            return f64::NAN;
+        }
         match self.resources.calendar_instant(c) {
             Ok(ms) => ms.map(clip).unwrap_or(f64::NAN),
             Err(e) => {

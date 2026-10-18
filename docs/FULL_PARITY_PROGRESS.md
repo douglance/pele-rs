@@ -706,3 +706,20 @@ produce a typed TypeError through render_operation instead of a renderer panic;
 legacy errors/preflight callback ordering remain explicit boundaries. Active
 sparse/lone-surrogate rendering, exotic overrides/coercion and numeric renderer
 kinds/lifecycle indexes outside typed ranges remain open. Renderer unchanged.
+
+
+## Gantt mutable native checkpoint
+
+Gantt brings native mutable coverage to twenty-six families. Seven public and
+two source baseline release integration slices pass all 18,994 historical
+outcomes with zero exclusions. Thirty-five pinned mutation vectors cover
+113 calls, 102 complete SVG hashes, six exact render errors and five explicit
+active UTF-16 output gaps. All thirty-one real methods use a shared native
+scheduler; task/Date/returned-array identities, detached byId tasks and partial
+failures remain live. Numeric compact order and repeated task references retain
+upstream layout identity. Public calendar scheduling stops at the first host
+error without changing immutable calendar behavior. Temporary lookup strings
+stay outside the retained arena, preserving valid stress behavior and budgets.
+Constructor/custom helper/callback overrides, active lone-surrogate scalar output
+and pre-callback host synchronization/reentry remain separate open gates. Foreign
+Gantt exposure is pending; the committed foreign checkpoint remains twenty-three.

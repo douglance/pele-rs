@@ -94,6 +94,30 @@ pub fn render(
     }
     Ok(result)
 }
+/// Draw an already scheduled public model. Scheduling and its mutations belong
+/// to the public store; draw's calendar-cache work remains observable afterward.
+pub(super) fn render_scheduled(
+    model: &mut GanttModel,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, PeleError> {
+    let mut cal = Calendar::public(r);
+    let now = model.now;
+    let result = draw(
+        model,
+        c,
+        o,
+        &mut cal,
+        o.font_size.unwrap_or(16.),
+        o.padding.unwrap_or(8.),
+        now,
+    );
+    if let Some(e) = cal.error {
+        return Err(e);
+    }
+    result
+}
 fn draw(
     m: &mut GanttModel,
     c: &Object,
@@ -130,7 +154,7 @@ fn draw(
             categories.push(tasks[i].section.clone())
         }
     }
-    let mut row_of = vec![usize::MAX; tasks.len()];
+    let mut row_of = HashMap::new();
     let mut row_section: Vec<String> = vec![];
     if compact {
         for section in &categories {
@@ -149,7 +173,11 @@ fn draw(
                     .start_time
                     .unwrap()
                     .total_cmp(&tasks[b].start_time.unwrap())
-                    .then(tasks[a].order.cmp(&tasks[b].order))
+                    .then_with(|| {
+                        m.public_task_order(a)
+                            .partial_cmp(&m.public_task_order(b))
+                            .unwrap_or(std::cmp::Ordering::Equal)
+                    })
             });
             let offset = row_section.len();
             let mut free = vec![];
@@ -164,12 +192,12 @@ fn draw(
                 } else {
                     free[row] = tasks[i].end_time.unwrap()
                 }
-                row_of[i] = offset + row
+                row_of.insert(m.public_task_identity(i), offset + row);
             }
             let mut rows = free.len();
             for i in group {
-                if row_of[i] == usize::MAX {
-                    row_of[i] = offset + rows;
+                if !row_of.contains_key(&m.public_task_identity(i)) {
+                    row_of.insert(m.public_task_identity(i), offset + rows);
                     rows += 1
                 }
             }
@@ -177,7 +205,7 @@ fn draw(
         }
     } else {
         for &i in &row_tasks {
-            row_of[i] = row_section.len();
+            row_of.insert(m.public_task_identity(i), row_section.len());
             row_section.push(tasks[i].section.clone())
         }
     }
@@ -243,7 +271,9 @@ fn draw(
         text(c, "axisFormat").unwrap_or("%Y-%m-%d")
     };
     let a = time_format(cal, axis_format, start);
+    cal.check()?;
     let b = time_format(cal, axis_format, stop);
+    cal.check()?;
     let sample_width = measure(cal.resources, o, &a, tick_size, 0)?.max(measure(
         cal.resources,
         o,
@@ -297,7 +327,7 @@ fn draw(
     for &i in &row_tasks {
         let t = &tasks[i];
         let label = one_line(&t.task, label_size, o, cal.resources)?;
-        let row = row_of[i];
+        let row = row_of[&m.public_task_identity(i)];
         if !scheduled(t) {
             let label_x = left + 8. + label.width / 2.;
             extent = extent.max(label_x + label.width / 2.);
@@ -363,6 +393,7 @@ fn draw(
         (plot_width / 3.).ceil() as usize,
     )
     .unwrap_or_else(|| auto_ticks(cal, start, stop, count));
+    cal.check()?;
     let (mut grid, mut axis_bottom, mut axis_top) = (String::new(), String::new(), String::new());
     let mut last_right = f64::NEG_INFINITY;
     let mut last_label = String::new();
@@ -377,6 +408,7 @@ fn draw(
             num(plot_bottom)
         );
         let label = time_format(cal, axis_format, t);
+        cal.check()?;
         let width = measure(cal.resources, o, &label, tick_size, 0)?;
         if tx - width / 2. < last_right + 8. || label == last_label {
             continue;
@@ -491,7 +523,10 @@ fn draw(
                 to = Some(day)
             } else if let (Some(a), Some(b)) = (from.take(), to.take()) {
                 let a = cal.today(a);
-                let Some(mut end_civil) = cal.fields(b).map(|f| f.civil) else {
+                cal.check()?;
+                let end_civil = cal.fields(b).map(|f| f.civil);
+                cal.check()?;
+                let Some(mut end_civil) = end_civil else {
                     continue;
                 };
                 end_civil.hour = 23;
@@ -499,6 +534,7 @@ fn draw(
                 end_civil.second = 59;
                 end_civil.millisecond = 999;
                 let b = cal.local(end_civil);
+                cal.check()?;
                 let ex0 = left.max(x(a));
                 let ex1 = right.min(x(b));
                 if ex1 > ex0 {
@@ -515,6 +551,7 @@ fn draw(
                 break;
             }
             day = cal.add_days(day, 1.);
+            cal.check()?;
             if !day.is_finite() {
                 break;
             }

@@ -4,8 +4,8 @@ The source-built development branch has all 33 diagram renderers. Twenty-three
 families expose mutable public models through Rust, Swift/C and browser WASM:
 Pie, Info, Sankey, Packet, Radar, Quadrant, Treemap, Journey, XYChart, Kanban,
 Mindmap, Timeline, Flowchart, Swimlane, ER, Architecture, GitGraph, AgentFlow,
-Ishikawa, Class, EventModeling, TreeView and State. Venn and Sequence also have native Rust
-codecs, bringing native coverage to twenty-five; their foreign checkpoint is pending.
+Ishikawa, Class, EventModeling, TreeView and State. Venn, Sequence and Gantt also have native Rust
+codecs, bringing native coverage to twenty-six; their foreign checkpoint is pending.
 Methods are available where inventoried. AgentFlow has thirty-four actual
 descriptors with one explicitly unavailable Error-valued return operation.
 The published v0.1.0 binary remains the earlier flowchart subset.

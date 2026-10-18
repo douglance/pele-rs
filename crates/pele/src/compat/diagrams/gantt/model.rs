@@ -1,5 +1,5 @@
 //! Pele gantt/db.ts scheduling and ordered typed model, 458322a5 (MIT, kepano).
-use super::dates::{utc_fields, Calendar, WEEKDAYS};
+use super::dates::{utc_fields, Calendar};
 use crate::compat::{
     source::{space, url::safe_url},
     ErrorCode, PeleError, RenderResources,
@@ -62,6 +62,8 @@ pub struct TaskRaw {
 #[derive(Clone, Debug)]
 pub struct GanttModel {
     task_at: HashMap<String, usize>,
+    public_task_orders: HashMap<usize, f64>,
+    public_task_identities: HashMap<usize, u32>,
     by_at: HashMap<String, usize>,
     pub title: Option<String>,
     pub acc_title: Option<String>,
@@ -152,7 +154,7 @@ pub fn error(message: impl Into<String>, code: ErrorCode) -> PeleError {
     e.diagram_type = Some("gantt".into());
     e
 }
-fn patterns() -> &'static Vec<Regex> {
+pub(super) fn patterns() -> &'static Vec<Regex> {
     static R: OnceLock<Vec<Regex>> = OnceLock::new();
     R.get_or_init(|| {
         [
@@ -173,6 +175,8 @@ impl GanttModel {
     pub fn new(title: Option<&str>, display_mode: String) -> Self {
         Self {
             task_at: HashMap::new(),
+            public_task_orders: HashMap::new(),
+            public_task_identities: HashMap::new(),
             by_at: HashMap::new(),
             title: title.map(str::to_string),
             acc_title: None,
@@ -345,234 +349,230 @@ impl GanttModel {
         Ok(m)
     }
     pub(crate) fn schedule(&mut self, now: f64, cal: &mut Calendar<'_>) -> Result<(), PeleError> {
-        self.now = now;
-        self.work = 0.;
-        self.include_set = self.includes.iter().cloned().collect();
-        self.exclude_set = self.excludes.iter().cloned().collect();
-        let start = if self.weekend == "friday" { 5 } else { 6 };
-        let weekends = self.exclude_set.contains("weekends");
-        self.excluded_days = WEEKDAYS
-            .iter()
-            .enumerate()
-            .map(|(day, name)| {
-                let iso = if day == 0 { 7 } else { day };
-                weekends && (iso == start || iso == start + 1)
-                    || self.exclude_set.contains(&name.to_lowercase())
-            })
-            .collect();
-        self.dated_tokens = !self.includes.is_empty()
-            || !patterns()[0].is_match(self.date_format.trim_matches(space));
-        for token in &self.excludes {
-            if token != "weekends" && !WEEKDAYS.iter().any(|d| d.to_lowercase() == *token) {
-                self.dated_tokens = true
-            }
-        }
-        for t in &mut self.tasks {
-            t.start_time = None;
-            t.end_time = None;
-            t.render_end_time = None;
-            t.processed = false;
-            t.manual_end_time = false
-        }
-        for _ in 0..11 {
-            let mut all = true;
-            for i in 0..self.tasks.len() {
-                self.compile_task(i, cal)?;
-                all &= self.tasks[i].processed
-            }
-            if all {
-                break;
-            }
-        }
-        Ok(())
-    }
-    fn spend(&mut self, units: f64) -> Result<(), PeleError> {
-        self.work += units;
-        if self.work > 4e8 {
-            Err(error(
-                "The gantt chart takes too much work to schedule.",
-                ErrorCode::Limit,
-            ))
-        } else {
-            Ok(())
-        }
-    }
-    fn parse(
-        &mut self,
-        s: &str,
-        template: &str,
-        cal: &mut Calendar<'_>,
-    ) -> Result<Option<f64>, PeleError> {
-        self.spend(
-            (template.encode_utf16().count() + 1) as f64 * (s.encode_utf16().count() + 1) as f64,
-        )?;
-        Ok(cal.parse_strict(s, template, self.now))
+        super::scheduler::schedule(self, now, cal)
     }
     pub(crate) fn invalid(&mut self, date: f64, cal: &mut Calendar<'_>) -> Result<bool, PeleError> {
-        let Some(f) = cal.fields(date) else {
-            return Ok(false);
-        };
-        let weekday = self
-            .excluded_days
-            .get(f.weekday as usize)
+        Ok(super::scheduler::invalid(self, &date, cal)? == Some(true))
+    }
+    pub(super) fn set_public_task_identity(&mut self, index: usize, identity: u32) {
+        self.public_task_identities.insert(index, identity);
+    }
+    pub(super) fn public_task_identity(&self, index: usize) -> u64 {
+        self.public_task_identities
+            .get(&index)
+            .map_or((index as u64) << 1, |id| (u64::from(*id) << 1) | 1)
+    }
+    pub(super) fn set_public_task_order(&mut self, index: usize, order: f64) {
+        self.public_task_orders.insert(index, order);
+    }
+    pub(super) fn public_task_order(&self, index: usize) -> f64 {
+        self.public_task_orders
+            .get(&index)
             .copied()
-            .unwrap_or(false);
-        if !self.dated_tokens {
-            return Ok(weekday);
-        }
-        let template = self.date_format.trim_matches(space).to_string();
-        let date_only = cal.iso(date);
-        self.spend(200.)?;
-        let formatted = if template != "YYYY-MM-DD" {
-            self.spend(400. + template.encode_utf16().count() as f64 * 8.)?;
-            cal.format(date, &template)
-        } else {
-            Some(date_only.clone())
+            .unwrap_or(self.tasks[index].order as f64)
+    }
+    pub(super) fn public_schedule_cache(&self) -> (Vec<String>, Vec<String>, Vec<bool>, bool) {
+        let ordered = |values: &Vec<String>, set: &HashSet<String>| {
+            let mut seen = HashSet::new();
+            values
+                .iter()
+                .filter(|s| set.contains(*s) && seen.insert((*s).clone()))
+                .cloned()
+                .collect()
         };
-        let listed = |s: &HashSet<String>| {
-            s.contains(&date_only) || formatted.as_ref().is_some_and(|f| s.contains(f))
-        };
-        if listed(&self.include_set) {
-            return Ok(false);
-        }
-        Ok(weekday || listed(&self.exclude_set))
+        (
+            ordered(&self.includes, &self.include_set),
+            ordered(&self.excludes, &self.exclude_set),
+            self.excluded_days.clone(),
+            self.dated_tokens,
+        )
     }
-    fn refs(&self, list: &str) -> Vec<usize> {
-        list.split(' ')
-            .filter(|s| !s.is_empty())
-            .filter_map(|id| self.task_at.get(id).copied())
-            .collect()
-    }
-    fn get_start(&mut self, raw: &str, cal: &mut Calendar<'_>) -> Result<Option<f64>, PeleError> {
-        let s = raw.trim_matches(space);
-        let template = self.date_format.trim_matches(space).to_string();
-        if matches!(template.as_str(), "x" | "X") && patterns()[6].is_match(s) {
-            let t = super::dates::clip(s.parse().unwrap_or(f64::NAN));
-            return if t.is_finite() {
-                Ok(Some(t))
-            } else {
-                Err(error(format!("Invalid date:{s}"), ErrorCode::Semantic))
-            };
-        }
-        if let Some(cap) = patterns()[2].captures(s) {
-            let mut latest: Option<usize> = None;
-            for i in self.refs(&cap[1]) {
-                if latest.is_none()
-                    || self.tasks[i]
-                        .end_time
-                        .zip(self.tasks[latest.unwrap()].end_time)
-                        .is_some_and(|(a, b)| a > b)
-                {
-                    latest = Some(i)
-                }
-            }
-            return Ok(latest.map_or_else(|| Some(cal.today(self.now)), |i| self.tasks[i].end_time));
-        }
-        if let Some(t) = self.parse(s, &template, cal)? {
-            return Ok(Some(t));
-        }
-        let date = cal.resources.parse_date(s)?.unwrap_or(f64::NAN);
-        if !date.is_finite()
-            || cal
-                .fields(date)
-                .is_none_or(|f| !(-10000..=10000).contains(&f.civil.year))
-        {
-            return Err(error(format!("Invalid date:{s}"), ErrorCode::Semantic));
-        }
-        Ok(Some(date))
-    }
-    fn get_end(
+    pub(super) fn import_public_cache(
         &mut self,
-        start: f64,
-        raw: &str,
-        cal: &mut Calendar<'_>,
-    ) -> Result<Option<f64>, PeleError> {
-        let s = raw.trim_matches(space);
-        if let Some(cap) = patterns()[3].captures(s) {
-            let mut earliest: Option<usize> = None;
-            for i in self.refs(&cap[1]) {
-                if earliest.is_none()
-                    || self.tasks[i]
-                        .start_time
-                        .zip(self.tasks[earliest.unwrap()].start_time)
-                        .is_some_and(|(a, b)| a < b)
-                {
-                    earliest = Some(i)
-                }
-            }
-            return Ok(
-                earliest.map_or_else(|| Some(cal.today(self.now)), |i| self.tasks[i].start_time)
-            );
-        }
-        let template = self.date_format.trim_matches(space).to_string();
-        if let Some(t) = self.parse(s, &template, cal)? {
-            return Ok(Some(if self.inclusive_end_dates {
-                cal.add_days(t, 1.)
-            } else {
-                t
-            }));
-        }
-        let Some(cap) = patterns()[4].captures(s) else {
-            return Ok(Some(start));
-        };
-        let n = cap[1].parse::<f64>().unwrap_or(f64::NAN);
-        let t = cal.add(start, n, &cap[2]);
-        Ok(Some(if t.is_finite() { t } else { start }))
+        now: f64,
+        work: f64,
+        includes: Vec<String>,
+        excludes: Vec<String>,
+        days: Vec<bool>,
+        dated: bool,
+    ) {
+        self.now = now;
+        self.work = work;
+        self.include_set = includes.into_iter().collect();
+        self.exclude_set = excludes.into_iter().collect();
+        self.excluded_days = days;
+        self.dated_tokens = dated;
     }
-    fn compile_task(&mut self, i: usize, cal: &mut Calendar<'_>) -> Result<(), PeleError> {
-        let raw = self.tasks[i].raw.clone();
-        if let Some(start) = raw.start {
-            if let Some(t) = self.get_start(&start, cal)? {
-                self.tasks[i].start_time = Some(t)
-            }
-        } else {
-            self.tasks[i].start_time = if let Some(p) = self.tasks[i]
-                .prev_task_id
-                .as_ref()
-                .and_then(|id| self.task_at.get(id))
-            {
-                self.tasks[*p].end_time
-            } else {
-                Some(cal.today(self.now))
-            }
-        }
-        let Some(start) = self.tasks[i].start_time else {
-            return Ok(());
-        };
-        let Some(end) = self.get_end(start, &raw.end, cal)? else {
-            return Ok(());
-        };
-        self.tasks[i].end_time = Some(end);
-        self.tasks[i].processed = true;
-        self.tasks[i].manual_end_time = self.parse(&raw.end, "YYYY-MM-DD", cal)?.is_some();
-        if self.excludes.is_empty() || self.tasks[i].manual_end_time {
-            return Ok(());
-        }
-        let mut cursor = cal.add_days(start, 1.);
-        let mut end = end;
-        let max = cal.add_days(end, 10000.);
-        let mut invalid = false;
-        let mut render_end = None;
-        while cursor <= end {
-            self.spend(400.)?;
-            if !invalid {
-                render_end = Some(end)
-            }
-            invalid = self.invalid(cursor, cal)?;
-            if invalid {
-                end = cal.add_days(end, 1.);
-                if end > max {
-                    return Err(error("Failed to find a valid date that was not excluded by `excludes` after 10,000 iterations.",ErrorCode::Semantic));
-                }
-            }
-            cursor = cal.add_days(cursor, 1.)
-        }
-        self.tasks[i].end_time = Some(end);
-        self.tasks[i].render_end_time = render_end;
-        Ok(())
+    pub(super) fn public_builder_state(&self) -> (&str, usize, usize, Option<&str>) {
+        (
+            &self.current_section,
+            self.task_count,
+            self.last_order,
+            self.last_task_id.as_deref(),
+        )
     }
 }
 
 fn compiled_regex(pattern: &str) -> Result<Regex, regex::Error> {
     Regex::new(&pattern.replace(r"\s", crate::compat::text::SPACE))
+}
+
+impl super::scheduler::Store for GanttModel {
+    type Task = usize;
+    type Date = f64;
+    type Token = String;
+    type Error = PeleError;
+    fn now(&mut self) -> Result<f64, PeleError> {
+        Ok(self.now)
+    }
+    fn set_now(&mut self, n: f64) -> Result<(), PeleError> {
+        self.now = n;
+        Ok(())
+    }
+    fn work(&mut self) -> Result<f64, PeleError> {
+        Ok(self.work)
+    }
+    fn set_work(&mut self, n: f64) -> Result<(), PeleError> {
+        self.work = n;
+        Ok(())
+    }
+    fn tokens(&mut self, include: bool) -> Result<Vec<String>, PeleError> {
+        Ok(if include {
+            &self.includes
+        } else {
+            &self.excludes
+        }
+        .clone())
+    }
+    fn token_is(&self, token: &String, text: &str) -> bool {
+        token == text
+    }
+    fn token_length(&mut self, include: bool) -> Result<f64, PeleError> {
+        Ok(if include {
+            self.includes.len()
+        } else {
+            self.excludes.len()
+        } as f64)
+    }
+    fn set_tokens(&mut self, include: bool, tokens: Vec<String>) -> Result<(), PeleError> {
+        if include {
+            self.include_set = tokens.into_iter().collect()
+        } else {
+            self.exclude_set = tokens.into_iter().collect()
+        }
+        Ok(())
+    }
+    fn contains(&mut self, include: bool, text: &str) -> Result<bool, PeleError> {
+        Ok(if include {
+            &self.include_set
+        } else {
+            &self.exclude_set
+        }
+        .contains(text))
+    }
+    fn weekend_start(&mut self) -> Result<Option<usize>, PeleError> {
+        Ok(match self.weekend.as_str() {
+            "friday" => Some(5),
+            "saturday" => Some(6),
+            _ => None,
+        })
+    }
+    fn set_excluded_days(&mut self, days: Vec<bool>) -> Result<(), PeleError> {
+        self.excluded_days = days;
+        Ok(())
+    }
+    fn excluded_day(&mut self, day: Option<usize>) -> Result<Option<bool>, PeleError> {
+        Ok(day.and_then(|day| self.excluded_days.get(day).copied()))
+    }
+    fn dated_tokens(&mut self) -> Result<bool, PeleError> {
+        Ok(self.dated_tokens)
+    }
+    fn set_dated_tokens(&mut self, value: bool) -> Result<(), PeleError> {
+        self.dated_tokens = value;
+        Ok(())
+    }
+    fn date_format(&mut self) -> Result<String, PeleError> {
+        Ok(self.date_format.clone())
+    }
+    fn inclusive(&mut self) -> Result<bool, PeleError> {
+        Ok(self.inclusive_end_dates)
+    }
+    fn tasks(&mut self) -> Result<Vec<usize>, PeleError> {
+        Ok((0..self.tasks.len()).collect())
+    }
+    fn previous(&mut self, task: &usize) -> Result<Option<usize>, PeleError> {
+        Ok(self.tasks[*task]
+            .prev_task_id
+            .as_ref()
+            .and_then(|id| self.task_at.get(id))
+            .copied())
+    }
+    fn lookup(&mut self, id: &str) -> Result<Option<usize>, PeleError> {
+        Ok(self.task_at.get(id).copied())
+    }
+    fn raw_start(&mut self, task: &usize) -> Result<Option<String>, PeleError> {
+        Ok(self.tasks[*task].raw.start.clone())
+    }
+    fn raw_end(&mut self, task: &usize) -> Result<String, PeleError> {
+        Ok(self.tasks[*task].raw.end.clone())
+    }
+    fn time(
+        &mut self,
+        task: &usize,
+        field: super::scheduler::Time,
+    ) -> Result<Option<f64>, PeleError> {
+        use super::scheduler::Time;
+        let task = &self.tasks[*task];
+        Ok(match field {
+            Time::Start => task.start_time,
+            Time::End => task.end_time,
+            Time::RenderEnd => task.render_end_time,
+        })
+    }
+    fn set_time(
+        &mut self,
+        task: &usize,
+        field: super::scheduler::Time,
+        value: Option<f64>,
+    ) -> Result<(), PeleError> {
+        use super::scheduler::Time;
+        let task = &mut self.tasks[*task];
+        match field {
+            Time::Start => task.start_time = value,
+            Time::End => task.end_time = value,
+            Time::RenderEnd => task.render_end_time = value,
+        }
+        Ok(())
+    }
+    fn date(&mut self, ms: f64) -> Result<f64, PeleError> {
+        Ok(super::dates::clip(ms))
+    }
+    fn milliseconds(&mut self, date: &f64) -> Result<f64, PeleError> {
+        Ok(*date)
+    }
+    fn date_truth(&self, _: &f64) -> bool {
+        true
+    }
+    fn manual(&mut self, task: &usize) -> Result<bool, PeleError> {
+        Ok(self.tasks[*task].manual_end_time)
+    }
+    fn processed(&mut self, task: &usize) -> Result<bool, PeleError> {
+        Ok(self.tasks[*task].processed)
+    }
+    fn set_flag(
+        &mut self,
+        task: &usize,
+        field: super::scheduler::Flag,
+        value: bool,
+    ) -> Result<(), PeleError> {
+        use super::scheduler::Flag;
+        match field {
+            Flag::Processed => self.tasks[*task].processed = value,
+            Flag::ManualEnd => self.tasks[*task].manual_end_time = value,
+        }
+        Ok(())
+    }
+    fn warn(&mut self, _: String) -> Result<(), PeleError> {
+        Ok(())
+    }
 }
