@@ -24,7 +24,17 @@ export interface TimelinePeriod { text: string; events: string[]; section: strin
 export interface TimelineModel extends AccessibleModel { type: 'timeline'; direction: string; sections: string[]; periods: TimelinePeriod[]; currentSection: string }
 export interface JourneyTask { task: string; score: number; people: string[]; section: string }
 export interface JourneyModel extends AccessibleModel { type: 'journey'; sections: string[]; tasks: JourneyTask[]; currentSection: string }
-export type DiagramModel = PieModel | PacketModel | RadarModel | QuadrantModel | TimelineModel | JourneyModel;
+export interface FlowNode { id: string; text?: string; labelType: string; type?: string; styles: string[]; classes: string[]; dir?: string; props?: { [key: string]: ConfigValue }; link?: string; linkTarget?: string; icon?: string; form?: string; pos?: string; img?: string; constraint?: string; assetWidth?: ConfigValue; assetHeight?: ConfigValue }
+export interface FlowEdge { start: string; end: string; type?: string; text: string; labelType: string; stroke?: string; length?: ConfigValue; style?: string[]; classes: string[]; id?: string; isUserDefinedId: boolean; interpolate?: ConfigValue; animate?: ConfigValue; animation?: ConfigValue }
+export interface FlowClassDef { id: string; styles: string[]; textStyles: string[] }
+export interface FlowSubgraph { id: string; nodes: string[]; title: string; classes: string[]; dir?: string; labelType: string; metadata?: { [key: string]: ConfigValue } }
+export interface FlowchartModel extends AccessibleModel { type: 'flowchart'; direction?: string; nodes: ReadonlyMap<string, FlowNode>; edges: FlowEdge[]; subgraphs: FlowSubgraph[]; classes: ReadonlyMap<string, FlowClassDef>; tooltips: ReadonlyMap<string, string>; defaultEdgeStyle?: string[]; defaultInterpolate?: ConfigValue }
+export interface KanbanNode { id: string; level: number; label: string; icon?: string; assigned?: string; ticket?: string; priority?: string; cssClasses?: string }
+export interface KanbanSection extends KanbanNode { items: KanbanNode[] }
+export interface KanbanModel { type: 'kanban'; title?: string; sections: KanbanSection[]; last?: KanbanNode | KanbanSection; sectionLevel: number; misplaced?: KanbanNode }
+export interface MindmapNode { id: number; nodeId: string; level: number; descr: string; type: number; children: MindmapNode[]; isRoot: boolean; section?: number; class?: string; icon?: string }
+export interface MindmapModel { type: 'mindmap'; title?: string; nodes: MindmapNode[]; baseLevel: number; open: MindmapNode[] }
+export type DiagramModel = PieModel | PacketModel | RadarModel | QuadrantModel | TimelineModel | JourneyModel | FlowchartModel | KanbanModel | MindmapModel;
 export interface Rendered { type: DiagramId; svg: string; width: number; height: number; links: { id: string; href: string; internal: boolean }[] }
 export interface Renderer {
   capabilities(): Capability[];

@@ -6,7 +6,7 @@ release or new GIF has been published from this branch.
 
 ## Implemented renderers
 
-`Engine::with_builtins()` currently registers six actual Rust diagram modules.
+`Engine::with_builtins()` currently registers nine actual Rust diagram modules.
 `Engine::empty()` and typed `DiagramModule<Model>` remain extension interfaces.
 Registration never certifies a global parity flag; all public API gates remain open.
 
@@ -18,7 +18,13 @@ Registration never certifies a global parity flag; all public API gates remain o
 | radar | 8,431 | 1,791 | 6,640 |
 | timeline | 11,932 | 8,017 | 3,915 |
 | journey | 10,725 | 3,244 | 7,481 |
-| Total | 58,154 | 18,741 | 39,413 |
+| flowchart | 18,175 | 8,952 | 9,223 |
+| kanban | 11,681 | 5,290 | 6,391 |
+| mindmap | 11,335 | 4,204 | 7,131 |
+| Total | 99,345 | 37,187 | 62,158 |
+
+Flowchart includes one parsed model whose render reaches the output limit; the
+model assertion and render-error assertion are both retained.
 
 These fixtures run through Rust, Swift/C and real browser WASM. Models and errors
 compare completely. SVG compares byte-for-byte, or by SHA256 of every UTF-8 byte
@@ -29,10 +35,11 @@ adaptation, configuration, accessibility and host resources. There is no upstrea
 JavaScript renderer in distributed Rust/native/WASM code. JavaScript is a
 build/test oracle and browser font/resource adapter only.
 
-Full flowchart parser checkpoint: `76efca9`, 4,796 model/error scenarios, separately
-from the legacy renderer. Actual shared layered/compound, shape/edge and full
-flowchart rendering are in progress. The checkpoint alone adds no flowchart
-handler to built-ins; see `FLOWCHART_PORT.md` for declared-model/private-cache scope.
+Full flowchart now uses the actual shared layered/compound, shape/edge geometry,
+graph normalization and SVG renderer. Its 47,917-edge typed stress document also
+passes foreign model projection. See `FLOWCHART_PORT.md` for declared-model and
+private-cache scope. Kanban and mindmap share the translated outline/icon parser;
+Rust owns all branch/column geometry and responsive behavior.
 
 ## Shared interfaces and behavior
 
@@ -60,20 +67,20 @@ handler to built-ins; see `FLOWCHART_PORT.md` for declared-model/private-cache s
 Host: macOS 26.6 arm64 / Apple M1 Pro, Rust 1.98.1, Swift 6.4, Node 25.9.
 
 - Public Rust integration coverage passes across legacy, preparation, extension,
-  all six families and the flowchart parser checkpoint. No unit tests added.
+  all nine families, including full flowchart rendering. No unit tests added.
 - Source preparation: all 5,345 scenarios, including 761 examples from 34 upstream
   corpora; extension links: 1,536 entity/link scenarios.
 - All four Swift integration tests pass. The additional-diagram test exercises
-  every packet/radar/quadrant/timeline/journey fixture through owned documents,
+  every packet/radar/quadrant/timeline/journey/flowchart/kanban/mindmap fixture through owned documents,
   callbacks and source rendering; pie and preparation have their own full corpora.
-- Thirty-three browser integration tests pass with one worker in Chrome, Firefox
+- Forty-two browser integration tests pass with one worker in Chrome, Firefox
   and WebKit, using the extracted npm tarball. Includes exact corpus comparisons,
   actual SVG pixels, browser Canvas/font behavior and callback error propagation.
 - C executable passes NULL/UTF-8/limits/ownership checks: 400 legacy lifetimes plus
   200 owned pie document lifetimes.
 - Rust crate packaging and independent downstream Cargo consumer pass.
-- Formatting/whitespace checks pass for completed slices. In-progress flow layout
-  helpers are not certified until their real public diagram path is verified.
+- Formatting/whitespace checks pass for completed slices. Shared graph/layout,
+  shapes and edge helpers are exercised through actual public flowchart rendering.
 
 AppKit decodes and paints current native exports. White proof backgrounds belong
 only to raster evidence, while exported diagrams retain SVG transparency.
@@ -82,6 +89,9 @@ only to raster evidence, while exported diagrams retain SVG transparency.
 | --- | --- | --- |
 | legacy flowchart | 416 x 789; 6,846 painted | Legacy outlined font path |
 | pie | 358 x 296; 44,733 colored | Native compatibility export |
+| full flowchart | 115 x 336; 3,338 painted | Nested group and resolved title halo |
+| kanban | 428 x 105; 3,069 painted | Columns and card labels |
+| mindmap | 269 x 73; 1,241 painted | Root and both branches |
 | packet | 1035 x 98; 6,053 painted | 456 title pixels |
 | radar | 470 x 419; 35,281 painted | 159 title pixels |
 | timeline | 408 x 266; 49,449 painted | 295 title pixels |
@@ -95,17 +105,19 @@ The 400 MB JSON projection is deliberately not built.
 
 ## Remaining acceptance work
 
-- Twenty-seven family renderers, remaining shared behavior and the complete
+- Twenty-four family renderers, remaining shared behavior and the complete
   registration/lazy/mount/zoom/public model interface remain required.
 - JavaScript model projections currently do not apply mutations back into the
   retained Rust document. Prototype methods/private enumerable state also need
   explicit compatibility decisions; full host parity is not claimed.
 - Lone UTF-16 surrogate transport remains unresolved. Radar records two and
-  quadrant three unrepresentable mutations explicitly; they are not passing cases.
+  quadrant three and mindmap seven unrepresentable mutations explicitly; they are not passing cases.
   Init-JSON's explicit 64-level work cap, extreme radix rounding and non-finite/
   negative numeric host budgets also require broader conformance.
 - The 16 MiB JSON projection cap is an explicit transport extension. Large typed
-  models/source rendering work without that expanded projection.
+  models/source rendering work without that expanded projection. Mindmap also
+  preflights depth 48 before recursive model encoding. Its depth 80, 310 and 3,000
+  source renders match exact SVG hashes in Rust, Swift/C and all browser engines.
 - No new CI run, Intel execution, GPU acceleration or full-parity release is asserted.
   Initial four-family Chrome timings show slower current WASM public calls than
   Pele JS; see `PERFORMANCE.md`. Rust/GPU choices are not speedup evidence.

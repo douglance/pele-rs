@@ -209,10 +209,14 @@ impl<'de> Deserialize<'de> for Object {
 // RawValue validates JSON grammar without converting overflowing JS numbers to errors.
 // Recursion/depth policy is owned by source orchestration rather than YAML scalar parsing.
 pub(crate) fn parse_json(text: &str) -> Result<Value, serde_json::Error> {
-    if json_depth_exceeds(text, 64) {
-        return Err(serde::de::Error::custom(
-            "configuration nesting is too deep",
-        ));
+    parse_json_depth(text, 64, "configuration nesting is too deep")
+}
+pub(crate) fn parse_model_json(text: &str) -> Result<Value, serde_json::Error> {
+    parse_json_depth(text, 128, "model nesting is too deep")
+}
+fn parse_json_depth(text: &str, limit: usize, message: &str) -> Result<Value, serde_json::Error> {
+    if json_depth_exceeds(text, limit) {
+        return Err(serde::de::Error::custom(message));
     }
     fn raw(input: &serde_json::value::RawValue) -> Result<Value, serde_json::Error> {
         let s = input.get();

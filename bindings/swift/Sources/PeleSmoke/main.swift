@@ -62,6 +62,9 @@ try piePNG.write(to: output.appendingPathComponent("swift-pie.png"))
 print("Swift owned pie + AppKit: \(pieWidth)x\(pieHeight), \(colored) colored pixels")
 
 for (type, source) in [
+    ("flowchart", "flowchart TD\nsubgraph one[My Group]\nA --> B\nend\nC --> A"),
+    ("kanban", "kanban\n  Todo\n    task[Build Rust]\n  Done\n    ship[Ship Swift]"),
+    ("mindmap", "mindmap\n  root((Rust))\n    Swift\n    Web"),
     ("packet", "packet-beta\ntitle Network header\n0-7: \"Version\"\n8-15: \"Flags\"\n16-31: \"Length\""),
     ("radar", "radar-beta\ntitle Skills\naxis a[\"Speed\"], b[\"Quality\"], c[\"Cost\"]\ncurve team[\"Team\"]{4, 3, 5}"),
     ("timeline", "timeline\ntitle Releases\nsection Core\n2025: Rust\n2026: Swift: Web"),
@@ -70,7 +73,7 @@ for (type, source) in [
 ] {
     let document = try engine.parse(source)
     let rendered = try engine.render(document, options: nativeOptions)
-    guard rendered.type == type, !rendered.svg.contains("var(") else { fatalError("Unresolved \(type) native export") }
+    guard rendered.type == type, !rendered.svg.contains("var("), !rendered.svg.contains("color-mix(") else { fatalError("Unresolved \(type) native export") }
     try Data(rendered.svg.utf8).write(to: output.appendingPathComponent("swift-\(type).svg"))
     guard let image = NSImage(data: Data(rendered.svg.utf8)), image.size.width > 0 else { fatalError("AppKit failed to decode \(type)") }
     let width = Int(ceil(rendered.width)), height = Int(ceil(rendered.height))
@@ -93,7 +96,7 @@ for (type, source) in [
         }
     }}
     guard painted > 100, let png = bitmap.representation(using: .png, properties: [:]) else { fatalError("No meaningful native \(type) pixels") }
-    guard titleInk > 20 else { fatalError("AppKit dropped positioned title in \(type)") }
+    guard ["flowchart", "kanban", "mindmap"].contains(type) || titleInk > 20 else { fatalError("AppKit dropped positioned title in \(type)") }
     try png.write(to: output.appendingPathComponent("swift-\(type).png"))
     print("Swift owned \(type) + AppKit: \(width)x\(height), \(painted) painted pixels, \(titleInk) title pixels")
 }

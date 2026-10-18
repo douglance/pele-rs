@@ -1,5 +1,7 @@
 //! Pele svg/{builder,root,theme}.ts rendering primitives, 458322a5 (MIT, kepano).
+pub(crate) mod edges;
 mod native;
+pub(crate) mod shapes;
 use crate::compat::{
     source::decode_entities,
     text::{Label, SPACE},

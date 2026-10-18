@@ -1,6 +1,6 @@
 //! Pele flowchart token catalogue, 458322a5 (MIT, kepano).
-#![allow(non_camel_case_types,clippy::upper_case_acronyms)]
-#[derive(Clone,Copy,Debug,PartialEq,Eq)]
+#![allow(non_camel_case_types, clippy::upper_case_acronyms)]
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
 #[repr(usize)]
 pub(super) enum T {
     END,

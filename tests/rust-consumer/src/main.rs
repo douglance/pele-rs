@@ -12,6 +12,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
     let engine = pele::compat::Engine::with_builtins();
     for (kind, source) in [
+        (pele::compat::DiagramType::Flowchart, "flowchart TD\nsubgraph Core\nA --> B\nend\nB --> C"),
+        (pele::compat::DiagramType::Kanban, "kanban\n  Todo\n    Task[Build Rust]"),
+        (pele::compat::DiagramType::Mindmap, "mindmap\n  root((Rust))\n    Swift\n    Web"),
         (pele::compat::DiagramType::Pie, "pie\n\"One\":1"),
         (
             pele::compat::DiagramType::Packet,
@@ -44,6 +47,6 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
         assert!(rendered.rendered.width > 0. && rendered.rendered.height > 0.);
         assert!(rendered.rendered.svg.starts_with("<svg"));
     }
-    println!("Packaged Rust compatibility consumer passed: pie, packet, radar, quadrantChart, timeline, journey");
+    println!("Packaged Rust compatibility consumer passed: flowchart, kanban, mindmap, pie, packet, radar, quadrantChart, timeline, journey");
     Ok(())
 }

@@ -1,7 +1,9 @@
 //! Resolved native export over the compatible SVG. Source text is never rewritten.
 use crate::compat::{ErrorCode, PeleError};
+use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
+use std::sync::OnceLock;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(default, rename_all = "camelCase", deny_unknown_fields)]
 pub struct NativeTheme {
@@ -121,6 +123,29 @@ fn resolve(
     out.push_str(&value[from..]);
     Ok(out)
 }
+// Generated cluster halos mix two opaque palette colors in encoded sRGB.
+// Resolve that operation for native decoders without rewriting authored text.
+fn color_mix(value: &str) -> String {
+    static MIX: OnceLock<Regex> = OnceLock::new();
+    let re = MIX.get_or_init(|| Regex::new(r"color-mix\(in srgb,\s*#([0-9a-fA-F]{6})\s+([0-9]+(?:\.[0-9]+)?)%,\s*#([0-9a-fA-F]{6})\s*\)").unwrap());
+    re.replace_all(value, |c: &regex::Captures<'_>| {
+        let weight = c[2].parse::<f64>().unwrap() / 100.;
+        if !(0.0..=1.0).contains(&weight) {
+            return c[0].to_string();
+        }
+        let mut out = String::from("#");
+        for offset in [0, 2, 4] {
+            let a = u8::from_str_radix(&c[1][offset..offset + 2], 16).unwrap() as f64;
+            let b = u8::from_str_radix(&c[3][offset..offset + 2], 16).unwrap() as f64;
+            out.push_str(&format!(
+                "{:02x}",
+                (a * weight + b * (1. - weight)).round() as u8
+            ));
+        }
+        out
+    })
+    .into_owned()
+}
 
 fn tags(svg: &str) -> Vec<std::ops::Range<usize>> {
     let mut out = Vec::new();
@@ -236,7 +261,7 @@ pub(crate) fn resolved_svg(svg: &str, theme: &NativeTheme) -> Result<String, Pel
             }
             out.push_str(&tag[last..attr.from]);
             let value = &tag[attr.from..attr.to];
-            let mut value = resolve(value, &tokens, 0)?;
+            let mut value = color_mix(&resolve(value, &tokens, 0)?);
             if attr.name == "style" {
                 value = value
                     .split(';')

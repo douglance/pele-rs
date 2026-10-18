@@ -73,7 +73,7 @@ impl<D: DiagramModule> ErasedModule for Module<D> {
         }
         result
             .and_then(|_| {
-                super::value::parse_json(
+                super::value::parse_model_json(
                     std::str::from_utf8(&writer.bytes).expect("JSON serializer emits UTF-8"),
                 )
             })
@@ -126,6 +126,9 @@ impl Engine {
     /// Registers implemented built-ins only; consult capabilities for parity status.
     pub fn with_builtins() -> Self {
         let mut engine = Self::empty();
+        engine.register(super::diagrams::flowchart::Flowchart);
+        engine.register(super::diagrams::kanban::Kanban);
+        engine.register(super::diagrams::mindmap::Mindmap);
         engine.register(super::diagrams::pie::Pie);
         engine.register(super::diagrams::quadrant_chart::QuadrantChart);
         engine.register(super::diagrams::packet::Packet);

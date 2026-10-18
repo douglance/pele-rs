@@ -53,7 +53,12 @@ origin and SHA-256 are in `crates/pele/assets/fonts/README.md`.
 | `compat/diagrams/timeline/` | `src/diagrams/timeline/{index,db,lexer,parser,render}.ts` | Periods/events/sections, colors, horizontal/vertical layout and narrow adaptation |
 | `compat/diagrams/journey/` | `src/diagrams/journey/{index,db,lexer,parser,render}.ts` | Tasks/actors/scores, ordered sections, faces and horizontal/vertical layout |
 | `compat/diagrams/common.rs` | `src/diagrams/common/tokens.ts` | Hidden YAML greedy-optional-body behavior shared by pie, packet and radar |
-| `compat/diagrams/flowchart/` | `src/diagrams/flowchart/{lexer,parser,db,types,shapes}.ts` | Full source/model checkpoint; actual renderer remains in progress |
+| `compat/diagrams/flowchart/` | `src/diagrams/flowchart/{lexer,parser,db,types,shapes,graph,render}.ts` | Full declared models, graph normalization and actual layered/compound SVG rendering |
+| `compat/layout/` | `src/layout/{layered,compound}.ts` | Actual rank/cycle/crossing/coordinates/routes, nested groups and bounded expansion translation |
+| `compat/svg/{shapes,edges}/` | `src/svg/{shapes,edges,theme,cluster}.ts` | Full shape paths/intersections, markers/curves/loops/style resolution and cluster titles |
+| `compat/diagrams/kanban/` | `src/diagrams/kanban/{index,db,render}.ts` | Columns/cards, metadata/icons/tickets, wrapped/folded board rendering |
+| `compat/diagrams/mindmap/` | `src/diagrams/mindmap/{index,db,parser,render}.ts` | Typed branch tree, shapes/icons, balanced branches and narrow outline rendering |
+| `compat/diagrams/common/{outline,icon}.rs` | `src/diagrams/common/{outline,icon}.ts` | Shared indentation/parser and icon layout behavior |
 | `compat/source/url.rs` | `src/util/url.ts` | Sanitization and scheme gates; WHATWG HTTP normalization uses Rust url crate |
 | `compat/text/` | `src/text/{label,measurer,metrics}.ts` | Rich labels, wrapping, style spans and deterministic Arial fallback metrics |
 | `compat/svg/` | `src/svg/{builder,root,theme}.ts` | Escaping, labels, SVG root and theme tokens; native palette resolution is a Rust extension |
@@ -65,7 +70,7 @@ checkout using Node's development-only TypeScript transformation. Its 34 source
 corpora include 761 examples across every family and agentflow reference cases.
 Mermaid fixture licensing is retained in `third_party/MERMAID-LICENSE`.
 
-The six family fixtures and extractors pin source-file hashes and 58,154 public
+The nine family fixtures and extractors pin source-file hashes and 99,345 public
 parse/render scenarios. Large SVGs use exact SHA256 comparisons; complete models
 remain present. A separate packet stress case checks shared labels and a 10,000-row
 typed model without materializing 400 MB of JSON. The oracle JavaScript is a
@@ -75,7 +80,10 @@ not certify all public API behavior: JavaScript model mutations are not yet appl
 to retained Rust documents, and lazy registration/mount/zoom remain pending.
 Shared label model projections have an explicit 16 MiB JSON transport cap, while
 typed Rust models and direct source rendering retain shared data. Native export
-also repeats initial tspan coordinates on parent text for AppKit's SVG decoder.
+also repeats initial tspan coordinates on parent text and resolves generated
+opaque sRGB color-mix halos for AppKit's SVG decoder. Mindmap model projection
+preflights repeated tree expansion and rejects depth 48 before recursive encoding;
+its typed model and source-render path support the tested depth 3,000.
 
 The full-parity inventory remains the acceptance gate. Passing preparation cases
 is not complete grammar/model/render compatibility. In particular, Rust/Swift UTF-8

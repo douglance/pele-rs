@@ -4,6 +4,7 @@ pub mod diagrams;
 mod engine;
 mod error;
 mod id;
+pub(crate) mod layout;
 mod svg;
 pub use svg::NativeTheme;
 pub mod text;

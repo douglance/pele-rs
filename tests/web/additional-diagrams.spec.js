@@ -1,7 +1,8 @@
 import {test,expect} from '@playwright/test';
 
-for(const family of ['packet','radar','quadrant','timeline','journey']) {
+for(const family of ['packet','radar','quadrant','timeline','journey','flowchart','kanban','mindmap']) {
   test(`${family} pinned corpus through WASM source and owned model APIs`, async({page})=>{
+    test.setTimeout(120_000);
     await page.goto('/examples/web/');
     const report=await page.evaluate(async family=>{
       const {loadRenderer,metricsMeasurer}=await import('/dist/package-web/package/full.js');
@@ -10,23 +11,29 @@ for(const family of ['packet','radar','quadrant','timeline','journey']) {
       const mismatches=[];
       for(const c of fixture.cases) {
         let actual,model;
-        const host=c.host??{},options={...c.options,measurer:host.measure==='fixed'?{width:(text,size,style)=>text.length*size*(style&1?.71:.6)}:metricsMeasurer,...(host.icons?{icons:n=>host.icons[n]}:{})};
+        const host=c.host??{},options={...c.options,measurer:host.measure==='fixed'?{width:(text,size,style)=>text.length*size*(style&1?.71:.6)}:metricsMeasurer,...(host.allIcons?{icons:()=>'<path d="M0,0"/>'}:host.icons?{icons:n=>Object.hasOwn(host.icons,n)&&typeof host.icons[n]==='string'?host.icons[n]:undefined}:{})};
         try {
           model=engine.parse(c.source,c.options);
           actual={model,result:engine.render(model,options)};
           if(canonical(actual.result)!==canonical(engine.render(c.source,options)))mismatches.push(`${c.id}: source/model differ`);
           if(c.expected.result?.svgSha256){const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(actual.result.svg));delete actual.result.svg;actual.result.svgSha256=[...new Uint8Array(hash)].map(v=>v.toString(16).padStart(2,'0')).join('');}
-        } catch(e) { actual={error:{name:e.name,message:e.message,code:e.code,type:e.type,line:e.line,column:e.column,snippet:e.snippet}}; }
+        } catch(e) { actual={...(c.expected.model&&model?{model}:{}),error:{name:e.name,message:e.message,code:e.code,type:e.type,line:e.line,column:e.column,snippet:e.snippet}}; }
         finally { if(model)engine.dispose(model); }
         if(canonical(actual)!==canonical(c.expected))mismatches.push(c.id);
       }
       // Rust checks the typed shared-string model without a 400 MB JSON projection.
-      for(const c of fixture.stress??[]) {
-        let bounded=false;try {const model=engine.parse(c.source,c.options);engine.dispose(model)}catch(e){bounded=e.code==='limit'&&e.type==='packet'}
+      for(const c of [...(fixture.stress??[]),...(fixture.typedCases??[])]) {
+        let bounded=false;try {const model=engine.parse(c.source,c.options);engine.dispose(model)}catch(e){bounded=e.code==='limit'&&e.type===family}
         if(!bounded)mismatches.push(`stress/${c.id}: model projection was not bounded`);
         const actual=engine.render(c.source,{...c.options,measurer:metricsMeasurer});
         const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(actual.svg));delete actual.svg;actual.svgSha256=[...new Uint8Array(hash)].map(v=>v.toString(16).padStart(2,'0')).join('');
         if(canonical(actual)!==canonical(c.expected.result))mismatches.push(`stress/${c.id}`);
+      }
+      for(const c of fixture.generatedStress??[]) {
+        let model;
+        try { model=engine.parse(c.source,c.options);
+          if(model.nodes.size!==c.expected.nodes||model.edges.length!==c.expected.edges||model.edges[0].type!==c.expected.firstEdgeType)mismatches.push(`generated/${c.id}`);
+        } finally {if(model)engine.dispose(model)}
       }
       return {count:fixture.cases.length,mismatches};
     },family);
@@ -40,6 +47,9 @@ test('new families paint resolved SVG through real browser decoders',async({page
   const report=await page.evaluate(async()=>{
     const {loadRenderer}=await import('/dist/package-web/package/full.js'),engine=await loadRenderer(),proof=[];
     for(const [type,source] of [
+      ['flowchart','flowchart TD\nsubgraph one[My Group]\nA --> B\nend\nC --> A'],
+      ['kanban','kanban\n  Todo\n    task[Build Rust]\n  Done\n    ship[Ship Swift]'],
+      ['mindmap','mindmap\n  root((Rust))\n    Swift\n    Web'],
       ['packet','packet-beta\ntitle Network header\n0-7: "Version"\n8-15: "Flags"\n16-31: "Length"'],
       ['radar','radar-beta\ntitle Skills\naxis a["Speed"], b["Quality"], c["Cost"]\ncurve team["Team"]{4, 3, 5}'],
       ['timeline','timeline\ntitle Releases\nsection Core\n2025: Rust\n2026: Swift: Web'],
@@ -51,7 +61,7 @@ test('new families paint resolved SVG through real browser decoders',async({page
       const canvas=document.createElement('canvas');canvas.width=Math.ceil(rendered.width);canvas.height=Math.ceil(rendered.height);
       const ctx=canvas.getContext('2d');ctx.drawImage(image,0,0);const data=ctx.getImageData(0,0,canvas.width,canvas.height).data;
       let painted=0;for(let i=0;i<data.length;i+=4)if(data[i+3]>100)painted++;
-      proof.push({type:rendered.type,expectedType:type,painted,unresolved:rendered.svg.includes('var(')});
+      proof.push({type:rendered.type,expectedType:type,painted,unresolved:rendered.svg.includes('var(')||rendered.svg.includes('color-mix(')});
     }
     return proof;
   });

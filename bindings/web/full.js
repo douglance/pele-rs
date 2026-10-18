@@ -23,6 +23,7 @@ export async function loadRenderer(moduleOrPath) {
         const model = projection.model;
         if (projection.type === 'pie') model.sections = new Map(model.sections);
         if (projection.type === 'quadrantChart') model.classes = new Map(model.classes);
+        if (projection.type === 'flowchart') for (const key of ['nodes', 'classes', 'tooltips']) model[key] = new Map(model[key]);
         documents.set(model, document);
         return model;
       } catch (error) { document.free(); throw error; }
