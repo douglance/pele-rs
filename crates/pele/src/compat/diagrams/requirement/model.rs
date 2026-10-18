@@ -55,6 +55,15 @@ pub struct RequirementModel {
     pub acc_title: Option<String>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub acc_descr: Option<String>,
+    /// Source builder state, omitted from the stable immutable model projection.
+    /// Typed reconstruction cannot recover erased JavaScript builder history.
+    #[serde(skip)]
+    pub public_provenance: RequirementProvenance,
+}
+#[derive(Clone, Debug, Default)]
+pub struct RequirementProvenance {
+    pub pending: [String; 6],
+    pub style_copies: usize,
 }
 pub(super) struct Db {
     pub model: RequirementModel,
@@ -82,6 +91,7 @@ impl Db {
                 title: title.map(str::to_owned),
                 acc_title: None,
                 acc_descr: None,
+                public_provenance: RequirementProvenance::default(),
             },
             new_id: String::new(),
             new_text: String::new(),
@@ -94,6 +104,20 @@ impl Db {
             els: HashMap::new(),
             cls: HashMap::new(),
         }
+    }
+    pub fn finish(mut self) -> RequirementModel {
+        self.model.public_provenance = RequirementProvenance {
+            pending: [
+                self.new_id,
+                self.new_text,
+                self.new_risk,
+                self.new_verify,
+                self.new_type,
+                self.new_doc_ref,
+            ],
+            style_copies: self.copies,
+        };
+        self.model
     }
     fn copy(&mut self, n: usize) -> Result<(), PeleError> {
         self.copies += n;

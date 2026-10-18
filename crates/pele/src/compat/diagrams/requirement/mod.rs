@@ -29,3 +29,7 @@ impl DiagramModule for RequirementDiagram {
         render::render(m, c, o, r)
     }
 }
+
+mod public_model;
+pub use public_model::RequirementPublicState;
+pub use model::RequirementProvenance;

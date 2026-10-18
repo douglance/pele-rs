@@ -374,7 +374,16 @@ fn draw(
     let mut cedges = vec![];
     let mut edge_labels = vec![];
     let mut drawn = vec![];
+    let keys: std::collections::HashSet<&str> = m
+        .requirements
+        .iter()
+        .map(|(k, _)| k.as_str())
+        .chain(m.elements.iter().map(|(k, _)| k.as_str()))
+        .collect();
     for (i, edge) in m.relations.iter().enumerate() {
+        if !keys.contains(edge.src.as_str()) || !keys.contains(edge.dst.as_str()) {
+            continue;
+        }
         let (Some(&src), Some(&dst)) = (index.get(&edge.src), index.get(&edge.dst)) else {
             continue;
         };

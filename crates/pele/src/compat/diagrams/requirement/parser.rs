@@ -225,7 +225,7 @@ impl Reader<'_> {
         loop {
             let t = self.t();
             if t == T::EOF {
-                return Ok(self.db.model);
+                return Ok(self.db.finish());
             }
             if t == T::NEWLINE {
                 self.i += 1;
