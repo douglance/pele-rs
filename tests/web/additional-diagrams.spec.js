@@ -1,6 +1,6 @@
 import {test,expect} from '@playwright/test';
 
-for(const family of ['packet','radar','quadrant','timeline','journey','flowchart','kanban','mindmap','class','er','xychart','state','gantt','sequence','git-graph','architecture','sankey']) {
+for(const family of ['packet','radar','quadrant','timeline','journey','flowchart','kanban','mindmap','class','er','xychart','state','gantt','sequence','git-graph','architecture','sankey','treemap','c4','info']) {
   test(`${family} pinned corpus through WASM source and owned model APIs`, async({page})=>{
     test.setTimeout(120_000);
     await page.goto('/examples/web/');
@@ -14,7 +14,9 @@ for(const family of ['packet','radar','quadrant','timeline','journey','flowchart
       for(const c of fixture.cases) {
         let actual,model;
         const host=c.host??{},options={...c.options,measurer:host.measure==='fixed'?{width:(text,size,style)=>text.length*size*(style&1?.71:.6)}:metricsMeasurer,...(host.allIcons?{icons:()=>'<path d="M0,0"/>'}:host.icons?{icons:n=>Object.hasOwn(host.icons,n)&&typeof host.icons[n]==='string'?host.icons[n]:undefined}:{})};
-        let expected=c.expected;
+        let expected={...c.expected};
+        // Diagnostic provenance is not part of the public parse/render envelope.
+        delete expected.upstreamModelSha256;
         // Date.parse is a host resource. Compare divergent legacy inputs against
         // the pinned upstream library in this same browser, without fixture injection.
         if(oracle&&Object.entries(host.oracleDateParse??{}).some(([text,value])=>{
@@ -71,6 +73,9 @@ test('new families paint resolved SVG through real browser decoders',async({page
   const report=await page.evaluate(async()=>{
     const {loadRenderer}=await import('/dist/package-web/package/full.js'),engine=await loadRenderer(),proof=[];
     for(const [type,source] of [
+      ['treemap','treemap-beta\n"Category A"\n  "Swift": 10\n  "Web": 20\n"Category B"\n  "Rust": 30'],
+      ['c4','C4Context\ntitle Shared system\nPerson(user, "User", "Author")\nSystem(core, "Rust", "Renderer")\nRel(user, core, "Uses")'],
+      ['info','info\ntitle Shared engine'],
       ['gitGraph','gitGraph\ncommit id: "base"\nbranch feature\ncommit\ncheckout main\nmerge feature'],
       ['architecture','architecture-beta\nservice app(server)[App]\nservice db(database)[Data]\napp:R --> L:db'],
       ['sankey','sankey\nCapture,Store,10\nStore,Swift,6\nStore,Web,4'],
@@ -98,7 +103,7 @@ test('new families paint resolved SVG through real browser decoders',async({page
     }
     return proof;
   });
-  for(const proof of report){expect(proof.type).toBe(proof.expectedType);expect(proof.unresolved).toBe(false);expect(proof.painted).toBeGreaterThan(1000);}
+  for(const proof of report){expect(proof.type).toBe(proof.expectedType);expect(proof.unresolved).toBe(false);expect(proof.painted, proof.expectedType).toBeGreaterThan(proof.expectedType==='info'?500:1000);}
 });
 
 

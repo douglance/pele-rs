@@ -1,10 +1,12 @@
 pub mod architecture;
+pub mod c4;
 pub mod class_diagram;
 mod common;
 pub mod er;
 pub mod flowchart;
 pub mod gantt;
 pub mod git_graph;
+pub mod info;
 pub mod journey;
 pub mod kanban;
 pub mod mindmap;
@@ -16,4 +18,5 @@ pub mod sankey;
 pub mod sequence;
 pub mod state;
 pub mod timeline;
+pub mod treemap;
 pub mod xychart;

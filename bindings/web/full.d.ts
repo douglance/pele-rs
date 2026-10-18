@@ -71,7 +71,14 @@ export interface ArchitectureEdge { lhsId: string; lhsDir: string; lhsInto: bool
 export interface ArchitectureModel extends AccessibleModel { type: 'architecture'; nodes: ReadonlyMap<string, ArchitectureNode>; groups: ReadonlyMap<string, ArchitectureGroup>; edges: ArchitectureEdge[]; layoutHints: { direction: string; members: string[] }[]; registered: ReadonlyMap<string, string> }
 export interface SankeyNode { id: string; index: number }
 export interface SankeyModel extends AccessibleModel { type: 'sankey'; nodes: SankeyNode[]; links: { source: SankeyNode; target: SankeyNode; value: number }[] }
-export type DiagramModel = PieModel | PacketModel | RadarModel | QuadrantModel | TimelineModel | JourneyModel | FlowchartModel | KanbanModel | MindmapModel | ClassModel | ErModel | XyChartModel | StateModel | GanttModel | SequenceModel | GitModel | ArchitectureModel | SankeyModel;
+export interface TreemapNode { name: string; children?: TreemapNode[]; value?: number; classSelector?: string; cssCompiledStyles?: string[] }
+export interface TreemapModel extends AccessibleModel { type: 'treemap'; roots: TreemapNode[]; classes: ReadonlyMap<string, string[]> }
+export interface InfoModel extends AccessibleModel { type: 'info' }
+export interface C4Named { key: string; value: string }
+export interface C4Element { alias: string; label: string; aliasAttr?: C4Named; labelAttr?: C4Named; parent?: C4Element; type?: string; descr?: string; techn?: string; sprite?: string; tags?: string; link?: string; bgColor?: string; fontColor?: string; borderColor?: string; shadowing?: string; shape?: string; legendText?: string; legendSprite?: string; extra?: ReadonlyMap<string,string> }
+export interface C4Relation { type: string; from: string; to: string; label: string; fromAttr?: C4Named; toAttr?: C4Named; labelAttr?: C4Named; techn?: string; descr?: string; sprite?: string; tags?: string; link?: string; textColor?: string; lineColor?: string; offsetX?: number; offsetY?: number; extra?: ReadonlyMap<string,string> }
+export interface C4Model extends AccessibleModel { type: 'c4'; c4Type?: string; shapes: (C4Element & {kind:string})[]; boundaries: (C4Element & {nodeType?:string})[]; rels: C4Relation[]; shapeInRow: number; boundaryInRow: number }
+export type DiagramModel = PieModel | PacketModel | RadarModel | QuadrantModel | TimelineModel | JourneyModel | FlowchartModel | KanbanModel | MindmapModel | ClassModel | ErModel | XyChartModel | StateModel | GanttModel | SequenceModel | GitModel | ArchitectureModel | SankeyModel | TreemapModel | C4Model | InfoModel;
 export interface Rendered { type: DiagramId; svg: string; width: number; height: number; links: { id: string; href: string; internal: boolean }[] }
 export interface Renderer {
   capabilities(): Capability[];

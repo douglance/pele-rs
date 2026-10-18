@@ -4,6 +4,13 @@ import XCTest
 import Pele
 
 final class AdditionalDiagramTests: XCTestCase {
+    private struct ModelExpectations: Decodable {
+        struct Case: Decodable {
+            struct Expected: Decodable { let model: ConfigValue? }
+            let expected: Expected
+        }
+        let cases: [Case]
+    }
     private func fixtureData(_ url: URL) throws -> Data {
         if FileManager.default.fileExists(atPath: url.path) { return try Data(contentsOf: url) }
         let process = Process(), pipe = Pipe()
@@ -19,12 +26,14 @@ final class AdditionalDiagramTests: XCTestCase {
     func testPinnedDiagramsThroughNativeDocuments() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent("../../../..").standardizedFileURL
         let decoder = JSONDecoder(), encoder = JSONEncoder(), engine = Pele.Engine()
-        for family in ["packet", "radar", "quadrant", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence", "git-graph", "architecture", "sankey"] {
+        for family in ["packet", "radar", "quadrant", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence", "git-graph", "architecture", "sankey", "treemap", "c4", "info"] {
             if let families = ProcessInfo.processInfo.environment["PELE_FAMILIES"], !families.split(separator: ",").contains(Substring(family)) { continue }
-            let fixture = try JSONSerialization.jsonObject(with: fixtureData(root.appendingPathComponent("fixtures/pele/\(family).json"))) as! [String: Any]
+            let bytes = try fixtureData(root.appendingPathComponent("fixtures/pele/\(family).json"))
+            let fixture = try JSONSerialization.jsonObject(with: bytes) as! [String: Any]
+            let modelExpectations = try decoder.decode(ModelExpectations.self, from: bytes)
             let cases = fixture["cases"] as! [[String: Any]]
             XCTAssertFalse(cases.isEmpty, family)
-            for item in cases {
+            for (index, item) in cases.enumerated() {
                 let id = "\(family)/\(item["id"]!)", source = item["source"] as! String
                 let settings = ["config": [String: Any]()].merging(item["options"] as? [String: Any] ?? [:]) { _, value in value }
                 let options = try decoder.decode(Pele.Engine.Options.self, from: JSONSerialization.data(withJSONObject: settings))
@@ -62,9 +71,10 @@ final class AdditionalDiagramTests: XCTestCase {
                         continue
                     }
                     let document = try engine.parse(source, options: parseOptions)
-                    let model = try JSONSerialization.jsonObject(with: encoder.encode(document.model)) as! NSDictionary
-                    if let expectedModel = expected["model"] as? NSDictionary {
-                        XCTAssertEqual(model, expectedModel, id)
+                    // Decode directly from oracle bytes: Foundation's Any projection
+                    // can retain decimal storage or strip leading U+FEFF from strings.
+                    if let expectedModel = modelExpectations.cases[index].expected.model {
+                        XCTAssertEqual(document.model, expectedModel, id)
                     }
                     projected = true
                     let rendered = try engine.render(document, options: options, resources: resources)
@@ -117,7 +127,7 @@ final class AdditionalDiagramTests: XCTestCase {
             }
         }
         let capabilities = try engine.capabilities()
-        XCTAssertEqual(Set(capabilities.filter { $0.registered }.map(\.type)), Set(["pie", "packet", "radar", "quadrantChart", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence", "gitGraph", "architecture", "sankey"]))
+        XCTAssertEqual(Set(capabilities.filter { $0.registered }.map(\.type)), Set(["pie", "packet", "radar", "quadrantChart", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence", "gitGraph", "architecture", "sankey", "treemap", "c4", "info"]))
     }
 }
 

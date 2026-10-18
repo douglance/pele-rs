@@ -126,6 +126,9 @@ impl Engine {
     /// Registers implemented built-ins only; consult capabilities for parity status.
     pub fn with_builtins() -> Self {
         let mut engine = Self::empty();
+        engine.register(super::diagrams::treemap::Treemap);
+        engine.register(super::diagrams::c4::C4);
+        engine.register(super::diagrams::info::Info);
         engine.register(super::diagrams::git_graph::GitGraph);
         engine.register(super::diagrams::architecture::Architecture);
         engine.register(super::diagrams::sankey::Sankey);

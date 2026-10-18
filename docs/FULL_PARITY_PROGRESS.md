@@ -6,7 +6,7 @@ release or new GIF has been published from this branch.
 
 ## Implemented renderers
 
-`Engine::with_builtins()` currently registers eighteen actual Rust diagram modules.
+`Engine::with_builtins()` currently registers twenty-one actual Rust diagram modules.
 `Engine::empty()` and typed `DiagramModule<Model>` remain extension interfaces.
 Registration never certifies a global parity flag; all public API gates remain open.
 
@@ -30,9 +30,12 @@ Registration never certifies a global parity flag; all public API gates remain o
 | gitGraph | 17,125 | 5,050 | 12,075 |
 | architecture | 18,780 | 4,593 | 14,187 |
 | sankey | 11,616 | 4,946 | 6,670 |
-| Total | 247,329 | 93,721 | 153,608 |
+| treemap | 15,370 | 9,946 | 5,424 |
+| c4 | 18,603 | 6,278 | 12,325 |
+| info | 8,053 | 1,491 | 6,562 |
+| Total | 289,355 | 111,436 | 177,919 |
 
-There are 98,205 complete model comparisons. Parsed models are retained when a
+There are 116,148 complete model comparisons. Parsed models are retained when a
 subsequent render fails. Six class stress cases explicitly exceed the JSON
 projection depth/size budget; their typed models and exact source renders/errors
 remain covered. These transport exceptions do not earn full public API parity.
@@ -107,6 +110,9 @@ only to raster evidence, while exported diagrams retain SVG transparency.
 
 | Diagram | Native pixels | Additional text proof |
 | --- | --- | --- |
+| treemap | 656 x 416; 242,303 painted | Hierarchy and 520 title pixels |
+| c4 | 548 x 168; 4,989 painted | Elements, relation and 437 title pixels |
+| info | 127 x 72; 1,106 painted | Pinned version and 419 title pixels |
 | legacy flowchart | 416 x 789; 6,846 painted | Legacy outlined font path |
 | pie | 358 x 296; 44,733 colored | Native compatibility export |
 | class | 140 x 240; 3,904 painted | Members, relations and labels |
@@ -168,6 +174,27 @@ consolidated eighteen-family Swift corpus run. Independent Rust/Swift package
 consumers were last exercised at the fifteen-family checkpoint; final all-family
 package and CI gates remain mandatory.
 
+## Treemap, C4 and Info checkpoint
+
+Eight additional release Rust integration tests pass. The complete three-family
+corpora pass through Swift/C source and owned-document rendering, and through
+Chrome, Firefox and WebKit (nine corpus checks). All three browser SVG decoder
+checks pass, with Info's small version label required to paint at least 500 pixels.
+AppKit paints each current native export; all seven Swift integration test methods
+pass in this checkpoint. This remains cumulative family coverage, with the final
+unfiltered all-family run required before release.
+
+Treemap retains one deep-model JSON projection limit; C4 retains eighteen cyclic
+or deep projections. Typed models and exact source renders remain tested. C4's
+five header forms are one family, with a dedicated layout and obstacle router.
+Info reports the pinned upstream version rather than the Rust package version.
+Treemap classes and C4 extra attributes are restored as Maps by the web adapter.
+
+Swift fixture models now decode directly from oracle bytes with JSONDecoder.
+Foundation's Any projection exposed false numeric comparison failures and stripped
+a leading U+FEFF in a model string; direct decoding verifies the public binary64
+values and exact Unicode strings. No fixture cases were removed.
+
 ## Calendar and deep models
 
 Gantt uses the translated V8 date parser for native fallback strings, attributed
@@ -195,7 +222,7 @@ architecture is [LLD_PUBLIC_MODELS.md](LLD_PUBLIC_MODELS.md).
 
 ## Remaining acceptance work
 
-- Fifteen family renderers, remaining shared behavior and the complete
+- Twelve family renderers, remaining shared behavior and the complete
   registration/lazy/mount/zoom/public model interface remain required.
 - JavaScript model projections currently do not apply mutations back into the
   retained Rust document. Prototype methods/private enumerable state also need

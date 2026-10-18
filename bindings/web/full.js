@@ -38,6 +38,19 @@ export async function loadRenderer(moduleOrPath) {
         if (projection.type === 'sankey') for(const link of model.links) {
           link.source=model.nodes[link.source.index];link.target=model.nodes[link.target.index];
         }
+        if (projection.type === 'treemap') model.classes = new Map(model.classes);
+        if (projection.type === 'c4') {
+          const pending = [model];
+          while (pending.length) {
+            const value = pending.pop();
+            if (!value || typeof value !== 'object') continue;
+            if (Object.hasOwn(value, 'extra')) value.extra = new Map(value.extra);
+            for (const [key, child] of Object.entries(value)) if (key !== 'extra') {
+              if (Array.isArray(child)) pending.push(...child);
+              else if (child && typeof child === 'object') pending.push(child);
+            }
+          }
+        }
         if (projection.type === 'pie') model.sections = new Map(model.sections);
         if (projection.type === 'quadrantChart') model.classes = new Map(model.classes);
         if (projection.type === 'state') for (const key of ['states', 'classes', 'links']) model[key] = new Map(model[key]);
