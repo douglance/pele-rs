@@ -39,7 +39,7 @@ description in FULL_PARITY_LLD; immutable APIs remain supported alongside them.
 | linkSchemes/imageSchemes/linkRel | Existing Options and Rust filtering | Native display still needs approved resource loading and actual link interaction. |
 | config | ConfigValue plus Rust Object; YAML/init preprocessing | Host JSON encoding rejects nonfinite numbers; shared-reference/config mutation semantics are not fully represented. Source YAML support does not close host-config transport. |
 | load / renderAsync | New native lazy/async slice below | Native built-ins are already linked; selection is lazy, binary download/code splitting is not. |
-| mount / mountAsync | No shipped native controller/view counterpart | Mandatory next host layers: lifecycle, error/last-good presentation, resize/font/theme refresh and cleanup. |
+| mount / mountAsync | Source-built AppKit DiagramView/Mounted; ARM window lifecycle/pixels verified | mountAsync, zoom, links and resource matching remain mandatory. |
 | enableZoom / Zoom | No shipped native counterpart | Mandatory native fit/pan/zoom/actions/focus/controls/localized labels and cleanup. |
 | forgetTextWidths | Rust makes width calls through resources; no shared cross-render width cache | Define invalidation in the native presentation/font-resource owner; do not invent a cache or claim a no-op invalidates host caches. |
 | Distribution | Local universal SDK build and AppKit smoke entry exist | Current root package can fall back to older v0.1 binary and exclude new APIs. Final release must publish matching artifact/checksum/header/Swift source and prove fresh external consumption. |
@@ -581,3 +581,28 @@ which contains serialization/unwind and uses constant bounded fallback envelopes
 the C feature test supplies an explicit-length 6 MiB NUL line. That addresses the
 new v9 result-byte contract structurally; runtime proof belongs to the parent
 verification batch. Earlier APIs' error-envelope budgets remain separate work.
+
+
+## Native view lifecycle acceptance checkpoint (2026-10-19)
+
+The rebuilt ARM64 SDK passes ten native-window feature tests. Ordered-front
+NSWindow fixtures exercise real DiagramView bitmap pixels, retained NSImage
+pixels, dimmed diagnostics, failed/deferred updates and recovery, callback
+publication/reentry, replacement/teardown, detached/zero-width initialization,
+adaptive host-follow-width quietness, Gantt retained cache/clock behavior and
+unique versus explicit drawing IDs. Native measurement/preparation reentry is
+rejected before changing ownership. Original class-based callback errors retain
+identity; structured value errors compare fields, not AnyObject bridge boxes.
+
+DiagramView owns its controller; native documents retain parsed and drawn roles
+separately. Font-set and window changes invalidate presentation without reparsing;
+`invalidateResources()` explicitly refreshes host resources. Native presentation
+resolves the default palette and rejects unusable image dimensions without
+changing raw engine numeric acceptance. Errors over an existing drawing appear as
+a bottom one-line summary with complete tooltip/accessibility help. Error-only
+views display the full diagnostic.
+
+This proves the first presentation layer, not interactive SVG parity. NSImage
+still supplies no link regions, zoom, image-resource policy or complete diagram
+accessibility tree. The next layers above remain release gates. x86_64/Rosetta
+verification and independent consumers are tracked separately.
