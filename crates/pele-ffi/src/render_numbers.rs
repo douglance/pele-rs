@@ -194,6 +194,62 @@ pub(super) fn check_lengths(
     }
     Ok(())
 }
+/// Raw Diagram options exclude core parse fields and output-limit policy.
+pub(super) unsafe fn raw_options(
+    bytes: *const u8,
+    len: usize,
+    numbers: *const PeleRenderNumbersV9,
+) -> Result<pele::compat::RenderSettings, PeleError> {
+    use pele::compat::RenderSettings;
+    struct Settings(u64);
+    impl<'de> Visitor<'de> for Settings {
+        type Value = RenderSettings;
+        fn expecting(&self, f: &mut std::fmt::Formatter) -> std::fmt::Result {
+            f.write_str("raw diagram render options object")
+        }
+        fn visit_map<A: MapAccess<'de>>(self, map: A) -> Result<RenderSettings, A::Error> {
+            RenderSettings::deserialize(MapAccessDeserializer::new(FilteredMap {
+                inner: map,
+                mask: self.0,
+                seen: 0,
+            }))
+        }
+    }
+    impl<'de> DeserializeSeed<'de> for Settings {
+        type Value = RenderSettings;
+        fn deserialize<D: serde::Deserializer<'de>>(
+            self,
+            decoder: D,
+        ) -> Result<Self::Value, D::Error> {
+            decoder.deserialize_map(self)
+        }
+    }
+    check_lengths(len, None)?;
+    let numbers = unsafe { packet(numbers) }?;
+    let text = unsafe { compatibility_input(bytes, len, 1024 * 1024) }?;
+    let mut settings = if text.trim().is_empty() {
+        RenderSettings::default()
+    } else {
+        let mut decoder = serde_json::Deserializer::from_str(text);
+        let value = Settings(numbers.present | 1 << 5)
+            .deserialize(&mut decoder)
+            .and_then(|value| decoder.end().map(|_| value));
+        value.map_err(|error| public::invalid(&format!("Invalid raw render options: {error}")))?
+    };
+    let fields = [
+        &mut settings.font_size,
+        &mut settings.max_width,
+        &mut settings.direction_breakpoint,
+        &mut settings.padding,
+        &mut settings.now,
+    ];
+    for (index, field) in fields.into_iter().enumerate() {
+        if numbers.present & (1 << index) != 0 {
+            *field = Some(f64::from_bits(numbers.values[index]));
+        }
+    }
+    Ok(settings)
+}
 pub(super) unsafe fn options(
     bytes: *const u8,
     len: usize,

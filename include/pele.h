@@ -329,6 +329,26 @@ PeleResult *pele_public_render_operation_with_functions_v12(PelePublicDocument *
  */
 PeleResult *pele_active_model_access_v12(PeleActiveModelV12 *, const uint8_t *, size_t);
 
+/* Named per-diagram parse/render. Source is verbatim already-prepared UTF-8.
+ * Packet NULL: offset0, no title, undefined edge cap (raw disables semantic cap).
+ * Packet version13/size48, flags<=1, reserved0. Edges0undefined/1null/2bits.
+ * Native source16MiB, config/title1MiB, returnedSVG64MiB bounds remain.
+ * Successful parse returns an owned public document; existing snapshot/apply/
+ * schema/invoke/free functions operate on it. Use explicit raw render below.
+ */
+typedef struct PelePreparedOptionsV13 {
+    uint32_t version, struct_size;
+    uint64_t line_offset;
+    uint32_t max_edges_kind, title_present;
+    uint64_t max_edges_bits, reserved[2];
+} PelePreparedOptionsV13;
+PeleResult *pele_parse_prepared_v13(const uint8_t *, size_t, const uint8_t *, size_t,
+    const uint8_t *, size_t, const uint8_t *, size_t,
+    const PelePreparedOptionsV13 *, PelePublicDocument **);
+PeleResult *pele_render_prepared_v13(PelePublicDocument *, uint64_t,
+    const uint8_t *, size_t, const uint8_t *, size_t,
+    const PeleRenderNumbersV9 *, const PeleHostResourcesV3 *);
+
 uint32_t pele_result_status(const PeleResult *result);
 const uint8_t *pele_result_data(const PeleResult *result);
 size_t pele_result_len(const PeleResult *result);

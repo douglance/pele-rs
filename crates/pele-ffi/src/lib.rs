@@ -526,3 +526,6 @@ pub unsafe extern "C" fn pele_document_query_v2(
         })
     })
 }
+
+mod prepared;
+pub use prepared::*;

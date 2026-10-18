@@ -46,6 +46,7 @@ extension Pele {
             active = true; defer { active = false }
             return try withExtendedLifetime(self) { try operation(handle) }
         }
+        internal func acceptPreparedRevision(_ revision: UInt64) { self.revision = revision }
         public func snapshot() throws -> PublicSnapshot {
             try withHandle { handle in
                 struct Metadata: Decodable { let type: String }
