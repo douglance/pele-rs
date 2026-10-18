@@ -466,3 +466,20 @@ public graph in each browser. The strict TypeScript 4.9.5 consumer also passes.
 
 These local results cover the frozen adapter layer. They do not assert final CI,
 Intel execution, complete mutable/API parity, new package publication or release.
+
+
+## GitGraph mutable native checkpoint
+
+GitGraph is the seventeenth native mutable codec. Its actual returned value is a
+plain object with no model prototype methods; no synthetic builder API is added.
+Commit/branch Maps, head aliases, present undefined merge fields and own-key order
+are retained. The concrete Git renderer consumes the edited graph with the same
+23 pinned mutation SVG comparisons and all 17,125 historical outcomes (5,050 SVG
+results and 12,075 errors), with zero corpus exclusions.
+
+Eight public feature tests plus two baseline integration tests pass in release
+profile. Default iterators, finite/infinite sequence ordering, inactive fields,
+UTF-16 extras, native raster/resource recovery and bounded alias expansion are
+covered. NaN/nonnumeric sorting, exotic callbacks/coercion, active sparse/isolated
+UTF-16 text and some render-error classes remain explicit gaps. The verified
+foreign mutable checkpoint remains sixteen families.

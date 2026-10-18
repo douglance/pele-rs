@@ -38,3 +38,6 @@ pub fn parse(source: &str, options: &ParseOptions) -> Result<GitModel, PeleError
         inspected.prepared.title.as_deref(),
     )
 }
+
+mod public_model;
+pub use public_model::GitGraphPublicState;
