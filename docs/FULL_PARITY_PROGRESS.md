@@ -857,3 +857,43 @@ package and parses, edits, renders and snapshots every one of the 33 mutable
 families. Raw UTF-16 extension fields survive the consumer's graph round trips.
 This is native/package proof; final Swift and universal/Intel results remain
 separate gates.
+
+## Consolidated Swift and universal SDK verification
+
+The actual source-built C/Swift SDK passes 26 release integration tests in
+1,598.349 seconds. The unfiltered corpus crosses all 33 mutable families:
+167,473 drawing checks, 270,358 error checks and five explicitly pinned native
+export-budget differences. The original immutable/source oracle checks remain
+independent. These counts include the declared differences; they do not erase
+them or certify arbitrary JavaScript runtime behavior.
+
+Three additional actual-C integration tests close the five stress cases outside
+the main fixture arrays: Packet's shared 40,000-unit label over 10,000 rows,
+Mindmap depths 80/310/3,000, and Flowchart's 47,917-edge parse. They pass in
+1.717 seconds, including binary snapshot/apply, graph counts, source-equivalent
+rendering where the fixture defines it, raw UTF-16 extras and cyclic identity.
+The Packet check never expands the shared labels into a 400 MB JSON model.
+
+Fresh Rust arm64 and x86_64 archives form one verified universal XCFramework.
+Both slices match their target build inputs byte-for-byte; both linked consumer
+executables declare macOS 14.0 minimum deployment. The host is macOS 26.6;
+Rosetta execution does not substitute for a physical Intel or macOS 14 runtime.
+Separate copied SDKs pass
+nine feature tests on arm64 and nine under actual Intel Rosetta execution, and
+independent consumers parse/edit/render/snapshot/close all 33 families on both
+architectures. The consumer's State source comparison preserves title-looking
+DSL statements: pinned Pele proves those are ordinary state grammar, so
+rewriting them would change the diagram. No library fix or relaxed assertion
+was needed.
+
+The universal library SHA-256 is
+`1a7f5b670b6d0ccdc57c605bf6014aecb6fd95984cbf8c59fe4268184210833f`;
+its arm64 slice is
+`f8c8f8bb4939bb815813add7990c2ab1d3bcc6bfa0af7cb91c81f8934783e621`,
+and its Intel slice is
+`77122bf7b644b49e1ff8e29bd98d835f4e2119a15f639f128452df7e9916596e`.
+The verified universal SDK replaces the local generated arm64-only artifact;
+generated binaries remain excluded from Git. CI now requests these consolidated
+Rust and Swift checks in release configuration. A final green hosted CI run,
+new browser mutable adapters and the documented full-runtime/API release gates
+remain separate from this native/Swift checkpoint.
