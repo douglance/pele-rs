@@ -107,6 +107,19 @@ PeleResult *pele_public_snapshot_binary_v5(const PelePublicDocument *document);
 PeleResult *pele_public_apply_binary_v5(PelePublicDocument *document, const uint8_t *graph, size_t graph_len);
 PeleResult *pele_public_invoke_binary_v5(PelePublicDocument *document, uint64_t expected_revision, const uint8_t *call, size_t call_len, const PeleHostResourcesV3 *resources);
 PeleResult *pele_public_render_operation_binary_v5(PelePublicDocument *document, uint64_t expected_revision, const uint8_t *options, size_t options_len, const PeleHostResourcesV3 *resources);
+/* Exact output-limit lane, binary graph outcome as v5. limit_kind: 0 undefined,
+ * 1 null (both default 4,000,000 UTF-16 units), 2 raw IEEE-754 number bits.
+ * Overrides only options.outputLimit; other options retain existing decoding.
+ * Rendering and host callbacks run before output comparison; operation errors
+ * retain post-call graph/revision. Stale revisions reject before dispatch.
+ * Independent returned SVG ceiling:64 MiB UTF-8, including with NaN/infinity.
+ * This bounds accepted output, not all peak allocations inside renderers.
+ * Options <=1 MiB, complete binary exchange <=64 MiB; outer export errors may
+ * follow state mutation. Unknown kinds reject before dispatch. Ownership and
+ * synchronous host callback rules match render_operation_binary_v5. */
+PeleResult *pele_public_render_operation_output_limit_v6(PelePublicDocument *document,
+    uint64_t expected_revision, const uint8_t *options, size_t options_len,
+    uint32_t limit_kind, uint64_t limit_bits, const PeleHostResourcesV3 *resources);
 void pele_public_document_free_v4(PelePublicDocument *);
 
 uint32_t pele_result_status(const PeleResult *result);

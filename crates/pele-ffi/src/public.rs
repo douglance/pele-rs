@@ -42,6 +42,27 @@ fn source_limit_options(json: &str) -> Result<pele::compat::ParseOptions, PeleEr
             )
         })
 }
+fn output_limit_options(json: &str) -> Result<pele::compat::RenderOptions, PeleError> {
+    // Explicit IEEE threshold supersedes only the legacy integer field.
+    #[derive(Deserialize)]
+    struct Options {
+        #[serde(rename = "outputLimit", default)]
+        _legacy_output_limit: Option<serde::de::IgnoredAny>,
+        #[serde(flatten)]
+        options: pele::compat::RenderOptions,
+    }
+    if json.trim().is_empty() {
+        return Ok(Default::default());
+    }
+    serde_json::from_str::<Options>(json)
+        .map(|value| value.options)
+        .map_err(|error| {
+            PeleError::new(
+                format!("Invalid render options: {error}"),
+                ErrorCode::Semantic,
+            )
+        })
+}
 unsafe fn document<'a>(
     handle: *const PelePublicDocument,
 ) -> Result<MutexGuard<'a, PublicDocument>, PeleError> {
@@ -457,5 +478,64 @@ pub unsafe extern "C" fn pele_public_render_operation_binary_v5(
         )
         .map_err(|_| invalid("Invalid render metadata"))?;
         binary_success(outcome.revision, &outcome.graph, &metadata)
+    })
+}
+
+/// Exact IEEE output threshold with binary graph/revision and bounded metadata.
+/// # Safety
+/// Same live-handle/options/callback ownership as render_operation_binary_v5.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_render_operation_output_limit_v6(
+    handle: *mut PelePublicDocument,
+    expected_revision: u64,
+    options: *const u8,
+    options_len: usize,
+    limit_kind: u32,
+    limit_bits: u64,
+    resources: *const PeleHostResourcesV3,
+) -> *mut PeleResult {
+    compatibility_call(|| {
+        let options = unsafe { compatibility_input(options, options_len, 1024 * 1024) }?;
+        let options = output_limit_options(options)?;
+        let limit = match limit_kind {
+            0 => pele::compat::OutputLimit::Undefined,
+            1 => pele::compat::OutputLimit::Null,
+            2 => pele::compat::OutputLimit::Number(f64::from_bits(limit_bits)),
+            _ => {
+                return Err(invalid(
+                    "Native public transport: unknown output-limit kind",
+                ))
+            }
+        };
+        let mut document = unsafe { document(handle) }?;
+        let outcome = unsafe {
+            calendar::with_resources(resources, |host| {
+                document.render_operation_with_output_limit(
+                    expected_revision,
+                    &options,
+                    limit,
+                    host,
+                )
+            })
+        }?;
+        let mut metadata = Output {
+            bytes: Vec::new(),
+            exceeded: false,
+        };
+        let encoded = serde_json::to_writer(
+            &mut metadata,
+            &outcome
+                .result
+                .as_ref()
+                .map(pele::compat::render_result_transport),
+        );
+        if metadata.exceeded {
+            return Err(PeleError::new(
+                "Native public transport: result exceeds 64 MiB JSON budget",
+                ErrorCode::Limit,
+            ));
+        }
+        encoded.map_err(|_| invalid("Invalid render metadata"))?;
+        binary_success(outcome.revision, &outcome.graph, &metadata.bytes)
     })
 }

@@ -12,6 +12,8 @@ pub use svg::NativeTheme;
 pub mod text;
 pub use id::DiagramId;
 mod module;
+mod output_limit;
+pub use output_limit::{OutputLimit, MAX_PUBLIC_OUTPUT_BYTES};
 pub mod public;
 pub use engine::{Engine, ParsedDocument};
 pub use module::*;

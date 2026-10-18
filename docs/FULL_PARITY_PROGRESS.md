@@ -947,3 +947,45 @@ constructors, callback dispatch and other full-runtime/release gates remain open
 See [source-limit contract](SOURCE_LIMITS.md). The earlier full corpus and
 performance results retain their recorded revisions and artifact fingerprints;
 this additive slice uses the focused verification above.
+
+## Exact numeric output limits through native and Swift
+
+The additive `OutputLimit` lane preserves Pele's nullish 4,000,000-unit default,
+direct IEEE threshold comparison and final SVG UTF-16 length. Rendering and host
+callbacks precede the semantic output check; mutable operations publish their
+advanced graph/revision even on output or callback errors. Existing integer
+entry points keep their contract. Explicit provider hooks let extensions retain
+their concrete models and override private legacy limit logic. Class shares its
+geometry while separating old integer preflight from exact post-render policy.
+Its optional native byte lower bound uses emitted record IDs, not Map keys, and
+defers authored-ID decoding errors to normal rendering so callbacks keep their
+order. Independent 64 MiB returned-SVG and bounded metadata/exchange checks stay
+active for NaN and infinity; this is not a universal peak-allocation guarantee.
+
+The pinned 192-case oracle has 96 whole SVG successes and 96 complete Pele error
+outcomes, plus two host-failure ordering vectors. It records complete measurement
+traces and mutable state, including Gantt scheduling and Date/task aliases.
+Immutable JSON and expanded mutable graph projections are asserted separately:
+the historical immutable Set projection remains `{}`, while the public arena
+retains the actual Set entries. Twenty-seven focused Rust release integration
+tests pass. Tests additionally cover retained extension registration, empty SVG,
+byte-budget rejection and the two Class preflight regressions. Strict C output,
+source-limit, mutable and legacy integrations pass, including 600 existing
+legacy/owned-document lifetimes.
+
+Nineteen Swift release integration tests pass through the actual universal SDK.
+Separate arm64 and Intel Rosetta SDK runs each pass six limit-feature tests,
+all 399 source/output-limit cases, both callback-order vectors, actual C output
+integration and independent immutable/mutable consumers across all 33 families.
+The universal archive SHA-256 is
+`972ffb6de07b8bd3742ab7cd8c0a0dea3bfe4f51ff24b2fa5d4cb58f2bbd9961`;
+its tested arm64 slice is
+`97a0a021194a1bbdb8430c5305fb67975d71546e4f510827d9aaea240fe0c54e`.
+The host remains macOS 26.6; Rosetta is not physical Intel/macOS 14 proof.
+An artifact-free consumer also builds/runs the unchanged checksum-pinned v0.1
+download with the new Swift file correctly excluded. Formatter and diff checks
+pass. See [output-limit contract](OUTPUT_LIMITS.md).
+
+This closes exact numeric output limits for well-formed strings. Numeric edge
+limits, arbitrary options coercion, malformed UTF-16 source/output, constructors,
+callback dispatch and the other full-runtime/browser/release gates remain open.

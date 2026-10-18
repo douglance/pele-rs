@@ -7,8 +7,8 @@ mod parser;
 mod render;
 mod tokens;
 use crate::compat::{
-    DiagramModule, DiagramType, ModuleDescriptor, Object, ParseContext, PeleError, RenderResources,
-    RenderSettings, Rendered,
+    DiagramModule, DiagramType, ModuleDescriptor, Object, OutputLimit, ParseContext, PeleError,
+    RenderResources, RenderSettings, Rendered,
 };
 pub use model::{
     ClassInterface, ClassMember, ClassModel, ClassNode, ClassNote, ClassRelation, NamespaceNode,
@@ -54,6 +54,16 @@ impl DiagramModule for Class {
         r: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError> {
         render::render(m, c, o, r)
+    }
+    fn render_with_output_limit(
+        &self,
+        m: &ClassModel,
+        c: &Object,
+        o: &RenderSettings,
+        r: &mut dyn RenderResources,
+        _limit: OutputLimit,
+    ) -> Result<Rendered, PeleError> {
+        render::render_exact(m, c, o, r)
     }
 }
 

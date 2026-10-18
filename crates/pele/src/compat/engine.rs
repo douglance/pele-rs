@@ -1,6 +1,6 @@
 use super::{
     module::*, source, Capability, DiagramId, DiagramType, ErrorCode, Inspection, Object,
-    PeleError, PrepareOptions, SourceLimit, Value, DIAGRAM_TYPES,
+    OutputLimit, PeleError, PrepareOptions, SourceLimit, Value, DIAGRAM_TYPES,
 };
 use serde::Serialize;
 use std::{any::Any, collections::HashMap, sync::Arc};
@@ -13,6 +13,14 @@ trait ErasedModule: Send + Sync {
         config: &Object,
         options: &RenderSettings,
         resources: &mut dyn RenderResources,
+    ) -> Result<Rendered, PeleError>;
+    fn render_with_output_limit(
+        &self,
+        model: &Model,
+        config: &Object,
+        options: &RenderSettings,
+        resources: &mut dyn RenderResources,
+        limit: OutputLimit,
     ) -> Result<Rendered, PeleError>;
     fn model_view(&self, model: &Model) -> Result<Value, PeleError>;
     fn query(&self, model: &Model, operation: &str, arguments: &Value) -> Result<Value, PeleError>;
@@ -87,6 +95,22 @@ impl<D: DiagramModule> ErasedModule for Module<D> {
             .expect("private module/model pairing");
         self.0.validate_model_projection(model)?;
         project_model(model)
+    }
+    fn render_with_output_limit(
+        &self,
+        model: &Model,
+        config: &Object,
+        options: &RenderSettings,
+        resources: &mut dyn RenderResources,
+        limit: OutputLimit,
+    ) -> Result<Rendered, PeleError> {
+        self.0.render_with_output_limit(
+            model.downcast_ref().expect("private module/model pairing"),
+            config,
+            options,
+            resources,
+            limit,
+        )
     }
     fn query(&self, model: &Model, operation: &str, arguments: &Value) -> Result<Value, PeleError> {
         self.0.query(
@@ -409,12 +433,71 @@ impl Engine {
             },
         )
     }
+    /// Render well-formed source with an exact output threshold. Source/edge
+    /// limits keep their existing typed contract; only output_limit is overridden.
+    pub fn render_source_with_output_limit(
+        &self,
+        source: &str,
+        options: &RenderOptions,
+        limit: OutputLimit,
+        resources: &mut dyn RenderResources,
+    ) -> Result<RenderResult, PeleError> {
+        let document = self.parse(source, &options.parse)?;
+        self.render_document_with_output_limit(&document, options, limit, resources)
+    }
+    /// Use the retained registration and exact post-render UTF-16 comparison.
+    /// The independent returned-SVG byte budget remains active for NaN/infinity.
+    pub fn render_document_with_output_limit(
+        &self,
+        document: &ParsedDocument,
+        options: &RenderOptions,
+        limit: OutputLimit,
+        resources: &mut dyn RenderResources,
+    ) -> Result<RenderResult, PeleError> {
+        let registration = &document.registration;
+        render_registered_with_output_limit(
+            &registration.descriptor,
+            &document.config,
+            options,
+            resources,
+            limit,
+            |settings, session| {
+                registration.module.render_with_output_limit(
+                    &document.model,
+                    &document.config,
+                    settings,
+                    session,
+                    limit,
+                )
+            },
+        )
+    }
 }
 pub(crate) fn render_registered(
     descriptor: &ModuleDescriptor,
     config: &Object,
     options: &RenderOptions,
     resources: &mut dyn RenderResources,
+    render: impl FnOnce(&RenderSettings, &mut dyn RenderResources) -> Result<Rendered, PeleError>,
+) -> Result<RenderResult, PeleError> {
+    render_registered_policy(descriptor, config, options, resources, None, render)
+}
+pub(crate) fn render_registered_with_output_limit(
+    descriptor: &ModuleDescriptor,
+    config: &Object,
+    options: &RenderOptions,
+    resources: &mut dyn RenderResources,
+    limit: OutputLimit,
+    render: impl FnOnce(&RenderSettings, &mut dyn RenderResources) -> Result<Rendered, PeleError>,
+) -> Result<RenderResult, PeleError> {
+    render_registered_policy(descriptor, config, options, resources, Some(limit), render)
+}
+pub(crate) fn render_registered_policy(
+    descriptor: &ModuleDescriptor,
+    config: &Object,
+    options: &RenderOptions,
+    resources: &mut dyn RenderResources,
+    limit: Option<OutputLimit>,
     render: impl FnOnce(&RenderSettings, &mut dyn RenderResources) -> Result<Rendered, PeleError>,
 ) -> Result<RenderResult, PeleError> {
     let mut settings = options.render.clone();
@@ -436,10 +519,15 @@ pub(crate) fn render_registered(
         clock: settings.now.map(Ok),
     };
     let mut rendered = render(&settings, &mut session)?;
+    if limit.is_some() {
+        OutputLimit::check_bytes(&rendered.svg, descriptor.id.as_str())?;
+    }
     if let Some(theme) = &settings.native_theme {
         rendered.svg = super::svg::resolved_svg(&rendered.svg, theme)?;
     }
-    if rendered.svg.encode_utf16().count() > settings.output_limit() {
+    if let Some(limit) = limit {
+        limit.check(&rendered.svg, descriptor.id.as_str())?;
+    } else if rendered.svg.encode_utf16().count() > settings.output_limit() {
         let mut e = PeleError::new(
             format!(
                 "Diagram output is longer than the limit of {} characters.",

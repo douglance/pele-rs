@@ -1,6 +1,7 @@
 //! Typed extension boundary. A module owns its model; the engine owns preparation/provenance.
 use super::{
-    DiagramId, Object, PeleError, PrepareOptions, DEFAULT_MAX_EDGES, DEFAULT_OUTPUT_LIMIT,
+    DiagramId, Object, OutputLimit, PeleError, PrepareOptions, DEFAULT_MAX_EDGES,
+    DEFAULT_OUTPUT_LIMIT,
 };
 use serde::{Deserialize, Serialize, Serializer};
 
@@ -200,6 +201,19 @@ pub trait DiagramModule: Send + Sync + 'static {
         options: &RenderSettings,
         resources: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError>;
+    /// Exact post-render output policy. The engine owns the final comparison.
+    /// Providers that privately enforce the legacy integer output_limit must
+    /// override this hook to avoid rejecting before the exact comparison.
+    fn render_with_output_limit(
+        &self,
+        model: &Self::Model,
+        config: &Object,
+        options: &RenderSettings,
+        resources: &mut dyn RenderResources,
+        _limit: OutputLimit,
+    ) -> Result<Rendered, PeleError> {
+        self.render(model, config, options, resources)
+    }
 }
 
 fn js_number<S: Serializer>(value: &f64, s: S) -> Result<S::Ok, S::Error> {

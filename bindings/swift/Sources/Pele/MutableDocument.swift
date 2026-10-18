@@ -92,10 +92,21 @@ extension Pele {
         }
         /// Stateful native rendering publishes graph/revision even on operation error.
         public func renderOperation(options: Engine.Options = .init(), resources: HostResources = .init()) throws -> PublicRenderOutcome {
+            try renderOperation(options: options, resources: resources, outputLimit: nil)
+        }
+        /// Exact IEEE threshold overrides only options.outputLimit. Callbacks and
+        /// renderer mutations precede comparison; operation errors retain state.
+        public func renderOperation(outputLimit: OutputLimit, options: Engine.Options = .init(), resources: HostResources = .init()) throws -> PublicRenderOutcome {
+            try renderOperation(options: options, resources: resources, outputLimit: outputLimit)
+        }
+        private func renderOperation(options: Engine.Options, resources: HostResources, outputLimit: OutputLimit?) throws -> PublicRenderOutcome {
             let settings = try JSONEncoder().encode(options)
             return try withHandle { handle in
                 let response = resources.withCapturedNativeResources { host in settings.withUnsafeBytes { bytes in
-                    pele_public_render_operation_binary_v5(handle, revision, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, host)
+                    if let limit = outputLimit?.nativeValue {
+                        return pele_public_render_operation_output_limit_v6(handle, revision, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, limit.kind, limit.bits, host)
+                    }
+                    return pele_public_render_operation_binary_v5(handle, revision, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, host)
                 }}
                 do {
                     let exchange = try Pele.binaryResult(response.handle)
@@ -107,7 +118,13 @@ extension Pele {
             }
         }
         public func render(options: Engine.Options = .init(), resources: HostResources = .init()) throws -> FullRenderedDiagram {
-            switch try renderOperation(options: options, resources: resources).result {
+            try renderedValue(renderOperation(options: options, resources: resources))
+        }
+        public func render(outputLimit: OutputLimit, options: Engine.Options = .init(), resources: HostResources = .init()) throws -> FullRenderedDiagram {
+            try renderedValue(renderOperation(outputLimit: outputLimit, options: options, resources: resources))
+        }
+        private func renderedValue(_ outcome: PublicRenderOutcome) throws -> FullRenderedDiagram {
+            switch outcome.result {
             case .rendered(let rendered): return rendered
             case .thrown(.pele(let error)): throw error
             case .thrown(let error): throw PublicOperationFailure(value: error)

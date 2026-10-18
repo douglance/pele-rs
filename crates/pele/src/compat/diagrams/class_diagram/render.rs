@@ -260,6 +260,28 @@ pub fn render(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
+    render_impl(db, c, o, r, Preflight::LegacyInteger)
+}
+pub(super) fn render_exact(
+    db: &ClassModel,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+) -> Result<Rendered, PeleError> {
+    render_impl(db, c, o, r, Preflight::ExactPostRender)
+}
+#[derive(Clone, Copy)]
+enum Preflight {
+    LegacyInteger,
+    ExactPostRender,
+}
+fn render_impl(
+    db: &ClassModel,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+    preflight: Preflight,
+) -> Result<Rendered, PeleError> {
     // Every drawn object emits its authored id. Refuse a proven output overflow
     // before allocating the compound geometry or the entire oversized SVG.
     let hierarchical = c
@@ -272,21 +294,51 @@ pub fn render(
         .namespaces
         .iter()
         .filter(|(_, n)| hierarchical || n.explicit)
-        .map(|(id, _)| id)
-        .chain(db.classes.iter().map(|(id, _)| id))
-        .chain(db.notes.iter().map(|(id, _)| id))
+        .map(|(key, value)| match preflight {
+            Preflight::LegacyInteger => key,
+            Preflight::ExactPostRender => &value.id,
+        })
+        .chain(db.classes.iter().map(|(key, value)| match preflight {
+            Preflight::LegacyInteger => key,
+            Preflight::ExactPostRender => &value.id,
+        }))
+        .chain(db.notes.iter().map(|(key, value)| match preflight {
+            Preflight::LegacyInteger => key,
+            Preflight::ExactPostRender => &value.id,
+        }))
     {
-        minimum = minimum.saturating_add(esc_text(id)?.encode_utf16().count());
-        if minimum > o.output_limit() {
-            let mut e = PeleError::new(
-                format!(
-                    "Diagram output is longer than the limit of {} characters.",
-                    o.output_limit()
-                ),
-                crate::compat::ErrorCode::Limit,
-            );
-            e.diagram_type = Some("class".into());
-            return Err(e);
+        let escaped = match preflight {
+            Preflight::LegacyInteger => esc_text(id)?,
+            // The bound is optional. Normal rendering must establish the order
+            // of authored-ID decoding errors relative to host callbacks.
+            Preflight::ExactPostRender => match esc_text(id) {
+                Ok(escaped) => escaped,
+                Err(_) => continue,
+            },
+        };
+        match preflight {
+            Preflight::LegacyInteger => {
+                minimum = minimum.saturating_add(escaped.encode_utf16().count());
+                if minimum > o.output_limit() {
+                    let mut e = PeleError::new(
+                        format!(
+                            "Diagram output is longer than the limit of {} characters.",
+                            o.output_limit()
+                        ),
+                        crate::compat::ErrorCode::Limit,
+                    );
+                    e.diagram_type = Some("class".into());
+                    return Err(e);
+                }
+            }
+            Preflight::ExactPostRender => {
+                // Only the independent native byte ceiling may reject early.
+                // A caller's semantic threshold is checked after callbacks.
+                minimum = minimum.saturating_add(escaped.len());
+                if minimum > crate::compat::MAX_PUBLIC_OUTPUT_BYTES {
+                    return Err(crate::compat::OutputLimit::byte_error("class"));
+                }
+            }
         }
     }
     let mut fitted = |turned| -> Result<Rendered, PeleError> {

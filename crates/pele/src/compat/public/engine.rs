@@ -3,9 +3,9 @@ use super::{
     PublicError, RenderOutcome, SharedFunction, OPAQUE_MODEL_SCHEMA,
 };
 use crate::compat::{
-    DiagramId, DiagramModule, Engine, ErrorCode, ModuleDescriptor, Object, ParseContext,
-    ParseOptions, PeleError, RenderOptions, RenderResources, RenderResult, RenderSettings,
-    Rendered, SourceLimit,
+    DiagramId, DiagramModule, Engine, ErrorCode, ModuleDescriptor, Object, OutputLimit,
+    ParseContext, ParseOptions, PeleError, RenderOptions, RenderResources, RenderResult,
+    RenderSettings, Rendered, SourceLimit,
 };
 use std::{any::Any, sync::Arc};
 /// Typed codec opt-in. Parsing, geometry and rendering remain in the native module.
@@ -50,6 +50,18 @@ pub trait PublicDiagramModule: DiagramModule {
         self.render_public(state, config, options, host)
             .map_err(Into::into)
     }
+    /// Exact post-render output policy, retaining native JavaScript/host errors.
+    /// Override when the provider privately enforces legacy integer output limits.
+    fn render_public_operation_with_output_limit(
+        &self,
+        state: &mut Self::PublicState,
+        config: &Object,
+        options: &RenderSettings,
+        host: &mut dyn RenderResources,
+        _limit: OutputLimit,
+    ) -> Result<Rendered, PublicError> {
+        self.render_public_operation(state, config, options, host)
+    }
     fn render_public(
         &self,
         state: &mut Self::PublicState,
@@ -90,6 +102,16 @@ impl<D: DiagramModule> DiagramModule for Shared<D> {
     ) -> Result<Rendered, PeleError> {
         self.module.render(m, c, o, h)
     }
+    fn render_with_output_limit(
+        &self,
+        m: &Self::Model,
+        c: &Object,
+        o: &RenderSettings,
+        h: &mut dyn RenderResources,
+        limit: OutputLimit,
+    ) -> Result<Rendered, PeleError> {
+        self.module.render_with_output_limit(m, c, o, h, limit)
+    }
 }
 type State = Box<dyn Any + Send>;
 trait Erased: Send + Sync {
@@ -109,6 +131,14 @@ trait Erased: Send + Sync {
         config: &Object,
         options: &RenderSettings,
         host: &mut dyn RenderResources,
+    ) -> Result<Rendered, PublicError>;
+    fn render_operation_with_output_limit(
+        &self,
+        state: &mut State,
+        config: &Object,
+        options: &RenderSettings,
+        host: &mut dyn RenderResources,
+        limit: OutputLimit,
     ) -> Result<Rendered, PublicError>;
     fn render(
         &self,
@@ -155,6 +185,22 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
             config,
             options,
             host,
+        )
+    }
+    fn render_operation_with_output_limit(
+        &self,
+        state: &mut State,
+        config: &Object,
+        options: &RenderSettings,
+        host: &mut dyn RenderResources,
+        limit: OutputLimit,
+    ) -> Result<Rendered, PublicError> {
+        self.0.render_public_operation_with_output_limit(
+            state.downcast_mut().expect("paired public state"),
+            config,
+            options,
+            host,
+            limit,
         )
     }
     fn render(
@@ -455,6 +501,26 @@ impl PublicDocument {
         options: &RenderOptions,
         host: &mut dyn RenderResources,
     ) -> Result<RenderOutcome, PeleError> {
+        self.render_operation_policy(expected_revision, options, host, None)
+    }
+    /// Exact output comparison after rendering. Dispatched mutations/revision
+    /// publish on limit and host errors, under the existing graph export budgets.
+    pub fn render_operation_with_output_limit(
+        &mut self,
+        expected_revision: u64,
+        options: &RenderOptions,
+        limit: OutputLimit,
+        host: &mut dyn RenderResources,
+    ) -> Result<RenderOutcome, PeleError> {
+        self.render_operation_policy(expected_revision, options, host, Some(limit))
+    }
+    fn render_operation_policy(
+        &mut self,
+        expected_revision: u64,
+        options: &RenderOptions,
+        host: &mut dyn RenderResources,
+        limit: Option<OutputLimit>,
+    ) -> Result<RenderOutcome, PeleError> {
         if expected_revision != self.revision {
             return Err(PeleError::new(
                 "Stale public model revision",
@@ -467,21 +533,32 @@ impl PublicDocument {
             .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
         self.snapshot()?;
         let mut operation_error = None;
-        let result = crate::compat::engine::render_registered(
+        let result = crate::compat::engine::render_registered_policy(
             &self.registration.descriptor,
             &self.config,
             options,
             host,
+            limit,
             |settings, session| {
-                self.registration
-                    .codec
-                    .render_operation(&mut self.state, &self.config, settings, session)
-                    .map_err(|error| {
-                        operation_error = Some(error);
-                        // The orchestration layer only needs to stop. Preserve
-                        // the real typed error outside its legacy error lane.
-                        PeleError::new("Public render operation failed", ErrorCode::Semantic)
-                    })
+                let codec = &self.registration.codec;
+                let result = match limit {
+                    Some(limit) => codec.render_operation_with_output_limit(
+                        &mut self.state,
+                        &self.config,
+                        settings,
+                        session,
+                        limit,
+                    ),
+                    None => {
+                        codec.render_operation(&mut self.state, &self.config, settings, session)
+                    }
+                };
+                result.map_err(|error| {
+                    operation_error = Some(error);
+                    // The orchestration layer only needs to stop. Preserve
+                    // the real typed error outside its legacy error lane.
+                    PeleError::new("Public render operation failed", ErrorCode::Semantic)
+                })
             },
         )
         .map_err(|error| operation_error.unwrap_or_else(|| error.into()));
