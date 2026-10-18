@@ -4,7 +4,7 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Deterministic Mermaid flowcharts for Rust, Swift and WebAssembly"
+description = "Pele-compatible diagram rendering for Rust, Swift and WebAssembly"
 include = ["src/**", "Cargo.toml", "README.md", "assets/**", "LICENSE", "NOTICE"]
 
 [lib]

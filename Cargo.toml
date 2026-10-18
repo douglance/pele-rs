@@ -3,13 +3,13 @@ members = ["crates/pele", "crates/pele-ffi", "crates/pele-wasm"]
 resolver = "2"
 
 [workspace.package]
-version = "0.1.0"
+version = "0.2.0"
 edition = "2021"
 license = "MIT"
 repository = "https://github.com/vijayksingh/pele-rs"
 
 [workspace.dependencies]
-pele = { package = "pele-rs", path = "crates/pele", version = "0.1.0" }
+pele = { package = "pele-rs", path = "crates/pele", version = "0.2.0" }
 serde = { version = "1", features = ["derive"] }
 serde_json = { version = "1", features = ["raw_value", "float_roundtrip"] }
 

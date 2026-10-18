@@ -3,7 +3,7 @@ import PackageDescription
 import Foundation
 let dependency: Package.Dependency
 if let url = ProcessInfo.processInfo.environment["PELE_PACKAGE_URL"] {
-    dependency = .package(url: url, exact: "0.1.0")
+    dependency = .package(url: url, exact: ProcessInfo.processInfo.environment["PELE_PACKAGE_VERSION"] ?? "0.1.0")
 } else {
     dependency = .package(name: "pele-rs", path: "../..")
 }

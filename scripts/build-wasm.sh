@@ -26,5 +26,11 @@ cp third_party/PELE-LICENSE bindings/web/PELE-LICENSE
 cp third_party/MERMAID-LICENSE bindings/web/MERMAID-LICENSE
 cp crates/pele/assets/fonts/OFL.txt bindings/web/FONT-OFL.txt
 mkdir -p dist/release dist/package-web
-npm pack ./bindings/web --pack-destination dist/release --silent
-tar -xzf dist/release/unlocalhosted-pele-rs-0.1.0.tgz -C dist/package-web
+package_archive="$(npm pack ./bindings/web --pack-destination dist/release --silent)"
+case "$package_archive" in
+    ''|*[!a-zA-Z0-9._-]*) echo 'Invalid npm package archive name' >&2; exit 1 ;;
+esac
+# Test exactly the package just packed; removed files must not survive staging.
+rm -rf "$repo_dir/dist/package-web/package"
+tar -xzf "dist/release/$package_archive" -C dist/package-web
+printf '%s\n' "$package_archive"

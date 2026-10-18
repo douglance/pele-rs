@@ -1,7 +1,7 @@
 {
   "name": "@unlocalhosted/pele-rs",
-  "version": "0.1.0",
-  "description": "Independent Rust Mermaid flowcharts through WebAssembly",
+  "version": "0.2.0",
+  "description": "Pele-compatible diagram rendering through independent Rust and WebAssembly",
   "type": "module",
   "license": "MIT",
   "repository": {
