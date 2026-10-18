@@ -3,6 +3,8 @@ mod public;
 pub use public::*;
 mod render_numbers;
 pub use render_numbers::*;
+mod providers;
+pub use providers::*;
 mod registry;
 pub use registry::*;
 mod calendar;

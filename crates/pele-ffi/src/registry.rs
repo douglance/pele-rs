@@ -8,8 +8,9 @@ use std::{
 
 pub struct PeleRegistry {
     engine: Mutex<PublicEngine>,
+    pub(super) providers: super::providers::ProviderEntries,
 }
-unsafe fn registry<'a>(
+pub(super) unsafe fn registry<'a>(
     handle: *const PeleRegistry,
 ) -> Result<MutexGuard<'a, PublicEngine>, PeleError> {
     let owner = unsafe { handle.as_ref() }
@@ -21,7 +22,7 @@ unsafe fn registry<'a>(
         }
     })
 }
-fn builtin(id: &str) -> Option<DiagramType> {
+pub(super) fn builtin(id: &str) -> Option<DiagramType> {
     DIAGRAM_TYPES
         .iter()
         .find(|kind| kind.as_str() == id)
@@ -51,6 +52,7 @@ pub unsafe extern "C" fn pele_registry_create_v8(
         let result = public::success(true)?;
         *out = Box::into_raw(Box::new(PeleRegistry {
             engine: Mutex::new(engine),
+            providers: Default::default(),
         }));
         Ok(result)
     })
@@ -71,7 +73,23 @@ pub unsafe extern "C" fn pele_registry_free_v8(handle: *mut PeleRegistry) {
 pub unsafe extern "C" fn pele_registry_capabilities_v8(
     handle: *const PeleRegistry,
 ) -> *mut PeleResult {
-    compatibility_call(|| public::success(unsafe { registry(handle) }?.capabilities()))
+    compatibility_call(|| {
+        let engine = unsafe { registry(handle) }?;
+        let mut capabilities = engine.capabilities();
+        for value in &mut capabilities {
+            if builtin(value.diagram_type.as_str())
+                .is_some_and(|id| unsafe { &*handle }.providers.get(id).is_some())
+            {
+                value.registered = true;
+                // A host replacement is not covered by built-in algorithm parity evidence.
+                value.syntax_parity = false;
+                value.semantic_parity = false;
+                value.render_parity = false;
+                value.host_parity = false;
+            }
+        }
+        public::success(capabilities)
+    })
 }
 /// # Safety
 /// id is readable UTF-8 up to4096 bytes, or null with zero length.
@@ -84,7 +102,10 @@ pub unsafe extern "C" fn pele_registry_registered_v8(
     compatibility_call(|| {
         let name = unsafe { compatibility_input(id, len, 4096) }?;
         let id = builtin(name).map_or_else(|| DiagramId::extension(name), DiagramId::from);
-        public::success(unsafe { registry(handle) }?.registered(id))
+        let engine = unsafe { registry(handle) }?;
+        let foreign =
+            builtin(name).is_some_and(|id| unsafe { &*handle }.providers.get(id).is_some());
+        public::success(foreign || engine.registered(id))
     })
 }
 /// # Safety
@@ -100,8 +121,11 @@ pub unsafe extern "C" fn pele_registry_register_builtin_v8(
         let kind = builtin(name).ok_or_else(|| {
             public::invalid(&format!("Unknown built-in diagram type \"{name}\"."))
         })?;
-        unsafe { registry(handle) }?.register_builtin(kind);
-        public::success(true)
+        let mut engine = unsafe { registry(handle) }?;
+        let result = public::success(true)?;
+        engine.register_builtin(kind);
+        unsafe { &*handle }.providers.remove(kind);
+        Ok(result)
     })
 }
 /// # Safety
@@ -131,7 +155,11 @@ pub unsafe extern "C" fn pele_registry_supports_v8(
     compatibility_call(|| {
         let source =
             unsafe { compatibility_input(source, len, pele::compat::MAX_PUBLIC_SOURCE_BYTES) }?;
-        public::success(unsafe { registry(handle) }?.supports(source))
+        let engine = unsafe { registry(handle) }?;
+        let supported = engine.detect_type(source).ok().flatten().is_some_and(|id| {
+            unsafe { &*handle }.providers.get(id).is_some() || engine.registered(id)
+        });
+        public::success(supported)
     })
 }
 /// # Safety
@@ -164,7 +192,19 @@ pub unsafe extern "C" fn pele_registry_parse_limits_v8(
             limits.source.is_some(),
             limits.max_edges.is_some(),
         )?;
-        let document = unsafe { registry(handle) }?.parse_with_limits(source, &options, limits)?;
+        let engine = unsafe { registry(handle) }?;
+        // An additive host registration must never silently dispatch a shadowed built-in.
+        if !unsafe { &*handle }.providers.is_empty()
+            && pele::compat::Engine::empty()
+                .inspect_with_limits(source, &options, limits)?
+                .diagram_type
+                .is_some_and(|id| unsafe { &*handle }.providers.get(id).is_some())
+        {
+            return Err(public::invalid(
+                "Foreign provider models require pele_registry_parse_provider_v10",
+            ));
+        }
+        let document = engine.parse_with_limits(source, &options, limits)?;
         public::publish_document(document, out)
     })
 }

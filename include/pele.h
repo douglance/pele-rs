@@ -202,6 +202,67 @@ PeleResult *pele_public_render_operation_with_numbers_v9(PelePublicDocument *doc
     uint64_t output_limit_bits, const PeleHostResourcesV3 *resources);
 void pele_public_document_free_v4(PelePublicDocument *);
 
+
+/* Additive owner-confined provider prototype (v10). Only canonical built-in IDs
+ * can be replaced. Registration retains provider context once. Existing documents
+ * retain their provider/model across replacement and Registry destruction.
+ * No callback may unwind; callers serialize Registry/document calls and destruction.
+ * Callback return buffers are independently owned leases released exactly once.
+ * Reply status: 0 success, 1 payload is PeleError JSON, 2 operation-scoped exception.
+ * status2 requires a nonnull invocation_context and a nonzero exception token.
+ * Call pointers/resources are valid only inside that synchronous callback.
+ * Finite Config/value-copy and well-formed UTF-8 prototype; no graph codec or VM.
+ * Provider calls may allocate arbitrary memory; accepted outputs remain <=64 MiB.
+ */
+typedef struct PeleProviderDocument PeleProviderDocument;
+typedef struct PeleForeignCallV10 PeleForeignCallV10;
+typedef struct PeleForeignBytesV10 {
+    void *owner; const uint8_t *data; size_t len; void (*release)(void *);
+} PeleForeignBytesV10;
+typedef struct PeleForeignReplyV10 {
+    uint32_t status, exception; void *model;
+    PeleForeignBytesV10 payload, links;
+    uint64_t width_bits, height_bits;
+} PeleForeignReplyV10;
+typedef struct PeleProviderParseV10 {
+    const uint8_t *source; size_t source_len;
+    const uint8_t *config; size_t config_len;
+    const uint8_t *title; size_t title_len;
+    uint32_t has_title; uint64_t line_offset;
+    uint32_t edge_kind; uint64_t edge_bits;
+} PeleProviderParseV10;
+typedef struct PeleProviderRenderV10 {
+    const uint8_t *config; size_t config_len;
+    const uint8_t *options; size_t options_len;
+    PeleRenderNumbersV9 numbers;
+    uint32_t output_kind; uint64_t output_bits;
+} PeleProviderRenderV10;
+typedef struct PeleDiagramProviderV10 {
+    uint32_t version, struct_size; void *context;
+    void (*retain)(void *); void (*release)(void *); void (*release_model)(void *, void *);
+    void (*describe)(void *, PeleForeignCallV10 *, uint32_t, PeleForeignReplyV10 *);
+    void (*parse)(void *, PeleForeignCallV10 *, const PeleProviderParseV10 *, PeleForeignReplyV10 *);
+    void (*render)(void *, void *, PeleForeignCallV10 *, const PeleProviderRenderV10 *, PeleForeignReplyV10 *);
+    uint64_t reserved[2];
+} PeleDiagramProviderV10;
+PeleResult *pele_registry_register_provider_v10(PeleRegistry *, const uint8_t *, size_t, const PeleDiagramProviderV10 *);
+/* New provider-only document lane; built-ins keep the existing v8 parse API.
+ * Inputs: source<=16 MiB, options<=1 MiB; exact threshold tags match v7.
+ * out_document initializes null on all failures. Successful result.result.Ok
+ * carries type/revision/modelKind; callback failures use result.result.Err.
+ */
+PeleResult *pele_registry_parse_provider_v10(const PeleRegistry *, const uint8_t *, size_t,
+    const uint8_t *, size_t, uint32_t, uint64_t, uint32_t, uint64_t, void *, PeleProviderDocument **);
+PeleResult *pele_provider_model_v10(const PeleProviderDocument *, void **);
+PeleResult *pele_provider_status_v10(const PeleProviderDocument *);
+PeleResult *pele_provider_render_v10(PeleProviderDocument *, uint64_t,
+    const uint8_t *, size_t, const PeleRenderNumbersV9 *, uint32_t, uint64_t,
+    const PeleHostResourcesV3 *, void *);
+void pele_provider_document_free_v10(PeleProviderDocument *);
+void *pele_foreign_call_context_v10(const PeleForeignCallV10 *);
+PeleResult *pele_foreign_text_width_v10(PeleForeignCallV10 *, const uint8_t *, size_t,
+    uint64_t, uint32_t, uint64_t *);
+
 uint32_t pele_result_status(const PeleResult *result);
 const uint8_t *pele_result_data(const PeleResult *result);
 size_t pele_result_len(const PeleResult *result);

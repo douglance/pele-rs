@@ -420,7 +420,7 @@ impl Engine {
             limits.max_edges,
         )
     }
-    fn inspect_with_limits(
+    pub fn inspect_with_limits(
         &self,
         source: &str,
         options: &ParseOptions,
