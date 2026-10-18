@@ -17,6 +17,9 @@ fn boundaries<S: Serializer>(v: &Option<Vec<f64>>, s: S) -> Result<S::Ok, S::Err
 #[derive(Clone, Debug, Default, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct WardleyNode {
+    /// Real builder insertion order, including own undefined properties.
+    #[serde(skip)]
+    pub public_keys: Vec<&'static str>,
     pub id: String,
     pub label: String,
     #[serde(serialize_with = "number")]
@@ -218,6 +221,30 @@ impl Builder {
         }
     }
     fn node(&mut self, mut n: WardleyNode, erase_flags: bool) {
+        n.public_keys = self
+            .indices
+            .get(&n.id)
+            .map_or_else(Vec::new, |&i| self.model.nodes[i].public_keys.clone());
+        for key in [
+            "id",
+            "label",
+            "x",
+            "y",
+            "className",
+            "labelOffsetX",
+            "labelOffsetY",
+        ]
+        .into_iter()
+        .chain(
+            erase_flags
+                .then_some(["inertia", "sourceStrategy"])
+                .into_iter()
+                .flatten(),
+        ) {
+            if !n.public_keys.contains(&key) {
+                n.public_keys.push(key);
+            }
+        }
         if let Some(&i) = self.indices.get(&n.id) {
             let prev = &self.model.nodes[i];
             if n.class_name.is_none() {
@@ -363,7 +390,11 @@ pub(super) fn build(ast: Ast, title: Option<&str>) -> Result<WardleyModel, PeleE
             });
             i
         };
-        b.model.nodes[b.indices[&parent]].is_pipeline_parent = Some(true);
+        let node = &mut b.model.nodes[b.indices[&parent]];
+        node.is_pipeline_parent = Some(true);
+        if !node.public_keys.contains(&"isPipelineParent") {
+            node.public_keys.push("isPipelineParent");
+        }
         for c in components {
             let id = format!("{parent}_{}", c.name);
             let x = percent(
@@ -384,7 +415,11 @@ pub(super) fn build(ast: Ast, title: Option<&str>) -> Result<WardleyModel, PeleE
                 true,
             );
             b.model.pipelines[pipeline].component_ids.push(id.clone());
-            b.model.nodes[b.indices[&id]].in_pipeline = Some(true);
+            let node = &mut b.model.nodes[b.indices[&id]];
+            node.in_pipeline = Some(true);
+            if !node.public_keys.contains(&"inPipeline") {
+                node.public_keys.push("inPipeline");
+            }
         }
     }
     for node in &b.model.nodes {

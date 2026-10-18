@@ -39,3 +39,6 @@ pub fn parse(source: &str, options: &ParseOptions) -> Result<WardleyModel, PeleE
     source.push('\n');
     model::build(parser::parse(&source)?, inspected.prepared.title.as_deref())
 }
+
+mod public_model;
+pub use public_model::WardleyPublicState;
