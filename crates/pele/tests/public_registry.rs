@@ -235,6 +235,8 @@ struct Model {
 #[derive(Default)]
 struct Calls {
     parses: AtomicUsize,
+    creates: AtomicUsize,
+    renders: AtomicUsize,
     invokes: AtomicUsize,
     drops: AtomicUsize,
 }
@@ -269,6 +271,7 @@ impl DiagramModule for Replacement {
         o: &RenderSettings,
         _: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError> {
+        self.calls.renders.fetch_add(1, Ordering::SeqCst);
         let tag = c
             .get("consumer")
             .and_then(Value::as_object)
@@ -293,6 +296,7 @@ impl PublicDiagramModule for Replacement {
         }
     }
     fn create_public(&self, m: &Model) -> Result<ModelGraph, PeleError> {
+        self.calls.creates.fetch_add(1, Ordering::SeqCst);
         let mut w = GraphWriter::default();
         let label = w.string(m.title.as_str());
         let p = w.property("title", Atom::String(label));
@@ -417,4 +421,96 @@ fn builtin_replacement_retains_exact_provider_schema_methods_config_and_owner_li
     assert_eq!(first.drops.load(Ordering::SeqCst), 1);
     drop(newer);
     assert_eq!(second.drops.load(Ordering::SeqCst), 1);
+}
+
+#[test]
+fn owned_registry_source_render_respects_exact_limits_without_a_public_graph_crossing() {
+    let calls = Arc::new(Calls::default());
+    let mut registry = PublicEngine::empty();
+    let mut options = RenderOptions::default();
+    options.parse.preparation.config =
+        serde_json::from_value(json!({"consumer":{"tag":"captured"}})).unwrap();
+    options.render.responsive = Some(false);
+    let source = "info";
+    let limits = ParseLimits {
+        source: Some(SourceLimit::Undefined),
+        max_edges: Some(EdgeLimit::Number(f64::NAN)),
+    };
+    let absent = registry.render_source_bounded_with_limits(
+        source,
+        &options,
+        limits,
+        Some(OutputLimit::Undefined),
+        &mut Host,
+    );
+    assert_eq!(absent.unwrap_err().code, ErrorCode::UnsupportedDiagram);
+    registry.register(Replacement {
+        generation: 1,
+        calls: calls.clone(),
+    });
+    let too_small = ParseLimits {
+        source: Some(SourceLimit::Number(3.5)),
+        ..limits
+    };
+    assert_eq!(
+        registry
+            .render_source_bounded_with_limits(
+                source,
+                &options,
+                too_small,
+                Some(OutputLimit::Undefined),
+                &mut Host
+            )
+            .unwrap_err()
+            .code,
+        ErrorCode::Limit
+    );
+    assert_eq!(calls.parses.load(Ordering::SeqCst), 0);
+    let drawing = registry
+        .render_source_bounded_with_limits(
+            source,
+            &options,
+            limits,
+            Some(OutputLimit::Undefined),
+            &mut Host,
+        )
+        .unwrap();
+    assert!(drawing.rendered.svg.contains("1:None"));
+    assert_eq!(calls.parses.load(Ordering::SeqCst), 1);
+    assert_eq!(calls.renders.load(Ordering::SeqCst), 1);
+    assert_eq!(calls.creates.load(Ordering::SeqCst), 0);
+    let threshold = OutputLimit::Number(drawing.rendered.svg.encode_utf16().count() as f64 - 0.5);
+    assert_eq!(
+        registry
+            .render_source_bounded_with_limits(source, &options, limits, Some(threshold), &mut Host)
+            .unwrap_err()
+            .code,
+        ErrorCode::Limit
+    );
+    assert_eq!(calls.renders.load(Ordering::SeqCst), 2);
+    assert_eq!(calls.creates.load(Ordering::SeqCst), 0);
+    let oversized = "x".repeat(MAX_PUBLIC_SOURCE_BYTES + 1);
+    let unbounded_semantic = ParseLimits {
+        source: Some(SourceLimit::Number(f64::NAN)),
+        ..limits
+    };
+    assert_eq!(
+        registry
+            .render_source_bounded_with_limits(
+                &oversized,
+                &options,
+                unbounded_semantic,
+                Some(OutputLimit::Undefined),
+                &mut Host
+            )
+            .unwrap_err()
+            .code,
+        ErrorCode::Limit
+    );
+    assert_eq!(calls.parses.load(Ordering::SeqCst), 2);
+    let document = registry
+        .parse_with_limits(source, &options.parse, limits)
+        .unwrap();
+    assert_eq!(calls.creates.load(Ordering::SeqCst), 1);
+    drop(document);
 }

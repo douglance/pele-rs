@@ -365,6 +365,23 @@ impl PublicEngine {
     ) -> Result<PublicDocument, PeleError> {
         self.create_document(self.engine.parse_with_limits(source, options, limits)?)
     }
+    /// Render source through this registry with exact parse limits, without
+    /// exporting or importing a public model graph solely to produce SVG.
+    pub fn render_source_bounded_with_limits(
+        &self,
+        source: &str,
+        options: &RenderOptions,
+        limits: ParseLimits,
+        output_limit: Option<OutputLimit>,
+        host: &mut dyn RenderResources,
+    ) -> Result<RenderResult, PeleError> {
+        SourceLimit::check_bytes(source)?;
+        let document = self
+            .engine
+            .parse_with_limits(source, &options.parse, limits)?;
+        self.engine
+            .render_document_bounded(&document, options, output_limit, host)
+    }
     pub fn parse_as_with_limits(
         &self,
         id: &DiagramId,
