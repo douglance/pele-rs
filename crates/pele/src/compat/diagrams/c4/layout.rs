@@ -70,6 +70,7 @@ fn form_of(shape: &C4Shape) -> String {
 fn measure(
     index: usize,
     shape: &C4Shape,
+    identity: ElementRef,
     resources: &mut dyn RenderResources,
     options: &RenderSettings,
     size: f64,
@@ -123,7 +124,7 @@ fn measure(
     Ok(Node {
         shape: index,
         bbox: Box::new(
-            ElementRef::Shape(index),
+            identity,
             form,
             width.max(tw + 28. + cap_w),
             64_f64.max(text_h + 24. + cap_h),
@@ -224,7 +225,7 @@ pub(super) fn layout(
         }
         groups.push(Group {
             boundary: i,
-            bbox: Box::new(ElementRef::Boundary(i), "rect".into(), 0., 0.),
+            bbox: Box::new(db.identity(ElementRef::Boundary(i)), "rect".into(), 0., 0.),
             kids: Vec::new(),
             nodes: Vec::new(),
             labels,
@@ -235,9 +236,18 @@ pub(super) fn layout(
             },
             head_w,
             head_x: HEAD_LEFT,
-        })
+        });
+        // Map.set replaces the group of a repeated boundary object, retaining
+        // first insertion order. Still measure every occurrence above.
+        let identity = db.boundary_identity(i);
+        if identity != i {
+            groups.swap(identity, i)
+        }
     }
     for i in 0..groups.len() {
+        if db.boundary_identity(i) != i {
+            continue;
+        }
         if let Some(p) = db.boundaries[i].parent {
             groups[p].kids.push(i)
         }
@@ -262,7 +272,16 @@ pub(super) fn layout(
                 100_f64.max(216_f64.min(room - 2. * depth as f64 * pad - 32.))
             });
             let index = nodes.len();
-            nodes.push(measure(i, shape, resources, options, size, small, width)?);
+            nodes.push(measure(
+                i,
+                shape,
+                db.identity(ElementRef::Shape(i)),
+                resources,
+                options,
+                size,
+                small,
+                width,
+            )?);
             groups[p].nodes.push(index)
         }
     }

@@ -38,9 +38,10 @@ pub struct C4Element {
     pub legend_text: Option<String>,
     pub legend_sprite: Option<String>,
     pub extra: Option<Vec<(String, String)>>,
+    pub(super) own_keys: Vec<String>,
 }
 impl C4Element {
-    fn new() -> Self {
+    pub(super) fn new() -> Self {
         Self {
             alias: String::new(),
             label: String::new(),
@@ -61,6 +62,15 @@ impl C4Element {
             legend_text: None,
             legend_sprite: None,
             extra: None,
+            own_keys: ["alias", "label", "parent"]
+                .into_iter()
+                .map(str::to_owned)
+                .collect(),
+        }
+    }
+    pub(super) fn remember(&mut self, key: &str) {
+        if !self.own_keys.iter().any(|k| k == key) {
+            self.own_keys.push(key.into())
         }
     }
     fn set(&mut self, key: &str, value: String) -> bool {
@@ -81,10 +91,12 @@ impl C4Element {
             "legendSprite" => self.legend_sprite = Some(value),
             _ => return false,
         }
+        self.remember(key);
         true
     }
     fn named(&mut self, attr: &C4Named) {
         if !self.set(&attr.key, attr.value.clone()) {
+            self.remember("extra");
             extra(&mut self.extra, &attr.key, &attr.value)
         }
     }
@@ -98,6 +110,7 @@ impl C4Element {
         }
     }
     fn label(&mut self, attr: Option<&C4Attr>) {
+        self.remember("labelAttr");
         self.label_attr = None;
         match attr {
             Some(C4Attr::Named(n)) => {
@@ -119,7 +132,8 @@ impl C4Element {
                 &mut self.techn
             };
             if target.is_none() {
-                *target = Some(String::new())
+                *target = Some(String::new());
+                self.remember(key);
             }
         }
     }
@@ -189,9 +203,11 @@ pub struct C4Rel {
     pub offset_y: Option<f64>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub extra: Option<Vec<(String, String)>>,
+    #[serde(skip)]
+    pub(super) own_keys: Vec<String>,
 }
 impl C4Rel {
-    fn new(kind: &str) -> Self {
+    pub(super) fn new(kind: &str) -> Self {
         Self {
             rel_type: kind.into(),
             from: String::new(),
@@ -210,6 +226,15 @@ impl C4Rel {
             offset_x: None,
             offset_y: None,
             extra: None,
+            own_keys: ["type", "from", "to", "label"]
+                .into_iter()
+                .map(str::to_owned)
+                .collect(),
+        }
+    }
+    pub(super) fn remember(&mut self, key: &str) {
+        if !self.own_keys.iter().any(|k| k == key) {
+            self.own_keys.push(key.into())
         }
     }
     fn set(&mut self, key: &str, value: String) -> bool {
@@ -224,14 +249,22 @@ impl C4Rel {
             "lineColor" => self.line_color = Some(value),
             _ => return false,
         }
+        self.remember(key);
         true
     }
     fn named(&mut self, attr: &C4Named) {
         match attr.key.as_str() {
-            "offsetX" => self.offset_x = Some(parse_int(&attr.value)),
-            "offsetY" => self.offset_y = Some(parse_int(&attr.value)),
+            "offsetX" => {
+                self.remember("offsetX");
+                self.offset_x = Some(parse_int(&attr.value))
+            }
+            "offsetY" => {
+                self.remember("offsetY");
+                self.offset_y = Some(parse_int(&attr.value))
+            }
             _ => {
                 if !self.set(&attr.key, attr.value.clone()) {
+                    self.remember("extra");
                     extra(&mut self.extra, &attr.key, &attr.value)
                 }
             }
@@ -247,6 +280,7 @@ impl C4Rel {
         }
     }
     fn label(&mut self, attr: &C4Attr) {
+        self.remember("labelAttr");
         self.label_attr = None;
         match attr {
             C4Attr::Text(s) => self.label = s.clone(),
@@ -267,7 +301,8 @@ impl C4Rel {
                 &mut self.techn
             };
             if target.is_none() {
-                *target = Some(String::new())
+                *target = Some(String::new());
+                self.remember(key);
             }
         }
     }
@@ -347,6 +382,16 @@ pub(super) fn parse_int(text: &str) -> f64 {
     };
     sign * value
 }
+/// Parser bookkeeping has ordered Maps and references, invisible to the legacy
+/// JSON projection. Public document snapshots expose the actual object graph.
+#[derive(Clone, Debug)]
+pub(super) struct C4Bookkeeping {
+    pub shape_index: Vec<(String, usize)>,
+    pub boundary_index: Vec<(String, usize)>,
+    pub rel_index: Vec<(String, String, usize)>,
+    pub current: usize,
+    pub stack: Vec<usize>,
+}
 #[derive(Clone, Debug)]
 pub struct C4Model {
     pub diagram_type: DiagramType,
@@ -359,6 +404,9 @@ pub struct C4Model {
     pub rels: Vec<C4Rel>,
     pub shape_in_row: f64,
     pub boundary_in_row: f64,
+    pub(super) bookkeeping: Option<C4Bookkeeping>,
+    pub(super) render_lookup: Option<HashMap<String, ElementRef>>,
+    pub(super) render_boundary_identity: Option<Vec<usize>>,
 }
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub enum ElementRef {
@@ -372,7 +420,19 @@ impl C4Model {
             ElementRef::Boundary(i) => &self.boundaries[i].element,
         }
     }
+    pub(super) fn identity(&self, id: ElementRef) -> ElementRef {
+        match id {
+            ElementRef::Shape(_) => id,
+            ElementRef::Boundary(i) => ElementRef::Boundary(self.boundary_identity(i)),
+        }
+    }
+    pub(super) fn boundary_identity(&self, i: usize) -> usize {
+        self.render_boundary_identity.as_ref().map_or(i, |v| v[i])
+    }
     pub(super) fn find(&self, alias: &str) -> Option<ElementRef> {
+        if let Some(lookup) = &self.render_lookup {
+            return lookup.get(alias).copied();
+        }
         self.shapes
             .iter()
             .position(|s| s.alias_attr.is_none() && s.alias == alias)
@@ -460,6 +520,10 @@ impl Db {
         global.alias = "global".into();
         global.label = "global".into();
         global.element_type = Some("global".into());
+        global.own_keys = ["alias", "label", "type", "parent"]
+            .into_iter()
+            .map(str::to_owned)
+            .collect();
         Self {
             model: C4Model {
                 diagram_type: DiagramType::C4,
@@ -475,6 +539,9 @@ impl Db {
                 rels: Vec::new(),
                 shape_in_row: 4.,
                 boundary_in_row: 2.,
+                bookkeeping: None,
+                render_lookup: None,
+                render_boundary_identity: None,
             },
             shape_index: HashMap::new(),
             boundary_index: HashMap::new(),
@@ -482,6 +549,26 @@ impl Db {
             current: 0,
             stack: Vec::new(),
         }
+    }
+    pub(super) fn finish(mut self) -> C4Model {
+        let mut shape_index: Vec<_> = self.shape_index.into_iter().collect();
+        shape_index.sort_by_key(|(_, i)| *i);
+        let mut boundary_index: Vec<_> = self.boundary_index.into_iter().collect();
+        boundary_index.sort_by_key(|(_, i)| *i);
+        let mut rel_index: Vec<_> = self
+            .rel_index
+            .into_iter()
+            .map(|((a, b), i)| (a, b, i))
+            .collect();
+        rel_index.sort_by_key(|(_, _, i)| *i);
+        self.model.bookkeeping = Some(C4Bookkeeping {
+            shape_index,
+            boundary_index,
+            rel_index,
+            current: self.current,
+            stack: self.stack,
+        });
+        self.model
     }
     pub fn acc_descr(&mut self, text: String) {
         let mut out = String::new();
@@ -500,6 +587,7 @@ impl Db {
         match alias {
             C4Attr::Text(s) => el.alias = s.clone(),
             C4Attr::Named(n) => {
+                el.remember("aliasAttr");
                 el.alias_attr = Some(n.clone());
                 el.named(n)
             }
@@ -539,6 +627,7 @@ impl Db {
         shape.element.put("sprite", attrs.get(at));
         shape.element.put("tags", attrs.get(at + 1));
         shape.element.put("link", attrs.get(at + 2));
+        shape.element.remember("kind");
         shape.kind = kind.into();
         shape.element.parent = Some(self.current)
     }
@@ -561,6 +650,7 @@ impl Db {
         let b = &mut self.model.boundaries[i];
         b.element.label(attrs.get(1));
         if attrs.get(2).is_none() {
+            b.element.remember("type");
             b.element.element_type = Some(fallback.into())
         } else {
             b.element.put("type", attrs.get(2))
@@ -570,6 +660,7 @@ impl Db {
             b.element.put("sprite", attrs.get(4));
             b.element.put("tags", attrs.get(5));
             b.element.put("link", attrs.get(6));
+            b.element.remember("nodeType");
             b.node_type = Some(typ.into())
         } else {
             b.element.put("tags", attrs.get(3));
@@ -602,11 +693,17 @@ impl Db {
                 }
                 match &attrs[0] {
                     C4Attr::Text(s) => rel.from = s.clone(),
-                    C4Attr::Named(n) => rel.from_attr = Some(n.clone()),
+                    C4Attr::Named(n) => {
+                        rel.remember("fromAttr");
+                        rel.from_attr = Some(n.clone())
+                    }
                 }
                 match &attrs[1] {
                     C4Attr::Text(s) => rel.to = s.clone(),
-                    C4Attr::Named(n) => rel.to_attr = Some(n.clone()),
+                    C4Attr::Named(n) => {
+                        rel.remember("toAttr");
+                        rel.to_attr = Some(n.clone())
+                    }
                 }
                 self.model.rels.push(rel);
                 i
@@ -671,8 +768,10 @@ impl Db {
             match attrs.get(i) {
                 Some(C4Attr::Text(s)) => {
                     if x {
+                        rel.remember("offsetX");
                         rel.offset_x = Some(parse_int(s))
                     } else {
+                        rel.remember("offsetY");
                         rel.offset_y = Some(parse_int(s))
                     }
                 }

@@ -272,7 +272,7 @@ pub(super) fn parse(c: ParseContext<'_>) -> Result<C4Model, PeleError> {
             r.expect(T::END)?;
             let first = &r.tokens[0];
             r.db.model.c4_type = Some(c.source[first.start..first.end].into());
-            return Ok(r.db.model);
+            return Ok(r.db.finish());
         }
     }
 }
