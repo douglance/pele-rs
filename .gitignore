@@ -1,0 +1,11 @@
+/target/
+/.build/
+**/.build/
+/dist/
+/node_modules/
+/test-results/
+/playwright-report/
+.DS_Store
+*.png
+*.svg
+!fixtures/**/*.svg
