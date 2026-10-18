@@ -250,6 +250,8 @@ pub struct StateLink {
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct StateModel {
+    #[serde(skip)]
+    pub public_divider_count: usize,
     #[serde(rename = "type")]
     pub diagram_type: DiagramType,
     pub direction: String,
@@ -278,6 +280,7 @@ impl Db {
         Self {
             model: StateModel {
                 diagram_type: DiagramType::State,
+                public_divider_count: 0,
                 direction: "TB".into(),
                 root_doc: Vec::new(),
                 states: Vec::new(),
@@ -321,6 +324,7 @@ impl Db {
         self.extract(&doc);
         self.model.graph = super::graph::build(&doc, &self.model.states, &self.model.classes)?;
         self.model.root_doc = doc;
+        self.model.public_divider_count = self.divider_count;
         Ok(self.model)
     }
     fn translate_doc(&mut self, _id: &str, doc: &mut Vec<Stmt>) {

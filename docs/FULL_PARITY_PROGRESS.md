@@ -602,3 +602,19 @@ resource failures and recovery. Existing twenty-seven source UTF-16 exclusions
 and three JSON projection ceilings remain explicit. Active sparse/lone-surrogate
 text, exotic coercion/prototypes and cyclic or over-budget expanded trees remain
 recorded gaps. Existing parser, model and renderer sources are unchanged.
+
+
+## State mutable native checkpoint
+
+State brings native mutable coverage to twenty-three families; foreign coverage
+remains sixteen. All eighteen real StateDb getter/method entries operate on its
+identity graph and retained caches. Forty-six complete graph vectors cover
+eighty-three operations and eighty-eight complete SVGs, including explicit
+rebuilds, detached style aliases, direction getters and post-error recovery.
+Four public and two baseline release integration slices pass all 10,222 historical
+outcomes, including repeated-class/description stress and eight deep source
+cases through the flat public graph. Superseded builder scratch objects stay
+private; existing 1M-item/8M-work/16M-text budgets are unchanged. The source model
+only adds skipped divider-counter provenance. Constructor/override/coercion,
+active sparse/nonstring renderer data, lone-surrogate rendering and legacy
+render-error category boundaries remain explicit.
