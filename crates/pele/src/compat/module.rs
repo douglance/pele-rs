@@ -136,6 +136,10 @@ pub trait RenderResources {
     fn icon(&mut self, _name: &str) -> Result<Option<TrustedSvg>, PeleError> {
         Ok(None)
     }
+    /// Direct host resolver: unlike inline-label icons, repeated calls are not cached.
+    fn direct_icon(&mut self, name: &str) -> Result<Option<TrustedSvg>, PeleError> {
+        self.icon(name)
+    }
     /// Host date-string parser. The portable default provides deterministic UTC
     /// formats; browser adapters delegate to their Date implementation.
     fn parse_date(&mut self, input: &str) -> Result<Option<f64>, PeleError> {

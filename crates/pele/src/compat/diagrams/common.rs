@@ -2,8 +2,10 @@
 use crate::compat::source::space;
 pub(crate) mod generics;
 pub(crate) mod icon;
+pub(crate) mod langium;
 pub(crate) mod literal_label;
 pub mod outline;
+pub(crate) mod plain_label;
 
 // /---[\t ]*\r?\n(?:[\S\s]*?\r?\n)?---(?:\r?\n|(?!\S))/y
 // The optional body is greedy: try a nonempty body before the empty alternative.

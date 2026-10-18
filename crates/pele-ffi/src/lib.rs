@@ -280,7 +280,7 @@ pub unsafe extern "C" fn pele_render_document_v2(
         )?;
         Ok(PeleResult {
             status: 0,
-            data: pele::compat::success_envelope(&rendered).into_bytes(),
+            data: pele::compat::render_result_envelope(&rendered).into_bytes(),
             document: None,
         })
     })
@@ -441,7 +441,7 @@ pub unsafe extern "C" fn pele_render_with_resources_v2(
         )?;
         Ok(PeleResult {
             status: 0,
-            data: pele::compat::success_envelope(&rendered).into_bytes(),
+            data: pele::compat::render_result_envelope(&rendered).into_bytes(),
             document: None,
         })
     })
@@ -474,7 +474,7 @@ pub unsafe extern "C" fn pele_render_document_with_resources_v2(
             pele::compat::Engine::empty().render_document(document, &options, &mut resources)?;
         Ok(PeleResult {
             status: 0,
-            data: pele::compat::success_envelope(&rendered).into_bytes(),
+            data: pele::compat::render_result_envelope(&rendered).into_bytes(),
             document: None,
         })
     })

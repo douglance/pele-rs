@@ -41,7 +41,7 @@ impl ParsedDocument {
                 &mut pele::compat::text::MetricsResources,
             )
         }) {
-            Ok(rendered) => pele::compat::success_envelope(&rendered),
+            Ok(rendered) => pele::compat::render_result_envelope(&rendered),
             Err(e) => pele::compat::error_envelope(&e),
         }
     }
@@ -198,7 +198,7 @@ impl ParsedDocument {
                 &mut BrowserResources { width, icons },
             )
         }) {
-            Ok(result) => pele::compat::success_envelope(&result),
+            Ok(result) => pele::compat::render_result_envelope(&result),
             Err(e) => pele::compat::error_envelope(&e),
         }
     }
@@ -217,7 +217,7 @@ pub fn render_with_resources(
             &mut BrowserResources { width, icons },
         )
     }) {
-        Ok(result) => pele::compat::success_envelope(&result),
+        Ok(result) => pele::compat::render_result_envelope(&result),
         Err(e) => pele::compat::error_envelope(&e),
     }
 }

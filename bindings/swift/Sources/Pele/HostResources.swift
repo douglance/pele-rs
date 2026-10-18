@@ -70,9 +70,12 @@ private func resourceIcon(_ context: UnsafeMutableRawPointer?, _ name: UnsafePoi
         }
         bridge.iconBytes = Data(icon.markup.utf8)
         // NSData owns stable backing storage until the next callback. Rust copies synchronously.
-        let bytes = bridge.iconBytes as NSData
+        let count = bridge.iconBytes.count
+        // A non-null zero-length buffer means a present empty icon. NSData's
+        // empty bytes pointer is null, which the ABI reserves for missing icons.
+        let bytes = (count == 0 ? Data([0]) : bridge.iconBytes) as NSData
         bridge.iconStorage = bytes
-        output.pointee = PeleBorrowedBytes(data: bytes.bytes.assumingMemoryBound(to: UInt8.self), len: bytes.length)
+        output.pointee = PeleBorrowedBytes(data: bytes.bytes.assumingMemoryBound(to: UInt8.self), len: count)
         return 0
     } catch { bridge.error = error; return 1 }
 }

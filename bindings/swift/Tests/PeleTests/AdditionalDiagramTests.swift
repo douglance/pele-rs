@@ -19,7 +19,7 @@ final class AdditionalDiagramTests: XCTestCase {
     func testPinnedDiagramsThroughNativeDocuments() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent("../../../..").standardizedFileURL
         let decoder = JSONDecoder(), encoder = JSONEncoder(), engine = Pele.Engine()
-        for family in ["packet", "radar", "quadrant", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence"] {
+        for family in ["packet", "radar", "quadrant", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence", "git-graph", "architecture", "sankey"] {
             if let families = ProcessInfo.processInfo.environment["PELE_FAMILIES"], !families.split(separator: ",").contains(Substring(family)) { continue }
             let fixture = try JSONSerialization.jsonObject(with: fixtureData(root.appendingPathComponent("fixtures/pele/\(family).json"))) as! [String: Any]
             let cases = fixture["cases"] as! [[String: Any]]
@@ -53,6 +53,7 @@ final class AdditionalDiagramTests: XCTestCase {
                         }
                         let rendered = try engine.render(source, options: options, resources: resources)
                         let result = (try JSONSerialization.jsonObject(with: encoder.encode(rendered)) as! NSDictionary).mutableCopy() as! NSMutableDictionary
+                        result.removeObject(forKey: "$numbers")
                         if (expected["result"] as? [String: Any])?["svgSha256"] != nil {
                             result.removeObject(forKey: "svg")
                             result["svgSha256"] = SHA256.hash(data: Data(rendered.svg.utf8)).map { String(format: "%02x", $0) }.joined()
@@ -68,6 +69,7 @@ final class AdditionalDiagramTests: XCTestCase {
                     projected = true
                     let rendered = try engine.render(document, options: options, resources: resources)
                     let result = (try JSONSerialization.jsonObject(with: encoder.encode(rendered)) as! NSDictionary).mutableCopy() as! NSMutableDictionary
+                    result.removeObject(forKey: "$numbers")
                     if (expected["result"] as? [String: Any])?["svgSha256"] != nil {
                         result.removeObject(forKey: "svg")
                         result["svgSha256"] = SHA256.hash(data: Data(rendered.svg.utf8)).map { String(format: "%02x", $0) }.joined()
@@ -115,6 +117,20 @@ final class AdditionalDiagramTests: XCTestCase {
             }
         }
         let capabilities = try engine.capabilities()
-        XCTAssertEqual(Set(capabilities.filter { $0.registered }.map(\.type)), Set(["pie", "packet", "radar", "quadrantChart", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence"]))
+        XCTAssertEqual(Set(capabilities.filter { $0.registered }.map(\.type)), Set(["pie", "packet", "radar", "quadrantChart", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence", "gitGraph", "architecture", "sankey"]))
+    }
+}
+
+
+final class NonfiniteDiagramTests: XCTestCase {
+    func testSankeyOwnedRenderAndCodableKeepNonfiniteHeight() throws {
+        let engine = Pele.Engine(), source = "sankey\na,b,5e-324"
+        let document = try engine.parse(source)
+        let rendered = try engine.render(document)
+        XCTAssertTrue(rendered.height.isNaN)
+        XCTAssertTrue(try engine.render(source).height.isNaN)
+        let restored = try JSONDecoder().decode(FullRenderedDiagram.self, from: JSONEncoder().encode(rendered))
+        XCTAssertEqual(restored.height.bitPattern, rendered.height.bitPattern)
+        XCTAssertEqual(restored.svg, rendered.svg)
     }
 }

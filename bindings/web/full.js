@@ -6,7 +6,16 @@ function result(json) {
   const envelope = JSON.parse(json);
   if (envelope.version !== 2) throw new Error('Unsupported compatibility contract');
   if (!envelope.ok) throw new PeleCompatibilityError(envelope.error);
-  return envelope.result;
+  const value=envelope.result;
+  if(value&&typeof value.svg==='string'&&value.$numbers) {
+    const bits=new DataView(new ArrayBuffer(8));
+    for(const [key,hex] of Object.entries(value.$numbers)) {
+      if(key!=='width'&&key!=='height')throw new Error('Invalid dimension transport');
+      bits.setBigUint64(0,BigInt('0x'+hex));value[key]=bits.getFloat64(0);
+    }
+    delete value.$numbers;
+  }
+  return value;
 }
 /** Implemented built-ins. Core rendering remains Rust; this adapter owns model lifetimes only. */
 export async function loadRenderer(moduleOrPath) {
@@ -21,6 +30,14 @@ export async function loadRenderer(moduleOrPath) {
       try {
         const projection = result(document.model());
         const model = projection.model;
+        if (projection.type === 'gitGraph') {
+          model.commits = new Map(model.commits);model.branches = new Map(model.branches);
+          if(model.head)model.head=model.commits.get(model.head.id)??model.head;
+        }
+        if (projection.type === 'architecture') for(const key of ['nodes','groups','registered'])model[key]=new Map(model[key]);
+        if (projection.type === 'sankey') for(const link of model.links) {
+          link.source=model.nodes[link.source.index];link.target=model.nodes[link.target.index];
+        }
         if (projection.type === 'pie') model.sections = new Map(model.sections);
         if (projection.type === 'quadrantChart') model.classes = new Map(model.classes);
         if (projection.type === 'state') for (const key of ['states', 'classes', 'links']) model[key] = new Map(model[key]);

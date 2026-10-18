@@ -126,6 +126,9 @@ impl Engine {
     /// Registers implemented built-ins only; consult capabilities for parity status.
     pub fn with_builtins() -> Self {
         let mut engine = Self::empty();
+        engine.register(super::diagrams::git_graph::GitGraph);
+        engine.register(super::diagrams::architecture::Architecture);
+        engine.register(super::diagrams::sankey::Sankey);
         engine.register(super::diagrams::state::State);
         engine.register(super::diagrams::gantt::Gantt);
         engine.register(super::diagrams::sequence::Sequence);
@@ -371,6 +374,9 @@ impl RenderResources for RenderSession<'_> {
         let result = self.host.icon(&source::decode_entities(name)?)?;
         self.icons.insert(name.into(), result.clone());
         Ok(result)
+    }
+    fn direct_icon(&mut self, name: &str) -> Result<Option<TrustedSvg>, PeleError> {
+        self.host.icon(&source::decode_entities(name)?)
     }
     fn parse_date(&mut self, input: &str) -> Result<Option<f64>, PeleError> {
         Ok(self

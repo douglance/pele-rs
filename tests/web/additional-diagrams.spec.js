@@ -1,6 +1,6 @@
 import {test,expect} from '@playwright/test';
 
-for(const family of ['packet','radar','quadrant','timeline','journey','flowchart','kanban','mindmap','class','er','xychart','state','gantt','sequence']) {
+for(const family of ['packet','radar','quadrant','timeline','journey','flowchart','kanban','mindmap','class','er','xychart','state','gantt','sequence','git-graph','architecture','sankey']) {
   test(`${family} pinned corpus through WASM source and owned model APIs`, async({page})=>{
     test.setTimeout(120_000);
     await page.goto('/examples/web/');
@@ -71,6 +71,9 @@ test('new families paint resolved SVG through real browser decoders',async({page
   const report=await page.evaluate(async()=>{
     const {loadRenderer}=await import('/dist/package-web/package/full.js'),engine=await loadRenderer(),proof=[];
     for(const [type,source] of [
+      ['gitGraph','gitGraph\ncommit id: "base"\nbranch feature\ncommit\ncheckout main\nmerge feature'],
+      ['architecture','architecture-beta\nservice app(server)[App]\nservice db(database)[Data]\napp:R --> L:db'],
+      ['sankey','sankey\nCapture,Store,10\nStore,Swift,6\nStore,Web,4'],
       ['state','stateDiagram-v2\n[*] --> Ready\nstate Active {\n  [*] --> Working\n  Working --> [*]\n}\nReady --> Active'],
       ['gantt','gantt\ntitle Release plan\ndateFormat YYYY-MM-DD\nsection Core\nBuild :done,a,2024-03-01,2d\nVerify :crit,b,after a,2d'],
       ['sequence','sequenceDiagram\nparticipant App\nparticipant Core\nApp->>Core: Render\nactivate Core\nCore-->>App: SVG\ndeactivate Core'],
@@ -96,4 +99,16 @@ test('new families paint resolved SVG through real browser decoders',async({page
     return proof;
   });
   for(const proof of report){expect(proof.type).toBe(proof.expectedType);expect(proof.unresolved).toBe(false);expect(proof.painted).toBeGreaterThan(1000);}
+});
+
+
+test('Sankey keeps non-finite result dimensions across owned WASM documents',async({page})=>{
+  await page.goto('/examples/web/');
+  const report=await page.evaluate(async()=>{
+    const {loadRenderer}=await import('/dist/package-web/package/full.js'),engine=await loadRenderer();
+    const model=engine.parse('sankey\na,b,5e-324');
+    try { const a=engine.render(model),b=engine.render('sankey\na,b,5e-324');return {heightNaN:Number.isNaN(a.height)&&Number.isNaN(b.height),metadataExposed:Object.keys(a).some(k=>k.startsWith('$'))}; }
+    finally {engine.dispose(model)}
+  });
+  expect(report).toEqual({heightNaN:true,metadataExposed:false});
 });

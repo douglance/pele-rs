@@ -179,7 +179,7 @@ unsafe fn render(
         };
         Ok(PeleResult {
             status: 0,
-            data: pele::compat::success_envelope(&rendered).into_bytes(),
+            data: pele::compat::render_result_envelope(&rendered).into_bytes(),
             document: None,
         })
     })

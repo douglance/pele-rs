@@ -6,7 +6,7 @@ release or new GIF has been published from this branch.
 
 ## Implemented renderers
 
-`Engine::with_builtins()` currently registers fifteen actual Rust diagram modules.
+`Engine::with_builtins()` currently registers eighteen actual Rust diagram modules.
 `Engine::empty()` and typed `DiagramModule<Model>` remain extension interfaces.
 Registration never certifies a global parity flag; all public API gates remain open.
 
@@ -27,9 +27,12 @@ Registration never certifies a global parity flag; all public API gates remain o
 | state | 10,222 | 7,209 | 3,013 |
 | gantt | 18,994 | 8,048 | 10,946 |
 | sequence | 19,166 | 6,702 | 12,464 |
-| Total | 199,808 | 79,132 | 120,676 |
+| gitGraph | 17,125 | 5,050 | 12,075 |
+| architecture | 18,780 | 4,593 | 14,187 |
+| sankey | 11,616 | 4,946 | 6,670 |
+| Total | 247,329 | 93,721 | 153,608 |
 
-There are 83,514 complete model comparisons. Parsed models are retained when a
+There are 98,205 complete model comparisons. Parsed models are retained when a
 subsequent render fails. Six class stress cases explicitly exceed the JSON
 projection depth/size budget; their typed models and exact source renders/errors
 remain covered. These transport exceptions do not earn full public API parity.
@@ -75,12 +78,12 @@ Rust owns all branch/column geometry and responsive behavior.
 Host: macOS 26.6 arm64 / Apple M1 Pro, Rust 1.98.1, Swift 6.4, Node 25.9.
 
 - Public Rust integration coverage passes across legacy, preparation, extension,
-  all fifteen families, including full flowchart rendering. The consolidated
-  release-profile run passed 50 public integration tests. No unit tests added.
+  all eighteen families, including full flowchart rendering. The consolidated
+  release-profile run passed 50 public integration tests at the fifteen-family checkpoint; seven more GitGraph/Architecture/Sankey integration tests pass in release mode. No unit tests added.
 - Source preparation: all 5,345 scenarios, including 761 examples from 34 upstream
   corpora; extension links: 1,536 entity/link scenarios.
-- All six Swift integration tests pass. The additional-diagram test exercises
-  every packet/radar/quadrant/timeline/journey/flowchart/kanban/mindmap/class/er/xychart/state/gantt/sequence fixture through owned documents,
+- All seven Swift integration tests pass. The additional-diagram test exercises
+  every packet/radar/quadrant/timeline/journey/flowchart/kanban/mindmap/class/er/xychart/state/gantt/sequence/gitGraph/architecture/sankey fixture through owned documents,
   callbacks and source rendering; pie and preparation have their own full corpora.
 - Fifty-one browser integration checks pass with one worker in Chrome, Firefox
   and WebKit, using the extracted npm tarball. Includes exact corpus comparisons,
@@ -90,7 +93,9 @@ Host: macOS 26.6 arm64 / Apple M1 Pro, Rust 1.98.1, Swift 6.4, Node 25.9.
   twelve passing three-browser checks (full source/owned-model corpora and native
   SVG decoder pixels). Fifteen more checks compare Gantt in five actual browser
   timezones, including gaps/folds, half-hour changes, leap/month arithmetic,
-  excluded weekends, ancient dates and Samoa's skipped day.
+  excluded weekends, ancient dates and Samoa's skipped day. The subsequent
+  GitGraph/Architecture/Sankey batch passes fifteen additional three-browser checks:
+  exact full corpora, native decoder pixels, and non-finite Sankey dimensions.
 - C executable passes NULL/UTF-8/limits/ownership checks: 400 legacy lifetimes plus
   200 owned pie document lifetimes.
 - Rust crate packaging and independent downstream Cargo consumer pass.
@@ -110,6 +115,9 @@ only to raster evidence, while exported diagrams retain SVG transparency.
 | state | 316 x 424; 5,636 painted | Composite states, arrows and 372 title pixels |
 | gantt | 801 x 137; 14,583 painted | Task states, axes and 382 title pixels |
 | sequence | 187 x 240; 4,492 painted | Messages, activation and 470 title pixels |
+| gitGraph | 204 x 191; 4,812 painted | Commit symbols, branches and 491 title pixels |
+| architecture | 155 x 128; 2,522 painted | Services, ports and 502 title pixels |
+| sankey | 616 x 416; 224,041 painted | Flow bands and labelled nodes |
 | full flowchart | 115 x 336; 3,338 painted | Nested group and resolved title halo |
 | kanban | 428 x 105; 3,069 painted | Columns and card labels |
 | mindmap | 269 x 73; 1,241 painted | Root and both branches |
@@ -139,6 +147,27 @@ Pinned XYChart explicitly clamped equal bounds can still emit NaN path geometry;
 that upstream behavior is preserved and does not constitute a universal finite-SVG
 claim. Ordinary diagrams have XML and real raster evidence.
 
+## Additional host transport evidence
+
+Sankey can produce a NaN result height from subnormal positive link weights in
+the pinned implementation. JSON alone erases that numeric value to null. Render
+transport now includes exact IEEE bits only for dimensions JSON cannot preserve;
+Swift and web adapters restore those numbers and hide transport metadata. Swift
+Codable round-trips the same bits. Ordinary finite result envelopes are unchanged.
+Full non-finite source options and model graphs remain separate required API work.
+
+Architecture icon tests also exposed an empty-string resource distinction: an
+explicit empty icon suppresses its builtin, while a missing icon selects fallback.
+Swift now supplies a non-null zero-length buffer for an explicit empty icon;
+all five previously failing cases pass, with nil/error ownership unchanged.
+
+The new GitGraph/Architecture/Sankey native corpus run passed all cases except
+those five icon cases; the complete Architecture corpus and all seven Swift test
+methods pass after that correction. These are cumulative host checks, not a new
+consolidated eighteen-family Swift corpus run. Independent Rust/Swift package
+consumers were last exercised at the fifteen-family checkpoint; final all-family
+package and CI gates remain mandatory.
+
 ## Calendar and deep models
 
 Gantt uses the translated V8 date parser for native fallback strings, attributed
@@ -166,7 +195,7 @@ architecture is [LLD_PUBLIC_MODELS.md](LLD_PUBLIC_MODELS.md).
 
 ## Remaining acceptance work
 
-- Eighteen family renderers, remaining shared behavior and the complete
+- Fifteen family renderers, remaining shared behavior and the complete
   registration/lazy/mount/zoom/public model interface remain required.
 - JavaScript model projections currently do not apply mutations back into the
   retained Rust document. Prototype methods/private enumerable state also need

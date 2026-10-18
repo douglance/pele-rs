@@ -8,6 +8,34 @@ public struct FullRenderedDiagram: Codable, Sendable {
     public let width: Double
     public let height: Double
     public let links: [DiagramLink]
+    private enum CodingKeys: String, CodingKey { case type, svg, width, height, links; case numbers = "$numbers" }
+    public init(from decoder: any Decoder) throws {
+        let fields = try decoder.container(keyedBy: CodingKeys.self)
+        type = try fields.decode(String.self, forKey: .type)
+        svg = try fields.decode(String.self, forKey: .svg)
+        links = try fields.decode([DiagramLink].self, forKey: .links)
+        let numbers = try fields.decodeIfPresent([String: String].self, forKey: .numbers) ?? [:]
+        func number(_ key: CodingKeys) throws -> Double {
+            if let hex = numbers[key.rawValue] {
+                guard hex.count == 16, let bits = UInt64(hex, radix: 16) else {
+                    throw DecodingError.dataCorruptedError(forKey: key, in: fields, debugDescription: "Invalid IEEE dimension bits")
+                }
+                return Double(bitPattern: bits)
+            }
+            return try fields.decode(Double.self, forKey: key)
+        }
+        width = try number(.width); height = try number(.height)
+    }
+    public func encode(to encoder: any Encoder) throws {
+        var fields = encoder.container(keyedBy: CodingKeys.self)
+        try fields.encode(type, forKey: .type); try fields.encode(svg, forKey: .svg); try fields.encode(links, forKey: .links)
+        var numbers: [String: String] = [:]
+        for (key, value) in [(CodingKeys.width, width), (.height, height)] {
+            if value.isFinite { try fields.encode(value, forKey: key) } else { try fields.encodeNil(forKey: key) }
+            if !value.isFinite || (value == 0 && value.sign == .minus) { numbers[key.rawValue] = String(format: "%016llx", value.bitPattern) }
+        }
+        if !numbers.isEmpty { try fields.encode(numbers, forKey: .numbers) }
+    }
 }
 private struct DocumentProjection: Decodable { let type: String; let model: ConfigValue }
 

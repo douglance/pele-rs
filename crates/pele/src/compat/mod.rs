@@ -102,6 +102,30 @@ pub fn success_envelope<T: Serialize>(result: &T) -> String {
     })
     .expect("serializable engine value")
 }
+/// V2 JSON projections use null for non-finite numbers. Render transport adds
+/// exact IEEE bits only where JSON loses a dimension; host adapters remove this metadata.
+pub fn render_result_envelope(result: &RenderResult) -> String {
+    #[derive(Serialize)]
+    struct Transport<'a> {
+        #[serde(flatten)]
+        result: &'a RenderResult,
+        #[serde(
+            rename = "$numbers",
+            skip_serializing_if = "std::collections::BTreeMap::is_empty"
+        )]
+        numbers: std::collections::BTreeMap<&'static str, String>,
+    }
+    let mut numbers = std::collections::BTreeMap::new();
+    for (key, value) in [
+        ("width", result.rendered.width),
+        ("height", result.rendered.height),
+    ] {
+        if !value.is_finite() || (value == 0.0 && value.is_sign_negative()) {
+            numbers.insert(key, format!("{:016x}", value.to_bits()));
+        }
+    }
+    success_envelope(&Transport { result, numbers })
+}
 pub fn error_envelope(error: &PeleError) -> String {
     serde_json::to_string(&ErrorEnvelope {
         version: 2,
@@ -157,7 +181,7 @@ pub fn render_envelope(source: &str, options_json: &str) -> (u32, String) {
         Engine::with_builtins().render_source(source, &options, &mut text::MetricsResources)
     });
     match result {
-        Ok(result) => (0, success_envelope(&result)),
+        Ok(result) => (0, render_result_envelope(&result)),
         Err(error) => (
             if error.code == ErrorCode::Limit { 2 } else { 1 },
             error_envelope(&error),

@@ -2,7 +2,7 @@
 set -euo pipefail
 source "$(dirname "$0")/env.sh"
 cargo fmt --all --check
-cargo test --locked -p pele-rs --test conformance --test source_compat --test module_contract --test pie_compat --test packet_compat --test quadrant_compat --test radar_compat --test timeline_compat --test journey_compat --test flowchart_compat --test kanban_compat --test mindmap_compat --test class_compat --test er_compat --test xychart_compat --test state_compat --test gantt_compat --test sequence_compat
+cargo test --locked -p pele-rs --test conformance --test source_compat --test module_contract --test pie_compat --test packet_compat --test quadrant_compat --test radar_compat --test timeline_compat --test journey_compat --test flowchart_compat --test kanban_compat --test mindmap_compat --test class_compat --test er_compat --test xychart_compat --test state_compat --test gantt_compat --test sequence_compat --test git_graph_compat --test architecture_compat --test sankey_compat
 cargo run --locked -p pele-rs --example corpus
 cargo package --locked --allow-dirty -p pele-rs
 cargo run --locked --manifest-path tests/rust-consumer/Cargo.toml

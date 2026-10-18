@@ -63,7 +63,15 @@ export interface SequenceNumbering { start?: number; step?: number; visible: boo
 export interface SequenceMessage { id: string; from?: string; to?: string; message: string | SequenceNumbering; wrap: boolean; type?: number; activate?: boolean; placement?: number; centralConnection?: number; answer?: ConfigValue }
 export interface SequenceNote { actor: string | string[]; placement: number; message: string; wrap: boolean }
 export interface SequenceModel extends AccessibleModel { type: 'sequence'; actors: ReadonlyMap<string, SequenceActor>; createdActors: ReadonlyMap<string, number>; destroyedActors: ReadonlyMap<string, number>; boxes: SequenceBox[]; messages: SequenceMessage[]; notes: SequenceNote[] }
-export type DiagramModel = PieModel | PacketModel | RadarModel | QuadrantModel | TimelineModel | JourneyModel | FlowchartModel | KanbanModel | MindmapModel | ClassModel | ErModel | XyChartModel | StateModel | GanttModel | SequenceModel;
+export interface GitCommit { id: string; message: string; seq: number; type: number; tags: string[]; parents: string[]; branch: string; customType?: number; customId?: boolean }
+export interface GitModel extends AccessibleModel { type: 'gitGraph'; direction: string; commits: ReadonlyMap<string, GitCommit>; branches: ReadonlyMap<string, string | null>; lanes: string[]; currentBranch: string; head: GitCommit | null; warnings: string[] }
+export interface ArchitectureNode { id: string; type: string; icon?: string; iconText?: string; title?: string; in?: string }
+export interface ArchitectureGroup { id: string; icon?: string; title?: string; in?: string }
+export interface ArchitectureEdge { lhsId: string; lhsDir: string; lhsInto: boolean; lhsGroup: boolean; rhsId: string; rhsDir: string; rhsInto: boolean; rhsGroup: boolean; title?: string }
+export interface ArchitectureModel extends AccessibleModel { type: 'architecture'; nodes: ReadonlyMap<string, ArchitectureNode>; groups: ReadonlyMap<string, ArchitectureGroup>; edges: ArchitectureEdge[]; layoutHints: { direction: string; members: string[] }[]; registered: ReadonlyMap<string, string> }
+export interface SankeyNode { id: string; index: number }
+export interface SankeyModel extends AccessibleModel { type: 'sankey'; nodes: SankeyNode[]; links: { source: SankeyNode; target: SankeyNode; value: number }[] }
+export type DiagramModel = PieModel | PacketModel | RadarModel | QuadrantModel | TimelineModel | JourneyModel | FlowchartModel | KanbanModel | MindmapModel | ClassModel | ErModel | XyChartModel | StateModel | GanttModel | SequenceModel | GitModel | ArchitectureModel | SankeyModel;
 export interface Rendered { type: DiagramId; svg: string; width: number; height: number; links: { id: string; href: string; internal: boolean }[] }
 export interface Renderer {
   capabilities(): Capability[];

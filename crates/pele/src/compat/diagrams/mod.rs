@@ -1,8 +1,10 @@
+pub mod architecture;
 pub mod class_diagram;
 mod common;
 pub mod er;
 pub mod flowchart;
 pub mod gantt;
+pub mod git_graph;
 pub mod journey;
 pub mod kanban;
 pub mod mindmap;
@@ -10,6 +12,7 @@ pub mod packet;
 pub mod pie;
 pub mod quadrant_chart;
 pub mod radar;
+pub mod sankey;
 pub mod sequence;
 pub mod state;
 pub mod timeline;
