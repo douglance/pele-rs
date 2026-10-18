@@ -116,18 +116,31 @@ extension Pele {
             } catch { pele_result_free(handle); throw error }
         }
         public func render(_ source: String, options: Options = .init(), resources: HostResources = .init()) throws -> FullRenderedDiagram {
-            let bytes = Data(source.utf8), settings = try JSONEncoder().encode(options)
-            let handle = try resources.withNativeResources { host in bytes.withUnsafeBytes { input in settings.withUnsafeBytes { output in
-                pele_render_with_resources_v3(input.bindMemory(to: UInt8.self).baseAddress, input.count,
-                                              output.bindMemory(to: UInt8.self).baseAddress, output.count, host)
-            }}}
+            try render(source, options: options, resources: resources, outputLimit: nil)
+        }
+        public func render(_ source: String, outputLimit: OutputLimit, options: Options = .init(), resources: HostResources = .init()) throws -> FullRenderedDiagram {
+            try render(source, options: options, resources: resources, outputLimit: outputLimit)
+        }
+        private func render(_ source: String, options: Options, resources: HostResources, outputLimit: OutputLimit?) throws -> FullRenderedDiagram {
+            let bytes = Data(source.utf8), settings = try RenderNumberEncoding(options, outputLimit: outputLimit)
+            let handle = try resources.withNativeResources { host in settings.withPacket { packet in bytes.withUnsafeBytes { input in settings.optionsJSON.withUnsafeBytes { output in
+                pele_render_with_numbers_v9(input.bindMemory(to: UInt8.self).baseAddress, input.count,
+                    output.bindMemory(to: UInt8.self).baseAddress, output.count, packet, settings.outputKind, settings.outputBits, host)
+            }}}}
             return try Pele.compatibilityResult(handle, as: FullRenderedDiagram.self)
         }
         public func render(_ document: Document, options: Options = .init(), resources: HostResources = .init()) throws -> FullRenderedDiagram {
-            let settings = try JSONEncoder().encode(options)
-            let handle = try resources.withNativeResources { host in withExtendedLifetime(document) { settings.withUnsafeBytes { output in
-                pele_render_document_with_resources_v3(document.handle, output.bindMemory(to: UInt8.self).baseAddress, output.count, host)
-            }}}
+            try render(document, options: options, resources: resources, outputLimit: nil)
+        }
+        public func render(_ document: Document, outputLimit: OutputLimit, options: Options = .init(), resources: HostResources = .init()) throws -> FullRenderedDiagram {
+            try render(document, options: options, resources: resources, outputLimit: outputLimit)
+        }
+        private func render(_ document: Document, options: Options, resources: HostResources, outputLimit: OutputLimit?) throws -> FullRenderedDiagram {
+            let settings = try RenderNumberEncoding(options, outputLimit: outputLimit)
+            let handle = try resources.withNativeResources { host in withExtendedLifetime(document) { settings.withPacket { packet in settings.optionsJSON.withUnsafeBytes { output in
+                pele_render_document_with_numbers_v9(document.handle, output.bindMemory(to: UInt8.self).baseAddress, output.count,
+                    packet, settings.outputKind, settings.outputBits, host)
+            }}}}
             return try Pele.compatibilityResult(handle, as: FullRenderedDiagram.self)
         }
     }

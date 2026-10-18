@@ -163,6 +163,43 @@ PeleResult *pele_public_render_operation_binary_v5(PelePublicDocument *document,
 PeleResult *pele_public_render_operation_output_limit_v6(PelePublicDocument *document,
     uint64_t expected_revision, const uint8_t *options, size_t options_len,
     uint32_t limit_kind, uint64_t limit_bits, const PeleHostResourcesV3 *resources);
+/* Native number overrides: exact56-byte host-ABI packet; never a wire format.
+ * NULL packet selects no overrides. Readable8-byte header required; full56bytes
+ * required when struct_size is56. version=9, exactsize56, present bits0..4 only.
+ * Payload slots contain binary64 bits; unselected slots ignored. Synchronous
+ * borrow only. NaN payload identity is transport-only, not after arithmetic. */
+#define PELE_RENDER_NUMBER_FONT_SIZE_V9 (UINT64_C(1) << 0)
+#define PELE_RENDER_NUMBER_MAX_WIDTH_V9 (UINT64_C(1) << 1)
+#define PELE_RENDER_NUMBER_DIRECTION_BREAKPOINT_V9 (UINT64_C(1) << 2)
+#define PELE_RENDER_NUMBER_PADDING_V9 (UINT64_C(1) << 3)
+#define PELE_RENDER_NUMBER_NOW_V9 (UINT64_C(1) << 4)
+typedef struct PeleRenderNumbersV9 {
+    uint32_t version, struct_size;
+    uint64_t present;
+    uint64_t font_size_bits, max_width_bits, direction_breakpoint_bits, padding_bits, now_bits;
+} PeleRenderNumbersV9;
+/* v9 checks options<=1MiB then source<=16MiB before buffer borrows, then packet
+ * and output tag, then options UTF-8/JSON, then source/document provenance or
+ * mutable lock/revision. Packet/preflight errors never dispatch callbacks or
+ * advance revision. Selected top-level JSON fields alone bypass old decoding;
+ * duplicate selected fields/trailing input reject. Output tags0/1/2 select exact
+ * undefined/null/number;3 retains legacy outputLimit/dispatch. Unknown tags reject.
+ * Returned SVG independently <=64MiB before/after native theme, all result
+ * envelopes/exchanges <=64MiB. Bounds accepted output, not renderer peak memory.
+ * Immutable results retain existing width/height IEEE sidecars. Mutable results
+ * publish dispatched graph/revision on operation errors as v5/v6. All inputs,
+ * packet, documents and resources borrow synchronously; existing result freeing
+ * and callback-error ownership apply. Old C exports retain their dispatch. */
+PeleResult *pele_render_with_numbers_v9(const uint8_t *source, size_t source_len,
+    const uint8_t *options, size_t options_len, const PeleRenderNumbersV9 *numbers,
+    uint32_t output_limit_kind, uint64_t output_limit_bits, const PeleHostResourcesV3 *resources);
+PeleResult *pele_render_document_with_numbers_v9(const PeleResult *document,
+    const uint8_t *options, size_t options_len, const PeleRenderNumbersV9 *numbers,
+    uint32_t output_limit_kind, uint64_t output_limit_bits, const PeleHostResourcesV3 *resources);
+PeleResult *pele_public_render_operation_with_numbers_v9(PelePublicDocument *document,
+    uint64_t expected_revision, const uint8_t *options, size_t options_len,
+    const PeleRenderNumbersV9 *numbers, uint32_t output_limit_kind,
+    uint64_t output_limit_bits, const PeleHostResourcesV3 *resources);
 void pele_public_document_free_v4(PelePublicDocument *);
 
 uint32_t pele_result_status(const PeleResult *result);

@@ -129,6 +129,60 @@ impl Write for Output {
         Ok(())
     }
 }
+// v9 alone bounds outer errors as well as successful envelopes/exchanges.
+// Constants are canonical version2 envelopes and avoid recursively serializing
+// an oversized source-derived error or an unexpected serialization panic.
+const BOUNDED_ERROR_FALLBACK: &[u8] = br#"{"version":2,"ok":false,"error":{"name":"PeleError","message":"Native public transport: result exceeds 64 MiB JSON budget","code":"limit","type":null,"line":0,"column":0,"snippet":""}}"#;
+const BOUNDED_PANIC_FALLBACK: &[u8] = br#"{"version":2,"ok":false,"error":{"name":"PeleError","message":"Native transport: unexpected engine failure","code":"semantic","type":null,"line":0,"column":0,"snippet":""}}"#;
+fn bounded_failure(error: &PeleError) -> PeleResult {
+    #[derive(Serialize)]
+    struct Envelope<'a> {
+        version: u32,
+        ok: bool,
+        error: &'a PeleError,
+    }
+    let mut output = Output {
+        bytes: Vec::new(),
+        exceeded: false,
+    };
+    let encoded = serde_json::to_writer(
+        &mut output,
+        &Envelope {
+            version: 2,
+            ok: false,
+            error,
+        },
+    );
+    if output.exceeded || encoded.is_err() {
+        return PeleResult {
+            status: 2,
+            data: BOUNDED_ERROR_FALLBACK.to_vec(),
+            document: None,
+        };
+    }
+    PeleResult {
+        status: if error.code == ErrorCode::Limit { 2 } else { 1 },
+        data: output.bytes,
+        document: None,
+    }
+}
+pub(super) fn bounded_call(run: impl FnOnce() -> Result<PeleResult, PeleError>) -> *mut PeleResult {
+    let result = catch_unwind(AssertUnwindSafe(|| match run() {
+        Ok(result) if result.data.len() <= GRAPH_JSON_BUDGET => result,
+        Ok(_) => PeleResult {
+            status: 2,
+            data: BOUNDED_ERROR_FALLBACK.to_vec(),
+            document: None,
+        },
+        Err(error) => bounded_failure(&error),
+    }))
+    .unwrap_or_else(|_| PeleResult {
+        status: 1,
+        data: BOUNDED_PANIC_FALLBACK.to_vec(),
+        document: None,
+    });
+    Box::into_raw(Box::new(result))
+}
 pub(super) fn success(value: impl Serialize) -> Result<PeleResult, PeleError> {
     #[derive(Serialize)]
     struct Envelope<T> {
@@ -636,24 +690,53 @@ pub unsafe extern "C" fn pele_public_render_operation_output_limit_v6(
                 )
             })
         }?;
-        let mut metadata = Output {
-            bytes: Vec::new(),
-            exceeded: false,
-        };
-        let encoded = serde_json::to_writer(
-            &mut metadata,
-            &outcome
-                .result
-                .as_ref()
-                .map(pele::compat::render_result_transport),
-        );
-        if metadata.exceeded {
-            return Err(PeleError::new(
-                "Native public transport: result exceeds 64 MiB JSON budget",
-                ErrorCode::Limit,
-            ));
-        }
-        encoded.map_err(|_| invalid("Invalid render metadata"))?;
-        binary_success(outcome.revision, &outcome.graph, &metadata.bytes)
+        render_outcome(&outcome)
+    })
+}
+
+fn render_outcome(outcome: &pele::compat::public::RenderOutcome) -> Result<PeleResult, PeleError> {
+    let mut metadata = Output {
+        bytes: Vec::new(),
+        exceeded: false,
+    };
+    let encoded = serde_json::to_writer(
+        &mut metadata,
+        &outcome
+            .result
+            .as_ref()
+            .map(pele::compat::render_result_transport),
+    );
+    if metadata.exceeded {
+        return Err(PeleError::new(
+            "Native public transport: result exceeds 64 MiB JSON budget",
+            ErrorCode::Limit,
+        ));
+    }
+    encoded.map_err(|_| invalid("Invalid render metadata"))?;
+    binary_success(outcome.revision, &outcome.graph, &metadata.bytes)
+}
+/// # Safety
+/// Same document ownership as v5; packet/options/resources are synchronous borrows.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_render_operation_with_numbers_v9(
+    handle: *mut PelePublicDocument,
+    expected_revision: u64,
+    bytes: *const u8,
+    len: usize,
+    numbers: *const super::PeleRenderNumbersV9,
+    kind: u32,
+    bits: u64,
+    resources: *const PeleHostResourcesV3,
+) -> *mut PeleResult {
+    bounded_call(|| {
+        let (options, limit) =
+            unsafe { super::render_numbers::options(bytes, len, numbers, kind, bits) }?;
+        let mut document = unsafe { document(handle) }?;
+        let outcome = unsafe {
+            calendar::with_resources(resources, |host| {
+                document.render_operation_bounded(expected_revision, &options, limit, host)
+            })
+        }?;
+        render_outcome(&outcome)
     })
 }

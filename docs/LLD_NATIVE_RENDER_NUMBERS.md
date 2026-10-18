@@ -383,3 +383,10 @@ The four original `public_render_numbers` feature tests also passed, including
 exact/legacy dispatch, lazy clock behavior, source byte guards, original callback
 errors, retained state and independent native SVG output budgets. These are Rust
 proofs. New C v9, actual Swift SDK and browser acceptance remain separate gates.
+
+The rebuilt ARM64 C v9 archive passes all five strict C integration programs
+(numeric transport, registry, exact parse/source/output limits). The copied Swift
+SDK compiles and passes all four RenderNumberTests, including all 3,069 all-family
+renders and the original 861 numeric renders, Date/raw ownership, exact output and
+original throwing callbacks. Registry and limit suites also pass. The independent
+x86_64/Rosetta and fresh external-consumer gates are still pending at this point.

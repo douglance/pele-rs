@@ -100,14 +100,11 @@ extension Pele {
             try renderOperation(options: options, resources: resources, outputLimit: outputLimit)
         }
         private func renderOperation(options: Engine.Options, resources: HostResources, outputLimit: OutputLimit?) throws -> PublicRenderOutcome {
-            let settings = try JSONEncoder().encode(options)
+            let settings = try RenderNumberEncoding(options, outputLimit: outputLimit)
             return try withHandle { handle in
-                let response = resources.withCapturedNativeResources { host in settings.withUnsafeBytes { bytes in
-                    if let limit = outputLimit?.nativeValue {
-                        return pele_public_render_operation_output_limit_v6(handle, revision, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, limit.kind, limit.bits, host)
-                    }
-                    return pele_public_render_operation_binary_v5(handle, revision, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, host)
-                }}
+                let response = resources.withCapturedNativeResources { host in settings.withPacket { packet in settings.optionsJSON.withUnsafeBytes { bytes in
+                    pele_public_render_operation_with_numbers_v9(handle, revision, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, packet, settings.outputKind, settings.outputBits, host)
+                }}}
                 do {
                     let exchange = try Pele.binaryResult(response.handle)
                     let outcome = PublicRenderOutcome(revision: exchange.revision, graph: exchange.graph, result: try JSONDecoder().decode(PublicRenderResult.self, from: exchange.metadata))
