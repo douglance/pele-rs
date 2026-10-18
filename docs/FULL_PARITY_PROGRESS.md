@@ -4,6 +4,42 @@ Acceptance remains every row of `PELE_PARITY.md`: all 33 families and public API
 The public v0.1.0 release remains the legacy flowchart subset. No full-library
 release or new GIF has been published from this branch.
 
+## Current checkpoint: 2026-10-19
+
+All 33 parsers/renderers and mutable model codecs are implemented. This count is
+not full API or release acceptance. Later sections retain historical evidence;
+their older gap descriptions do not override the checkpoints below.
+
+- The numeric fix is checked across all 33 families: 1,023 pinned cases and
+  3,069 source/retained/mutable renders, including NaN, infinity and signed zero.
+- The complete browser regression passes 234/234 (78 per Chromium, Firefox and
+  WebKit, one worker). The documented extreme Class native-output ceiling and
+  VM-specific intrinsic diagnostics remain explicit transport/runtime boundaries.
+  See `WEB_LEGACY_CORPUS.md` and `WEB_VM_DIAGNOSTICS.md`.
+- Retained web custom providers are committed in `01ca5c7`; the expanded API
+  regression passes 81/81 across the three browsers. This used a fresh isolated
+  WASM build; it is not evidence that a published package contains these APIs.
+- Native mount, lazy mounting, zoom and retained Swift custom providers are
+  committed. The actual signed AppKit QA application passes all 19 mount/zoom
+  features. Synthetic magnification is not physical-trackpad proof.
+- `608464e` completes logical action regions for every current link-producing
+  family: Flowchart/Swimlane, AgentFlow, ER and Kanban. Existing pinned producer
+  corpora remain green. These regions alone do not prove native link interaction.
+- `1ff8e01` and `1cf9f40` expose session resources and native presentation through
+  C/Swift. One matching ARM64 release SDK passes all 17 selected Swift features
+  (four presentation, thirteen provider/resource/registry) and four strict C
+  integrations (presentation, resources, retained providers and render numbers).
+  Its archive SHA-256 is
+  `05344a5b19c62028694ebf8a0e8d1355a2bff3f79f8d0605ec44555b4e759a8e`;
+  matching header SHA-256 is
+  `c4e7be6035352d19818319a16ed4f6bb940a5b132a97ed4cbe86f3a837c1c3b0`.
+
+Active remaining work: native link/accessibility controls and resources,
+per-diagram prepared/raw entries and caller-built models, declared host-callable
+model overrides, shared Config/ill-formed UTF-16 boundaries, then final matching
+universal Swift/WASM packages and external-consumer/release verification. The
+performance experiment remains on hold; no Rust/WebGPU speedup is claimed.
+
 ## Implemented renderers
 
 `Engine::with_builtins()` currently registers all thirty-three actual Rust diagram modules.
