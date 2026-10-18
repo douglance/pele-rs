@@ -672,3 +672,19 @@ now calls its actual native semanticModel method. TypeScript 4.9.5 consumer chec
 pass with mutable fields and method declarations. Native Venn remains the next
 foreign checkpoint. Binary graph exchange is still required by the public-model
 LLD and will replace JSON expansion; source/options and runtime gaps remain open.
+
+
+## Native binary graph exchange primitive
+
+`encode_binary_exchange`/`decode_binary_exchange` provide bounded little-endian
+flat identity tables, revision and opaque metadata, following the public-model
+LLD. Counts are checked against remaining bytes and native work ceilings before
+allocation; decode checks references/flags and rejects trailing/truncated input.
+Raw UTF-16, IEEE payloads, Dates, sparse arrays, builtins, host tokens, aliases and
+cycles survive without JSON expansion. Three native feature integration slices
+plus two original Class baseline slices pass in release mode. Both valid Class
+style models blocked by foreign JSON export now fit the native binary lane under
+the unchanged 64 MiB/default graph limits and render exact pinned SVG hashes.
+Foreign adapters still use their separately verified JSON checkpoint until the
+next binary-binding slice passes. This does not close source/options transport
+or general JavaScript object/runtime parity.

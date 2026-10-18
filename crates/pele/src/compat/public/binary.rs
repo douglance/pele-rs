@@ -1,0 +1,339 @@
+//! Bounded little-endian identity-graph transport, independent of diagram codecs.
+//! JSON remains a diagnostic/legacy lane; strings and numbers retain exact bits.
+use super::{Atom, JsString, ModelGraph, Node, Property, PrototypeId};
+use crate::compat::{ErrorCode, PeleError};
+
+const MAGIC: &[u8; 8] = b"PELGBIN1";
+const MAX_TABLE: usize = 1_000_000;
+const MAX_UNITS: usize = 16_000_000;
+const MAX_ENTRIES: usize = 8_000_000;
+/// Per-exchange byte ceiling, separate from the engine's graph work ceilings.
+pub const DEFAULT_BINARY_BUDGET: usize = 64 * 1024 * 1024;
+/// Metadata is caller-owned UTF-8/JSON or another negotiated format; the graph
+/// codec never interprets it. Revisions identify the snapshot/operation result.
+#[derive(Debug)]
+pub struct BinaryExchange {
+    pub revision: u64,
+    pub graph: ModelGraph,
+    pub metadata: Vec<u8>,
+}
+fn invalid() -> PeleError {
+    PeleError::new("Invalid public binary graph transport", ErrorCode::Semantic)
+}
+fn limit() -> PeleError {
+    PeleError::new(
+        "Public binary graph exceeds transport budget",
+        ErrorCode::Limit,
+    )
+}
+struct Writer {
+    bytes: Vec<u8>,
+    budget: usize,
+}
+impl Writer {
+    fn put(&mut self, bytes: &[u8]) -> Result<(), PeleError> {
+        if bytes.len() > self.budget.saturating_sub(self.bytes.len()) {
+            return Err(limit());
+        }
+        self.bytes.extend_from_slice(bytes);
+        Ok(())
+    }
+    fn byte(&mut self, value: u8) -> Result<(), PeleError> {
+        self.put(&[value])
+    }
+    fn u32(&mut self, value: u32) -> Result<(), PeleError> {
+        self.put(&value.to_le_bytes())
+    }
+    fn count(&mut self, value: usize) -> Result<(), PeleError> {
+        self.u32(u32::try_from(value).map_err(|_| limit())?)
+    }
+    fn number(&mut self, value: f64) -> Result<(), PeleError> {
+        self.put(&value.to_bits().to_le_bytes())
+    }
+    fn atom(&mut self, value: &Atom) -> Result<(), PeleError> {
+        match value {
+            Atom::Undefined => self.byte(0),
+            Atom::Null => self.byte(1),
+            Atom::Bool(false) => self.byte(2),
+            Atom::Bool(true) => self.byte(3),
+            Atom::Number(n) => {
+                self.byte(4)?;
+                self.number(*n)
+            }
+            Atom::String(id) => {
+                self.byte(5)?;
+                self.u32(*id)
+            }
+            Atom::Ref(id) => {
+                self.byte(6)?;
+                self.u32(*id)
+            }
+            Atom::BuiltinFunction(id) => {
+                self.byte(7)?;
+                self.u32(*id)
+            }
+            Atom::HostReference(id) => {
+                self.byte(8)?;
+                self.u32(*id)
+            }
+        }
+    }
+    fn properties(&mut self, values: &[Property]) -> Result<(), PeleError> {
+        self.count(values.len())?;
+        for p in values {
+            self.u32(p.key)?;
+            self.byte(p.flags)?;
+            self.atom(&p.value)?;
+        }
+        Ok(())
+    }
+    fn node(&mut self, node: &Node) -> Result<(), PeleError> {
+        match node {
+            Node::Object { .. } => self.byte(0)?,
+            Node::Instance { prototype, .. } => {
+                self.byte(1)?;
+                self.u32(prototype.0)?;
+            }
+            Node::Array { length, .. } => {
+                self.byte(2)?;
+                self.u32(*length)?;
+            }
+            Node::Map { entries, .. } => {
+                self.byte(3)?;
+                self.count(entries.len())?;
+                for (k, v) in entries {
+                    self.atom(k)?;
+                    self.atom(v)?;
+                }
+            }
+            Node::Set { values, .. } => {
+                self.byte(4)?;
+                self.count(values.len())?;
+                for value in values {
+                    self.atom(value)?;
+                }
+            }
+            Node::Date { milliseconds, .. } => {
+                self.byte(5)?;
+                self.number(*milliseconds)?;
+            }
+        }
+        self.properties(node.properties())
+    }
+}
+/// Encode a validated graph without recursively expanding references or JSON
+/// number/string projections. No partial bytes escape on failure.
+pub fn encode_binary_exchange(
+    revision: u64,
+    graph: &ModelGraph,
+    metadata: &[u8],
+    byte_budget: usize,
+) -> Result<Vec<u8>, PeleError> {
+    graph.validate()?;
+    let mut w = Writer {
+        bytes: Vec::new(),
+        budget: byte_budget,
+    };
+    w.put(MAGIC)?;
+    w.u32(graph.version)?;
+    w.put(&revision.to_le_bytes())?;
+    w.count(metadata.len())?;
+    w.atom(&graph.root)?;
+    w.count(graph.strings.len())?;
+    for s in &graph.strings {
+        w.count(s.0.len())?;
+        for unit in &s.0 {
+            w.put(&unit.to_le_bytes())?;
+        }
+    }
+    w.count(graph.nodes.len())?;
+    for node in &graph.nodes {
+        w.node(node)?;
+    }
+    w.put(metadata)?;
+    Ok(w.bytes)
+}
+struct Reader<'a> {
+    bytes: &'a [u8],
+    offset: usize,
+    units: usize,
+    entries: usize,
+}
+impl<'a> Reader<'a> {
+    fn take(&mut self, size: usize) -> Result<&'a [u8], PeleError> {
+        let end = self.offset.checked_add(size).ok_or_else(invalid)?;
+        let value = self.bytes.get(self.offset..end).ok_or_else(invalid)?;
+        self.offset = end;
+        Ok(value)
+    }
+    fn byte(&mut self) -> Result<u8, PeleError> {
+        Ok(self.take(1)?[0])
+    }
+    fn u32(&mut self) -> Result<u32, PeleError> {
+        Ok(u32::from_le_bytes(
+            self.take(4)?.try_into().map_err(|_| invalid())?,
+        ))
+    }
+    fn u64(&mut self) -> Result<u64, PeleError> {
+        Ok(u64::from_le_bytes(
+            self.take(8)?.try_into().map_err(|_| invalid())?,
+        ))
+    }
+    // Check counts against both native ceilings and physical remaining input
+    // before allocating. A malicious length cannot reserve unbacked memory.
+    fn count(&mut self, max: usize, min_bytes: usize) -> Result<usize, PeleError> {
+        let n = self.u32()? as usize;
+        if n > max {
+            return Err(limit());
+        }
+        if n > self.bytes.len().saturating_sub(self.offset) / min_bytes {
+            return Err(invalid());
+        }
+        Ok(n)
+    }
+    fn work(&mut self, n: usize) -> Result<(), PeleError> {
+        self.entries = self.entries.checked_add(n).ok_or_else(limit)?;
+        if self.entries > MAX_ENTRIES {
+            return Err(limit());
+        }
+        Ok(())
+    }
+    fn atom(&mut self) -> Result<Atom, PeleError> {
+        Ok(match self.byte()? {
+            0 => Atom::Undefined,
+            1 => Atom::Null,
+            2 => Atom::Bool(false),
+            3 => Atom::Bool(true),
+            4 => Atom::Number(f64::from_bits(self.u64()?)),
+            5 => Atom::String(self.u32()?),
+            6 => Atom::Ref(self.u32()?),
+            7 => Atom::BuiltinFunction(self.u32()?),
+            8 => Atom::HostReference(self.u32()?),
+            _ => return Err(invalid()),
+        })
+    }
+    fn properties(&mut self) -> Result<Vec<Property>, PeleError> {
+        let n = self.count(MAX_ENTRIES, 6)?;
+        self.work(n)?;
+        let mut out = Vec::with_capacity(n);
+        for _ in 0..n {
+            let key = self.u32()?;
+            let flags = self.byte()?;
+            let value = self.atom()?;
+            out.push(Property { key, value, flags });
+        }
+        Ok(out)
+    }
+    fn node(&mut self) -> Result<Node, PeleError> {
+        let tag = self.byte()?;
+        let mut node = match tag {
+            0 => Node::Object { properties: vec![] },
+            1 => Node::Instance {
+                prototype: PrototypeId(self.u32()?),
+                properties: vec![],
+            },
+            2 => Node::Array {
+                length: self.u32()?,
+                properties: vec![],
+            },
+            3 => {
+                let n = self.count(MAX_ENTRIES / 2, 2)?;
+                self.work(n * 2)?;
+                let mut entries = Vec::with_capacity(n);
+                for _ in 0..n {
+                    entries.push((self.atom()?, self.atom()?));
+                }
+                Node::Map {
+                    entries,
+                    properties: vec![],
+                }
+            }
+            4 => {
+                let n = self.count(MAX_ENTRIES, 1)?;
+                self.work(n)?;
+                let mut values = Vec::with_capacity(n);
+                for _ in 0..n {
+                    values.push(self.atom()?);
+                }
+                Node::Set {
+                    values,
+                    properties: vec![],
+                }
+            }
+            5 => Node::Date {
+                milliseconds: f64::from_bits(self.u64()?),
+                properties: vec![],
+            },
+            _ => return Err(invalid()),
+        };
+        *node.properties_mut() = self.properties()?;
+        Ok(node)
+    }
+}
+/// Decode one complete bounded exchange. All graph references/flags are checked;
+/// apply/invoke still validate registration-specific method/prototype IDs.
+pub fn decode_binary_exchange(
+    bytes: &[u8],
+    byte_budget: usize,
+) -> Result<BinaryExchange, PeleError> {
+    if bytes.len() > byte_budget {
+        return Err(limit());
+    }
+    let mut r = Reader {
+        bytes,
+        offset: 0,
+        units: 0,
+        entries: 0,
+    };
+    if r.take(MAGIC.len())? != MAGIC {
+        return Err(invalid());
+    }
+    let version = r.u32()?;
+    if version != 1 {
+        return Err(invalid());
+    }
+    let revision = r.u64()?;
+    let metadata_len = r.u32()? as usize;
+    if metadata_len > bytes.len().saturating_sub(r.offset) {
+        return Err(invalid());
+    }
+    // Exclude trailing metadata from all graph length checks.
+    let graph_end = bytes.len() - metadata_len;
+    r.bytes = bytes.get(..graph_end).ok_or_else(invalid)?;
+    let root = r.atom()?;
+    let count = r.count(MAX_TABLE, 4)?;
+    let mut strings = Vec::with_capacity(count);
+    for _ in 0..count {
+        let n = r.count(MAX_UNITS, 2)?;
+        r.units = r.units.checked_add(n).ok_or_else(limit)?;
+        if r.units > MAX_UNITS {
+            return Err(limit());
+        }
+        let raw = r.take(n.checked_mul(2).ok_or_else(limit)?)?;
+        strings.push(JsString(
+            raw.chunks_exact(2)
+                .map(|v| u16::from_le_bytes([v[0], v[1]]))
+                .collect(),
+        ));
+    }
+    let count = r.count(MAX_TABLE, 5)?;
+    let mut nodes = Vec::with_capacity(count);
+    for _ in 0..count {
+        nodes.push(r.node()?);
+    }
+    if r.offset != graph_end {
+        return Err(invalid());
+    }
+    let graph = ModelGraph {
+        version,
+        root,
+        strings,
+        nodes,
+    };
+    graph.validate()?;
+    Ok(BinaryExchange {
+        revision,
+        graph,
+        metadata: bytes[graph_end..].to_vec(),
+    })
+}
