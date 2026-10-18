@@ -1,4 +1,5 @@
 import initialize, { parse_v2, render_with_resources, builtin_capabilities } from './pkg/pele.js';
+import {encodeGraphBinary,decodeGraphBinary} from './graph-binary.js';
 import {fromNativeError} from './errors.js';
 export {PeleError, PeleError as PeleCompatibilityError} from './errors.js';
 import { ModelBridge, ModelRegistry, stringValue } from './graph.js';
@@ -9,6 +10,10 @@ function result(json) {
   if (envelope.version !== 2) throw new Error('Unsupported compatibility contract');
   if (!envelope.ok) throw fromNativeError(envelope.error);
   return renderedValue(envelope.result);
+}
+function binaryResult(call) {
+  try {const exchange=decodeGraphBinary(call());return {revision:exchange.revision,graph:exchange.graph,result:exchange.metadata};}
+  catch(error){if(typeof error==='string')return result(error);throw error;}
 }
 function renderedValue(value) {
   if(value&&typeof value.svg==='string'&&value.$numbers) {
@@ -56,13 +61,13 @@ export async function loadRenderer(moduleOrPath) {
         const mutable = document.to_public();
         if (mutable) {
           document.free(); document = mutable;
-          const snapshot = result(mutable.snapshot()), schema = result(mutable.schema());
+          const snapshot = binaryResult(()=>mutable.snapshot_binary()), schema = result(mutable.schema());
           const entry = {handle: mutable, revision: snapshot.revision, disposed: false};
           const bridge = new ModelBridge(snapshot.graph, schema, registry, (method, receiver, argumentsValue) => {
             if (entry.disposed) throw new TypeError('Public model document is disposed');
             const input = bridge.snapshot([receiver, ...argumentsValue]);
-            entry.revision = result(mutable.apply(entry.revision, JSON.stringify(input.graph)));
-            const outcome = result(mutable.invoke(entry.revision, JSON.stringify({method, receiver: input.values[0], arguments: input.values.slice(1)})));
+            entry.revision = result(mutable.apply_binary(encodeGraphBinary(entry.revision,input.graph)));
+            const outcome = binaryResult(()=>mutable.invoke_binary(entry.revision, JSON.stringify({method, receiver: input.values[0], arguments: input.values.slice(1)})));
             entry.revision = outcome.revision;
             bridge.reconcile(outcome.graph);
             if (Object.hasOwn(outcome.result, 'Err')) throw operationError(outcome.result.Err, bridge);
@@ -144,8 +149,8 @@ export async function loadRenderer(moduleOrPath) {
           if (!document) throw new TypeError('render() takes diagram text or a model that parse() returned.');
           if (document.bridge) {
             bridge=document.bridge;
-            document.revision = result(document.handle.apply(document.revision, JSON.stringify(bridge.snapshot().graph)));
-            const outcome=result(document.handle.render_operation_with_resources(document.revision,JSON.stringify(options),width,icons));
+            document.revision = result(document.handle.apply_binary(encodeGraphBinary(document.revision,bridge.snapshot().graph)));
+            const outcome=binaryResult(()=>document.handle.render_operation_binary(document.revision,JSON.stringify(options),width,icons));
             document.revision=outcome.revision;
             bridge.reconcile(outcome.graph);
             operation=outcome.result;

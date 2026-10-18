@@ -324,6 +324,109 @@ impl MutableDocument {
             Err(error) => pele::compat::error_envelope(&error),
         }
     }
+    pub fn snapshot_binary(&self) -> Result<Vec<u8>, JsValue> {
+        let run = || -> Result<Vec<u8>, pele::compat::PeleError> {
+            let graph = self.inner.snapshot()?;
+            let metadata =
+                serde_json::to_vec(&serde_json::json!({"type":self.inner.diagram_type()}))
+                    .expect("snapshot metadata");
+            pele::compat::public::encode_binary_exchange(
+                self.inner.revision(),
+                &graph,
+                &metadata,
+                pele::compat::public::DEFAULT_BINARY_BUDGET,
+            )
+        };
+        run().map_err(|error| JsValue::from_str(&pele::compat::error_envelope(&error)))
+    }
+    pub fn apply_binary(&mut self, bytes: &[u8]) -> String {
+        let mut run = || -> Result<(), pele::compat::PeleError> {
+            let exchange = pele::compat::public::decode_binary_exchange(
+                bytes,
+                pele::compat::public::DEFAULT_BINARY_BUDGET,
+            )?;
+            if !exchange.metadata.is_empty() {
+                return Err(pele::compat::PeleError::new(
+                    "Apply binary metadata must be empty",
+                    pele::compat::ErrorCode::Semantic,
+                ));
+            }
+            self.inner.apply(exchange.revision, exchange.graph)
+        };
+        match run() {
+            Ok(()) => public_result(&self.inner.revision().to_string()),
+            Err(error) => pele::compat::error_envelope(&error),
+        }
+    }
+    pub fn invoke_binary(&mut self, revision: &str, call_json: &str) -> Result<Vec<u8>, JsValue> {
+        let mut run = || -> Result<Vec<u8>, pele::compat::PeleError> {
+            use pele::compat::{ErrorCode, PeleError};
+            if call_json.len() > 64 * 1024 * 1024 {
+                return Err(PeleError::new(
+                    "Public method JSON exceeds 64 MiB transport budget",
+                    ErrorCode::Limit,
+                ));
+            }
+            let revision = revision.parse::<u64>().map_err(|_| {
+                PeleError::new("Invalid public model revision", ErrorCode::Semantic)
+            })?;
+            let call = serde_json::from_str(call_json).map_err(|_| {
+                PeleError::new("Invalid public model method call", ErrorCode::Semantic)
+            })?;
+            let outcome = self.inner.invoke(
+                revision,
+                call,
+                &mut BrowserResources {
+                    width: None,
+                    icons: None,
+                },
+            )?;
+            let metadata = serde_json::to_vec(&outcome.result).expect("operation metadata");
+            pele::compat::public::encode_binary_exchange(
+                outcome.revision,
+                &outcome.graph,
+                &metadata,
+                pele::compat::public::DEFAULT_BINARY_BUDGET,
+            )
+        };
+        run().map_err(|error| JsValue::from_str(&pele::compat::error_envelope(&error)))
+    }
+    pub fn render_operation_binary(
+        &mut self,
+        revision: &str,
+        options_json: &str,
+        width: Option<js_sys::Function>,
+        icons: Option<js_sys::Function>,
+    ) -> Result<Vec<u8>, JsValue> {
+        let run = || -> Result<Vec<u8>, pele::compat::PeleError> {
+            let revision = revision.parse::<u64>().map_err(|_| {
+                pele::compat::PeleError::new(
+                    "Invalid public model revision",
+                    pele::compat::ErrorCode::Semantic,
+                )
+            })?;
+            let options = pele::compat::render_options(options_json)?;
+            let outcome = self.inner.render_operation(
+                revision,
+                &options,
+                &mut BrowserResources { width, icons },
+            )?;
+            let metadata = serde_json::to_vec(
+                &outcome
+                    .result
+                    .as_ref()
+                    .map(pele::compat::render_result_transport),
+            )
+            .expect("render metadata");
+            pele::compat::public::encode_binary_exchange(
+                outcome.revision,
+                &outcome.graph,
+                &metadata,
+                pele::compat::public::DEFAULT_BINARY_BUDGET,
+            )
+        };
+        run().map_err(|error| JsValue::from_str(&pele::compat::error_envelope(&error)))
+    }
     pub fn render_with_resources(
         &mut self,
         options_json: &str,

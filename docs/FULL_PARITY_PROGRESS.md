@@ -723,3 +723,22 @@ stay outside the retained arena, preserving valid stress behavior and budgets.
 Constructor/custom helper/callback overrides, active lone-surrogate scalar output
 and pre-callback host synchronization/reentry remain separate open gates. Foreign
 Gantt exposure is pending; the committed foreign checkpoint remains twenty-three.
+
+
+## Binary model exchange through C, Swift and browser WASM
+
+Additive v5 C operations and WASM binary operations carry graph identity tables
+plus revision and operation metadata. The standard Swift/browser adapters now use
+this lane for snapshot/apply/invoke/render; legacy v4 JSON operations remain.
+Strict C integration, twelve consolidated Swift feature slices, thirty packed
+browser feature/ownership/error checks and six three-browser Class/Sankey corpus
+checks pass. Both valid large Class style models now round-trip and render exact
+pinned SVGs in Swift and Chrome/Firefox/WebKit under unchanged byte/work limits.
+The two foreign JSON-export differences from the prior checkpoint are closed.
+The two separate native Class graph-budget differences remain explicit.
+
+Raw UTF-16, cycles/aliases, descriptor flags, builtin/host references, IEEE
+payloads, non-finite rendered dimensions, stale/malformed inputs, native callback
+identity and recovery retain their native contracts. Counts are bounded before
+allocation in every adapter. Source/options transport, generic canonical graph
+validation and complete JavaScript runtime/constructor compatibility remain open.

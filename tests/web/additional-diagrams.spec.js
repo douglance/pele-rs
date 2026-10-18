@@ -11,7 +11,7 @@ for(const family of ['packet','radar','quadrant','timeline','journey','flowchart
       const canonical=value=>JSON.stringify(value,(_,v)=>v instanceof Map?[...v]:v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.entries(v).sort(([a],[b])=>a.localeCompare(b))):v);
       const mismatches=[];
       const oracle=family==='gantt'?await import('/dist/evidence/pele-oracle.js'):null;
-      let runtimeDateCases=0, flatProjectionCases=0, transportBoundaryCases=0, jsonTransportBoundaryCases=0;
+      let runtimeDateCases=0, flatProjectionCases=0, transportBoundaryCases=0, binaryStyleCases=0;
       // The old corpus omits this declared private lookup. Raw public ownership
       // and alias identity have their own mutable-model E2E proof.
       const comparedModel=model=>{
@@ -60,19 +60,10 @@ for(const family of ['packet','radar','quadrant','timeline','journey','flowchart
         try {
           if((host.modelProjection==='excluded'||expected.modelProjectionLimit)) {
             let bounded=false, projected;
-            try {projected=engine.parse(c.source,c.options)} catch(e){
-              bounded=e.code==='limit'&&e.type===publicType;
-              const classJsonBoundaries={
-                'stress/1,600 classDefs applied to 1,600 classes':'b82045f65afca176762902f6be9aeb2bb9cf9aea68e003a06e00550eb607b522',
-                'stress/a classDef of 5,000 declarations on 800 classes, each with a style of its own':'d1b872a618e7c94e99fad4e176ac92125210ce7954dbdd5fde4adc1db3d1c69a'
-              };
-              if(family==='class'&&Object.hasOwn(classJsonBoundaries,c.id)){
-                const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(c.source));
-                const hash=[...new Uint8Array(bytes)].map(v=>v.toString(16).padStart(2,'0')).join('');
-                if(hash!==classJsonBoundaries[c.id])mismatches.push(c.id+': foreign JSON boundary source hash');
-                bounded=e.name==='PeleError'&&e.code==='limit'&&e.type===null&&e.message==='Public result JSON exceeds 64 MiB transport budget'&&e.line===0&&e.column===0&&e.snippet==='';
-                jsonTransportBoundaryCases++;
-              }
+            try {projected=engine.parse(c.source,c.options)} catch(e){bounded=e.code==='limit'&&e.type===publicType}
+            if(family==='class'&&['stress/1,600 classDefs applied to 1,600 classes','stress/a classDef of 5,000 declarations on 800 classes, each with a style of its own'].includes(c.id)){
+              if(!projected)mismatches.push(c.id+': valid model must cross binary transport');
+              else binaryStyleCases++;
             }
             projectionBounded=bounded||!!projected;
             if(!projectionBounded)mismatches.push(`${c.id}: projection failed outside declared bounds`);
@@ -116,9 +107,9 @@ for(const family of ['packet','radar','quadrant','timeline','journey','flowchart
           if(model.nodes.size!==c.expected.nodes||model.edges.length!==c.expected.edges||model.edges[0].type!==c.expected.firstEdgeType)mismatches.push(`generated/${c.id}`);
         } finally {if(model)engine.dispose(model)}
       }
-      return {count:fixture.cases.length,runtimeDateCases,flatProjectionCases,transportBoundaryCases,jsonTransportBoundaryCases,mismatches};
+      return {count:fixture.cases.length,runtimeDateCases,flatProjectionCases,transportBoundaryCases,binaryStyleCases,mismatches};
     },family);
-    if(report.jsonTransportBoundaryCases)console.log(`${family}: ${report.jsonTransportBoundaryCases} explicit foreign 64 MiB JSON transport differences verified separately from source parity`);
+    if(family==='class'){expect(report.binaryStyleCases).toBe(2);expect(report.transportBoundaryCases).toBe(2);}
     if(report.transportBoundaryCases)console.log(`${family}: ${report.transportBoundaryCases} explicit mutable graph transport differences verified separately from source parity`);
     if(report.flatProjectionCases)console.log(`${family}: ${report.flatProjectionCases} previous projection exceptions now exercised through flat public models`);
     if(report.runtimeDateCases)console.log(`${family}: ${report.runtimeDateCases} browser Date.parse cases checked against pinned same-browser Pele`);

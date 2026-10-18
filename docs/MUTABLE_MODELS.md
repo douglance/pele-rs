@@ -92,11 +92,14 @@ contract from serde output. Old typed immutable models remain usable.
 Flat graph version 1 transports object/array/Map/Set/Date identity, UTF-16 strings,
 undefined/null, number bits and property flags. Default array length is implicit;
 a readonly length uses its nondefault own `length` property descriptor. Revisions
-reject stale edits before dispatch. C/WASM JSON crossings have a 64 MiB limit.
-Two large Class style models exceed the foreign 64 MiB JSON export ceiling while
-their source renders succeed. Two other Class namespace cases exceed the native
-16M-unit graph budget. Exact source hashes/errors are checked separately from
-parity; binary model transport is the next shared layer. A post-call
+reject stale edits before dispatch. C/WASM binary graph exchanges have a 64 MiB default byte ceiling. Legacy JSON
+graph operations remain additive; source/options and schema metadata still use
+their bounded JSON lane.
+The default foreign model lane uses binary identity tables. Both large Class
+style models previously blocked by JSON export now round-trip in Swift and all
+three browsers without raising budgets. Two separate Class namespace cases still
+exceed the native 16M-unit graph budget. Exact source hashes/errors are checked
+separately from parity. A post-call
 export/transport failure can leave native state advanced; only outcomes
 whose graph fits the output budget can carry complete post-call state.
 

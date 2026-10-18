@@ -2,6 +2,7 @@ import Foundation
 import XCTest
 import Pele
 import AppKit
+import CryptoKit
 
 private final class MutableHostFailure: Error {}
 final class MutableDocumentTests: XCTestCase {
@@ -143,6 +144,44 @@ final class MutableDocumentTests: XCTestCase {
         guard case .rendered(let result) = recovered.result else { return XCTFail("Recovered render") }
         XCTAssertTrue(result.svg.contains("Recovered state"))
     }
+    func testLargeClassModelsUseBinaryExchangeWithoutRaisingBudgets() throws {
+        var root = URL(fileURLWithPath: #filePath)
+        for _ in 0..<5 { root.deleteLastPathComponent() }
+        let fixture = try JSONSerialization.jsonObject(with: Data(contentsOf: root.appendingPathComponent("fixtures/pele/class.json"))) as! [String: Any]
+        let cases = fixture["cases"] as! [[String: Any]]
+        let ids = ["stress/1,600 classDefs applied to 1,600 classes", "stress/a classDef of 5,000 declarations on 800 classes, each with a style of its own"]
+        for id in ids {
+            let item = try XCTUnwrap(cases.first { $0["id"] as? String == id })
+            let source = try XCTUnwrap(item["source"] as? String)
+            let supplied = item["options"] as! [String: Any]
+            var parseFields = try JSONSerialization.jsonObject(with: JSONEncoder().encode(Pele.Engine.ParseOptions())) as! [String: Any]
+            var renderFields = try JSONSerialization.jsonObject(with: JSONEncoder().encode(Pele.Engine.Options())) as! [String: Any]
+            for (key, value) in supplied { parseFields[key] = value; renderFields[key] = value }
+            let parse = try JSONDecoder().decode(Pele.Engine.ParseOptions.self, from: JSONSerialization.data(withJSONObject: parseFields))
+            let options = try JSONDecoder().decode(Pele.Engine.Options.self, from: JSONSerialization.data(withJSONObject: renderFields))
+            let document = try Pele.Engine().parseMutable(source, options: parse)
+            defer { try? document.close() }
+            let snapshot = try document.snapshot()
+            XCTAssertGreaterThan(snapshot.graph.nodes.count, 1000)
+            try document.apply(snapshot.graph, expectedRevision: snapshot.revision)
+            let rendered = try document.render(options: options)
+            let expected = (item["expected"] as! [String: Any])["result"] as! [String: Any]
+            let digest = SHA256.hash(data: Data(rendered.svg.utf8)).map { String(format: "%02x", $0) }.joined()
+            XCTAssertEqual(digest, expected["svgSha256"] as? String, id)
+        }
+    }
+
+    func testBinaryRenderMetadataKeepsNonFiniteDimensions() throws {
+        let document = try Pele.Engine().parseMutable("sankey\na,b,5e-324")
+        defer { try? document.close() }
+        let outcome = try document.renderOperation()
+        guard case .rendered(let rendered) = outcome.result else { return XCTFail("Non-finite drawing is an outcome") }
+        XCTAssertTrue(rendered.height.isNaN)
+        XCTAssertEqual(rendered.type, "sankey")
+        XCTAssertEqual(document.revision, outcome.revision)
+        XCTAssertTrue(try document.render().height.isNaN)
+    }
+
     func testUnavailableCodecsAndRepeatedCreateCloseAreExplicit() throws {
         XCTAssertThrowsError(try Pele.Engine().parseMutable("sequenceDiagram\nAlice->>Bob:Hello")) {
             XCTAssertEqual(($0 as? CompatibilityError)?.type, "sequence")

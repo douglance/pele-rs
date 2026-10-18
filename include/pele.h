@@ -91,6 +91,13 @@ PeleResult *pele_public_render_v4(PelePublicDocument *, const uint8_t *, size_t,
  * export/transport failure may follow mutation, as for invoke_v4. */
 PeleResult *pele_public_render_operation_v4(PelePublicDocument *, uint64_t expected_revision,
                                           const uint8_t *, size_t, const PeleHostResourcesV3 *);
+/* Binary graph schema1: PELGBIN1, LE version/revision/metadata length,
+ * root/string/node tables, trailing JSON metadata. Each result is owned/freed
+ * exactly as v4. A nonzero status carries the existing JSON error envelope. */
+PeleResult *pele_public_snapshot_binary_v5(const PelePublicDocument *document);
+PeleResult *pele_public_apply_binary_v5(PelePublicDocument *document, const uint8_t *graph, size_t graph_len);
+PeleResult *pele_public_invoke_binary_v5(PelePublicDocument *document, uint64_t expected_revision, const uint8_t *call, size_t call_len, const PeleHostResourcesV3 *resources);
+PeleResult *pele_public_render_operation_binary_v5(PelePublicDocument *document, uint64_t expected_revision, const uint8_t *options, size_t options_len, const PeleHostResourcesV3 *resources);
 void pele_public_document_free_v4(PelePublicDocument *);
 
 uint32_t pele_result_status(const PeleResult *result);

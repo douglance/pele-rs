@@ -8,7 +8,7 @@ private struct PublicDocumentMetadata: Decodable {
 private struct AppliedRevision: Decodable { let revision: String }
 extension Pele {
     /// Owned mutable Rust model. Confine to one owner/actor; this class is not Sendable.
-    /// JSON graph crossings are bounded to 64 MiB. Source convenience accepts Swift String;
+    /// Binary graph crossings are bounded to 64 MiB. Source convenience accepts Swift String;
     /// graph strings preserve isolated UTF-16 units, whose rendering remains codec-dependent.
     public final class MutableDocument {
         private var handle: OpaquePointer?
@@ -31,7 +31,10 @@ extension Pele {
         }
         public func snapshot() throws -> PublicSnapshot {
             try withHandle { handle in
-                let snapshot = try Pele.compatibilityResult(pele_public_snapshot_v4(handle), as: PublicSnapshot.self)
+                struct Metadata: Decodable { let type: String }
+                let exchange = try Pele.binaryResult(pele_public_snapshot_binary_v5(handle))
+                let metadata = try JSONDecoder().decode(Metadata.self, from: exchange.metadata)
+                let snapshot = PublicSnapshot(type: metadata.type, revision: exchange.revision, graph: exchange.graph)
                 guard snapshot.type == type else { throw PeleError(code: "internal", message: "Mutable document type changed") }
                 revision = snapshot.revision; return snapshot
             }
@@ -39,11 +42,11 @@ extension Pele {
         /// Explicit full-graph edit boundary. Stale revisions leave the native state unchanged.
         @discardableResult
         public func apply(_ graph: PublicGraph, expectedRevision: UInt64) throws -> UInt64 {
-            let bytes = try JSONEncoder().encode(graph)
-            guard bytes.count <= 64 * 1024 * 1024 else { throw PeleError(code: "limit", message: "Public graph exceeds 64 MiB JSON budget") }
+            let bytes = try graph.binaryBytes(revision: expectedRevision)
+            guard bytes.count <= 64 * 1024 * 1024 else { throw PeleError(code: "limit", message: "Public binary graph exceeds transport budget") }
             return try withHandle { handle in
                 let result = bytes.withUnsafeBytes { input in
-                    pele_public_apply_v4(handle, expectedRevision, input.bindMemory(to: UInt8.self).baseAddress, input.count)
+                    pele_public_apply_binary_v5(handle, input.bindMemory(to: UInt8.self).baseAddress, input.count)
                 }
                 let applied = try Pele.compatibilityResult(result, as: AppliedRevision.self)
                 guard let next = UInt64(applied.revision), String(next) == applied.revision else {
@@ -64,10 +67,11 @@ extension Pele {
             guard bytes.count <= 64 * 1024 * 1024 else { throw PeleError(code: "limit", message: "Public method exceeds 64 MiB JSON budget") }
             return try withHandle { handle in
                 let response = resources.withCapturedNativeResources { host in bytes.withUnsafeBytes { input in
-                    pele_public_invoke_v4(handle, revision, input.bindMemory(to: UInt8.self).baseAddress, input.count, host)
+                    pele_public_invoke_binary_v5(handle, revision, input.bindMemory(to: UInt8.self).baseAddress, input.count, host)
                 }}
                 do {
-                    let outcome = try Pele.compatibilityResult(response.handle, as: PublicInvocationOutcome.self)
+                    let exchange = try Pele.binaryResult(response.handle)
+                    let outcome = PublicInvocationOutcome(revision: exchange.revision, graph: exchange.graph, result: try JSONDecoder().decode(PublicOperationResult.self, from: exchange.metadata))
                     revision = outcome.revision
                     if let error = response.error { throw error }
                     return outcome
@@ -79,10 +83,11 @@ extension Pele {
             let settings = try JSONEncoder().encode(options)
             return try withHandle { handle in
                 let response = resources.withCapturedNativeResources { host in settings.withUnsafeBytes { bytes in
-                    pele_public_render_operation_v4(handle, revision, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, host)
+                    pele_public_render_operation_binary_v5(handle, revision, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, host)
                 }}
                 do {
-                    let outcome = try Pele.compatibilityResult(response.handle, as: PublicRenderOutcome.self)
+                    let exchange = try Pele.binaryResult(response.handle)
+                    let outcome = PublicRenderOutcome(revision: exchange.revision, graph: exchange.graph, result: try JSONDecoder().decode(PublicRenderResult.self, from: exchange.metadata))
                     revision = outcome.revision
                     if let error = response.error { throw error }
                     return outcome

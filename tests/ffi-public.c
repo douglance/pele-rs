@@ -25,11 +25,21 @@ static uint32_t width(void *raw, const uint8_t *source, size_t length, double si
     if (context->fail) return 1;
     *output = (double)length * size * 0.6; return 0;
 }
+static uint32_t little32(const unsigned char *p) { return (uint32_t)p[0] | (uint32_t)p[1]<<8 | (uint32_t)p[2]<<16 | (uint32_t)p[3]<<24; }
+static void binary_outcome(PeleResult *result, unsigned char revision, const char *expected) {
+    ok(result); const unsigned char *bytes=pele_result_data(result); size_t length=pele_result_len(result);
+    assert(length>=24 && !memcmp(bytes,"PELGBIN1",8) && bytes[12]==revision);
+    size_t n=little32(bytes+20); assert(n<=length-24);
+    char *metadata=malloc(n+1); assert(metadata); memcpy(metadata,bytes+length-n,n); metadata[n]=0;
+    assert(strstr(metadata,expected)); free(metadata); pele_result_free(result);
+}
 int main(void) {
     PelePublicDocument *document = (PelePublicDocument *)(uintptr_t)1;
     failure(pele_public_parse_v4(NULL, 1, NULL, 0, &document), 1, "null input"); assert(document == NULL);
     failure(pele_public_parse_v4((const uint8_t *)"info", 4, NULL, 0, NULL), 1, "null document output");
     failure(pele_public_snapshot_v4(NULL), 1, "null document");
+    failure(pele_public_snapshot_binary_v5(NULL), 1, "null document");
+    failure(pele_public_apply_binary_v5(NULL, NULL, 64 * 1024 * 1024 + 1), 2, "budget");
     failure(pele_public_schema_v4(NULL), 1, "null document");
     failure(pele_public_invoke_v4(NULL, 0, NULL, 64 * 1024 * 1024 + 1, NULL), 2, "budget");
     failure(pele_public_render_v4(NULL, NULL, 0, NULL), 1, "null document");
@@ -80,6 +90,16 @@ int main(void) {
     result = pele_public_render_operation_v4(document, 4, NULL, 0, &host); ok(result);
     metadata = text(result); assert(strstr(metadata, "\"revision\":5")); assert(strstr(metadata, "\"Ok\":{")); free(metadata); pele_result_free(result);
     result = pele_public_snapshot_v4(document); ok(result); metadata = text(result); assert(strstr(metadata, "\"revision\":\"5\"")); free(metadata); pele_result_free(result);
+    result=pele_public_snapshot_binary_v5(document); ok(result);
+    const unsigned char *binary=pele_result_data(result); size_t total=pele_result_len(result); assert(total>24&&!memcmp(binary,"PELGBIN1",8));
+    size_t binary_length=total-little32(binary+20); unsigned char *upload=malloc(binary_length); assert(upload); memcpy(upload,binary,binary_length); memset(upload+20,0,4); pele_result_free(result);
+    failure(pele_public_apply_binary_v5(document,upload,8),1,"Invalid public binary graph transport");
+    result=pele_public_apply_binary_v5(document,upload,binary_length); ok(result); pele_result_free(result);
+    failure(pele_public_apply_binary_v5(document,upload,binary_length),1,"Stale public model revision"); free(upload);
+    binary_outcome(pele_public_render_operation_binary_v5(document,6,(const uint8_t *)limited,strlen(limited),NULL),7,"\"Err\":");
+    context.fail=1; binary_outcome(pele_public_render_operation_binary_v5(document,7,NULL,0,&host),8,"Host text measurer failed");
+    context.fail=0; binary_outcome(pele_public_render_operation_binary_v5(document,8,NULL,0,&host),9,"\"Ok\":");
+    failure(pele_public_invoke_binary_v5(document,9,(const uint8_t *)unknown_method,strlen(unknown_method),NULL),1,"method is unavailable");
     pele_public_document_free_v4(document); pele_public_document_free_v4(NULL);
     for (int i = 0; i < 200; i++) {
         document = NULL; result = pele_public_parse_v4((const uint8_t *)"info", 4, NULL, 0, &document); ok(result); pele_result_free(result);

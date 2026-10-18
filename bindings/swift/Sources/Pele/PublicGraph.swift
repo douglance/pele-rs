@@ -163,6 +163,7 @@ extension Pele {
         public let type: String
         public let revision: UInt64
         public var graph: PublicGraph
+        init(type: String, revision: UInt64, graph: PublicGraph) { self.type = type; self.revision = revision; self.graph = graph }
         private enum Keys: String, CodingKey { case type, revision, graph }
         public init(from decoder: any Decoder) throws {
             let fields = try decoder.container(keyedBy: Keys.self)

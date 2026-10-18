@@ -300,3 +300,117 @@ pub unsafe extern "C" fn pele_public_document_free_v4(handle: *mut PelePublicDoc
         }
     }));
 }
+
+fn binary_success(
+    revision: u64,
+    graph: &ModelGraph,
+    metadata: &[u8],
+) -> Result<PeleResult, PeleError> {
+    let data =
+        pele::compat::public::encode_binary_exchange(revision, graph, metadata, GRAPH_JSON_BUDGET)?;
+    Ok(PeleResult {
+        status: 0,
+        data,
+        document: None,
+    })
+}
+/// Binary graph schema1, revision and JSON metadata; graph references never expand.
+/// # Safety
+/// Same live-handle and synchronous callback ownership as the v4 operations.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_snapshot_binary_v5(
+    handle: *const PelePublicDocument,
+) -> *mut PeleResult {
+    compatibility_call(|| {
+        let document = unsafe { document(handle) }?;
+        let metadata = serde_json::to_vec(&serde_json::json!({"type":document.diagram_type()}))
+            .map_err(|_| invalid("Invalid snapshot metadata"))?;
+        binary_success(document.revision(), &document.snapshot()?, &metadata)
+    })
+}
+/// # Safety
+/// Graph names a readable binary exchange up to64MiB; handle is live or null.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_apply_binary_v5(
+    handle: *mut PelePublicDocument,
+    graph: *const u8,
+    len: usize,
+) -> *mut PeleResult {
+    compatibility_call(|| {
+        if len > GRAPH_JSON_BUDGET {
+            return Err(PeleError::new(
+                "Public binary graph exceeds transport budget",
+                ErrorCode::Limit,
+            ));
+        }
+        let bytes = if len == 0 {
+            &[][..]
+        } else {
+            if graph.is_null() {
+                return Err(invalid("Native public transport: null input"));
+            }
+            unsafe { std::slice::from_raw_parts(graph, len) }
+        };
+        let exchange = pele::compat::public::decode_binary_exchange(bytes, GRAPH_JSON_BUDGET)?;
+        if !exchange.metadata.is_empty() {
+            return Err(invalid("Apply binary metadata must be empty"));
+        }
+        let mut document = unsafe { document(handle) }?;
+        document.apply(exchange.revision, exchange.graph)?;
+        success(serde_json::json!({"revision":document.revision().to_string()}))
+    })
+}
+/// # Safety
+/// Same call/host ownership as invoke_v4; result graph uses binary schema1.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_invoke_binary_v5(
+    handle: *mut PelePublicDocument,
+    expected_revision: u64,
+    call: *const u8,
+    call_len: usize,
+    resources: *const PeleHostResourcesV3,
+) -> *mut PeleResult {
+    compatibility_call(|| {
+        let call = unsafe { compatibility_input(call, call_len, GRAPH_JSON_BUDGET) }?;
+        let call: pele::compat::public::MethodCall =
+            serde_json::from_str(call).map_err(|_| invalid("Invalid public model method call"))?;
+        let mut document = unsafe { document(handle) }?;
+        let outcome = unsafe {
+            calendar::with_resources(resources, |host| {
+                document.invoke(expected_revision, call, host)
+            })
+        }?;
+        let metadata = serde_json::to_vec(&outcome.result)
+            .map_err(|_| invalid("Invalid invocation metadata"))?;
+        binary_success(outcome.revision, &outcome.graph, &metadata)
+    })
+}
+/// # Safety
+/// Same options/host ownership as render_operation_v4; result graph is binary.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_render_operation_binary_v5(
+    handle: *mut PelePublicDocument,
+    expected_revision: u64,
+    options: *const u8,
+    options_len: usize,
+    resources: *const PeleHostResourcesV3,
+) -> *mut PeleResult {
+    compatibility_call(|| {
+        let options = unsafe { compatibility_input(options, options_len, 1024 * 1024) }?;
+        let options = pele::compat::render_options(options)?;
+        let mut document = unsafe { document(handle) }?;
+        let outcome = unsafe {
+            calendar::with_resources(resources, |host| {
+                document.render_operation(expected_revision, &options, host)
+            })
+        }?;
+        let metadata = serde_json::to_vec(
+            &outcome
+                .result
+                .as_ref()
+                .map(pele::compat::render_result_transport),
+        )
+        .map_err(|_| invalid("Invalid render metadata"))?;
+        binary_success(outcome.revision, &outcome.graph, &metadata)
+    })
+}
