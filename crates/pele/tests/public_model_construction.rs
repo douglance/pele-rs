@@ -472,3 +472,47 @@ fn direct_graph_factory_validates_first_and_retains_real_provider_config_and_ali
         .svg
         .contains("generation=\"3\""));
 }
+
+#[test]
+fn fresh_agentflow_missing_helpers_preserve_exact_errors_and_partial_graphs() {
+    let fixture: J = serde_json::from_str(include_str!(
+        "../../../fixtures/pele/model-construction-diagnostics.json"
+    ))
+    .unwrap();
+    assert_eq!(fixture["cases"].as_array().unwrap().len(), 4);
+    let engine = PublicEngine::with_builtins();
+    for c in fixture["cases"].as_array().unwrap() {
+        let id = c["id"].as_str().unwrap();
+        let graph = decode_graph(&c["expected"]["before"]);
+        let mut document = engine
+            .create_from_graph_as(&DiagramType::Agentflow.into(), graph, Object::default())
+            .unwrap();
+        let mut host = Host::default();
+        let outcome = document
+            .render_raw_operation(
+                0,
+                &Object::default(),
+                &RenderSettings {
+                    now: Some(1704067200000.),
+                    ..Default::default()
+                },
+                &mut host,
+            )
+            .unwrap();
+        assert_eq!(
+            error_view(outcome.result.unwrap_err()),
+            c["expected"]["error"],
+            "diagnostic {id}"
+        );
+        assert_eq!(json!(host.calls), c["expected"]["calls"], "callbacks {id}");
+        assert_eq!(
+            canonical(
+                &outcome.graph,
+                document.schema_view(),
+                &c["expected"]["before"]["functionObservations"]
+            ),
+            c["expected"]["after"],
+            "partial graph {id}"
+        );
+    }
+}

@@ -3109,7 +3109,7 @@ fn fresh_render_model(
     if subgraphs.iter().any(|s| {
         s.metadata.as_ref().and_then(|m| m.get("view")) == Some(&Value::String("collapsed".into()))
     }) {
-        return Err(ty("db.subgraph is not a function"));
+        return Err(ty("n.subgraph is not a function"));
     }
     let edges = common
         .edges
@@ -3170,9 +3170,11 @@ fn fresh_render_model(
     let graph = super::graph::build(&mut db, config);
     if let Some(diagnostic) = db.model.diagnostics.first() {
         return Err(ty(if diagnostic.severity == "error" {
-            "sink.emitError is not a function"
+            "t.emitError is not a function"
+        } else if diagnostic.id == super::model::DiagnosticId::ContainmentViolation {
+            "n.emitWarning is not a function"
         } else {
-            "sink.emitWarning is not a function"
+            "t.emitWarning is not a function"
         }));
     }
     let connectors: std::collections::HashSet<_> = db

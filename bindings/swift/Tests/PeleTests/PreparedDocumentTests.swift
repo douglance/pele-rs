@@ -119,8 +119,12 @@ final class PreparedDocumentTests: XCTestCase {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent("../../../..").standardizedFileURL
         let data = try Data(contentsOf: root.appendingPathComponent("fixtures/pele/diagram-model-construction.json"))
         let fixture = try JSONSerialization.jsonObject(with: data) as! [String: Any]
-        let cases = fixture["cases"] as! [[String: Any]]
+        var cases = fixture["cases"] as! [[String: Any]]
         XCTAssertEqual(cases.count, 67); XCTAssertEqual(Set(cases.map { $0["family"] as! String }).count, 33)
+        let diagnosticData = try Data(contentsOf: root.appendingPathComponent("fixtures/pele/model-construction-diagnostics.json"))
+        let diagnosticFixture = try JSONSerialization.jsonObject(with: diagnosticData) as! [String: Any]
+        let diagnostics = diagnosticFixture["cases"] as! [[String: Any]]
+        XCTAssertEqual(diagnostics.count, 4); cases.append(contentsOf: diagnostics)
         func value(_ input: Any) throws -> ConfigValue {
             try JSONDecoder().decode(ConfigValue.self, from: JSONSerialization.data(withJSONObject: input, options: [.fragmentsAllowed]))
         }
