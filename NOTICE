@@ -13,4 +13,4 @@ The supported diagram language is a documented subset of Mermaid flowcharts.
 No upstream Mermaid test files or generated parsers are included in this slice.
 
 Noto Sans is bundled under the SIL Open Font License 1.1.
-See assets/fonts/OFL.txt and assets/fonts/README.md for font provenance.
+See crates/pele/assets/fonts/OFL.txt and crates/pele/assets/fonts/README.md for font provenance.

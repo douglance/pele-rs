@@ -1,0 +1,4 @@
+module CPele {
+    header "pele.h"
+    export *
+}
