@@ -12,6 +12,10 @@ pub enum JsonAtom {
     Number(f64),
     Bool(bool),
     Null,
+    /// Native render projection of an undefined property value.
+    Undefined,
+    /// Native render projection of an absent array index.
+    Hole,
 }
 #[derive(Clone, Debug)]
 pub struct JsonValue {
@@ -19,6 +23,8 @@ pub struct JsonValue {
     pub root: usize,
     raw: Box<serde_json::value::RawValue>,
     pub depth: usize,
+    // Original escaped JSON before the legacy UTF8 atom projection.
+    pub(super) authored: Option<std::sync::Arc<str>>,
 }
 impl Default for JsonValue {
     fn default() -> Self {
@@ -27,6 +33,19 @@ impl Default for JsonValue {
             root: 0,
             raw: serde_json::value::RawValue::from_string("{}".into()).unwrap(),
             depth: 1,
+            authored: None,
+        }
+    }
+}
+impl JsonValue {
+    // Render-only projection; authoritative public values remain in ModelGraph.
+    pub(super) fn from_render_atoms(atoms: Vec<JsonAtom>, root: usize) -> Self {
+        Self {
+            atoms,
+            root,
+            raw: serde_json::value::RawValue::from_string("{}".into()).unwrap(),
+            depth: 1,
+            authored: None,
         }
     }
 }
@@ -376,7 +395,7 @@ fn raw(atoms: &[JsonAtom], root: usize) -> String {
             Item::Node(i) => match &atoms[i] {
                 JsonAtom::String(s) => out.push_str(&serde_json::to_string(s).unwrap()),
                 JsonAtom::Bool(b) => out.push_str(if *b { "true" } else { "false" }),
-                JsonAtom::Null => out.push_str("null"),
+                JsonAtom::Null | JsonAtom::Undefined | JsonAtom::Hole => out.push_str("null"),
                 JsonAtom::Number(n) => out.push_str(&if n.is_finite() {
                     crate::compat::svg::js_num(*n)
                 } else {
@@ -463,6 +482,7 @@ pub(super) fn parse(
         root,
         raw: serde_json::value::RawValue::from_string(json).unwrap(),
         depth: r.max_depth,
+        authored: Some(text.into()),
     };
     Ok((value, r.order.into_iter().flatten().collect()))
 }

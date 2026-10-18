@@ -742,3 +742,34 @@ payloads, non-finite rendered dimensions, stale/malformed inputs, native callbac
 identity and recovery retain their native contracts. Counts are bounded before
 allocation in every adapter. Source/options transport, generic canonical graph
 validation and complete JavaScript runtime/constructor compatibility remain open.
+
+## C4, Requirement and Usecase native mutable checkpoints
+
+Native mutable codecs now cover twenty-nine families. C4 exposes all nineteen
+actual prototype methods and preserves parser-private indexes, repeated shape
+and boundary aliases, last-layout lookup identity and exact host measurement
+order. Nine public and two original release tests pass, including all 18,603
+historical outcomes, 32 mutation SVGs and two partial-error drawings. Existing
+18 deep/cyclic JSON projection exclusions retain flat graph/render proof.
+
+Requirement exposes seventeen methods and sixteen ordered own fields, including
+six pending builder strings and private style-copy history. Seven public and
+three original release tests pass, including all 10,358 historical outcomes,
+25 pinned vectors, 102 calls, 93 SVG hashes and sixteen exact method exceptions.
+A 100,000-style-copy feature remains bounded without quadratic descriptor scans.
+Nine active rendering differences remain explicit (five UTF-16, four nonscalar).
+
+Usecase returns the actual plain object without invented builder methods. Five
+public, three original and nine Sequence regression tests pass after sharing the
+bounded UTF-16 JSON arena parser. The source corpus remains 16,744 cases; mutable
+export matches 16,741 with three explicitly hashed budget differences: two huge
+independent style/class expansions and authored JSON-pointer text. Source render
+outcomes remain tested for all three. Ninety-six graph cases, 98 edits and 188
+SVG hashes cover JSON authored order, holes, aliases, raw UTF-16 and IEEE values.
+An 8,000-by-8,000 shared style-array import retains identity without allocating
+64 million duplicate strings. Existing native budgets are unchanged.
+
+These checkpoints do not certify full runtime parity. Constructors, custom
+callbacks/coercions, several active sparse/nonnumeric fields and lone-surrogate
+SVG output remain explicit shared or family-specific boundaries. Native source
+codecs and foreign Swift/web exposure are counted separately.

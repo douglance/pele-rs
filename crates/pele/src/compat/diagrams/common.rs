@@ -52,3 +52,6 @@ pub(super) fn hidden_yaml_end(source: &str, start: usize) -> Option<usize> {
     }
     closer(body)
 }
+
+// Private shared JSON data transport; no diagram parser/runtime dependency.
+pub(crate) mod json_graph;

@@ -55,15 +55,18 @@ fn scalar(a: &JsonAtom) -> String {
         JsonAtom::Number(n) => crate::compat::svg::js_num(*n),
         JsonAtom::Bool(b) => b.to_string(),
         JsonAtom::Null => "null".into(),
+        JsonAtom::Undefined | JsonAtom::Hole => "undefined".into(),
         _ => unreachable!(),
     }
 }
 pub fn flatten_json_rows(value: &JsonValue, order: &[(String, Vec<String>)]) -> Vec<JsonRow> {
     let order: HashMap<_, _> = order.iter().map(|(k, v)| (k.as_str(), v)).collect();
+    let undefined = value.atoms.len();
     let mut rows = vec![];
     let mut stack = vec![(value.root, String::new(), String::new())];
     while let Some((i, path, pointer)) = stack.pop() {
-        match &value.atoms[i] {
+        let current = value.atoms.get(i).unwrap_or(&JsonAtom::Undefined);
+        match current {
             JsonAtom::Array(a) => {
                 if a.is_empty() {
                     rows.push(JsonRow {
@@ -76,6 +79,9 @@ pub fn flatten_json_rows(value: &JsonValue, order: &[(String, Vec<String>)]) -> 
                     .all(|&i| !matches!(value.atoms[i], JsonAtom::Array(_) | JsonAtom::Object(_)))
                 {
                     for (k, &i) in a.iter().enumerate() {
+                        if matches!(value.atoms[i], JsonAtom::Hole) {
+                            continue;
+                        }
                         rows.push(JsonRow {
                             key: if k == 0 { path.clone() } else { String::new() },
                             accessible_key: path.clone(),
@@ -84,6 +90,9 @@ pub fn flatten_json_rows(value: &JsonValue, order: &[(String, Vec<String>)]) -> 
                     }
                 } else {
                     for (k, &i) in a.iter().enumerate().rev() {
+                        if matches!(value.atoms[i], JsonAtom::Hole) {
+                            continue;
+                        }
                         stack.push((i, format!("{path}[{k}]"), format!("{pointer}/{k}")))
                     }
                 }
@@ -100,7 +109,8 @@ pub fn flatten_json_rows(value: &JsonValue, order: &[(String, Vec<String>)]) -> 
                     })
                 }
                 for key in keys.iter().rev() {
-                    if let Some(&i) = lookup.get(key.as_str()) {
+                    {
+                        let i = lookup.get(key.as_str()).copied().unwrap_or(undefined);
                         stack.push((
                             i,
                             if path.is_empty() {
