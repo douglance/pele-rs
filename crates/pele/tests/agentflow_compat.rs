@@ -145,7 +145,14 @@ fn pinned_agentflow_semantic_model_corpus() {
             .unwrap();
         let actual =
             serde_json::to_value(doc.model::<AgentflowModel>().unwrap().semantic_model()).unwrap();
-        assert_eq!(serde_json::to_value(doc.query("semanticModel", &pele::compat::Value::Null).unwrap()).unwrap(), *expected);
+        assert_eq!(
+            serde_json::to_value(
+                doc.query("semanticModel", &pele::compat::Value::Null)
+                    .unwrap()
+            )
+            .unwrap(),
+            *expected
+        );
         if &actual != expected {
             if failures.len() < 6 {
                 eprintln!(
