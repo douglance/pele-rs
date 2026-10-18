@@ -347,55 +347,68 @@ impl Engine {
         resources: &mut dyn RenderResources,
     ) -> Result<RenderResult, PeleError> {
         let registration = &document.registration;
-        let mut settings = options.render.clone();
-        let section = registration
-            .descriptor
-            .section
-            .as_deref()
-            .unwrap_or(registration.descriptor.id.as_str());
-        let fixed = document
-            .config
-            .get(section)
-            .and_then(Value::as_object)
-            .and_then(|s| s.get("useMaxWidth"))
-            == Some(&Value::Bool(false));
-        if settings.responsive.is_none() {
-            settings.responsive = Some(!fixed)
-        }
-        let mut session = RenderSession {
-            host: resources,
-            icons: HashMap::new(),
-            clock: settings.now.map(Ok),
-        };
-        let mut rendered = registration.module.render(
-            &document.model,
+        render_registered(
+            &registration.descriptor,
             &document.config,
-            &settings,
-            &mut session,
-        )?;
-        if let Some(theme) = &settings.native_theme {
-            rendered.svg = super::svg::resolved_svg(&rendered.svg, theme)?;
-        }
-        if rendered.svg.encode_utf16().count() > settings.output_limit() {
-            let mut e = PeleError::new(
-                format!(
-                    "Diagram output is longer than the limit of {} characters.",
-                    settings.output_limit()
-                ),
-                ErrorCode::Limit,
-            );
-            e.diagram_type = Some(registration.descriptor.id.to_string());
-            return Err(e);
-        }
-        for link in &mut rendered.links {
-            link.id = source::decode_entities(&link.id)?
-        }
-        Ok(RenderResult {
-            diagram_type: registration.descriptor.id.clone(),
-            rendered,
-        })
+            options,
+            resources,
+            |settings, session| {
+                registration
+                    .module
+                    .render(&document.model, &document.config, settings, session)
+            },
+        )
     }
 }
+pub(crate) fn render_registered(
+    descriptor: &ModuleDescriptor,
+    config: &Object,
+    options: &RenderOptions,
+    resources: &mut dyn RenderResources,
+    render: impl FnOnce(&RenderSettings, &mut dyn RenderResources) -> Result<Rendered, PeleError>,
+) -> Result<RenderResult, PeleError> {
+    let mut settings = options.render.clone();
+    let section = descriptor
+        .section
+        .as_deref()
+        .unwrap_or(descriptor.id.as_str());
+    let fixed = config
+        .get(section)
+        .and_then(Value::as_object)
+        .and_then(|s| s.get("useMaxWidth"))
+        == Some(&Value::Bool(false));
+    if settings.responsive.is_none() {
+        settings.responsive = Some(!fixed)
+    }
+    let mut session = RenderSession {
+        host: resources,
+        icons: HashMap::new(),
+        clock: settings.now.map(Ok),
+    };
+    let mut rendered = render(&settings, &mut session)?;
+    if let Some(theme) = &settings.native_theme {
+        rendered.svg = super::svg::resolved_svg(&rendered.svg, theme)?;
+    }
+    if rendered.svg.encode_utf16().count() > settings.output_limit() {
+        let mut e = PeleError::new(
+            format!(
+                "Diagram output is longer than the limit of {} characters.",
+                settings.output_limit()
+            ),
+            ErrorCode::Limit,
+        );
+        e.diagram_type = Some(descriptor.id.to_string());
+        return Err(e);
+    }
+    for link in &mut rendered.links {
+        link.id = source::decode_entities(&link.id)?
+    }
+    Ok(RenderResult {
+        diagram_type: descriptor.id.clone(),
+        rendered,
+    })
+}
+
 struct RenderSession<'a> {
     host: &'a mut dyn RenderResources,
     icons: HashMap<String, Option<TrustedSvg>>,

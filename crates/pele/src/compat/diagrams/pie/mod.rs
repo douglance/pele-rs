@@ -1,5 +1,7 @@
 //! Pele diagrams/pie/{parser,model,index}.ts, 458322a5 (MIT, kepano).
 mod parser;
+mod public_model;
+pub use public_model::PiePublicState;
 mod render;
 use crate::compat::{
     DiagramModule, DiagramType, ModuleDescriptor, Object, ParseContext, PeleError, RenderResources,

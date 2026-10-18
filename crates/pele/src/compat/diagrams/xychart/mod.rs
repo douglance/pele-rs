@@ -2,6 +2,8 @@
 mod lexer;
 mod model;
 mod parser;
+mod public_model;
+pub use public_model::XyChartPublicState;
 mod render;
 mod ticks;
 mod tokens;

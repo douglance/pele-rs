@@ -1,6 +1,8 @@
 //! Translated from Pele diagrams/quadrant/{index,db,lexer,parser,render}.ts.
 //! Upstream 458322a5b8abb1ae57ddf127c32017ab9fb14a92, MIT, Copyright kepano.
 mod parser;
+mod public_model;
+pub use public_model::QuadrantPublicState;
 mod render;
 use crate::compat::{
     DiagramModule, DiagramType, ModuleDescriptor, Object, ParseContext, PeleError, RenderResources,

@@ -3,6 +3,8 @@ mod format;
 mod layout;
 mod model;
 mod parser;
+mod public_model;
+pub use public_model::TreemapPublicState;
 mod render;
 use crate::compat::{
     DiagramModule, DiagramType, ErrorCode, ModuleDescriptor, Object, ParseContext, PeleError,

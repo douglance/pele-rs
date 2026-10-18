@@ -350,3 +350,34 @@ All public API gates remain open: mutable model fields/identity, real methods an
 prototypes, lossless source/options transport, live registry, lazy/mount/zoom,
 final independent consumers and distribution checks. The v0.1.0 release remains
 the earlier limited flowchart API. No new release or GIF is published here.
+
+
+## Mutable native model layer
+
+Nine families now opt into `PublicDiagramModule`: Pie, Info, Sankey, Packet,
+Radar, Quadrant, Treemap, Journey and XYChart. This is an additive native layer;
+the immutable typed model API and released v1 contract remain available. Flat
+model arenas preserve object IDs, aliases/cycles, Map/Set/Date values, absence,
+undefined, UTF-16 strings, IEEE number bits and data-property flags. Typed native
+module implementations own mutations and geometry. Existing documents retain
+their registered codec/configuration after registry changes.
+
+The three method-bearing codecs use explicit schemas; field-only codecs retain
+opaque descriptors pending full inventory. Schema tables declare field, prototype and method IDs without recovering
+contracts from serde projections. Journey exposes six actual methods, Quadrant
+thirteen and XYChart thirteen. Calls publish the post-call graph and revision
+even when a JavaScript or Pele operation error follows partial edits; stale or
+invalid calls reject before dispatch. UTF-16 Pele errors preserve message, type
+and snippet without lossy conversion, while ordinary errors keep their old form.
+Custom extension integration tests exercise the same retained native dispatcher.
+
+This layer does not certify foreign mutable APIs or complete model parity.
+Constructors, arbitrary getter/proxy/coercion and overridden callback behavior,
+active lone-surrogate rendering, sparse active collections in some codecs and
+render-time JavaScript error categories remain explicit capability gaps. Native
+work/projection ceilings also differ from unbounded JavaScript behavior. The
+Swift/C and WASM mutable adapters are a separately verified layer in progress.
+
+The frozen nine-codec native batch passes 57 release-profile integration tests
+across 14 targets, including retained extension contracts and Packet/Quadrant
+source-corpus regressions. Rust formatting and staged whitespace checks pass.

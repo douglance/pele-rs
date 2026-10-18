@@ -1,5 +1,7 @@
 //! Pele diagrams/journey/{index,db,lexer,parser,render}.ts, 458322a5 (MIT, kepano).
 mod parser;
+mod public_model;
+pub use public_model::JourneyPublicState;
 mod render;
 use crate::compat::{
     DiagramModule, DiagramType, ModuleDescriptor, Object, ParseContext, PeleError, RenderResources,

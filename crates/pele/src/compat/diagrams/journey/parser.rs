@@ -190,7 +190,7 @@ fn tokens(s: &str) -> Vec<Token> {
     emit(&mut out, K::End, s.len(), s.len());
     out
 }
-fn js_number(raw: &str) -> f64 {
+pub(super) fn js_number(raw: &str) -> f64 {
     let raw = raw.trim_matches(space);
     if raw.is_empty() {
         return 0.;

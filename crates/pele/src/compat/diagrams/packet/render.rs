@@ -4,8 +4,33 @@ use crate::compat::{
     source::{decode_entities, space},
     svg::{self, esc, js_num, label_svg, num},
     text::{layout_label, measure, Label, Span},
-    Object, PeleError, RenderResources, RenderSettings, Rendered, Value,
+    ErrorCode, Object, PeleError, RenderResources, RenderSettings, Rendered, Value,
 };
+// Rust min/max discard NaN; JavaScript Math.min/max retain it.
+trait JsExtrema {
+    fn js_min(self, other: Self) -> Self;
+    fn js_max(self, other: Self) -> Self;
+}
+impl JsExtrema for f64 {
+    fn js_min(self, other: Self) -> Self {
+        if self.is_nan() || other.is_nan() {
+            f64::NAN
+        } else if self == 0. && other == 0. {
+            f64::from_bits(self.to_bits() | other.to_bits())
+        } else {
+            self.min(other)
+        }
+    }
+    fn js_max(self, other: Self) -> Self {
+        if self.is_nan() || other.is_nan() {
+            f64::NAN
+        } else if self == 0. && other == 0. {
+            f64::from_bits(self.to_bits() & other.to_bits())
+        } else {
+            self.max(other)
+        }
+    }
+}
 fn round(n: f64) -> f64 {
     (n + 0.5).floor()
 }
@@ -81,7 +106,7 @@ fn literal(
     };
     for line in lines {
         let width = measure(r, o, &line, size, 0)?;
-        out.width = out.width.max(width);
+        out.width = out.width.js_max(width);
         out.widths.push(width);
         out.lines.push(vec![Span {
             text: line,
@@ -108,7 +133,7 @@ fn fit(
     if width <= max {
         return Ok(Some((text.into(), size)));
     }
-    let mut fitted = min.max((size * max / width).floor());
+    let mut fitted = min.js_max((size * max / width).floor());
     while fitted >= min {
         if measure(r, o, text, fitted, 0)? <= max {
             return Ok(Some((text.into(), fitted)));
@@ -153,7 +178,18 @@ pub(super) fn render(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    let across = draw(m, c, o, r, false)?;
+    render_with_row_holes(m, c, o, r, &[])
+}
+/// Sparse outer rows preserve Array.map/forEach behavior. Typed source models
+/// remain dense; mutable public documents provide the absent index sidecar.
+pub(super) fn render_with_row_holes(
+    m: &PacketModel,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+    holes: &[usize],
+) -> Result<Rendered, PeleError> {
+    let across = draw(m, c, o, r, false, holes)?;
     let Some(available) = o.max_width.filter(|w| *w > 0.) else {
         return Ok(across);
     };
@@ -161,7 +197,7 @@ pub(super) fn render(
     if o.auto_direction == Some(false) || across.width <= available || available >= breakpoint {
         return Ok(across);
     }
-    let down = draw(m, c, o, r, true)?;
+    let down = draw(m, c, o, r, true, holes)?;
     Ok(if down.width < across.width {
         down
     } else {
@@ -174,6 +210,7 @@ fn draw(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
     down: bool,
+    holes: &[usize],
 ) -> Result<Rendered, PeleError> {
     let size = o.font_size.unwrap_or(16.);
     let label_size = round(size * 0.875);
@@ -189,17 +226,25 @@ fn draw(
         packet.and_then(|p| p.get("bitOrder")) == Some(&Value::String("descending".into()));
     let mut bits_per_row = m.bits_per_row;
     let mut rows = m.rows.clone();
+    let mut reflow_present = Vec::new();
     if down {
-        let count = ((o.max_width.unwrap_or(320.) - 2. * pad) / bit_width.min(18.))
+        if !holes.is_empty() {
+            // Pele's for-of reads an absent row as undefined. Error category is
+            // transported by the public-operation seam, not invented here.
+            let mut error = PeleError::new("row is not iterable", ErrorCode::Semantic);
+            error.diagram_type = Some("packet".into());
+            return Err(error);
+        }
+        let count = ((o.max_width.unwrap_or(320.) - 2. * pad) / bit_width.js_min(18.))
             .floor()
-            .max(1.);
-        bits_per_row = bits_per_row.min(2f64.powf(count.log2().floor()).max(8.));
+            .js_max(1.);
+        bits_per_row = bits_per_row.js_min(2f64.powf(count.log2().floor()).js_max(8.));
         let last = m.rows.last().and_then(|r| r.last()).map_or(0., |b| b.end);
         if ((last + 1.) / bits_per_row).ceil() > 10000. {
             bits_per_row = m.bits_per_row
         }
         bit_width =
-            bit_width.min(((o.max_width.unwrap_or(320.) - 2. * pad) / bits_per_row).max(18.));
+            bit_width.js_min(((o.max_width.unwrap_or(320.) - 2. * pad) / bits_per_row).js_max(18.));
         let mut whole: Vec<PacketBlock> = Vec::new();
         for b in m.rows.iter().flatten() {
             if let Some(prev) = whole.last_mut().filter(|p| {
@@ -216,34 +261,61 @@ fn draw(
             }
         }
         rows.clear();
+        let mut split_work = 0usize;
         for block in whole {
             let mut start = block.start;
             while start <= block.end {
                 let end = block
                     .end
-                    .min(((start / bits_per_row).floor() + 1.) * bits_per_row - 1.);
-                let index = (start / bits_per_row).floor() as usize;
-                if rows.len() <= index {
-                    rows.resize_with(index + 1, Vec::new)
+                    .js_min(((start / bits_per_row).floor() + 1.) * bits_per_row - 1.);
+                let index = (start / bits_per_row).floor();
+                let next = end + 1.;
+                split_work += 1;
+                if split_work > 1_000_000
+                    || index >= 1_000_000.
+                    || next == start
+                    || (next < start && bits_per_row.is_finite())
+                {
+                    let mut error = PeleError::new(
+                        "Packet public row splitting exceeds the work budget",
+                        ErrorCode::Limit,
+                    );
+                    error.diagram_type = Some("packet".into());
+                    return Err(error);
                 }
-                rows[index].push(PacketBlock {
-                    start,
-                    end,
-                    ..block.clone()
-                });
-                start = end + 1.;
+                // Negative/NaN keys are ordinary Array properties in JS. They
+                // do not become indexed rows or participate in its iterators.
+                if index >= 0. && index.is_finite() {
+                    let index = index as usize;
+                    if rows.len() <= index {
+                        rows.resize_with(index + 1, Vec::new);
+                        reflow_present.resize(index + 1, false);
+                    }
+                    reflow_present[index] = true;
+                    rows[index].push(PacketBlock {
+                        start,
+                        end,
+                        ..block.clone()
+                    });
+                }
+                start = next;
             }
         }
     }
     let mut labels: Vec<Vec<Label>> = Vec::new();
     if down {
-        for row in &rows {
+        for (i, row) in rows.iter().enumerate() {
+            if !reflow_present[i] {
+                let mut error = PeleError::new("row is not iterable", ErrorCode::Semantic);
+                error.diagram_type = Some("packet".into());
+                return Err(error);
+            }
             let mut line = Vec::new();
             for block in row {
                 let room = ((block.end - block.start + 1.) * bit_width
-                    - padding_x.min(bit_width - 1.)
+                    - padding_x.js_min(bit_width - 1.)
                     - 6.)
-                    .max(1.);
+                    .js_max(1.);
                 line.push(literal(
                     decode_entities(&block.label)?.trim_matches(space),
                     r,
@@ -260,10 +332,14 @@ fn draw(
     let mut tops = Vec::new();
     let mut rows_height = 0.;
     for (i, _) in rows.iter().enumerate() {
-        let mut height = row_height;
+        let mut height = if !down && holes.binary_search(&i).is_ok() {
+            f64::NAN
+        } else {
+            row_height
+        };
         if down {
             for label in &labels[i] {
-                height = height.max(label.height + 10.)
+                height = height.js_max(label.height + 10.)
             }
         }
         tops.push(rows_height);
@@ -273,7 +349,7 @@ fn draw(
     if !rows.is_empty() {
         rows_height -= padding_y
     }
-    let gap = padding_x.min(bit_width - 1.);
+    let gap = padding_x.js_min(bit_width - 1.);
     let width = if !rows.is_empty() {
         bits_per_row * bit_width - gap
     } else {
@@ -282,7 +358,7 @@ fn draw(
     let title_room = if down {
         o.max_width
             .filter(|v| *v > 0.)
-            .map_or(4000., |v| (v - 2. * pad).max(80.))
+            .map_or(4000., |v| (v - 2. * pad).js_max(80.))
     } else {
         4000.
     };
@@ -292,11 +368,14 @@ fn draw(
     } else {
         0.
     };
-    let left = pad + ((title.width - width) / 2.).max(0.);
+    let left = pad + ((title.width - width) / 2.).js_max(0.);
     let mut fields = String::new();
     let mut bits = String::new();
     let mut fits: Vec<(std::sync::Arc<str>, f64, Option<(String, f64)>)> = Vec::new();
     for (i, row) in rows.iter().enumerate() {
+        if !down && holes.binary_search(&i).is_ok() {
+            continue;
+        }
         let y = pad + tops[i] + numbers;
         let height = heights[i];
         for (j, block) in row.iter().enumerate() {
@@ -365,7 +444,7 @@ fn draw(
             }
         }
     }
-    let total_width = (width.max(title.width) + 2. * pad).ceil();
+    let total_width = (width.js_max(title.width) + 2. * pad).ceil();
     let total_height = (rows_height + title_height + 2. * pad).ceil();
     let content = format!(
         "{}{}{}",

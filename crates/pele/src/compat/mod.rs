@@ -12,6 +12,7 @@ pub use svg::NativeTheme;
 pub mod text;
 pub use id::DiagramId;
 mod module;
+pub mod public;
 pub use engine::{Engine, ParsedDocument};
 pub use module::*;
 pub mod source;

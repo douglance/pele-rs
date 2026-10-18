@@ -1,10 +1,72 @@
 //! Pele diagrams/quadrant/render.ts, pinned 458322a5 (MIT, kepano).
 use super::{QuadrantModel, QuadrantText};
 use crate::compat::{
-    svg::{self, esc_text, label_svg, num, series_color},
+    svg::{self, edges::theme::resolve_style, esc_text, label_svg, num, series_color},
     text::{layout_label, Label},
     Object, PeleError, RenderResources, RenderSettings, Rendered, Value,
 };
+// Number.parseInt without a radix accepts a sign, decimal prefix or 0x hex.
+fn parse_int(text: &str) -> f64 {
+    let text = text.trim_start_matches(crate::compat::source::space);
+    let (sign, text) = if let Some(s) = text.strip_prefix('-') {
+        (-1., s)
+    } else if let Some(s) = text.strip_prefix('+') {
+        (1., s)
+    } else {
+        (1., text)
+    };
+    let hex = text.starts_with("0x") || text.starts_with("0X");
+    let text = if hex { &text[2..] } else { text };
+    let n = text
+        .bytes()
+        .take_while(|c| {
+            if hex {
+                c.is_ascii_hexdigit()
+            } else {
+                c.is_ascii_digit()
+            }
+        })
+        .count();
+    if n == 0 {
+        return f64::NAN;
+    }
+    let text = &text[..n];
+    let value = if !hex {
+        text.parse::<f64>().unwrap_or(f64::INFINITY)
+    } else {
+        let mut leading = true;
+        let (mut bits, mut mant, mut round, mut sticky) = (0usize, 0u64, false, false);
+        for c in text.bytes() {
+            let digit = (c as char).to_digit(16).unwrap();
+            for k in (0..4).rev() {
+                let bit = (digit >> k) & 1;
+                if leading && bit == 0 {
+                    continue;
+                }
+                leading = false;
+                bits += 1;
+                if bits <= 53 {
+                    mant = (mant << 1) | bit as u64
+                } else if bits == 54 {
+                    round = bit != 0
+                } else {
+                    sticky |= bit != 0
+                }
+            }
+        }
+        if bits <= 53 {
+            mant as f64
+        } else if bits > 1024 {
+            f64::INFINITY
+        } else {
+            if round && (sticky || mant & 1 != 0) {
+                mant += 1
+            }
+            (mant as f64) * 2_f64.powi((bits - 53) as i32)
+        }
+    };
+    sign * value
+}
 fn setting<'a>(config: &'a Object, key: &str) -> Option<&'a Value> {
     config
         .get("quadrantChart")
@@ -251,11 +313,12 @@ pub(super) fn render(
             .find(|e| e.0 == point.class_name)
             .map(|e| &e.1);
         let p = &point.style;
-        let radius = p
-            .radius
-            .or(shared.and_then(|s| s.radius))
-            .unwrap_or(radius)
-            .min(2000.);
+        let radius = p.radius.or(shared.and_then(|s| s.radius)).unwrap_or(radius);
+        let radius = if radius.is_nan() {
+            radius
+        } else {
+            radius.min(2000.)
+        };
         let color = p
             .color
             .as_ref()
@@ -268,30 +331,27 @@ pub(super) fn render(
             .stroke_width
             .as_ref()
             .or_else(|| shared.and_then(|s| s.stroke_width.as_ref()));
-        let mut styles = String::new();
+        let mut styles = Vec::new();
         if let Some(color) = color.filter(|s| !s.is_empty()) {
-            styles.push_str(&format!("fill:{};", hex(color)))
+            styles.push(format!("fill:{}", hex(color)))
         }
         if let Some(sw) = stroke_width.filter(|s| !s.is_empty()) {
             if let Some(sc) = stroke_color.filter(|s| !s.is_empty()) {
-                styles.push_str(&format!("stroke:{};", hex(sc)))
+                styles.push(format!("stroke:{}", hex(sc)))
             }
-            styles.push_str(&format!("stroke-width:{sw};"))
+            styles.push(format!("stroke-width:{sw}"))
         }
-        let shape = if styles.is_empty() {
-            String::new()
-        } else {
-            format!(" style=\"{}\"", svg::esc(&styles))
-        };
+        let shape = resolve_style(&styles).shape;
         let cx = left + x * w;
         let cy = top + (1. - y) * h;
         let reach = radius
-            + stroke_width.map_or(0., |s| {
-                s.trim_end_matches("px")
-                    .parse::<f64>()
-                    .unwrap_or(f64::INFINITY)
-                    .min(400.)
-                    / 2.
+            + stroke_width.filter(|s| !s.is_empty()).map_or(0., |s| {
+                let n = parse_int(s);
+                if n.is_nan() {
+                    n
+                } else {
+                    n.min(400.) / 2.
+                }
             });
         dots.push(Dot {
             cx,
@@ -306,7 +366,9 @@ pub(super) fn render(
             num(cx),
             num(cy),
             num(radius),
-            if stroke_width.is_some() && stroke_color.is_none() {
+            if stroke_width.is_some_and(|s| !s.is_empty())
+                && !stroke_color.is_some_and(|s| !s.is_empty())
+            {
                 format!(" stroke=\"{fill}\"")
             } else {
                 String::new()
