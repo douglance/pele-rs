@@ -75,6 +75,37 @@ PeleResult *pele_render_document_with_resources_v3(const PeleResult *, const uin
  * before work; a successful handle must be freed once. Recursive/concurrent
  * operations on one handle return an error; never free during an active call. */
 typedef struct PelePublicDocument PelePublicDocument;
+/* Owned selective registry. mode0 empty, mode1 all33 built-ins; all successful
+ * results use owned version2 envelopes. create writes NULL before any failure
+ * and publishes ownership only after result encoding. Free once after all calls
+ * return; free(NULL) is safe. Concurrent/reentrant operations return busy rather
+ * than blocking. Registries and documents have independent lifetimes: returned
+ * documents retain their module/config/state after registration replacement/free.
+ * Exact built-in IDs only for registration; duplicate registration replaces its
+ * handler without adding a capability row. IDs are UTF-8 <=4096 bytes.
+ * Discovery preprocesses source <=16MiB without parse thresholds or grammar
+ * validation. detect returns {type:string|null}; preprocessing errors propagate.
+ * supports returns bool, false on preprocessing failure or missing registration;
+ * invalid UTF-8/native transport failures remain errors. capabilities includes
+ * every known built-in even when unregistered. NULL registry operations fail.
+ * Synchronize free with all operations; no registry pointer is retained by docs. */
+typedef struct PeleRegistry PeleRegistry;
+PeleResult *pele_registry_create_v8(uint32_t mode, PeleRegistry **out_registry);
+void pele_registry_free_v8(PeleRegistry *registry);
+PeleResult *pele_registry_capabilities_v8(const PeleRegistry *registry);
+PeleResult *pele_registry_registered_v8(const PeleRegistry *registry, const uint8_t *id, size_t id_len);
+PeleResult *pele_registry_register_builtin_v8(PeleRegistry *registry, const uint8_t *id, size_t id_len);
+PeleResult *pele_registry_detect_type_v8(const PeleRegistry *registry, const uint8_t *source, size_t source_len);
+PeleResult *pele_registry_supports_v8(const PeleRegistry *registry, const uint8_t *source, size_t source_len);
+/* Same independent numeric policy tags as parse_limits_v7:0 undefined,1 null,
+ * 2 raw IEEE-754 bits,3 legacy integer option. Source16MiB/options1MiB budgets
+ * always apply. Only explicitly overridden fields bypass old integer decoding.
+ * *out_document is NULL on every error. Missing-registration errors retain core
+ * type/message. Live documents use the existing public document operations. */
+PeleResult *pele_registry_parse_limits_v8(const PeleRegistry *registry,
+    const uint8_t *source, size_t source_len, const uint8_t *options, size_t options_len,
+    uint32_t source_kind, uint64_t source_bits, uint32_t edge_kind, uint64_t edge_bits,
+    PelePublicDocument **out_document);
 PeleResult *pele_public_parse_v4(const uint8_t *, size_t, const uint8_t *, size_t, PelePublicDocument **out_document);
 /* Additive exact source-limit lane for well-formed UTF-8 source. limit_kind:
  * 0 undefined (default 50,000 UTF-16 units), 1 null, 2 IEEE-754 number bits.

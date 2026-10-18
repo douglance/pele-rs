@@ -5,7 +5,7 @@ private struct PublicDocumentMetadata: Decodable {
     let type: String
     let revision: String
 }
-private func ownedPublicDocument(_ result: OpaquePointer?, document: OpaquePointer?) throws -> Pele.MutableDocument {
+func ownedPublicDocument(_ result: OpaquePointer?, document: OpaquePointer?) throws -> Pele.MutableDocument {
     do {
         let metadata = try Pele.compatibilityResult(result, as: PublicDocumentMetadata.self)
         guard let handle = document, let revision = UInt64(metadata.revision), String(revision) == metadata.revision else {

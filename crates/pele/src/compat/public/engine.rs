@@ -249,40 +249,67 @@ impl PublicEngine {
     /// same typed interface; registration alone does not certify runtime parity.
     pub fn with_builtins() -> Self {
         let mut engine = Self::empty();
-        engine.register(crate::compat::diagrams::venn::Venn);
-        engine.register(crate::compat::diagrams::ishikawa::Ishikawa);
-        engine.register(crate::compat::diagrams::swimlane::Swimlane);
-        engine.register(crate::compat::diagrams::wardley::Wardley);
-        engine.register(crate::compat::diagrams::event_modeling::EventModeling);
-        engine.register(crate::compat::diagrams::usecase::Usecase);
-        engine.register(crate::compat::diagrams::cynefin::Cynefin);
-        engine.register(crate::compat::diagrams::tree_view::TreeView);
-        engine.register(crate::compat::diagrams::agentflow::AgentFlow);
-        engine.register(crate::compat::diagrams::requirement::RequirementDiagram);
-        engine.register(crate::compat::diagrams::block::Block);
-        engine.register(crate::compat::diagrams::railroad::Railroad);
-        engine.register(crate::compat::diagrams::treemap::Treemap);
-        engine.register(crate::compat::diagrams::c4::C4);
-        engine.register(crate::compat::diagrams::info::Info);
-        engine.register(crate::compat::diagrams::git_graph::GitGraph);
-        engine.register(crate::compat::diagrams::architecture::Architecture);
-        engine.register(crate::compat::diagrams::sankey::Sankey);
-        engine.register(crate::compat::diagrams::state::State);
-        engine.register(crate::compat::diagrams::gantt::Gantt);
-        engine.register(crate::compat::diagrams::sequence::Sequence);
-        engine.register(crate::compat::diagrams::xychart::XyChart);
-        engine.register(crate::compat::diagrams::class_diagram::Class);
-        engine.register(crate::compat::diagrams::er::Er);
-        engine.register(crate::compat::diagrams::flowchart::Flowchart);
-        engine.register(crate::compat::diagrams::kanban::Kanban);
-        engine.register(crate::compat::diagrams::mindmap::Mindmap);
-        engine.register(crate::compat::diagrams::pie::Pie);
-        engine.register(crate::compat::diagrams::quadrant_chart::QuadrantChart);
-        engine.register(crate::compat::diagrams::packet::Packet);
-        engine.register(crate::compat::diagrams::radar::Radar);
-        engine.register(crate::compat::diagrams::timeline::Timeline);
-        engine.register(crate::compat::diagrams::journey::Journey);
+        for kind in crate::compat::DIAGRAM_TYPES {
+            engine.register_builtin(kind);
+        }
         engine
+    }
+    /// Install one canonical built-in through the same typed module interface
+    /// used by extensions. Repeated registration replaces later parses only.
+    pub fn register_builtin(&mut self, kind: crate::compat::DiagramType) {
+        use crate::compat::{diagrams as d, DiagramType as T};
+        match kind {
+            T::Flowchart => self.register(d::flowchart::Flowchart),
+            T::Pie => self.register(d::pie::Pie),
+            T::Er => self.register(d::er::Er),
+            T::Mindmap => self.register(d::mindmap::Mindmap),
+            T::Kanban => self.register(d::kanban::Kanban),
+            T::Timeline => self.register(d::timeline::Timeline),
+            T::Journey => self.register(d::journey::Journey),
+            T::Class => self.register(d::class_diagram::Class),
+            T::QuadrantChart => self.register(d::quadrant_chart::QuadrantChart),
+            T::Xychart => self.register(d::xychart::XyChart),
+            T::State => self.register(d::state::State),
+            T::Gantt => self.register(d::gantt::Gantt),
+            T::GitGraph => self.register(d::git_graph::GitGraph),
+            T::Architecture => self.register(d::architecture::Architecture),
+            T::Requirement => self.register(d::requirement::RequirementDiagram),
+            T::Sankey => self.register(d::sankey::Sankey),
+            T::Packet => self.register(d::packet::Packet),
+            T::Radar => self.register(d::radar::Radar),
+            T::Treemap => self.register(d::treemap::Treemap),
+            T::Info => self.register(d::info::Info),
+            T::Sequence => self.register(d::sequence::Sequence),
+            T::C4 => self.register(d::c4::C4),
+            T::Block => self.register(d::block::Block),
+            T::Railroad => self.register(d::railroad::Railroad),
+            T::Agentflow => self.register(d::agentflow::AgentFlow),
+            T::TreeView => self.register(d::tree_view::TreeView),
+            T::Cynefin => self.register(d::cynefin::Cynefin),
+            T::Wardley => self.register(d::wardley::Wardley),
+            T::Eventmodeling => self.register(d::event_modeling::EventModeling),
+            T::Usecase => self.register(d::usecase::Usecase),
+            T::Venn => self.register(d::venn::Venn),
+            T::Ishikawa => self.register(d::ishikawa::Ishikawa),
+            T::Swimlane => self.register(d::swimlane::Swimlane),
+        }
+    }
+    pub fn registered(&self, id: impl Into<DiagramId>) -> bool {
+        self.engine.registered(id)
+    }
+    pub fn capabilities(&self) -> Vec<crate::compat::Capability> {
+        self.engine.capabilities()
+    }
+    /// Discovery preprocesses without applying parse limits or grammar checks.
+    pub fn detect_type(
+        &self,
+        source: &str,
+    ) -> Result<Option<crate::compat::DiagramType>, PeleError> {
+        self.engine.detect_type(source)
+    }
+    /// Preprocessing failure is unsupported; parsing remains a separate step.
+    pub fn supports(&self, source: &str) -> bool {
+        self.engine.supports(source)
     }
     pub fn empty() -> Self {
         Self::default()

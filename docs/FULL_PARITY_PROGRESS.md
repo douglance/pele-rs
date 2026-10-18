@@ -1034,3 +1034,45 @@ This additive slice closes numeric parse policies for well-formed strings;
 arbitrary coercion, constructors, active malformed UTF-16, callback dispatch and
 the remaining public-runtime/browser/release gates remain open. See
 [composable parse-limit contract](PARSE_LIMITS.md).
+
+
+## Owned selective native registry
+
+The source-built Rust/C/Swift interface now owns selective registries through the
+existing typed `PublicEngine`; there is no second module system. New
+`register_builtin` dispatch covers all 33 canonical types, and `with_builtins`
+uses the same path. Membership/capabilities/discovery query that owner. Detection
+preprocesses without grammar or the default source threshold; supports converts
+preprocessing failure to false. Byte-budget/UTF-8 transport failures remain errors.
+Unknown foreign registration names reject without mutation. Empty-registry parse
+preserves the upstream unsupported-type error.
+
+C v8 owns a try-locked engine, publishes handles after encoding metadata and shares
+v7's independent parse-limit decoder. The non-Sendable Swift `Pele.Registry`
+provides empty/all-builtins factories, explicit closure and existing owned mutable
+documents. A document retains its concrete provider, schema, config and methods
+after replacement or registry disposal. Existing Engine convenience APIs and the
+published legacy fallback retain their behavior.
+
+The portable oracle regenerates byte for byte: five independently isolated core/
+full registries, 240 source discovery checks, 85 parse outcomes and three retained-
+model provenance vectors. Eighteen focused Rust release integration tests pass,
+including custom-provider/schema/method/config/drop retention. The previously
+verified million-edge case was deliberately excluded from this registry batch;
+no edge-generation code changed. Strict C registry and v7 integrations pass on
+the current native archive. The artifact-free, checksum-verified v0.1 Swift
+fallback also builds and runs with Registry.swift excluded.
+
+Twenty-five focused Swift release integration tests pass against the fresh
+universal SDK. Independent arm64 and Intel Rosetta copies each pass 12 registry/
+limit-feature tests, four strict C integrations and immutable/mutable consumers
+across all 33 families. The universal archive SHA-256 is
+`4fb2e8fb065c2054651846e974587a07196bfb2d101fffe04b8dd0baa3b3fd59`;
+its arm64 slice is byte-identical to the independently tested archive
+`9b7cfe5a9d5a8cd2fcc0f86692de048ff9de0a898586a18d9fda4a5d0d78260d`.
+The packaged header also matches current source. The tested host is macOS 26.6;
+Rosetta is not physical Intel/macOS 14 runtime proof. Formatter and diff checks
+pass. The contract, ownership rules and remaining boundaries are recorded in
+[owned registry architecture](LLD_NATIVE_REGISTRY.md). Arbitrary foreign callback
+providers, live JavaScript Diagram changes, constructors, active malformed
+UTF-16, callback/coercion execution and browser/release gates remain separate.

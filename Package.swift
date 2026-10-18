@@ -15,4 +15,4 @@ let package = Package(name: "Pele", platforms: [.macOS(.v14)],
     products: [.library(name: "Pele", targets: ["Pele"])],
     targets: [binary, .target(name: "Pele", dependencies: ["CPele"],
                             path: "bindings/swift/Sources/Pele",
-                            exclude: hasLocalCore ? [] : ["SourceInspection.swift", "Engine.swift", "HostResources.swift", "CalendarResources.swift", "PublicGraph.swift", "MutableDocument.swift", "PublicMethods.swift", "PublicBinary.swift", "SourceLimit.swift", "OutputLimit.swift", "EdgeLimit.swift", "ParseLimits.swift"])])
+                            exclude: hasLocalCore ? [] : ["SourceInspection.swift", "Engine.swift", "HostResources.swift", "CalendarResources.swift", "PublicGraph.swift", "MutableDocument.swift", "PublicMethods.swift", "PublicBinary.swift", "SourceLimit.swift", "OutputLimit.swift", "EdgeLimit.swift", "ParseLimits.swift", "Registry.swift"])])

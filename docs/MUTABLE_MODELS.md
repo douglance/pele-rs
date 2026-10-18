@@ -117,6 +117,29 @@ separately from parity. A post-call
 export/transport failure can leave native state advanced; only outcomes
 whose graph fits the output budget can carry complete post-call state.
 
+## Owned native registry
+
+Source-built Swift consumers can own an empty or complete registry, then select
+individual built-ins through the shared Rust module interface:
+
+```swift
+let registry = try Pele.Registry.empty()
+try registry.registerBuiltin("flowchart")
+let document = try registry.parseMutable("flowchart LR\nA --> B")
+try registry.close()
+defer { try? document.close() }
+let drawing = try document.render()
+```
+
+`allBuiltins()` installs all 33. `registered`, `capabilities`, `detectType` and
+`supports` query that owner. IDs are exact canonical strings; unknown registration
+fails. Detection and support preprocess without checking grammar or the default
+parse threshold. Native transport byte budgets remain active. Mutable documents
+retain their handler, schema and config after replacement or registry closure.
+The class is deliberately not Sendable; confine it to one owner or actor. Existing
+`Pele.Engine` convenience APIs retain their behavior. See the
+[registry architecture](LLD_NATIVE_REGISTRY.md) for C ownership and extension seams.
+
 ## Remaining compatibility boundary
 
 The additive Rust/C/Swift [source-limit API](SOURCE_LIMITS.md) now handles

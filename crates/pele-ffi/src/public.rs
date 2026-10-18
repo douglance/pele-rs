@@ -16,7 +16,7 @@ const GRAPH_JSON_BUDGET: usize = 64 * 1024 * 1024;
 pub struct PelePublicDocument {
     document: Mutex<PublicDocument>,
 }
-fn invalid(message: &str) -> PeleError {
+pub(super) fn invalid(message: &str) -> PeleError {
     PeleError::new(message, ErrorCode::Semantic)
 }
 fn source_limit_options(json: &str) -> Result<pele::compat::ParseOptions, PeleError> {
@@ -42,7 +42,7 @@ fn source_limit_options(json: &str) -> Result<pele::compat::ParseOptions, PeleEr
             )
         })
 }
-fn parse_limits_options(
+pub(super) fn parse_limits_options(
     json: &str,
     source_overridden: bool,
     edges_overridden: bool,
@@ -129,7 +129,7 @@ impl Write for Output {
         Ok(())
     }
 }
-fn success(value: impl Serialize) -> Result<PeleResult, PeleError> {
+pub(super) fn success(value: impl Serialize) -> Result<PeleResult, PeleError> {
     #[derive(Serialize)]
     struct Envelope<T> {
         version: u32,
@@ -256,6 +256,49 @@ pub unsafe extern "C" fn pele_public_parse_source_limit_v6(
         Ok(result)
     })
 }
+pub(super) fn decode_parse_limits(
+    source_kind: u32,
+    source_bits: u64,
+    edge_kind: u32,
+    edge_bits: u64,
+) -> Result<pele::compat::ParseLimits, PeleError> {
+    let source_limit = match source_kind {
+        0 => Some(pele::compat::SourceLimit::Undefined),
+        1 => Some(pele::compat::SourceLimit::Null),
+        2 => Some(pele::compat::SourceLimit::Number(f64::from_bits(
+            source_bits,
+        ))),
+        3 => None,
+        _ => {
+            return Err(invalid(
+                "Native public transport: unknown source-limit kind",
+            ))
+        }
+    };
+    let edge_limit = match edge_kind {
+        0 => Some(pele::compat::EdgeLimit::Undefined),
+        1 => Some(pele::compat::EdgeLimit::Null),
+        2 => Some(pele::compat::EdgeLimit::Number(f64::from_bits(edge_bits))),
+        3 => None,
+        _ => return Err(invalid("Native public transport: unknown edge-limit kind")),
+    };
+    Ok(pele::compat::ParseLimits {
+        source: source_limit,
+        max_edges: edge_limit,
+    })
+}
+pub(super) fn publish_document(
+    document: PublicDocument,
+    out: &mut *mut PelePublicDocument,
+) -> Result<PeleResult, PeleError> {
+    let result = success(
+        serde_json::json!({"type":document.diagram_type(),"revision":document.revision().to_string()}),
+    )?;
+    *out = Box::into_raw(Box::new(PelePublicDocument {
+        document: Mutex::new(document),
+    }));
+    Ok(result)
+}
 /// Independently select exact source/edge thresholds or legacy integer options.
 /// # Safety
 /// Pointer ownership, budgets and writable output requirements match parse_v4.
@@ -279,32 +322,11 @@ pub unsafe extern "C" fn pele_public_parse_limits_v7(
             compatibility_input(source, source_len, pele::compat::MAX_PUBLIC_SOURCE_BYTES)
         }?;
         let options = unsafe { compatibility_input(options, options_len, 1024 * 1024) }?;
-        let source_limit = match source_kind {
-            0 => Some(pele::compat::SourceLimit::Undefined),
-            1 => Some(pele::compat::SourceLimit::Null),
-            2 => Some(pele::compat::SourceLimit::Number(f64::from_bits(
-                source_bits,
-            ))),
-            3 => None,
-            _ => {
-                return Err(invalid(
-                    "Native public transport: unknown source-limit kind",
-                ))
-            }
-        };
-        let edge_limit = match edge_kind {
-            0 => Some(pele::compat::EdgeLimit::Undefined),
-            1 => Some(pele::compat::EdgeLimit::Null),
-            2 => Some(pele::compat::EdgeLimit::Number(f64::from_bits(edge_bits))),
-            3 => None,
-            _ => return Err(invalid("Native public transport: unknown edge-limit kind")),
-        };
-        let options = parse_limits_options(options, source_limit.is_some(), edge_limit.is_some())?;
+        let limits = decode_parse_limits(source_kind, source_bits, edge_kind, edge_bits)?;
+        let options =
+            parse_limits_options(options, limits.source.is_some(), limits.max_edges.is_some())?;
         let registry = PublicEngine::with_builtins();
-        let document = registry.parse_with_limits(source, &options, pele::compat::ParseLimits {
-            source: source_limit,
-            max_edges: edge_limit,
-        }).map_err(|mut error| {
+        let document = registry.parse_with_limits(source, &options, limits).map_err(|mut error| {
             if error.code == ErrorCode::UnsupportedDiagram {
                 if let Some(kind) = &error.diagram_type {
                     error.message = format!("Mutable public model codec for diagram type \"{kind}\" is unavailable.");
@@ -312,13 +334,7 @@ pub unsafe extern "C" fn pele_public_parse_limits_v7(
             }
             error
         })?;
-        let result = success(
-            serde_json::json!({"type":document.diagram_type(),"revision":document.revision().to_string()}),
-        )?;
-        *out = Box::into_raw(Box::new(PelePublicDocument {
-            document: Mutex::new(document),
-        }));
-        Ok(result)
+        publish_document(document, out)
     })
 }
 /// Flat graph schema 1 plus decimal-string revision. Result JSON is limited to 64 MiB.

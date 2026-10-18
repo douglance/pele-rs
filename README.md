@@ -55,6 +55,8 @@ checks the finished SVG after callbacks, publishing mutable state on errors.
 The composable [parse-limit API](docs/PARSE_LIMITS.md) independently overrides
 source and edge thresholds, preserving fractional edge accounting and mutable
 graph options while keeping native byte and generation budgets active.
+Source-built Swift also exposes an [owned selective registry](docs/MUTABLE_MODELS.md#owned-native-registry)
+with independent registration, discovery and document lifetimes.
 Current browser measurements show no speedup over Pele JS; see the scoped
 [performance baseline](docs/PERFORMANCE.md). GPU acceleration is not implemented.
 
