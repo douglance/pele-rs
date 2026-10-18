@@ -1,6 +1,6 @@
 import {test,expect} from '@playwright/test';
 
-for(const family of ['packet','radar','quadrant','timeline','journey','flowchart','kanban','mindmap','class','er','xychart']) {
+for(const family of ['packet','radar','quadrant','timeline','journey','flowchart','kanban','mindmap','class','er','xychart','state','gantt','sequence']) {
   test(`${family} pinned corpus through WASM source and owned model APIs`, async({page})=>{
     test.setTimeout(120_000);
     await page.goto('/examples/web/');
@@ -9,24 +9,40 @@ for(const family of ['packet','radar','quadrant','timeline','journey','flowchart
       const engine=await loadRenderer(), fixture=await(await fetch(`/fixtures/pele/${family}.json`)).json();
       const canonical=value=>JSON.stringify(value,(_,v)=>v instanceof Map?[...v]:v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.entries(v).sort(([a],[b])=>a.localeCompare(b))):v);
       const mismatches=[];
+      const oracle=family==='gantt'?await import('/dist/evidence/pele-oracle.js'):null;
+      let runtimeDateCases=0;
       for(const c of fixture.cases) {
         let actual,model;
         const host=c.host??{},options={...c.options,measurer:host.measure==='fixed'?{width:(text,size,style)=>text.length*size*(style&1?.71:.6)}:metricsMeasurer,...(host.allIcons?{icons:()=>'<path d="M0,0"/>'}:host.icons?{icons:n=>Object.hasOwn(host.icons,n)&&typeof host.icons[n]==='string'?host.icons[n]:undefined}:{})};
+        let expected=c.expected;
+        // Date.parse is a host resource. Compare divergent legacy inputs against
+        // the pinned upstream library in this same browser, without fixture injection.
+        if(oracle&&Object.entries(host.oracleDateParse??{}).some(([text,value])=>{
+          const parsed=Date.parse(text);return (Number.isFinite(parsed)?parsed:null)!==value;
+        })) {
+          runtimeDateCases++;
+          let oracleModel;
+          try {
+            const parsed=oracle.parse(c.source,c.options);
+            oracleModel=JSON.parse(JSON.stringify(parsed,(_,v)=>v instanceof Map?[...v]:v));
+            expected={model:oracleModel,result:oracle.render(parsed,options)};
+          } catch(e) {expected={...(oracleModel?{model:oracleModel}:{}),error:{name:e.name,message:e.message,code:e.code,type:e.type,line:e.line,column:e.column,snippet:e.snippet}};}
+        }
         try {
-          if(host.modelProjection==='excluded') {
+          if((host.modelProjection==='excluded'||expected.modelProjectionLimit)) {
             let bounded=false;
             try {const projected=engine.parse(c.source,c.options);engine.dispose(projected)} catch(e){bounded=e.code==='limit'&&e.type===family}
             if(!bounded)mismatches.push(`${c.id}: projection was not bounded`);
-            actual={result:engine.render(c.source,options)};
+            actual={...(expected.modelProjectionLimit?{modelProjectionLimit:true}:{}),result:engine.render(c.source,options)};
           } else {
             model=engine.parse(c.source,c.options);
             actual={model,result:engine.render(model,options)};
           }
-          if(host.modelProjection!=='excluded'&&canonical(actual.result)!==canonical(engine.render(c.source,options)))mismatches.push(`${c.id}: source/model differ`);
-          if(c.expected.result?.svgSha256){const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(actual.result.svg));delete actual.result.svg;actual.result.svgSha256=[...new Uint8Array(hash)].map(v=>v.toString(16).padStart(2,'0')).join('');}
-        } catch(e) { actual={...(c.expected.model&&model?{model}:{}),error:{name:e.name,message:e.message,code:e.code,type:e.type,line:e.line,column:e.column,snippet:e.snippet}}; }
+          if(!(host.modelProjection==='excluded'||expected.modelProjectionLimit)&&canonical(actual.result)!==canonical(engine.render(c.source,options)))mismatches.push(`${c.id}: source/model differ`);
+          if(expected.result?.svgSha256){const hash=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(actual.result.svg));delete actual.result.svg;actual.result.svgSha256=[...new Uint8Array(hash)].map(v=>v.toString(16).padStart(2,'0')).join('');}
+        } catch(e) { actual={...(expected.model&&model?{model}:{}),error:{name:e.name,message:e.message,code:e.code,type:e.type,line:e.line,column:e.column,snippet:e.snippet}}; }
         finally { if(model)engine.dispose(model); }
-        if(canonical(actual)!==canonical(c.expected))mismatches.push(c.id);
+        if(canonical(actual)!==canonical(expected))mismatches.push(c.id);
       }
       // Rust checks the typed shared-string model without a 400 MB JSON projection.
       for(const c of [...(fixture.stress??[]),...(fixture.typedCases??[])]) {
@@ -42,8 +58,9 @@ for(const family of ['packet','radar','quadrant','timeline','journey','flowchart
           if(model.nodes.size!==c.expected.nodes||model.edges.length!==c.expected.edges||model.edges[0].type!==c.expected.firstEdgeType)mismatches.push(`generated/${c.id}`);
         } finally {if(model)engine.dispose(model)}
       }
-      return {count:fixture.cases.length,mismatches};
+      return {count:fixture.cases.length,runtimeDateCases,mismatches};
     },family);
+    if(report.runtimeDateCases)console.log(`${family}: ${report.runtimeDateCases} browser Date.parse cases checked against pinned same-browser Pele`);
     expect(report.count).toBeGreaterThan(100);
     expect(report.mismatches).toEqual([]);
   });
@@ -54,6 +71,9 @@ test('new families paint resolved SVG through real browser decoders',async({page
   const report=await page.evaluate(async()=>{
     const {loadRenderer}=await import('/dist/package-web/package/full.js'),engine=await loadRenderer(),proof=[];
     for(const [type,source] of [
+      ['state','stateDiagram-v2\n[*] --> Ready\nstate Active {\n  [*] --> Working\n  Working --> [*]\n}\nReady --> Active'],
+      ['gantt','gantt\ntitle Release plan\ndateFormat YYYY-MM-DD\nsection Core\nBuild :done,a,2024-03-01,2d\nVerify :crit,b,after a,2d'],
+      ['sequence','sequenceDiagram\nparticipant App\nparticipant Core\nApp->>Core: Render\nactivate Core\nCore-->>App: SVG\ndeactivate Core'],
       ['xychart','xychart-beta\ntitle Revenue\nx-axis [Jan, Feb, Mar]\ny-axis Sales 0 --> 100\nbar [20, 40, 70]\nline [25, 45, 80]'],
       ['class','classDiagram\nclass Engine {\n +render() SVG\n}\nEngine --> Document : renders'],
       ['er','erDiagram\nUSER ||--o{ DOCUMENT : owns\nUSER {\n int id PK\n string name\n}\nDOCUMENT {\n int id PK\n}'],

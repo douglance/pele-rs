@@ -81,7 +81,7 @@ extension Pele {
         public func render(_ source: String, options: Options = .init(), resources: HostResources = .init()) throws -> FullRenderedDiagram {
             let bytes = Data(source.utf8), settings = try JSONEncoder().encode(options)
             let handle = try resources.withNativeResources { host in bytes.withUnsafeBytes { input in settings.withUnsafeBytes { output in
-                pele_render_with_resources_v2(input.bindMemory(to: UInt8.self).baseAddress, input.count,
+                pele_render_with_resources_v3(input.bindMemory(to: UInt8.self).baseAddress, input.count,
                                               output.bindMemory(to: UInt8.self).baseAddress, output.count, host)
             }}}
             return try Pele.compatibilityResult(handle, as: FullRenderedDiagram.self)
@@ -89,7 +89,7 @@ extension Pele {
         public func render(_ document: Document, options: Options = .init(), resources: HostResources = .init()) throws -> FullRenderedDiagram {
             let settings = try JSONEncoder().encode(options)
             let handle = try resources.withNativeResources { host in withExtendedLifetime(document) { settings.withUnsafeBytes { output in
-                pele_render_document_with_resources_v2(document.handle, output.bindMemory(to: UInt8.self).baseAddress, output.count, host)
+                pele_render_document_with_resources_v3(document.handle, output.bindMemory(to: UInt8.self).baseAddress, output.count, host)
             }}}
             return try Pele.compatibilityResult(handle, as: FullRenderedDiagram.self)
         }

@@ -15,8 +15,14 @@ createServer(async (request, response) => {
         !Object.hasOwn(types, extname(file))) {
       response.writeHead(404); return response.end('Not found');
     }
-    const bytes = await readFile(file);
-    response.writeHead(200, { 'Content-Type': types[extname(file)] ?? 'application/octet-stream', 'Cache-Control': 'no-store' });
+    let bytes, encoding = {};
+    try { bytes = await readFile(file); }
+    catch (error) {
+      if (error.code !== 'ENOENT' || extname(file) !== '.json' || !normalized.startsWith('/fixtures/')) throw error;
+      bytes = await readFile(file + '.gz');
+      encoding = { 'Content-Encoding': 'gzip' };
+    }
+    response.writeHead(200, { ...encoding, 'Content-Type': types[extname(file)] ?? 'application/octet-stream', 'Cache-Control': 'no-store' });
     response.end(bytes);
   } catch { response.writeHead(404); response.end('Not found'); }
 }).listen(5191, '127.0.0.1', () => console.log('Pele playground: http://127.0.0.1:5191/examples/web/'));

@@ -1,4 +1,6 @@
 //! Opaque, immutable owned results. Unsafe code is confined to the C adapter.
+mod calendar;
+pub use calendar::PeleHostResourcesV3;
 use pele::Error;
 use std::{
     panic::{catch_unwind, AssertUnwindSafe},

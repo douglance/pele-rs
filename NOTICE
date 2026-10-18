@@ -18,3 +18,7 @@ Copyright (c) 2014 - 2022 Knut Sveidqvist, MIT; see third_party/MERMAID-LICENSE.
 
 Noto Sans is bundled under the SIL Open Font License 1.1.
 See crates/pele/assets/fonts/OFL.txt and crates/pele/assets/fonts/README.md for font provenance.
+
+V8 DateParser: Copyright 2011 the V8 project authors.
+Rust ISO/legacy date parsing is translated from Node.js v25.9.0 V8 sources.
+BSD-3-Clause; see third_party/v8/LICENSE or V8-LICENSE in binary packages.

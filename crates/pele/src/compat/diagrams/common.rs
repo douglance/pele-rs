@@ -2,6 +2,7 @@
 use crate::compat::source::space;
 pub(crate) mod generics;
 pub(crate) mod icon;
+pub(crate) mod literal_label;
 pub mod outline;
 
 // /---[\t ]*\r?\n(?:[\S\s]*?\r?\n)?---(?:\r?\n|(?!\S))/y

@@ -23,6 +23,17 @@ export async function loadRenderer(moduleOrPath) {
         const model = projection.model;
         if (projection.type === 'pie') model.sections = new Map(model.sections);
         if (projection.type === 'quadrantChart') model.classes = new Map(model.classes);
+        if (projection.type === 'state') for (const key of ['states', 'classes', 'links']) model[key] = new Map(model[key]);
+        if (projection.type === 'gantt') {
+          model.links = new Map(model.links);
+          model.byId = new Map(model.byId);
+          for (const task of [...model.tasks, ...model.byId.values()]) for (const key of ['startTime', 'endTime', 'renderEndTime']) if (typeof task[key] === 'string') task[key] = new Date(task[key]);
+        }
+        if (projection.type === 'sequence') {
+          for (const key of ['actors', 'createdActors', 'destroyedActors']) model[key] = new Map(model[key]);
+          for (const actor of model.actors.values()) for (const key of ['links', 'properties']) actor[key] = new Map(actor[key]);
+          for (const box of model.boxes) for (const id of box.actorKeys) { const actor = model.actors.get(id); if (actor) actor.box = box; }
+        }
         if (projection.type === 'er') for (const key of ['entities', 'classes']) model[key] = new Map(model[key]);
         if (projection.type === 'class') {
           const namespaces = values => new Map(values.map(([id, value]) => [id, {...value, classes: new Map(value.classes), notes: new Map(value.notes), children: namespaces(value.children)}]));

@@ -12,6 +12,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     );
     let engine = pele::compat::Engine::with_builtins();
     for (kind, source) in [
+        (pele::compat::DiagramType::State, "stateDiagram-v2\n[*] --> Ready\nReady --> [*]"),
+        (pele::compat::DiagramType::Gantt, "gantt\ndateFormat YYYY-MM-DD\nA :2024-01-01,2d"),
+        (pele::compat::DiagramType::Sequence, "sequenceDiagram\nApp->>Core: Render\nCore-->>App: SVG"),
         (pele::compat::DiagramType::Class, "classDiagram\nclass Engine\nEngine --> Document"),
         (pele::compat::DiagramType::Er, "erDiagram\nUSER ||--o{ DOCUMENT : owns"),
         (pele::compat::DiagramType::Xychart, "xychart-beta\nx-axis [A,B]\nbar [1,2]"),
@@ -42,14 +45,16 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     ] {
         let document = engine.parse(source, &Default::default())?;
         assert_eq!(*document.diagram_type(), kind.into());
+        let mut options = pele::compat::RenderOptions::default();
+        options.render.now = Some(1_704_067_200_000.0);
         let rendered = engine.render_document(
             &document,
-            &Default::default(),
+            &options,
             &mut pele::compat::text::MetricsResources,
         )?;
         assert!(rendered.rendered.width > 0. && rendered.rendered.height > 0.);
         assert!(rendered.rendered.svg.starts_with("<svg"));
     }
-    println!("Packaged Rust compatibility consumer passed: class, er, xychart, flowchart, kanban, mindmap, pie, packet, radar, quadrantChart, timeline, journey");
+    println!("Packaged Rust compatibility consumer passed: state, gantt, sequence, class, er, xychart, flowchart, kanban, mindmap, pie, packet, radar, quadrantChart, timeline, journey");
     Ok(())
 }

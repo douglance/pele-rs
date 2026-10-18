@@ -9,6 +9,9 @@
 - **Noto Sans Regular**: Copyright 2018 The Noto Project Authors. Unmodified font
   is bundled in [crates/pele/assets/fonts](crates/pele/assets/fonts/README.md), with
   the full [SIL OFL 1.1](crates/pele/assets/fonts/OFL.txt). Font is not relicensed MIT.
+- **V8 date parser**: Copyright 2011 the V8 project authors. BSD-3-Clause;
+  complete [license](third_party/v8/LICENSE) retained for the Rust translation of
+  Node.js v25.9.0 V8 ISO/legacy date parsing. No V8 runtime is embedded.
 - Rust and npm dependencies retain their respective upstream licenses. Their
   exact versions and sources are recorded in `Cargo.lock` and `package-lock.json`.
   Pele's npm package is a development-only compatibility oracle, not a runtime

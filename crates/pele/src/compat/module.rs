@@ -136,6 +136,29 @@ pub trait RenderResources {
     fn icon(&mut self, _name: &str) -> Result<Option<TrustedSvg>, PeleError> {
         Ok(None)
     }
+    /// Host date-string parser. The portable default provides deterministic UTC
+    /// formats; browser adapters delegate to their Date implementation.
+    fn parse_date(&mut self, input: &str) -> Result<Option<f64>, PeleError> {
+        match super::calendar::date_parser::parse(input) {
+            Some(super::calendar::date_parser::ParsedDate::Instant(value)) => Ok(Some(value)),
+            Some(super::calendar::date_parser::ParsedDate::Local(civil)) => {
+                self.calendar_instant(civil)
+            }
+            None => Ok(None),
+        }
+    }
+    /// Local calendar supplied by the host. The portable default uses UTC.
+    fn calendar_fields(
+        &mut self,
+        instant_ms: f64,
+    ) -> Result<Option<super::CalendarFields>, PeleError> {
+        Ok(super::calendar::utc_fields(instant_ms))
+    }
+    /// Resolve normalized civil time. Hosts follow JavaScript Date: earliest
+    /// instant in a fold, and shift forward by the gap for nonexistent time.
+    fn calendar_instant(&mut self, civil: super::CivilDateTime) -> Result<Option<f64>, PeleError> {
+        Ok(super::calendar::utc_instant(civil))
+    }
     fn now_millis(&mut self) -> Result<f64, PeleError> {
         Err(PeleError::new(
             "Host did not supply a clock",

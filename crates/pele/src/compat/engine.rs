@@ -126,6 +126,9 @@ impl Engine {
     /// Registers implemented built-ins only; consult capabilities for parity status.
     pub fn with_builtins() -> Self {
         let mut engine = Self::empty();
+        engine.register(super::diagrams::state::State);
+        engine.register(super::diagrams::gantt::Gantt);
+        engine.register(super::diagrams::sequence::Sequence);
         engine.register(super::diagrams::xychart::XyChart);
         engine.register(super::diagrams::class_diagram::Class);
         engine.register(super::diagrams::er::Er);
@@ -368,6 +371,47 @@ impl RenderResources for RenderSession<'_> {
         let result = self.host.icon(&source::decode_entities(name)?)?;
         self.icons.insert(name.into(), result.clone());
         Ok(result)
+    }
+    fn parse_date(&mut self, input: &str) -> Result<Option<f64>, PeleError> {
+        Ok(self
+            .host
+            .parse_date(input)?
+            .filter(|value| value.is_finite() && value.abs() <= 8.64e15)
+            .map(f64::trunc))
+    }
+    fn calendar_fields(
+        &mut self,
+        instant_ms: f64,
+    ) -> Result<Option<super::CalendarFields>, PeleError> {
+        if !instant_ms.is_finite() || instant_ms.abs() > 8.64e15 {
+            return Ok(None);
+        }
+        let fields = self.host.calendar_fields(instant_ms.trunc())?;
+        if fields.is_some_and(|fields| {
+            let c = fields.civil;
+            i64::from(c.year).abs() > 300_000
+                || !(1..=12).contains(&c.month)
+                || !(1..=31).contains(&c.day)
+                || c.hour > 23
+                || c.minute > 59
+                || c.second > 59
+                || c.millisecond > 999
+                || fields.weekday > 6
+                || i64::from(fields.utc_offset_minutes).abs() > 1440
+        }) {
+            return Err(PeleError::new(
+                "Host calendar returned invalid fields",
+                ErrorCode::Semantic,
+            ));
+        }
+        Ok(fields)
+    }
+    fn calendar_instant(&mut self, civil: super::CivilDateTime) -> Result<Option<f64>, PeleError> {
+        Ok(self
+            .host
+            .calendar_instant(civil)?
+            .filter(|value| value.is_finite() && value.abs() <= 8.64e15)
+            .map(f64::trunc))
     }
     fn now_millis(&mut self) -> Result<f64, PeleError> {
         if self.clock.is_none() {

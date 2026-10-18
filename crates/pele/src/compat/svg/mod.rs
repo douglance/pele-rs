@@ -2,6 +2,7 @@
 pub(crate) mod edges;
 mod native;
 pub(crate) mod shapes;
+pub(crate) mod title;
 use crate::compat::{
     source::decode_entities,
     text::{Label, SPACE},

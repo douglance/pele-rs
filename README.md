@@ -31,10 +31,10 @@ The development compatibility interface adds typed `DiagramModule` and
 capability discovery. Its separate v2 contract preserves the released v1 renderer.
 Open extension IDs and `parse_as` allow additional languages without editing the
 built-in detector. New modules retain their concrete model types; parsed documents keep the
-handler/config that created them, including after registry replacement. Twelve
+handler/config that created them, including after registry replacement. Fifteen
 compatibility renderers are implemented: **flowchart, pie, quadrantChart, packet,
-radar, timeline, journey, kanban, mindmap, class, ER and XYChart**. Their 151,426 pinned model/SVG/error
-scenarios pass through Rust, Swift/C and browser WASM. The remaining 21 families
+radar, timeline, journey, kanban, mindmap, class, ER, XYChart, state, Gantt and sequence**. Their 199,808 pinned model/SVG/error
+scenarios pass through Rust, Swift/C and browser WASM. The remaining 18 families
 and remaining public APIs still require implementation/verification.
 
 Source preparation is checked against pinned upstream examples and generated cases.

@@ -4,12 +4,24 @@ import XCTest
 import Pele
 
 final class AdditionalDiagramTests: XCTestCase {
+    private func fixtureData(_ url: URL) throws -> Data {
+        if FileManager.default.fileExists(atPath: url.path) { return try Data(contentsOf: url) }
+        let process = Process(), pipe = Pipe()
+        process.executableURL = URL(fileURLWithPath: "/usr/bin/gzip")
+        process.arguments = ["-dc", url.path + ".gz"]
+        process.standardOutput = pipe
+        try process.run()
+        let data = pipe.fileHandleForReading.readDataToEndOfFile()
+        process.waitUntilExit()
+        guard process.terminationStatus == 0 else { throw NSError(domain: "FixtureGzip", code: Int(process.terminationStatus)) }
+        return data
+    }
     func testPinnedDiagramsThroughNativeDocuments() throws {
         let root = URL(fileURLWithPath: #filePath).deletingLastPathComponent().appendingPathComponent("../../../..").standardizedFileURL
         let decoder = JSONDecoder(), encoder = JSONEncoder(), engine = Pele.Engine()
-        for family in ["packet", "radar", "quadrant", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart"] {
+        for family in ["packet", "radar", "quadrant", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence"] {
             if let families = ProcessInfo.processInfo.environment["PELE_FAMILIES"], !families.split(separator: ",").contains(Substring(family)) { continue }
-            let fixture = try JSONSerialization.jsonObject(with: Data(contentsOf: root.appendingPathComponent("fixtures/pele/\(family).json"))) as! [String: Any]
+            let fixture = try JSONSerialization.jsonObject(with: fixtureData(root.appendingPathComponent("fixtures/pele/\(family).json"))) as! [String: Any]
             let cases = fixture["cases"] as! [[String: Any]]
             XCTAssertFalse(cases.isEmpty, family)
             for item in cases {
@@ -22,6 +34,7 @@ final class AdditionalDiagramTests: XCTestCase {
                 parseOptions.config = options.config
                 let host = item["host"] as? [String: Any] ?? [:]
                 var resources = Pele.HostResources()
+                resources.timeZone = TimeZone(secondsFromGMT: 0)!
                 if host["measure"] as? String == "fixed" {
                     resources.textWidth = { r in Double(r.text.utf16.count) * r.size * (r.style & 1 != 0 ? 0.71 : 0.6) }
                 }
@@ -33,7 +46,7 @@ final class AdditionalDiagramTests: XCTestCase {
                 let expected = item["expected"] as! [String: Any]
                 var projected = false
                 do {
-                    if host["modelProjection"] as? String == "excluded" {
+                    if host["modelProjection"] as? String == "excluded" || expected["modelProjectionLimit"] as? Bool == true {
                         XCTAssertThrowsError(try engine.parse(source, options: parseOptions)) { error in
                             XCTAssertEqual((error as? CompatibilityError)?.code, "limit", id)
                             XCTAssertEqual((error as? CompatibilityError)?.type, family, id)
@@ -44,7 +57,7 @@ final class AdditionalDiagramTests: XCTestCase {
                             result.removeObject(forKey: "svg")
                             result["svgSha256"] = SHA256.hash(data: Data(rendered.svg.utf8)).map { String(format: "%02x", $0) }.joined()
                         }
-                        XCTAssertEqual(result, expected["result"] as? NSDictionary, id)
+                        XCTAssertTrue(result.isEqual(expected["result"] as? NSDictionary), id)
                         continue
                     }
                     let document = try engine.parse(source, options: parseOptions)
@@ -59,7 +72,7 @@ final class AdditionalDiagramTests: XCTestCase {
                         result.removeObject(forKey: "svg")
                         result["svgSha256"] = SHA256.hash(data: Data(rendered.svg.utf8)).map { String(format: "%02x", $0) }.joined()
                     }
-                    XCTAssertEqual(result, expected["result"] as? NSDictionary, id)
+                    XCTAssertTrue(result.isEqual(expected["result"] as? NSDictionary), id)
                     // Retained model and source are separate ABI paths.
                     let sourceResult = try engine.render(source, options: options, resources: resources)
                     XCTAssertEqual(sourceResult.svg, rendered.svg, id)
@@ -102,6 +115,6 @@ final class AdditionalDiagramTests: XCTestCase {
             }
         }
         let capabilities = try engine.capabilities()
-        XCTAssertEqual(Set(capabilities.filter { $0.registered }.map(\.type)), Set(["pie", "packet", "radar", "quadrantChart", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart"]))
+        XCTAssertEqual(Set(capabilities.filter { $0.registered }.map(\.type)), Set(["pie", "packet", "radar", "quadrantChart", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence"]))
     }
 }

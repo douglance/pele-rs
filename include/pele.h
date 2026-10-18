@@ -41,6 +41,26 @@ typedef struct PeleHostResources {
 } PeleHostResources;
 PeleResult *pele_render_with_resources_v2(const uint8_t *, size_t, const uint8_t *, size_t, const PeleHostResources *);
 PeleResult *pele_render_document_with_resources_v2(const PeleResult *, const uint8_t *, size_t, const PeleHostResources *);
+/* Calendar extension preserves the v2 resource struct ABI. Operation 0 takes a
+ * JSON millisecond instant, returning CalendarFields or null. Operation 1 takes
+ * {civil:{year,month,day,hour,minute,second,millisecond},utcAnchorMillis:number|null},
+ * returning the local millisecond instant or null. Month=1..12, weekday=0 Sunday,
+ * utcOffsetMinutes is east-positive. Civil fields are normalized; resolve folds
+ * to the earliest instant and gaps forward by their duration, as JavaScript Date.
+ * The optional date_parser callback uses operation 2, takes a date string and returns its parsed instant or null.
+ * Optional utc_offset receives an instant in milliseconds and writes integer offset
+ * seconds east of UTC; returns zero on success. Rust resolves proleptic civil dates and DST gaps/folds.
+ * Explicit calendar/calendar_instant callbacks take precedence over utc_offset.
+ * Calendar output is borrowed until next callback; NULL/0 also means null. */
+typedef struct PeleHostResourcesV3 {
+    PeleHostResources base;
+    uint32_t (*calendar)(void *, uint32_t, const uint8_t *, size_t, PeleBorrowedBytes *);
+    uint32_t (*calendar_instant)(void *, uint32_t, const uint8_t *, size_t, PeleBorrowedBytes *);
+    uint32_t (*date_parser)(void *, uint32_t, const uint8_t *, size_t, PeleBorrowedBytes *);
+    uint32_t (*utc_offset)(void *, double, int32_t *);
+} PeleHostResourcesV3;
+PeleResult *pele_render_with_resources_v3(const uint8_t *, size_t, const uint8_t *, size_t, const PeleHostResourcesV3 *);
+PeleResult *pele_render_document_with_resources_v3(const PeleResult *, const uint8_t *, size_t, const PeleHostResourcesV3 *);
 /* NULL-safe accessors: status 3, data NULL, length 0. Status: 0 success,
  * 1 input error, 2 resource limit, 3 internal error. Bytes contain versioned JSON,
  * not a NUL-terminated string; data remains valid until result_free. */

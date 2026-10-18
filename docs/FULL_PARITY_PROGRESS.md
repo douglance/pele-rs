@@ -6,7 +6,7 @@ release or new GIF has been published from this branch.
 
 ## Implemented renderers
 
-`Engine::with_builtins()` currently registers twelve actual Rust diagram modules.
+`Engine::with_builtins()` currently registers fifteen actual Rust diagram modules.
 `Engine::empty()` and typed `DiagramModule<Model>` remain extension interfaces.
 Registration never certifies a global parity flag; all public API gates remain open.
 
@@ -24,9 +24,12 @@ Registration never certifies a global parity flag; all public API gates remain o
 | class | 24,758 | 8,746 | 16,012 |
 | er | 17,437 | 7,535 | 9,902 |
 | xychart | 9,886 | 3,705 | 6,181 |
-| Total | 151,426 | 57,173 | 94,253 |
+| state | 10,222 | 7,209 | 3,013 |
+| gantt | 18,994 | 8,048 | 10,946 |
+| sequence | 19,166 | 6,702 | 12,464 |
+| Total | 199,808 | 79,132 | 120,676 |
 
-There are 57,569 complete model comparisons. Parsed models are retained when a
+There are 83,514 complete model comparisons. Parsed models are retained when a
 subsequent render fails. Six class stress cases explicitly exceed the JSON
 projection depth/size budget; their typed models and exact source renders/errors
 remain covered. These transport exceptions do not earn full public API parity.
@@ -72,18 +75,22 @@ Rust owns all branch/column geometry and responsive behavior.
 Host: macOS 26.6 arm64 / Apple M1 Pro, Rust 1.98.1, Swift 6.4, Node 25.9.
 
 - Public Rust integration coverage passes across legacy, preparation, extension,
-  all twelve families, including full flowchart rendering. The consolidated
-  release-profile run passed 42 public integration tests after the numeric fix. No unit tests added.
+  all fifteen families, including full flowchart rendering. The consolidated
+  release-profile run passed 50 public integration tests. No unit tests added.
 - Source preparation: all 5,345 scenarios, including 761 examples from 34 upstream
   corpora; extension links: 1,536 entity/link scenarios.
-- All four Swift integration tests pass. The additional-diagram test exercises
-  every packet/radar/quadrant/timeline/journey/flowchart/kanban/mindmap/class/er/xychart fixture through owned documents,
+- All six Swift integration tests pass. The additional-diagram test exercises
+  every packet/radar/quadrant/timeline/journey/flowchart/kanban/mindmap/class/er/xychart/state/gantt/sequence fixture through owned documents,
   callbacks and source rendering; pie and preparation have their own full corpora.
 - Fifty-one browser integration checks pass with one worker in Chrome, Firefox
   and WebKit, using the extracted npm tarball. Includes exact corpus comparisons,
   actual SVG pixels, browser Canvas/font behavior and callback error propagation.
   The consolidated run passed 48 checks; the final three XYChart checks passed
-  after its targeted tick-portability fix.
+  after its targeted tick-portability fix. The State/Gantt/Sequence batch adds
+  twelve passing three-browser checks (full source/owned-model corpora and native
+  SVG decoder pixels). Fifteen more checks compare Gantt in five actual browser
+  timezones, including gaps/folds, half-hour changes, leap/month arithmetic,
+  excluded weekends, ancient dates and Samoa's skipped day.
 - C executable passes NULL/UTF-8/limits/ownership checks: 400 legacy lifetimes plus
   200 owned pie document lifetimes.
 - Rust crate packaging and independent downstream Cargo consumer pass.
@@ -100,6 +107,9 @@ only to raster evidence, while exported diagrams retain SVG transparency.
 | class | 140 x 240; 3,904 painted | Members, relations and labels |
 | er | 158 x 279; 4,467 painted | Attribute tables and cardinalities |
 | xychart | 700 x 500; 81,821 painted | Bars, line, axes and 260 title pixels |
+| state | 316 x 424; 5,636 painted | Composite states, arrows and 372 title pixels |
+| gantt | 801 x 137; 14,583 painted | Task states, axes and 382 title pixels |
+| sequence | 187 x 240; 4,492 painted | Messages, activation and 470 title pixels |
 | full flowchart | 115 x 336; 3,338 painted | Nested group and resolved title halo |
 | kanban | 428 x 105; 3,069 painted | Columns and card labels |
 | mindmap | 269 x 73; 1,241 painted | Root and both branches |
@@ -129,9 +139,34 @@ Pinned XYChart explicitly clamped equal bounds can still emit NaN path geometry;
 that upstream behavior is preserved and does not constitute a universal finite-SVG
 claim. Ordinary diagrams have XML and real raster evidence.
 
+## Calendar and deep models
+
+Gantt uses the translated V8 date parser for native fallback strings, attributed
+under its BSD license. Browser rendering calls its actual host Date parser.
+Firefox and WebKit differ from Node on 883 and 1,980 legacy-date corpus inputs;
+those cases compare against the same pinned Pele library running in that browser,
+with the same host resources. This is host parity, not fixture date injection.
+
+Native civil arithmetic remains proleptic Gregorian Rust. Swift supplies timezone
+offsets through the additive v3 C resource interface, preserving historical seconds;
+Rust resolves gaps forward and repeated times to their first occurrence. Foundation
+calendar extraction was rejected after ancient-date corpus mismatches. Forty public
+scheduling scenarios pass in UTC, New York, Kolkata, Lord Howe and Apia. Host-error
+identity, invalid calendar data and recovery also pass through the Swift bridge.
+
+State retains deeply nested documents with iterative clone/drop. Eight State model
+projections exceed the bounded JSON view; typed models and exact renders remain
+covered. Sequence retains its deep menu JSON and shared actor boxes without the
+expanded foreign projection. One deep-menu projection is explicitly bounded.
+Two State inline-note cases and two Sequence menu-link cases produce isolated
+UTF-16 output surrogates in upstream from otherwise well-formed input. Their exact
+code units and upstream output hashes are recorded in exclusion ledgers. They do
+not count as passing public string/API cases. The required mutable/lossless API
+architecture is [LLD_PUBLIC_MODELS.md](LLD_PUBLIC_MODELS.md).
+
 ## Remaining acceptance work
 
-- Twenty-one family renderers, remaining shared behavior and the complete
+- Eighteen family renderers, remaining shared behavior and the complete
   registration/lazy/mount/zoom/public model interface remain required.
 - JavaScript model projections currently do not apply mutations back into the
   retained Rust document. Prototype methods/private enumerable state also need

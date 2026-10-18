@@ -21,6 +21,7 @@ if [[ "$(uname -s)" == Darwin ]]; then
     if [[ -d "$artifact" ]]; then rm -rf "$artifact"; fi
     xcodebuild -create-xcframework -library "$library" \
       -headers "$repo_dir/include" -output "$artifact"
+    cp third_party/v8/LICENSE "$artifact/V8-LICENSE"
     cp LICENSE "$artifact/LICENSE"
     cp third_party/PELE-LICENSE "$artifact/PELE-LICENSE"
     cp third_party/MERMAID-LICENSE "$artifact/MERMAID-LICENSE"

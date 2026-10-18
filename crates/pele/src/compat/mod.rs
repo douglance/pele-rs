@@ -1,5 +1,7 @@
 //! Full Pele compatibility interface, under construction. Legacy v1 remains separate.
 //! Detection recognizes all pinned families; capabilities never imply an absent renderer.
+mod calendar;
+pub use calendar::{fields_at_offset, instant_in_zone, CalendarFields, CivilDateTime};
 pub mod diagrams;
 mod engine;
 mod error;

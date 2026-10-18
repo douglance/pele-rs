@@ -19,6 +19,7 @@ regex = "=1.13.1"
 url = "=2.5.8"
 
 [dev-dependencies]
+flate2 = "=1.1.10"
 sha2 = "=0.10.7"
 roxmltree = "0.21"
-resvg = { version = "0.48", default-features = false }
+resvg = { version = "0.48", default-features = false, features = ["text"] }

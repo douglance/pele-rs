@@ -16,6 +16,7 @@ wasm-bindgen target/wasm32-unknown-unknown/release/pele_wasm.wasm \
   --target web --out-dir dist/wasm --out-name pele
 mkdir -p bindings/web/pkg
 cp dist/wasm/* bindings/web/pkg/
+cp third_party/v8/LICENSE bindings/web/V8-LICENSE
 cp LICENSE bindings/web/LICENSE
 cp NOTICE bindings/web/NOTICE
 cp third_party/PELE-LICENSE bindings/web/PELE-LICENSE
