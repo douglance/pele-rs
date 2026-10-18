@@ -743,7 +743,10 @@ impl Arena<'_> {
         })
     }
 }
-fn new_graph(m: &AgentflowModel) -> Result<(ModelGraph, Vec<Option<u32>>), PublicError> {
+fn new_graph(
+    m: &AgentflowModel,
+    limit: Option<crate::compat::EdgeLimit>,
+) -> Result<(ModelGraph, Vec<Option<u32>>), PublicError> {
     let mut graph = ModelGraph {
         version: 1,
         root: Atom::Undefined,
@@ -1034,11 +1037,11 @@ fn new_graph(m: &AgentflowModel) -> Result<(ModelGraph, Vec<Option<u32>>), Publi
     let dir = a.opt(m.public_origin.direction.as_ref())?;
     a.assign(options, "direction", dir)?;
     a.assign(options, "lineOffset", Atom::Number(m.line_offset as f64))?;
-    a.assign(
-        options,
-        "maxEdges",
-        Atom::Number(m.public_origin.max_edges as f64),
-    )?;
+    let max_edges = match limit {
+        Some(limit) => a.value(&limit.value())?,
+        None => Atom::Number(m.public_origin.max_edges as f64),
+    };
+    a.assign(options, "maxEdges", max_edges)?;
     let fields = vec![
         ("type", a.string("agentflow")?),
         ("direction", a.opt(m.direction.as_ref())?),
@@ -2917,23 +2920,36 @@ fn invoke_agent(a: &mut Arena, call: MethodCall) -> Result<Atom, PublicError> {
         _ => Err(error("AgentFlow public method is unavailable").into()),
     }
 }
+fn create_state(
+    m: &AgentflowModel,
+    limit: Option<crate::compat::EdgeLimit>,
+) -> Result<AgentflowPublicState, PeleError> {
+    let (graph, style_bindings) = new_graph(m, limit).map_err(|e| match e {
+        PublicError::Pele(e) => e,
+        _ => error("AgentFlow public export failed"),
+    })?;
+    let projected = project_render(&graph, m, &style_bindings);
+    Ok(AgentflowPublicState {
+        graph,
+        base: m.clone(),
+        style_bindings,
+        projected,
+    })
+}
 impl PublicDiagramModule for AgentFlow {
     type PublicState = AgentflowPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
     fn create_public(&self, m: &AgentflowModel) -> Result<Self::PublicState, PeleError> {
-        let (graph, style_bindings) = new_graph(m).map_err(|e| match e {
-            PublicError::Pele(e) => e,
-            _ => error("AgentFlow public export failed"),
-        })?;
-        let projected = project_render(&graph, m, &style_bindings);
-        Ok(AgentflowPublicState {
-            graph,
-            base: m.clone(),
-            style_bindings,
-            projected,
-        })
+        create_state(m, None)
+    }
+    fn create_public_with_edge_limit(
+        &self,
+        m: &AgentflowModel,
+        limit: crate::compat::EdgeLimit,
+    ) -> Result<Self::PublicState, PeleError> {
+        create_state(m, Some(limit))
     }
     fn export_public(&self, s: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())

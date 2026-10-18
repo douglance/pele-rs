@@ -767,7 +767,10 @@ fn same(g: &ModelGraph, a: &Atom, b: &Atom) -> bool {
         _ => false,
     }
 }
-fn new_graph(m: &FlowchartModel) -> Result<ModelGraph, PublicError> {
+fn new_graph(
+    m: &FlowchartModel,
+    limit: Option<crate::compat::EdgeLimit>,
+) -> Result<ModelGraph, PublicError> {
     let mut graph = ModelGraph {
         version: 1,
         root: Atom::Undefined,
@@ -963,11 +966,11 @@ fn new_graph(m: &FlowchartModel) -> Result<ModelGraph, PublicError> {
         "inheritDir",
         Atom::Bool(m.public_origin.inherit_dir),
     )?;
-    a.assign(
-        options,
-        "maxEdges",
-        Atom::Number(m.public_origin.max_edges as f64),
-    )?;
+    let max_edges = match limit {
+        Some(limit) => a.value(&limit.value())?,
+        None => Atom::Number(m.public_origin.max_edges as f64),
+    };
+    a.assign(options, "maxEdges", max_edges)?;
     let fields = vec![
         ("type", a.string("flowchart")?),
         ("direction", a.opt(m.direction.as_ref())?),
@@ -1962,18 +1965,31 @@ fn invoke(g: &mut ModelGraph, call: MethodCall) -> Result<Atom, PublicError> {
     }
     Ok(Atom::Undefined)
 }
+fn create_state(
+    m: &FlowchartModel,
+    limit: Option<crate::compat::EdgeLimit>,
+) -> Result<FlowchartPublicState, PeleError> {
+    let graph = new_graph(m, limit).map_err(|e| match e {
+        PublicError::Pele(e) => e,
+        _ => error("Flowchart public export failed"),
+    })?;
+    let imported = imported(&graph);
+    Ok(FlowchartPublicState { graph, imported })
+}
 impl PublicDiagramModule for Flowchart {
     type PublicState = FlowchartPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
     fn create_public(&self, m: &FlowchartModel) -> Result<Self::PublicState, PeleError> {
-        let graph = new_graph(m).map_err(|e| match e {
-            PublicError::Pele(e) => e,
-            _ => error("Flowchart public export failed"),
-        })?;
-        let imported = imported(&graph);
-        Ok(FlowchartPublicState { graph, imported })
+        create_state(m, None)
+    }
+    fn create_public_with_edge_limit(
+        &self,
+        m: &FlowchartModel,
+        limit: crate::compat::EdgeLimit,
+    ) -> Result<Self::PublicState, PeleError> {
+        create_state(m, Some(limit))
     }
     fn export_public(&self, s: &Self::PublicState) -> Result<ModelGraph, PeleError> {
         Ok(s.graph.clone())

@@ -1,5 +1,6 @@
 //! Pele agentflow public model/database, 458322a5 (MIT, kepano).
 use crate::compat::{
+    edge_limit::EdgePolicy,
     source::{space, yaml::parse as parse_yaml},
     DiagramType, ErrorCode, Object, ParseContext, PeleError, Value,
 };
@@ -156,7 +157,7 @@ pub(super) struct AgentDb {
     edge_by_id: HashMap<String, usize>,
     pair_count: HashMap<(String, String), usize>,
     sub_count: usize,
-    max_edges: usize,
+    edge_policy: EdgePolicy,
     inherit_dir: bool,
     config_direction: Option<String>,
     connectors: HashMap<String, usize>,
@@ -234,7 +235,7 @@ impl AgentDb {
             edge_by_id: HashMap::new(),
             pair_count: HashMap::new(),
             sub_count: 0,
-            max_edges: context.max_edges,
+            edge_policy: EdgePolicy::Legacy(context.max_edges),
             config_direction: match context.config.get("direction") {
                 Some(Value::String(s)) => Some(s.clone()),
                 _ => None,
@@ -251,6 +252,14 @@ impl AgentDb {
                 .and_then(|o| o.get("inheritDir"))
                 == Some(&Value::Bool(true)),
         }
+    }
+    pub fn new_with_edge_limit(
+        context: &ParseContext<'_>,
+        limit: crate::compat::EdgeLimit,
+    ) -> Self {
+        let mut db = Self::new(context);
+        db.edge_policy = EdgePolicy::Exact(limit);
+        db
     }
     pub fn add_vertex(
         &mut self,
@@ -505,15 +514,7 @@ impl AgentDb {
                     animation: None,
                 };
                 let len = self.model.edges.len();
-                if len >= self.max_edges {
-                    return Err(err(
-                        format!(
-                            "Edge limit exceeded. {len} edges found, but the limit is {}.",
-                            self.max_edges
-                        ),
-                        ErrorCode::Limit,
-                    ));
-                }
+                self.edge_policy.check(len, "agentflow")?;
                 let mut keys = vec![
                     "start",
                     "end",

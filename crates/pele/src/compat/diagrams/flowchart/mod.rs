@@ -37,6 +37,13 @@ impl DiagramModule for Flowchart {
     fn parse(&self, context: ParseContext<'_>) -> Result<Self::Model, PeleError> {
         parser::parse(context)
     }
+    fn parse_with_edge_limit(
+        &self,
+        context: ParseContext<'_>,
+        limit: crate::compat::EdgeLimit,
+    ) -> Result<Self::Model, PeleError> {
+        parser::parse_with_edge_limit(context, limit)
+    }
     fn render(
         &self,
         model: &Self::Model,

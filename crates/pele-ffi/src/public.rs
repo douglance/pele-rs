@@ -42,6 +42,43 @@ fn source_limit_options(json: &str) -> Result<pele::compat::ParseOptions, PeleEr
             )
         })
 }
+fn parse_limits_options(
+    json: &str,
+    source_overridden: bool,
+    edges_overridden: bool,
+) -> Result<pele::compat::ParseOptions, PeleError> {
+    #[derive(Deserialize)]
+    struct Edges {
+        #[serde(rename = "maxEdges", default)]
+        _legacy_edges: Option<serde::de::IgnoredAny>,
+        #[serde(flatten)]
+        options: pele::compat::ParseOptions,
+    }
+    #[derive(Deserialize)]
+    struct Both {
+        #[serde(rename = "limit", default)]
+        _legacy_source: Option<serde::de::IgnoredAny>,
+        #[serde(flatten)]
+        edges: Edges,
+    }
+    if json.trim().is_empty() {
+        return Ok(Default::default());
+    }
+    // Only explicitly overridden fields bypass their legacy integer decoders.
+    // In particular, tag3 must not hide an invalid value in the JSON options.
+    let decoded = match (source_overridden, edges_overridden) {
+        (false, false) => return pele::compat::parse_options(json),
+        (true, false) => return source_limit_options(json),
+        (false, true) => serde_json::from_str::<Edges>(json).map(|value| value.options),
+        (true, true) => serde_json::from_str::<Both>(json).map(|value| value.edges.options),
+    };
+    decoded.map_err(|error| {
+        PeleError::new(
+            format!("Invalid parse options: {error}"),
+            ErrorCode::Semantic,
+        )
+    })
+}
 fn output_limit_options(json: &str) -> Result<pele::compat::RenderOptions, PeleError> {
     // Explicit IEEE threshold supersedes only the legacy integer field.
     #[derive(Deserialize)]
@@ -210,6 +247,71 @@ pub unsafe extern "C" fn pele_public_parse_source_limit_v6(
                 }
                 error
             })?;
+        let result = success(
+            serde_json::json!({"type":document.diagram_type(),"revision":document.revision().to_string()}),
+        )?;
+        *out = Box::into_raw(Box::new(PelePublicDocument {
+            document: Mutex::new(document),
+        }));
+        Ok(result)
+    })
+}
+/// Independently select exact source/edge thresholds or legacy integer options.
+/// # Safety
+/// Pointer ownership, budgets and writable output requirements match parse_v4.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_parse_limits_v7(
+    source: *const u8,
+    source_len: usize,
+    options: *const u8,
+    options_len: usize,
+    source_kind: u32,
+    source_bits: u64,
+    edge_kind: u32,
+    edge_bits: u64,
+    out_document: *mut *mut PelePublicDocument,
+) -> *mut PeleResult {
+    compatibility_call(|| {
+        let out = unsafe { out_document.as_mut() }
+            .ok_or_else(|| invalid("Native public transport: null document output"))?;
+        *out = std::ptr::null_mut();
+        let source = unsafe {
+            compatibility_input(source, source_len, pele::compat::MAX_PUBLIC_SOURCE_BYTES)
+        }?;
+        let options = unsafe { compatibility_input(options, options_len, 1024 * 1024) }?;
+        let source_limit = match source_kind {
+            0 => Some(pele::compat::SourceLimit::Undefined),
+            1 => Some(pele::compat::SourceLimit::Null),
+            2 => Some(pele::compat::SourceLimit::Number(f64::from_bits(
+                source_bits,
+            ))),
+            3 => None,
+            _ => {
+                return Err(invalid(
+                    "Native public transport: unknown source-limit kind",
+                ))
+            }
+        };
+        let edge_limit = match edge_kind {
+            0 => Some(pele::compat::EdgeLimit::Undefined),
+            1 => Some(pele::compat::EdgeLimit::Null),
+            2 => Some(pele::compat::EdgeLimit::Number(f64::from_bits(edge_bits))),
+            3 => None,
+            _ => return Err(invalid("Native public transport: unknown edge-limit kind")),
+        };
+        let options = parse_limits_options(options, source_limit.is_some(), edge_limit.is_some())?;
+        let registry = PublicEngine::with_builtins();
+        let document = registry.parse_with_limits(source, &options, pele::compat::ParseLimits {
+            source: source_limit,
+            max_edges: edge_limit,
+        }).map_err(|mut error| {
+            if error.code == ErrorCode::UnsupportedDiagram {
+                if let Some(kind) = &error.diagram_type {
+                    error.message = format!("Mutable public model codec for diagram type \"{kind}\" is unavailable.");
+                }
+            }
+            error
+        })?;
         let result = success(
             serde_json::json!({"type":document.diagram_type(),"revision":document.revision().to_string()}),
         )?;

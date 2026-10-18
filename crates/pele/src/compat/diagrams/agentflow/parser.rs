@@ -824,6 +824,18 @@ impl Reader<'_> {
 }
 
 pub(super) fn parse(context: ParseContext<'_>) -> Result<AgentflowModel, PeleError> {
+    parse_with_policy(context, None)
+}
+pub(super) fn parse_with_edge_limit(
+    context: ParseContext<'_>,
+    limit: crate::compat::EdgeLimit,
+) -> Result<AgentflowModel, PeleError> {
+    parse_with_policy(context, Some(limit))
+}
+fn parse_with_policy(
+    context: ParseContext<'_>,
+    limit: Option<crate::compat::EdgeLimit>,
+) -> Result<AgentflowModel, PeleError> {
     static TRAIL: OnceLock<Regex> = OnceLock::new();
     let src = if context.source.contains('}') {
         TRAIL.get_or_init(||Regex::new(r"}[\t\x0b\x0c \r\u{a0}\u{1680}\u{2000}-\u{200a}\u{2028}\u{2029}\u{202f}\u{205f}\u{3000}\u{feff}]*\n").unwrap())
@@ -839,7 +851,10 @@ pub(super) fn parse(context: ParseContext<'_>) -> Result<AgentflowModel, PeleErr
         data_from: 0,
         data_to: 0,
         last_bare: false,
-        db: AgentDb::new(&context),
+        db: match limit {
+            Some(limit) => AgentDb::new_with_edge_limit(&context, limit),
+            None => AgentDb::new(&context),
+        },
     };
     while matches!(r.t(), T::SPACE | T::NEWLINE | T::COMMENT) {
         r.i += 1

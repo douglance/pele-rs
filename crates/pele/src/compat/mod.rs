@@ -3,7 +3,9 @@
 mod calendar;
 pub use calendar::{fields_at_offset, instant_in_zone, CalendarFields, CivilDateTime};
 pub mod diagrams;
+mod edge_limit;
 mod engine;
+pub use edge_limit::{EdgeLimit, ParseLimits, MAX_PUBLIC_EDGES};
 mod error;
 mod id;
 pub(crate) mod layout;

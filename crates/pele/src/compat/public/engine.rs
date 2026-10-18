@@ -3,9 +3,9 @@ use super::{
     PublicError, RenderOutcome, SharedFunction, OPAQUE_MODEL_SCHEMA,
 };
 use crate::compat::{
-    DiagramId, DiagramModule, Engine, ErrorCode, ModuleDescriptor, Object, OutputLimit,
-    ParseContext, ParseOptions, PeleError, RenderOptions, RenderResources, RenderResult,
-    RenderSettings, Rendered, SourceLimit,
+    DiagramId, DiagramModule, EdgeLimit, Engine, ErrorCode, ModuleDescriptor, Object, OutputLimit,
+    ParseContext, ParseLimits, ParseOptions, PeleError, RenderOptions, RenderResources,
+    RenderResult, RenderSettings, Rendered, SourceLimit,
 };
 use std::{any::Any, sync::Arc};
 /// Typed codec opt-in. Parsing, geometry and rendering remain in the native module.
@@ -32,6 +32,15 @@ pub trait PublicDiagramModule: DiagramModule {
         Err(PeleError::new("Public model methods are unavailable", ErrorCode::Semantic).into())
     }
     fn create_public(&self, model: &Self::Model) -> Result<Self::PublicState, PeleError>;
+    /// Seed exact parse-time edge options before deriving public state. Once
+    /// created, the mutable graph owns its options; provenance is not reapplied.
+    fn create_public_with_edge_limit(
+        &self,
+        model: &Self::Model,
+        _limit: EdgeLimit,
+    ) -> Result<Self::PublicState, PeleError> {
+        self.create_public(model)
+    }
     fn export_public(&self, state: &Self::PublicState) -> Result<ModelGraph, PeleError>;
     fn apply_public(
         &self,
@@ -89,6 +98,13 @@ impl<D: DiagramModule> DiagramModule for Shared<D> {
     }
     fn parse(&self, c: ParseContext<'_>) -> Result<Self::Model, PeleError> {
         self.module.parse(c)
+    }
+    fn parse_with_edge_limit(
+        &self,
+        c: ParseContext<'_>,
+        limit: EdgeLimit,
+    ) -> Result<Self::Model, PeleError> {
+        self.module.parse_with_edge_limit(c, limit)
     }
     fn validate_model_projection(&self, m: &Self::Model) -> Result<(), PeleError> {
         self.module.validate_model_projection(m)
@@ -151,9 +167,11 @@ trait Erased: Send + Sync {
 struct Codec<D>(Arc<D>);
 impl<D: PublicDiagramModule> Erased for Codec<D> {
     fn create(&self, doc: &crate::compat::ParsedDocument) -> Result<State, PeleError> {
-        Ok(Box::new(self.0.create_public(
-            doc.model::<D::Model>().expect("paired public codec"),
-        )?))
+        let model = doc.model::<D::Model>().expect("paired public codec");
+        Ok(Box::new(match doc.edge_limit() {
+            Some(limit) => self.0.create_public_with_edge_limit(model, limit)?,
+            None => self.0.create_public(model)?,
+        }))
     }
     fn graph(&self, s: &State) -> Result<ModelGraph, PeleError> {
         self.0
@@ -310,6 +328,26 @@ impl PublicEngine {
         self.create_document(
             self.engine
                 .parse_with_source_limit(source, options, limit)?,
+        )
+    }
+    pub fn parse_with_limits(
+        &self,
+        source: &str,
+        options: &ParseOptions,
+        limits: ParseLimits,
+    ) -> Result<PublicDocument, PeleError> {
+        self.create_document(self.engine.parse_with_limits(source, options, limits)?)
+    }
+    pub fn parse_as_with_limits(
+        &self,
+        id: &DiagramId,
+        source: &str,
+        options: &ParseOptions,
+        limits: ParseLimits,
+    ) -> Result<PublicDocument, PeleError> {
+        self.create_document(
+            self.engine
+                .parse_as_with_limits(id, source, options, limits)?,
         )
     }
     /// Select an extension language without changing the built-in source detector.

@@ -27,6 +27,13 @@ impl DiagramModule for AgentFlow {
     fn parse(&self, c: ParseContext<'_>) -> Result<Self::Model, PeleError> {
         parser::parse(c)
     }
+    fn parse_with_edge_limit(
+        &self,
+        c: ParseContext<'_>,
+        limit: crate::compat::EdgeLimit,
+    ) -> Result<Self::Model, PeleError> {
+        parser::parse_with_edge_limit(c, limit)
+    }
     fn query(
         &self,
         model: &Self::Model,

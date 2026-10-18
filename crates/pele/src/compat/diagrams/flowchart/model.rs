@@ -1,7 +1,8 @@
 //! Pele flowchart public model/database, 458322a5 (MIT, kepano).
 use crate::compat::{
+    edge_limit::EdgePolicy,
     source::{space, yaml::parse as parse_yaml},
-    DiagramType, ErrorCode, Object, ParseContext, PeleError, Value,
+    DiagramType, EdgeLimit, ErrorCode, Object, ParseContext, PeleError, Value,
 };
 use serde::{Serialize, Serializer};
 use std::collections::{HashMap, HashSet};
@@ -153,7 +154,7 @@ pub(super) struct FlowDb {
     edge_by_id: HashMap<String, usize>,
     pair_count: HashMap<(String, String), usize>,
     sub_count: usize,
-    max_edges: usize,
+    edge_policy: EdgePolicy,
     inherit_dir: bool,
 }
 fn trim(s: &str) -> &str {
@@ -264,7 +265,7 @@ impl FlowDb {
             edge_by_id: HashMap::new(),
             pair_count: HashMap::new(),
             sub_count: 0,
-            max_edges: context.max_edges,
+            edge_policy: EdgePolicy::Legacy(context.max_edges),
             inherit_dir: context
                 .config
                 .get("flowchart")
@@ -272,6 +273,11 @@ impl FlowDb {
                 .and_then(|o| o.get("inheritDir"))
                 == Some(&Value::Bool(true)),
         }
+    }
+    pub fn new_with_edge_limit(context: &ParseContext<'_>, limit: EdgeLimit) -> Self {
+        let mut db = Self::new(context);
+        db.edge_policy = EdgePolicy::Exact(limit);
+        db
     }
     pub fn add_vertex(
         &mut self,
@@ -504,15 +510,7 @@ impl FlowDb {
                     animation: None,
                 };
                 let len = self.model.edges.len();
-                if len >= self.max_edges {
-                    return Err(err(
-                        format!(
-                            "Edge limit exceeded. {len} edges found, but the limit is {}.",
-                            self.max_edges
-                        ),
-                        ErrorCode::Limit,
-                    ));
-                }
+                self.edge_policy.check(len, "flowchart")?;
                 self.model.public_origin.edges.push(vec![
                     "start",
                     "end",

@@ -85,6 +85,18 @@ PeleResult *pele_public_parse_source_limit_v6(const uint8_t *, size_t,
                                            const uint8_t *, size_t,
                                            uint32_t limit_kind, uint64_t limit_bits,
                                            PelePublicDocument **out_document);
+/* Independent parse policies. Each kind: 0 undefined, 1 null, 2 IEEE-754 bits,
+ * 3 legacy options field (bits ignored). Explicit source overrides only limit;
+ * explicit edge overrides only maxEdges. Non-overridden fields retain their
+ * existing integer decoder, including errors. Undefined uses defaults50,000
+ * UTF-16 source units/5,000 edges; null compares as0. Actual edge accounting is
+ * diagram-specific. Native source16MiB/options1MiB budgets always remain active.
+ * Source checks precede diagram parsing/edge checks. Parse_v4 ownership applies;
+ * every failure leaves *out_document=NULL. Unknown tags reject without a handle. */
+PeleResult *pele_public_parse_limits_v7(const uint8_t *source, size_t source_len,
+    const uint8_t *options, size_t options_len, uint32_t source_kind,
+    uint64_t source_bits, uint32_t edge_kind, uint64_t edge_bits,
+    PelePublicDocument **out_document);
 PeleResult *pele_public_snapshot_v4(const PelePublicDocument *);
 /* Native schema and method operations. invoke returns an operation outcome with
  * graph/revision/result even when the method throws, subject to output budgets.

@@ -1,6 +1,6 @@
 //! Typed extension boundary. A module owns its model; the engine owns preparation/provenance.
 use super::{
-    DiagramId, Object, OutputLimit, PeleError, PrepareOptions, DEFAULT_MAX_EDGES,
+    DiagramId, EdgeLimit, Object, OutputLimit, PeleError, PrepareOptions, DEFAULT_MAX_EDGES,
     DEFAULT_OUTPUT_LIMIT,
 };
 use serde::{Deserialize, Serialize, Serializer};
@@ -194,6 +194,15 @@ pub trait DiagramModule: Send + Sync + 'static {
     }
     fn descriptor(&self) -> ModuleDescriptor;
     fn parse(&self, context: ParseContext<'_>) -> Result<Self::Model, PeleError>;
+    /// Exact edge policy. Providers that enforce context.max_edges privately
+    /// must override this hook; the default retains their previous parse seam.
+    fn parse_with_edge_limit(
+        &self,
+        context: ParseContext<'_>,
+        _limit: EdgeLimit,
+    ) -> Result<Self::Model, PeleError> {
+        self.parse(context)
+    }
     fn render(
         &self,
         model: &Self::Model,

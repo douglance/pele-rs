@@ -52,6 +52,9 @@ The additive native/Swift [source-limit API](docs/SOURCE_LIMITS.md) preserves
 undefined, null and exact IEEE number comparisons before source preparation.
 The [output-limit API](docs/OUTPUT_LIMITS.md) preserves nullish defaults and
 checks the finished SVG after callbacks, publishing mutable state on errors.
+The composable [parse-limit API](docs/PARSE_LIMITS.md) independently overrides
+source and edge thresholds, preserving fractional edge accounting and mutable
+graph options while keeping native byte and generation budgets active.
 Current browser measurements show no speedup over Pele JS; see the scoped
 [performance baseline](docs/PERFORMANCE.md). GPU acceleration is not implemented.
 

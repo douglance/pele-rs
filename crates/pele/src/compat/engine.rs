@@ -1,12 +1,17 @@
 use super::{
-    module::*, source, Capability, DiagramId, DiagramType, ErrorCode, Inspection, Object,
-    OutputLimit, PeleError, PrepareOptions, SourceLimit, Value, DIAGRAM_TYPES,
+    module::*, source, Capability, DiagramId, DiagramType, EdgeLimit, ErrorCode, Inspection,
+    Object, OutputLimit, ParseLimits, PeleError, PrepareOptions, SourceLimit, Value, DIAGRAM_TYPES,
 };
 use serde::Serialize;
 use std::{any::Any, collections::HashMap, sync::Arc};
 type Model = Box<dyn Any + Send + Sync>;
 trait ErasedModule: Send + Sync {
     fn parse(&self, context: ParseContext<'_>) -> Result<Model, PeleError>;
+    fn parse_with_edge_limit(
+        &self,
+        context: ParseContext<'_>,
+        limit: EdgeLimit,
+    ) -> Result<Model, PeleError>;
     fn render(
         &self,
         model: &Model,
@@ -75,6 +80,13 @@ impl<D: DiagramModule> ErasedModule for Module<D> {
     fn parse(&self, context: ParseContext<'_>) -> Result<Model, PeleError> {
         Ok(Box::new(self.0.parse(context)?))
     }
+    fn parse_with_edge_limit(
+        &self,
+        context: ParseContext<'_>,
+        limit: EdgeLimit,
+    ) -> Result<Model, PeleError> {
+        Ok(Box::new(self.0.parse_with_edge_limit(context, limit)?))
+    }
     fn render(
         &self,
         model: &Model,
@@ -129,8 +141,14 @@ pub struct ParsedDocument {
     registration: Arc<Registration>,
     model: Model,
     config: Object,
+    edge_limit: Option<EdgeLimit>,
 }
 impl ParsedDocument {
+    /// Exact parse override, if supplied. Exported convenience-model Origin
+    /// integer fields retain their legacy projection; this records the override.
+    pub fn edge_limit(&self) -> Option<EdgeLimit> {
+        self.edge_limit
+    }
     pub fn diagram_type(&self) -> &DiagramId {
         &self.registration.descriptor.id
     }
@@ -366,11 +384,68 @@ impl Engine {
             options.max_edges,
         )
     }
+    /// Composable exact source/edge overrides. Omitted overrides retain typed
+    /// options. The native source-byte ceiling applies to this entire new lane.
+    pub fn parse_with_limits(
+        &self,
+        source: &str,
+        options: &ParseOptions,
+        limits: ParseLimits,
+    ) -> Result<ParsedDocument, PeleError> {
+        let inspection = self.inspect_with_limits(source, options, limits)?;
+        let kind = inspection.diagram_type.ok_or_else(|| {
+            PeleError::new(
+                "No diagram type detected for the given text.",
+                ErrorCode::UnsupportedDiagram,
+            )
+        })?;
+        self.parse_prepared_policy(
+            inspection,
+            &kind.into(),
+            options.max_edges,
+            limits.max_edges,
+        )
+    }
+    pub fn parse_as_with_limits(
+        &self,
+        id: &DiagramId,
+        source: &str,
+        options: &ParseOptions,
+        limits: ParseLimits,
+    ) -> Result<ParsedDocument, PeleError> {
+        self.parse_prepared_policy(
+            self.inspect_with_limits(source, options, limits)?,
+            id,
+            options.max_edges,
+            limits.max_edges,
+        )
+    }
+    fn inspect_with_limits(
+        &self,
+        source: &str,
+        options: &ParseOptions,
+        limits: ParseLimits,
+    ) -> Result<Inspection, PeleError> {
+        SourceLimit::check_bytes(source)?;
+        match limits.source {
+            Some(limit) => self.inspect_with_source_limit(source, &options.preparation, limit),
+            None => self.inspect(source, &options.preparation),
+        }
+    }
     fn parse_prepared(
         &self,
         inspection: Inspection,
         id: &DiagramId,
         max_edges: usize,
+    ) -> Result<ParsedDocument, PeleError> {
+        self.parse_prepared_policy(inspection, id, max_edges, None)
+    }
+    fn parse_prepared_policy(
+        &self,
+        inspection: Inspection,
+        id: &DiagramId,
+        max_edges: usize,
+        edge_limit: Option<EdgeLimit>,
     ) -> Result<ParsedDocument, PeleError> {
         let registration = self
             .modules
@@ -392,17 +467,22 @@ impl Engine {
             inspection.encoded_text
         };
         source.push('\n');
-        let model = registration.module.parse(ParseContext {
+        let context = ParseContext {
             source: &source,
             config: &pre.config,
             title: pre.title.as_deref(),
             line_offset: pre.line_offset,
             max_edges,
-        })?;
+        };
+        let model = match edge_limit {
+            Some(limit) => registration.module.parse_with_edge_limit(context, limit),
+            None => registration.module.parse(context),
+        }?;
         Ok(ParsedDocument {
             registration,
             model,
             config: pre.config,
+            edge_limit,
         })
     }
     pub fn render_source(

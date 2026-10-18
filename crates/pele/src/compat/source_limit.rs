@@ -18,13 +18,17 @@ pub enum SourceLimit {
     Number(f64),
 }
 impl SourceLimit {
-    pub(crate) fn check(self, source: &str) -> Result<(), PeleError> {
+    pub(crate) fn check_bytes(source: &str) -> Result<(), PeleError> {
         if source.len() > MAX_PUBLIC_SOURCE_BYTES {
             return Err(PeleError::new(
                 "Native transport: declared input exceeds budget",
                 ErrorCode::Limit,
             ));
         }
+        Ok(())
+    }
+    pub(crate) fn check(self, source: &str) -> Result<(), PeleError> {
+        Self::check_bytes(source)?;
         let (threshold, display) = match self {
             Self::Undefined => (DEFAULT_LIMIT as f64, Value::Number(DEFAULT_LIMIT as f64)),
             Self::Null => (0., Value::Null),

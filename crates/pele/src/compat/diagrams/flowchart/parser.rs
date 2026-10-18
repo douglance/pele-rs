@@ -718,6 +718,18 @@ impl Reader<'_> {
     }
 }
 pub(super) fn parse(context: ParseContext<'_>) -> Result<FlowchartModel, PeleError> {
+    parse_with_policy(context, None)
+}
+pub(super) fn parse_with_edge_limit(
+    context: ParseContext<'_>,
+    limit: crate::compat::EdgeLimit,
+) -> Result<FlowchartModel, PeleError> {
+    parse_with_policy(context, Some(limit))
+}
+fn parse_with_policy(
+    context: ParseContext<'_>,
+    limit: Option<crate::compat::EdgeLimit>,
+) -> Result<FlowchartModel, PeleError> {
     static TRAIL: OnceLock<Regex> = OnceLock::new();
     let src = if context.source.contains('}') {
         TRAIL
@@ -731,7 +743,10 @@ pub(super) fn parse(context: ParseContext<'_>) -> Result<FlowchartModel, PeleErr
         tokens: tokenize(&src),
         i: 0,
         pending: None,
-        db: FlowDb::new(&context),
+        db: match limit {
+            Some(limit) => FlowDb::new_with_edge_limit(&context, limit),
+            None => FlowDb::new(&context),
+        },
     };
     while matches!(r.t(), T::SPACE | T::NEWLINE) {
         r.i += 1

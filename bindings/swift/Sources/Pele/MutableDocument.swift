@@ -157,4 +157,19 @@ extension Pele.Engine {
         }}
         return try ownedPublicDocument(result, document: document)
     }
+    /// Override source and edge thresholds independently. Source is well-formed
+    /// Swift text; native byte/work budgets remain independent of numeric limits.
+    public func parseMutable(_ source: String, limits: Pele.ParseLimits, options: ParseOptions = .init()) throws -> Pele.MutableDocument {
+        let source = Data(source.utf8), settings = try JSONEncoder().encode(options)
+        let sourceLimit = limits.source?.nativeValue ?? (kind: UInt32(3), bits: UInt64(0))
+        let edgeLimit = limits.maxEdges?.nativeValue ?? (kind: UInt32(3), bits: UInt64(0))
+        var document: OpaquePointer?
+        let result = source.withUnsafeBytes { input in settings.withUnsafeBytes { output in
+            pele_public_parse_limits_v7(input.bindMemory(to: UInt8.self).baseAddress, input.count,
+                                       output.bindMemory(to: UInt8.self).baseAddress, output.count,
+                                       sourceLimit.kind, sourceLimit.bits, edgeLimit.kind, edgeLimit.bits, &document)
+        }}
+        return try ownedPublicDocument(result, document: document)
+    }
+
 }

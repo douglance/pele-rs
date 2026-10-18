@@ -989,3 +989,48 @@ pass. See [output-limit contract](OUTPUT_LIMITS.md).
 This closes exact numeric output limits for well-formed strings. Numeric edge
 limits, arbitrary options coercion, malformed UTF-16 source/output, constructors,
 callback dispatch and the other full-runtime/browser/release gates remain open.
+
+## Composable exact source and edge limits through native and Swift
+
+`ParseLimits` independently selects exact source and edge overrides while
+retaining omitted legacy integer fields. Flowchart, AgentFlow and Swimlane share
+their existing parsing paths with an explicit private policy. Undefined selects
+5,000 edges; null compares as zero; fractional thresholds compare the existing
+count before each push. NaN and positive infinity disable that semantic check.
+The exact lane retains an independent 16 MiB source-byte budget and incremental
+1,000,000-edge generation ceiling. Semantic rejection still precedes the native
+generation check. The native ceiling is an explicit platform extension, not an
+upstream error-parity result.
+
+Additive provider hooks preserve concrete models, registration retention and
+public struct layouts. The parsed document retains its explicit policy privately;
+mutable graph creation seeds exact `options.maxEdges` before deriving state.
+Thereafter graph options remain authoritative, including deletion/undefined and
+partial Cartesian method failures. New C v7 and Swift `ParseLimits` APIs carry
+independent tags and IEEE bits without weakening unrelated option decoding,
+handle ownership, revision checks or transport budgets.
+
+The pinned edge oracle contains 313 cases: 139 complete SVG successes, 171 full
+errors and three parse-only successes. It also records 24 method steps across
+the three families, covering partial commits, collection aliases and recovery.
+Thirty-one focused Rust release integration tests pass together; the additional
+million-edge Cartesian integration passes once in isolation. The combined slice
+is 32/32. Five strict C integration programs pass: composable parse limits,
+output limits, source limits, mutable operations and legacy ownership. All 22
+focused Swift release integration tests pass against the fresh universal SDK.
+
+Separate arm64 and Intel Rosetta runs each pass nine limit-feature tests: all
+712 source/output/edge cases, 24 method steps and two callback-order cases. Each
+also passes the actual C v7 integration and an independent immutable/mutable
+consumer across all 33 families. The universal archive SHA-256 is
+`1293ce6887a50aa45713a91dd1e18e79e6241557c9386eb3f85e71664ee4190f`;
+its arm64 slice matches the separately verified archive byte for byte. The host
+is macOS 26.6; Rosetta is not physical Intel/macOS 14 runtime proof. A fresh
+artifact-free Swift consumer also builds/runs the unchanged checksum-pinned
+v0.1 archive with both new Swift files correctly excluded.
+
+The earlier full-corpus and performance results retain their recorded revisions.
+This additive slice closes numeric parse policies for well-formed strings;
+arbitrary coercion, constructors, active malformed UTF-16, callback dispatch and
+the remaining public-runtime/browser/release gates remain open. See
+[composable parse-limit contract](PARSE_LIMITS.md).

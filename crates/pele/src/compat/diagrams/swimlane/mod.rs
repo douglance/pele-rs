@@ -127,6 +127,13 @@ impl DiagramModule for Swimlane {
     fn parse(&self, c: ParseContext<'_>) -> Result<Self::Model, PeleError> {
         flowchart::Flowchart.parse(c)
     }
+    fn parse_with_edge_limit(
+        &self,
+        c: ParseContext<'_>,
+        limit: crate::compat::EdgeLimit,
+    ) -> Result<Self::Model, PeleError> {
+        flowchart::Flowchart.parse_with_edge_limit(c, limit)
+    }
     fn render(
         &self,
         m: &Self::Model,
