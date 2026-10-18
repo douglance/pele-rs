@@ -26,8 +26,59 @@ fn edge(kind: u32, value: f64) -> Result<EdgeLimit, PeleError> {
         _ => Err(invalid("Invalid prepared maxEdges kind")),
     }
 }
+fn builtin_id(id: &str) -> Result<DiagramId, PeleError> {
+    DIAGRAM_TYPES
+        .into_iter()
+        .find(|kind| kind.as_str() == id)
+        .map(DiagramId::Builtin)
+        .ok_or_else(|| {
+            PeleError::new(
+                "Unknown prepared diagram type",
+                ErrorCode::UnsupportedDiagram,
+            )
+        })
+}
 #[wasm_bindgen]
 impl NativeRegistry {
+    /// Declared schema for lifting a caller-authored model without parsing.
+    pub fn entry_schema(&self, id: &str) -> Result<String, JsValue> {
+        let run = || -> Result<String, PeleError> {
+            let engine = self
+                .inner
+                .as_ref()
+                .ok_or_else(|| invalid("Registry is closed"))?;
+            let id = builtin_id(id)?;
+            Ok(super::public_result(&engine.schema_for(&id)?))
+        };
+        run().map_err(failure)
+    }
+    /// Direct owned graph construction. Revision and metadata are not imported
+    /// from another document; every new registration starts at revision zero.
+    pub fn create_prepared_model_binary(
+        &self,
+        id: &str,
+        bytes: &[u8],
+        config_json: &str,
+    ) -> Result<MutableDocument, JsValue> {
+        let run = || -> Result<MutableDocument, PeleError> {
+            let engine = self
+                .inner
+                .as_ref()
+                .ok_or_else(|| invalid("Registry is closed"))?;
+            let id = builtin_id(id)?;
+            let config = config(config_json)?;
+            let exchange = decode_binary_exchange(bytes, DEFAULT_BINARY_BUDGET)?;
+            if exchange.revision != 0 || !exchange.metadata.is_empty() {
+                return Err(invalid(
+                    "New model graph requires revision zero and empty metadata",
+                ));
+            }
+            Ok(MutableDocument {
+                inner: engine.create_from_graph_as(&id, exchange.graph, config)?,
+            })
+        };
+        run().map_err(failure)
+    }
     #[allow(clippy::too_many_arguments)]
     pub fn parse_prepared(
         &self,

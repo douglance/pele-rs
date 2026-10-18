@@ -5,6 +5,8 @@ import {loadDiagramEntries,disposeDiagramModel} from '../../bindings/web/diagram
 import {loadRegistry} from '../../bindings/web/registry.js';
 async function feature(){
  await loadDiagramEntries();const registry=await loadRegistry();registry.register(pie,gantt,flowchart);
+ const authored={type:'pie' as const,sections:new Map([['Literal',3]]),showData:true};pie.render(authored,{},{});
+ const plainFlow={type:'flowchart' as const,direction:'LR',nodes:new Map(),edges:[],subgraphs:[],classes:new Map(),tooltips:new Map()};flowchart.render(plainFlow,{},{});
  const chart=pie.parse('pie\n"A":1\n',{},undefined,0,{maxEdges:5000});chart.sections.set('B',2);const drawing=pie.render(chart,{}, {outputLimit:1});
  const schedule=gantt.parse('gantt\nA:a,1d\n',{},undefined,0,{maxEdges:5000});schedule.getTasks(new Date());
  const graph=flowchart.parse('flowchart TD\nA-->B\n',{},'Prepared',7,{maxEdges:2.5});graph.addSingleLink('B','A',undefined);flowchart.render(graph,{flowchart:{useMaxWidth:false}}, {fontSize:13.25,maxWidth:300});

@@ -85,7 +85,7 @@ export async function loadRenderer(moduleOrPath) {
 export function createRenderer(nativeRegistry, canonicalProviders = []) {
   const liveProviders=new Map(canonicalProviders.map(provider=>[provider.type,{provider,native:true}]));
   function syncProviders(){for(const [type,entry] of liveProviders){const native=builtinDiagramType(entry.provider)===type;if(native!==entry.native){if(native)registryCall(()=>nativeValue(()=>{nativeRegistry.register_builtin(type);return '{"version":2,"ok":true,"result":null}';}));else registryCall(()=>foreignValue(()=>nativeRegistry.register_foreign(type,entry.provider)));entry.native=native;}}}
-  const documents = new WeakMap(), registry = new ModelRegistry();
+  const documents = new WeakMap(), rawDisposed = new WeakSet(), registry = new ModelRegistry();
   const finalizer = typeof FinalizationRegistry === 'function' ? new FinalizationRegistry(handle => handle.free()) : null;
   let registryBusy = false;
   const registryCall = operation => {
@@ -123,11 +123,11 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
         numeric.json, numeric.mask, numeric.numbers, numeric.outputKind, numeric.output)));
     } finally { entry.busy = false; }
   }
-  function adoptMutable(mutable, preparedType) {
+  function adoptMutable(mutable, preparedType, existingBridge) {
           const snapshot = binaryResult(()=>mutable.snapshot_binary()), schema = result(mutable.schema());
           const rawType=mutable.entry_type(), live=preparedType===undefined?liveProviders.get(rawType):undefined;
           const entry = {handle: mutable, revision: snapshot.revision, disposed: false, preparedType,rawType,provider:live?.provider};
-          const bridge = new ModelBridge(snapshot.graph, schema, registry, (method, receiver, argumentsValue) => nativeModelCall(entry, () => {
+          const invoke = (method, receiver, argumentsValue) => nativeModelCall(entry, () => {
             if (entry.disposed) throw new TypeError('Public model document is disposed');
             const input = bridge.snapshot([receiver, ...argumentsValue]);
             entry.revision = result(mutable.apply_binary(encodeGraphBinary(entry.revision,input.graph)));
@@ -136,7 +136,9 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
             bridge.reconcile(outcome.graph);
             if (Object.hasOwn(outcome.result, 'Err')) throw operationError(outcome.result.Err, bridge);
             return bridge.value(outcome.result.Ok);
-          }));
+          });
+          const bridge = existingBridge ?? new ModelBridge(snapshot.graph,schema,registry,invoke);
+          if(existingBridge){bridge.invoke=invoke;bridge.reconcile(snapshot.graph);}
           entry.bridge = bridge;
           const model = bridge.root;
           documents.set(model, entry);
@@ -166,8 +168,18 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       try{return adoptMutable(handle,type);}catch(error){handle.free();throw error;}
     },
     renderRaw(type, model, config, options = {}) {
-      const entry=documents.get(model);
-      if(!entry?.bridge||entry.rawType!==type)throw new TypeError('Raw diagram render requires a model returned by this diagram entry');
+      if(rawDisposed.has(model))throw new TypeError('Public model document is disposed');
+      let entry=documents.get(model);
+      if(!entry){
+        const schema=registryCall(()=>nativeValue(()=>nativeRegistry.entry_schema(type)));
+        const bridge=new ModelBridge({version:1,root:{kind:'undefined'},strings:[],nodes:[]},schema,registry,()=>{throw new TypeError('Public model construction is incomplete');});
+        bridge.root=model;
+        const graph=bridge.snapshot().graph;
+        const handle=registryCall(()=>{try{return nativeRegistry.create_prepared_model_binary(type,encodeGraphBinary('0',graph),finiteConfigJSON(config));}catch(error){if(typeof error==='string')return result(error);throw error;}});
+        try{adoptMutable(handle,type,bridge);}catch(error){handle.free();throw error;}
+        entry=documents.get(model);
+      }
+      if(!entry?.bridge||entry.rawType!==type)throw new TypeError('Raw diagram render requires a model of this diagram');
       if(entry.disposed)throw new TypeError('Public model document is disposed');
       return nativeModelCall(entry,()=>{
       let callbackFailed=false,callbackError;
@@ -341,7 +353,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     dispose(model) {
       const document = documents.get(model);
       if (document?.busy || document?.nativeBusy) throw new TypeError('Public model document is already in use');
-      if (document) { documents.delete(model); document.disposed = true; if(document.bridge)document.bridge.disposed=true; finalizer?.unregister(model); document.handle.free();document.policy?.free(); }
+      if (document) { if(document.bridge)rawDisposed.add(model); documents.delete(model); document.disposed = true; if(document.bridge)document.bridge.disposed=true; finalizer?.unregister(model); document.handle.free();document.policy?.free(); }
     }
   };
   return renderer;
