@@ -42,8 +42,11 @@ Clean runner: [Shared flowchart conformance](https://github.com/vijayksingh/pele
 Conclusion: **success** for source commit `b1b5cd4`. Workflow executes Rust, C, Swift, AppKit and all three web engines, and retains
 evidence as an Actions artifact. Its live conclusion is authoritative CI status.
 
-GitHub asset publication and fresh remote Swift consumer are verified after
-publication. Compilation alone does not prove release download/install.
+Post-publication checks passed against GitHub v0.1.0: a fresh SwiftPM consumer
+downloaded the checksum-pinned universal binary and executed; npm installed the
+public release tarball and ran its WASM; a fresh Cargo project fetched the Git
+tag and rendered. All six uploaded asset digests matched local SHA-256.
+Release commit: `88e75f8`. See the release `verification.json` for the summary.
 
 ## Limits of proof
 
