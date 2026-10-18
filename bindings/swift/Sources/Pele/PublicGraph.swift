@@ -139,14 +139,29 @@ extension Pele {
         public mutating func intern(_ string: String) throws -> UInt32 { try intern(JSString(string)) }
         public func field(_ name: String, on object: UInt32? = nil) throws -> Atom? {
             let id = try objectID(object)
+            if name == "length", case .array = nodes[Int(id)] {
+                let state = try arrayStorage(id)
+                return .number(Double(state.length))
+            }
             for property in nodes[Int(id)].properties {
                 guard strings.indices.contains(Int(property.key)) else { throw invalidGraph() }
                 if strings[Int(property.key)] == JSString(name) { return property.value }
             }
             return nil
         }
+        /// Edit an own field. Array indexes and length maintain the implicit
+        /// length and holes; structural failures leave the graph unchanged.
         public mutating func setField(_ name: String, value: Atom, on object: UInt32? = nil) throws {
             let id = try objectID(object)
+            if case .array = nodes[Int(id)] {
+                if name == "length" {
+                    guard case .number(let number) = value, let length = UInt32(exactly: number) else {
+                        throw PeleError(code: "semantic", message: "Array length must be an integer from 0 through 4294967295")
+                    }
+                    try setArrayLength(length, on: id); return
+                }
+                if let index = Self.arrayIndex(name) { try setArrayElement(index, value: value, on: id); return }
+            }
             var properties = nodes[Int(id)].properties
             for i in properties.indices {
                 guard strings.indices.contains(Int(properties[i].key)) else { throw invalidGraph() }
@@ -155,6 +170,80 @@ extension Pele {
                 }
             }
             properties.append(Property(key: try intern(name), value: value)); nodes[Int(id)].properties = properties
+        }
+        /// Canonical indexes are 0 through 4294967294. Extending an Array
+        /// changes its length without filling intermediate holes.
+        public mutating func setArrayElement(_ index: UInt32, value: Atom, on array: UInt32? = nil) throws {
+            guard index < UInt32.max else { throw PeleError(code: "semantic", message: "4294967295 is not an Array index") }
+            let id = try objectID(array), state = try arrayStorage(id)
+            var properties = state.properties
+            let key = String(index)
+            let existing = properties.firstIndex { strings[Int($0.key)] == JSString(key) }
+            if let existing, properties[existing].flags & 2 == 0 {
+                throw PeleError(code: "semantic", message: "Array element is readonly")
+            }
+            let length = max(state.length, index + 1)
+            if length != state.length, let property = state.lengthProperty, properties[property].flags & 2 == 0 {
+                throw PeleError(code: "semantic", message: "Array length is readonly")
+            }
+            if let existing { properties[existing].value = value }
+            else {
+                // Array own keys enumerate numeric indexes before other fields.
+                let insertion = properties.firstIndex { property in
+                    guard let other = Self.arrayIndex(strings[Int(property.key)].stringIfWellFormed ?? "") else { return true }
+                    return other > index
+                } ?? properties.count
+                properties.insert(Property(key: try intern(key), value: value), at: insertion)
+            }
+            for i in properties.indices where strings[Int(properties[i].key)].isLength {
+                properties[i].value = .number(Double(length))
+            }
+            nodes[Int(id)] = .array(length: length, properties: properties)
+        }
+        /// Shrinking removes configurable indexed elements only. It does not
+        /// remove ordinary string fields or silently bypass readonly length.
+        public mutating func setArrayLength(_ length: UInt32, on array: UInt32? = nil) throws {
+            let id = try objectID(array), state = try arrayStorage(id)
+            if let property = state.lengthProperty, state.properties[property].flags & 2 == 0 {
+                throw PeleError(code: "semantic", message: "Array length is readonly")
+            }
+            for property in state.properties {
+                if let index = Self.arrayIndex(strings[Int(property.key)].stringIfWellFormed ?? ""), index >= length, property.flags & 4 == 0 {
+                    throw PeleError(code: "semantic", message: "Cannot truncate Array past a nonconfigurable element")
+                }
+            }
+            var properties = state.properties.filter { property in
+                guard let index = Self.arrayIndex(strings[Int(property.key)].stringIfWellFormed ?? "") else { return true }
+                return index < length
+            }
+            for i in properties.indices where strings[Int(properties[i].key)].isLength {
+                properties[i].value = .number(Double(length))
+            }
+            nodes[Int(id)] = .array(length: length, properties: properties)
+        }
+        private static func arrayIndex(_ name: String) -> UInt32? {
+            guard let index = UInt32(name), index < UInt32.max, String(index) == name else { return nil }; return index
+        }
+        private func arrayStorage(_ id: UInt32) throws -> (length: UInt32, properties: [Property], lengthProperty: Int?) {
+            guard case .array(let length, let properties) = nodes[Int(id)] else {
+                throw PeleError(code: "semantic", message: "Expected an Array node")
+            }
+            var seen = Set<JSString>(), lengthProperty: Int?
+            for (i, property) in properties.enumerated() {
+                guard strings.indices.contains(Int(property.key)), property.flags & ~7 == 0 else { throw invalidGraph() }
+                let key = strings[Int(property.key)]
+                guard seen.insert(key).inserted else { throw invalidGraph() }
+                if key.isLength {
+                    guard property.flags == 0 || property.flags == 2,
+                          case .number(let number) = property.value, UInt32(exactly: number) == length else {
+                        throw PeleError(code: "semantic", message: "Invalid Array length descriptor")
+                    }
+                    lengthProperty = i
+                } else if let index = Self.arrayIndex(key.stringIfWellFormed ?? ""), index >= length {
+                    throw PeleError(code: "semantic", message: "Array element exceeds its declared length")
+                }
+            }
+            return (length, properties, lengthProperty)
         }
         private func objectID(_ object: UInt32?) throws -> UInt32 {
             let id: UInt32
@@ -182,6 +271,7 @@ extension Pele {
         }
     }
 }
+private extension Pele.JSString { var isLength: Bool { codeUnits == [108, 101, 110, 103, 116, 104] } }
 private func invalidGraph() -> PeleError { PeleError(code: "semantic", message: "Invalid public graph reference") }
 private func encodeBits(_ value: Double) -> String { String(format: "%016llx", value.bitPattern) }
 private func decodeBits(_ hex: String, _ decoder: any Decoder) throws -> Double {
