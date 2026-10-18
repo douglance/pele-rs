@@ -16,7 +16,7 @@ pub use id::DiagramId;
 mod module;
 mod number_math;
 mod provider;
-pub use provider::{ProviderInput, render_provider_bounded};
+pub use provider::{render_provider_bounded, ProviderInput};
 mod output_limit;
 pub use output_limit::{OutputLimit, MAX_PUBLIC_OUTPUT_BYTES};
 pub mod public;
