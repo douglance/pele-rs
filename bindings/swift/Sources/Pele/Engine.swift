@@ -13,12 +13,14 @@ public struct FullRenderedDiagram: Codable, Sendable {
     public let width: Double
     public let height: Double
     public let links: [DiagramLink]
-    private enum CodingKeys: String, CodingKey { case type, svg, width, height, links; case numbers = "$numbers" }
+    public let presentation: Pele.PresentationOutcome?
+    private enum CodingKeys: String, CodingKey { case type, svg, width, height, links, presentation; case numbers = "$numbers" }
     public init(from decoder: any Decoder) throws {
         let fields = try decoder.container(keyedBy: CodingKeys.self)
         type = try fields.decode(String.self, forKey: .type)
         svg = try fields.decode(String.self, forKey: .svg)
         links = try fields.decode([DiagramLink].self, forKey: .links)
+        presentation = try fields.decodeIfPresent(Pele.PresentationOutcome.self, forKey: .presentation)
         let numbers = try fields.decodeIfPresent([String: String].self, forKey: .numbers) ?? [:]
         func number(_ key: CodingKeys) throws -> Double {
             if let hex = numbers[key.rawValue] {
@@ -34,6 +36,7 @@ public struct FullRenderedDiagram: Codable, Sendable {
     public func encode(to encoder: any Encoder) throws {
         var fields = encoder.container(keyedBy: CodingKeys.self)
         try fields.encode(type, forKey: .type); try fields.encode(svg, forKey: .svg); try fields.encode(links, forKey: .links)
+        try fields.encodeIfPresent(presentation, forKey: .presentation)
         var numbers: [String: String] = [:]
         for (key, value) in [(CodingKeys.width, width), (.height, height)] {
             if value.isFinite { try fields.encode(value, forKey: key) } else { try fields.encodeNil(forKey: key) }
@@ -47,7 +50,7 @@ private struct DocumentProjection: Decodable { let type: String; let model: Conf
 extension Pele {
     /// Owned immutable parse result. Rust registration/config/model survive until deinit.
     public final class Document: @unchecked Sendable {
-        fileprivate let handle: OpaquePointer
+        internal let handle: OpaquePointer
         public let type: String
         public let model: ConfigValue
         fileprivate init(handle: OpaquePointer, projection: DocumentProjection) {

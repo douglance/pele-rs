@@ -1,11 +1,13 @@
-# Native presentation artifact: first Rust slice
+# Native presentation artifact
 
 Flowchart, Swimlane, AgentFlow, ER and Kanban can produce a version 1
 presentation artifact alongside normal Rust rendering. This is the first
 interaction/accessibility gate from `LLD_NATIVE_API_COMPLETION.md`; producer
 specifics are recorded in `NATIVE_PRESENTATION_PRODUCERS.md`. Other families
 report `UnsupportedDiagram`.
-There is no C/Swift/WASM artifact transport or native link activation in this slice.
+The additive C v11 and source-built Swift interfaces transport the same artifact.
+Native link activation is a separate presentation layer. WASM keeps its existing
+SVG/DOM presentation path.
 
 ```rust
 use pele::compat::{Engine, PresentationBudget, PresentationCapture, RenderOptions};
@@ -84,3 +86,39 @@ accessible data and URL gates, explicit metadata budgets/nonfinite dimensions,
 output/theme/measurement failures and recovery, and a downstream codec whose
 post-render snapshot fails. Existing Flowchart and Swimlane pinned source/SVG
 corpora remain the compatibility check for unchanged ordinary output.
+
+## C and Swift transport
+
+`pele_render_presentation_v11`, `pele_render_document_presentation_v11` and
+`pele_public_render_presentation_v11` share the v9 numeric/output policy and v3
+host-resource contracts. A null budget packet selects defaults. Otherwise its
+version must be 11, size 40 bytes, and reserved fields zero. Invalid packets fail
+before callbacks. Mutable calls keep the existing binary graph/revision envelope;
+only successful render metadata adds `presentation`. Existing render exports and
+their serialization remain unchanged.
+
+```swift
+let engine = Pele.Engine()
+let document = try engine.parseMutable("flowchart LR\nA[Read] --> B[Finish]\nclick A \"https://example.test\"")
+defer { try? document.close() }
+let drawing = try document.renderPresentation()
+if case .available(let frame) = drawing.presentation {
+    // Apply the actual image/camera transform to frame.links[].bounds.
+    print(frame.title ?? "Diagram", frame.text.map(\.text))
+}
+```
+
+`Engine.renderPresentation` also accepts source or an immutable `Document`.
+`PresentationBudget` controls copied metadata, independently of SVG output limits.
+The same `FullRenderedDiagram` type decodes both lanes; old render results have
+`presentation == nil` and still omit that key when encoded. Raw numeric dimensions
+retain their IEEE sidecars even when metadata reports invalid geometry. A host
+callback error retains its original Swift identity; mutable revisions publish
+before that error is rethrown.
+
+The current ARM64 release SDK passes the strict C three-lane ownership/policy
+scenario and all four Swift presentation features. The Swift batch also includes
+13 provider/resource/registry integrations (17 total). Tests cover all five current
+producers, approved/blocked URLs, identical ordinary SVG, budgets, unsupported
+families, nonfinite geometry, exact output limits, callback failure and recovery.
+Final universal packaging, native action controls and release remain separate gates.

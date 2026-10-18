@@ -262,7 +262,6 @@ void pele_provider_document_free_v10(PeleProviderDocument *);
 void *pele_foreign_call_context_v10(const PeleForeignCallV10 *);
 PeleResult *pele_foreign_text_width_v10(PeleForeignCallV10 *, const uint8_t *, size_t,
     uint64_t, uint32_t, uint64_t *);
-
 /* Borrowed resources: active synchronous render only, one call at a time across
  * all helpers. Reentry returns a semantic error; never retain the call pointer.
  * Icon names are entity-decoded with no cache. Result owns {value: string|null};
@@ -278,6 +277,27 @@ PeleResult *pele_foreign_now_millis_v10(PeleForeignCallV10 *, uint64_t *);
 PeleResult *pele_foreign_parse_date_v10(PeleForeignCallV10 *, const uint8_t *, size_t, uint32_t *, uint64_t *);
 PeleResult *pele_foreign_calendar_fields_v10(PeleForeignCallV10 *, uint64_t);
 PeleResult *pele_foreign_calendar_instant_v10(PeleForeignCallV10 *, const uint8_t *, size_t, uint32_t *, uint64_t *);
+
+/* Additive native presentation lane. NULL packet selects defaults; otherwise
+ * version=11, struct_size=sizeof(PelePresentationOptionsV11), reserved all zero.
+ * Requested budgets are clamped to native hard ceilings. Successful render
+ * result adds presentation: available artifact or explicit unavailable reason.
+ * Existing v9 numeric/output policy and v3 host-resource contracts apply.
+ */
+typedef struct PelePresentationOptionsV11 {
+    uint32_t version, struct_size;
+    uint64_t max_elements, max_text_bytes;
+    uint64_t reserved[2];
+} PelePresentationOptionsV11;
+PeleResult *pele_render_presentation_v11(const uint8_t *, size_t, const uint8_t *, size_t,
+    const PeleRenderNumbersV9 *, uint32_t, uint64_t,
+    const PelePresentationOptionsV11 *, const PeleHostResourcesV3 *);
+PeleResult *pele_render_document_presentation_v11(const PeleResult *, const uint8_t *, size_t,
+    const PeleRenderNumbersV9 *, uint32_t, uint64_t,
+    const PelePresentationOptionsV11 *, const PeleHostResourcesV3 *);
+PeleResult *pele_public_render_presentation_v11(PelePublicDocument *, uint64_t,
+    const uint8_t *, size_t, const PeleRenderNumbersV9 *, uint32_t, uint64_t,
+    const PelePresentationOptionsV11 *, const PeleHostResourcesV3 *);
 
 uint32_t pele_result_status(const PeleResult *result);
 const uint8_t *pele_result_data(const PeleResult *result);

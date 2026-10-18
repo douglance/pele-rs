@@ -99,11 +99,17 @@ extension Pele {
         public func renderOperation(outputLimit: OutputLimit, options: Engine.Options = .init(), resources: HostResources = .init()) throws -> PublicRenderOutcome {
             try renderOperation(options: options, resources: resources, outputLimit: outputLimit)
         }
-        private func renderOperation(options: Engine.Options, resources: HostResources, outputLimit: OutputLimit?) throws -> PublicRenderOutcome {
+        private func renderOperation(options: Engine.Options, resources: HostResources, outputLimit: OutputLimit?, presentationBudget: PresentationBudget? = nil) throws -> PublicRenderOutcome {
             let settings = try RenderNumberEncoding(options, outputLimit: outputLimit)
+            let presentation = try presentationBudget?.packet()
             return try withHandle { handle in
                 let response = resources.withCapturedNativeResources { host in settings.withPacket { packet in settings.optionsJSON.withUnsafeBytes { bytes in
-                    pele_public_render_operation_with_numbers_v9(handle, revision, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, packet, settings.outputKind, settings.outputBits, host)
+                    if var value = presentation {
+                        return withUnsafePointer(to: &value) { presentation in
+                            pele_public_render_presentation_v11(handle, revision, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, packet, settings.outputKind, settings.outputBits, presentation, host)
+                        }
+                    }
+                    return pele_public_render_operation_with_numbers_v9(handle, revision, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, packet, settings.outputKind, settings.outputBits, host)
                 }}}
                 do {
                     let exchange = try Pele.binaryResult(response.handle)
@@ -119,6 +125,10 @@ extension Pele {
         }
         public func render(outputLimit: OutputLimit, options: Engine.Options = .init(), resources: HostResources = .init()) throws -> FullRenderedDiagram {
             try renderedValue(renderOperation(outputLimit: outputLimit, options: options, resources: resources))
+        }
+        public func renderPresentation(outputLimit: OutputLimit? = nil, budget: PresentationBudget = .init(), options: Engine.Options = .init(), resources: HostResources = .init()) throws -> FullRenderedDiagram {
+            let limit = outputLimit ?? options.outputLimit.map { OutputLimit.number(Double($0)) } ?? .undefined
+            return try renderedValue(renderOperation(options: options, resources: resources, outputLimit: limit, presentationBudget: budget))
         }
         private func renderedValue(_ outcome: PublicRenderOutcome) throws -> FullRenderedDiagram {
             switch outcome.result {

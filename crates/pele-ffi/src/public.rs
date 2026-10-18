@@ -100,7 +100,7 @@ fn output_limit_options(json: &str) -> Result<pele::compat::RenderOptions, PeleE
             )
         })
 }
-unsafe fn document<'a>(
+pub(super) unsafe fn document<'a>(
     handle: *const PelePublicDocument,
 ) -> Result<MutexGuard<'a, PublicDocument>, PeleError> {
     let owner = unsafe { handle.as_ref() }
@@ -695,17 +695,25 @@ pub unsafe extern "C" fn pele_public_render_operation_output_limit_v6(
 }
 
 fn render_outcome(outcome: &pele::compat::public::RenderOutcome) -> Result<PeleResult, PeleError> {
-    let mut metadata = Output {
-        bytes: Vec::new(),
-        exceeded: false,
-    };
-    let encoded = serde_json::to_writer(
-        &mut metadata,
+    binary_metadata(
+        outcome.revision,
+        &outcome.graph,
         &outcome
             .result
             .as_ref()
             .map(pele::compat::render_result_transport),
-    );
+    )
+}
+pub(super) fn binary_metadata(
+    revision: u64,
+    graph: &ModelGraph,
+    value: &impl Serialize,
+) -> Result<PeleResult, PeleError> {
+    let mut metadata = Output {
+        bytes: Vec::new(),
+        exceeded: false,
+    };
+    let encoded = serde_json::to_writer(&mut metadata, value);
     if metadata.exceeded {
         return Err(PeleError::new(
             "Native public transport: result exceeds 64 MiB JSON budget",
@@ -713,7 +721,7 @@ fn render_outcome(outcome: &pele::compat::public::RenderOutcome) -> Result<PeleR
         ));
     }
     encoded.map_err(|_| invalid("Invalid render metadata"))?;
-    binary_success(outcome.revision, &outcome.graph, &metadata.bytes)
+    binary_success(revision, graph, &metadata.bytes)
 }
 /// # Safety
 /// Same document ownership as v5; packet/options/resources are synchronous borrows.
