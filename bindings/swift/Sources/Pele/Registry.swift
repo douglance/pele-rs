@@ -25,9 +25,12 @@ extension Pele {
         public static func allBuiltins() throws -> Registry { try create(1) }
         public func close() throws {
             guard !active else { throw PeleError(code: "semantic", message: "Registry is already in use") }
-            if let handle { pele_registry_free_v8(handle); self.handle = nil }
+            if let handle {
+                self.handle = nil; active = true; defer { active = false }
+                pele_registry_free_v8(handle)
+            }
         }
-        private func withHandle<T>(_ operation: (OpaquePointer) throws -> T) throws -> T {
+        func withHandle<T>(_ operation: (OpaquePointer) throws -> T) throws -> T {
             guard let handle else { throw PeleError(code: "semantic", message: "Registry is closed") }
             guard !active else { throw PeleError(code: "semantic", message: "Registry is already in use") }
             active = true; defer { active = false }

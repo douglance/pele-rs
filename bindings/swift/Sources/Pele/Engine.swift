@@ -1,7 +1,12 @@
 import Foundation
 import CPele
 
-public struct DiagramLink: Codable, Sendable { public let id: String; public let href: String; public let `internal`: Bool }
+public struct DiagramLink: Codable, Sendable {
+    public let id: String; public let href: String; public let `internal`: Bool
+    public init(id: String, href: String, internal isInternal: Bool = false) {
+        self.id = id; self.href = href; self.internal = isInternal
+    }
+}
 public struct FullRenderedDiagram: Codable, Sendable {
     public let type: String
     public let svg: String

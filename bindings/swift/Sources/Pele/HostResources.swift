@@ -31,13 +31,20 @@ extension Pele {
         // Mutable operations decode and publish their post-call state before
         // rethrowing the original Swift callback error.
         func withCapturedNativeResources(_ invoke: (UnsafePointer<PeleHostResourcesV3>) -> OpaquePointer?) -> (handle: OpaquePointer?, error: (any Error)?) {
+            withCapturedNativeResources { callbacks, _ in invoke(callbacks) }
+        }
+        // Foreign callbacks may catch a resource error and recover. Consume the
+        // original error at the callback boundary instead of making it sticky.
+        func withCapturedNativeResources(_ invoke: (UnsafePointer<PeleHostResourcesV3>, () -> (any Error)?) -> OpaquePointer?) -> (handle: OpaquePointer?, error: (any Error)?) {
             let bridge = ResourceBridge(self)
             let base = PeleHostResources(context: Unmanaged.passUnretained(bridge).toOpaque(),
                 width: textWidth == nil ? nil : resourceWidth,
                 icon: icon == nil ? nil : resourceIcon,
                 now: nowMillis == nil ? nil : resourceClock)
             var callbacks = PeleHostResourcesV3(base: base, calendar: calendarFields == nil ? nil : resourceCalendar, calendar_instant: calendarInstant == nil ? nil : resourceCalendar, date_parser: parseDate == nil ? nil : resourceCalendar, utc_offset: resourceUtcOffset)
-            let result = withExtendedLifetime(bridge) { withUnsafePointer(to: &callbacks, invoke) }
+            let result = withExtendedLifetime(bridge) { withUnsafePointer(to: &callbacks) { pointer in
+                invoke(pointer, { let error = bridge.error; bridge.error = nil; return error })
+            } }
             return (result, bridge.error)
         }
     }
