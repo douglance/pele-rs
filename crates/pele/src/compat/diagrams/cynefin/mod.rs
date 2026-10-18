@@ -40,3 +40,6 @@ pub fn parse(source: &str, options: &ParseOptions) -> Result<CynefinModel, PeleE
         max_edges: options.max_edges,
     })
 }
+
+mod public_model;
+pub use public_model::CynefinPublicState;
