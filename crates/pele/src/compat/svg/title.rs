@@ -1,5 +1,6 @@
 //! Pele svg/title.ts, 458322a5 (MIT, kepano).
 use super::{label_svg, num};
+use crate::compat::number_math::NumberMath;
 use crate::compat::{text::layout_label, PeleError, RenderResources, RenderSettings};
 pub(crate) struct Titled {
     pub width: f64,
@@ -26,7 +27,7 @@ pub(crate) fn with_title(
         });
     }
     let shift = label.height + 12.;
-    let full = width.max((label.width + 2. * pad).ceil());
+    let full = width.js_max((label.width + 2. * pad).ceil());
     Ok(Titled {
         width: full,
         height: (height + shift).ceil(),

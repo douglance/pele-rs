@@ -552,6 +552,54 @@ impl Engine {
             },
         )
     }
+    /// Render in the bounded native lane. None retains the typed integer output
+    /// policy and module dispatch; Some selects the exact post-render policy.
+    /// Native source/output byte ceilings cannot be disabled by either policy.
+    pub fn render_source_bounded(
+        &self,
+        source: &str,
+        options: &RenderOptions,
+        output_limit: Option<OutputLimit>,
+        resources: &mut dyn RenderResources,
+    ) -> Result<RenderResult, PeleError> {
+        SourceLimit::check_bytes(source)?;
+        let document = self.parse(source, &options.parse)?;
+        self.render_document_bounded(&document, options, output_limit, resources)
+    }
+    /// Retain the exact provider/config while independently bounding returned SVG
+    /// bytes before and after native theme resolution. This does not bound every
+    /// provider's peak allocation. Existing legacy methods keep their contract.
+    pub fn render_document_bounded(
+        &self,
+        document: &ParsedDocument,
+        options: &RenderOptions,
+        output_limit: Option<OutputLimit>,
+        resources: &mut dyn RenderResources,
+    ) -> Result<RenderResult, PeleError> {
+        let registration = &document.registration;
+        render_registered_policy(
+            &registration.descriptor,
+            &document.config,
+            options,
+            resources,
+            output_limit,
+            true,
+            |settings, session| match output_limit {
+                Some(limit) => registration.module.render_with_output_limit(
+                    &document.model,
+                    &document.config,
+                    settings,
+                    session,
+                    limit,
+                ),
+                None => {
+                    registration
+                        .module
+                        .render(&document.model, &document.config, settings, session)
+                }
+            },
+        )
+    }
 }
 pub(crate) fn render_registered(
     descriptor: &ModuleDescriptor,
@@ -560,7 +608,7 @@ pub(crate) fn render_registered(
     resources: &mut dyn RenderResources,
     render: impl FnOnce(&RenderSettings, &mut dyn RenderResources) -> Result<Rendered, PeleError>,
 ) -> Result<RenderResult, PeleError> {
-    render_registered_policy(descriptor, config, options, resources, None, render)
+    render_registered_policy(descriptor, config, options, resources, None, false, render)
 }
 pub(crate) fn render_registered_with_output_limit(
     descriptor: &ModuleDescriptor,
@@ -570,7 +618,15 @@ pub(crate) fn render_registered_with_output_limit(
     limit: OutputLimit,
     render: impl FnOnce(&RenderSettings, &mut dyn RenderResources) -> Result<Rendered, PeleError>,
 ) -> Result<RenderResult, PeleError> {
-    render_registered_policy(descriptor, config, options, resources, Some(limit), render)
+    render_registered_policy(
+        descriptor,
+        config,
+        options,
+        resources,
+        Some(limit),
+        true,
+        render,
+    )
 }
 pub(crate) fn render_registered_policy(
     descriptor: &ModuleDescriptor,
@@ -578,6 +634,7 @@ pub(crate) fn render_registered_policy(
     options: &RenderOptions,
     resources: &mut dyn RenderResources,
     limit: Option<OutputLimit>,
+    enforce_native_bytes: bool,
     render: impl FnOnce(&RenderSettings, &mut dyn RenderResources) -> Result<Rendered, PeleError>,
 ) -> Result<RenderResult, PeleError> {
     let mut settings = options.render.clone();
@@ -596,14 +653,18 @@ pub(crate) fn render_registered_policy(
     let mut session = RenderSession {
         host: resources,
         icons: HashMap::new(),
-        clock: settings.now.map(Ok),
+        clock: settings.now.filter(|value| value.is_finite()).map(Ok),
     };
     let mut rendered = render(&settings, &mut session)?;
-    if limit.is_some() {
+    let native_bytes = enforce_native_bytes || limit.is_some();
+    if native_bytes {
         OutputLimit::check_bytes(&rendered.svg, descriptor.id.as_str())?;
     }
     if let Some(theme) = &settings.native_theme {
         rendered.svg = super::svg::resolved_svg(&rendered.svg, theme)?;
+    }
+    if native_bytes {
+        OutputLimit::check_bytes(&rendered.svg, descriptor.id.as_str())?;
     }
     if let Some(limit) = limit {
         limit.check(&rendered.svg, descriptor.id.as_str())?;

@@ -1,5 +1,6 @@
 //! Pele layout/compound.ts nested groups and border ports, 458322a5 (MIT, kepano).
 use super::layered::{layered, orient, rank, Kind, LEdge, LNode, LayeredOptions};
+use crate::compat::number_math::NumberMath;
 use std::collections::HashMap;
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Dir {
@@ -180,7 +181,7 @@ fn build(
             LNode::new(0., 0., Kind::Node)
         };
         ln.span = if node.is_group {
-            node.span.min(ln.w - 2. * node.pad_x)
+            node.span.js_min(ln.w - 2. * node.pad_x)
         } else {
             node.span
         };
@@ -484,7 +485,7 @@ pub fn compound_layout(
         let content_h = if vertical { size.height } else { size.width };
         let pad_x = group.map_or(0., |i| nodes[i].pad_x);
         let pad_top = group.map_or(0., |i| nodes[i].pad_top);
-        let box_w = (content_w + 2. * pad_x).max(group.map_or(0., |i| nodes[i].min_w));
+        let box_w = (content_w + 2. * pad_x).js_max(group.map_or(0., |i| nodes[i].min_w));
         let box_h = content_h + pad_top + group.map_or(0., |i| nodes[i].pad_bottom);
         let off_x = (box_w - content_w) / 2.;
         let off_y = pad_top;

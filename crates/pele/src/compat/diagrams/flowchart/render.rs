@@ -4,6 +4,7 @@ use super::{
     model::{FlowchartModel, LabelType},
     shapes::canonical,
 };
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     layout::{
         compound::{compound_layout, direction, shift_layout, CEdge, CNode, CompoundResult, Dir},
@@ -36,7 +37,7 @@ const SHAPE_ATTRS: &str = " fill=\"var(--_s)\" stroke=\"var(--_b)\"";
 const LINE_ATTRS: &str = " stroke=\"var(--_b)\"";
 fn number_option(flow: Option<&Object>, key: &str, fallback: f64) -> f64 {
     match flow.and_then(|o| o.get(key)) {
-        Some(Value::Number(v)) if *v > 0. => v.min(2000.),
+        Some(Value::Number(v)) if *v > 0. => v.js_min(2000.),
         _ => fallback,
     }
 }
@@ -69,10 +70,9 @@ fn sideways(cnodes: &[CNode], i: usize, root: Dir) -> bool {
     dir.unwrap_or(root).sideways()
 }
 fn title_room(options: &RenderSettings) -> f64 {
-    options
-        .max_width
-        .filter(|w| *w > 0.)
-        .map_or(4000., |w| (w - 2. * options.padding.unwrap_or(8.)).max(80.))
+    options.max_width.filter(|w| *w > 0.).map_or(4000., |w| {
+        (w - 2. * options.padding.unwrap_or(8.)).js_max(80.)
+    })
 }
 /// A family that consumes the same flow graph but supplies its own group/layout behavior.
 /// The first consumer is the flowchart engine; swimlane can supply lane semantics without
@@ -183,9 +183,9 @@ fn draw(
         variant.prepare(&mut graph)
     }
     let size = options.font_size.unwrap_or(16.);
-    let edge_size = (size * 0.875 + 0.5).floor();
+    let edge_size = round(size * 0.875);
     let wrap_width =
-        number_option(flow, "wrappingWidth", 200.).min(if variant.is_some() && tight {
+        number_option(flow, "wrappingWidth", 200.).js_min(if variant.is_some() && tight {
             100.
         } else {
             f64::INFINITY
@@ -214,7 +214,7 @@ fn draw(
                 options,
                 font_size,
                 if variant.is_some() && tight {
-                    (title_room(options) / 2.).max(80.)
+                    (title_room(options) / 2.).js_max(80.)
                 } else {
                     4000.
                 },
@@ -269,7 +269,7 @@ fn draw(
                 let aw = asset_size(node.asset_width.as_ref(), bx);
                 let ah = asset_size(node.asset_height.as_ref(), bx);
                 (
-                    aw.max(label.width + 8.),
+                    aw.js_max(label.width + 8.),
                     ah + if label.height > 0. {
                         label.height + 6.
                     } else {
@@ -424,7 +424,7 @@ fn draw(
     } else {
         0.
     };
-    let inner = layout.width.max(title.width);
+    let inner = layout.width.js_max(title.width);
     let ox = pad + (inner - layout.width) / 2.;
     let oy = pad + title_height;
     shift_layout(&mut cnodes, &mut cedges, ox, oy);

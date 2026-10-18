@@ -1,5 +1,6 @@
 //! Pele layout/layered.ts, 458322a5 (MIT, kepano).
 //! Sugiyama ranks, virtual nodes, stable sweeps, Brandes–Köpf positioning and port routing.
+use crate::compat::number_math::NumberMath;
 use std::collections::{HashMap, HashSet};
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Kind {
@@ -292,7 +293,12 @@ pub fn rank(nodes: &mut [LNode], edges: &[LEdge], step: usize) {
     }
 }
 pub fn ease(across: f64, along: f64) -> f64 {
-    (4. * along.abs() / if across == 0. { 1. } else { across.abs() }).clamp(0.25, 0.5)
+    let across = if across == 0. || across.is_nan() {
+        1.
+    } else {
+        across.abs()
+    };
+    (4. * along.abs() / across).js_min(0.5).js_max(0.25)
 }
 pub fn layered(nodes: &mut [LNode], edges: &mut [LEdge], opt: &LayeredOptions) -> LayeredResult {
     let real = nodes.len();
@@ -619,7 +625,7 @@ pub fn layered(nodes: &mut [LNode], edges: &mut [LEdge], opt: &LayeredOptions) -
         gap[r] = if pieces.is_some() {
             usual(r)
         } else {
-            usual(r).max((MAX_GAP * opt.rank_sep / step as f64).min(run[r] * MIN_SLOPE))
+            usual(r).js_max((MAX_GAP * opt.rank_sep / step as f64).js_min(run[r] * MIN_SLOPE))
         }
     }
     let mut between = vec![true; max_rank + 1];
@@ -630,7 +636,7 @@ pub fn layered(nodes: &mut [LNode], edges: &mut [LEdge], opt: &LayeredOptions) -
         if opt.tracks || !between[r] || !matches!(heads[r], 1 | 2) {
             continue;
         }
-        let shift = (opt.head_room / 2.).min(gap[if heads[r] == 1 { r - 1 } else { r }] / 2.);
+        let shift = (opt.head_room / 2.).js_min(gap[if heads[r] == 1 { r - 1 } else { r }] / 2.);
         gap[r - 1] += if heads[r] == 1 { -shift } else { shift };
         gap[r] += if heads[r] == 1 { shift } else { -shift }
     }
@@ -668,9 +674,9 @@ pub fn layered(nodes: &mut [LNode], edges: &mut [LEdge], opt: &LayeredOptions) -
         for r in 0..max_rank {
             if track_count[r] > 0 {
                 gap[r] +=
-                    (2. * margin + (track_count[r] as f64 - 1.) * least_pitch - room[r]).max(0.)
+                    (2. * margin + (track_count[r] as f64 - 1.) * least_pitch - room[r]).js_max(0.)
             } else if tall[r] > 0. {
-                gap[r] += ((MAX_GAP * opt.rank_sep).min(tall[r]) - room[r]).max(0.)
+                gap[r] += ((MAX_GAP * opt.rank_sep).js_min(tall[r]) - room[r]).js_max(0.)
             }
         }
     }
@@ -692,7 +698,7 @@ pub fn layered(nodes: &mut [LNode], edges: &mut [LEdge], opt: &LayeredOptions) -
             p.levels[k]
         };
         let pitch = if count > 1 {
-            most_pitch.min((top[below[r]] - bottom[r] - 2. * margin) / (count as f64 - 1.))
+            most_pitch.js_min((top[below[r]] - bottom[r] - 2. * margin) / (count as f64 - 1.))
         } else {
             0.
         };
@@ -1259,7 +1265,7 @@ fn side_ends(
     if total == 0. {
         return (ids, room, 0.);
     }
-    let pitch = PORT_PITCH.min(span / total);
+    let pitch = PORT_PITCH.js_min(span / total);
     for r in room.iter_mut().skip(1) {
         *r *= pitch
     }
@@ -1267,7 +1273,7 @@ fn side_ends(
 }
 fn spread(g: &mut Graph, nodes: &[LNode], efk: &[u8], etk: &[u8]) {
     for v in 0..g.real {
-        let span = nodes[v].span.min(g.w[v]);
+        let span = nodes[v].span.js_min(g.w[v]);
         if span <= 0. || nodes[v].kind != Kind::Node {
             continue;
         }
@@ -1376,7 +1382,7 @@ fn align_labels(
         choices
             .into_iter()
             .find(|v| *v >= lo && *v <= hi)
-            .unwrap_or_else(|| lo.max(hi.min(choices[0])))
+            .unwrap_or_else(|| lo.js_max(hi.js_min(choices[0])))
     };
     let mut done = vec![false; g.n];
     for r in 1..g.max_rank {
@@ -1399,8 +1405,8 @@ fn align_labels(
                     done[d] = true;
                     chain.push(d);
                     let (least, most) = label_room(g, xs, d, opt);
-                    lo = lo.max(least);
-                    hi = hi.min(most)
+                    lo = lo.js_max(least);
+                    hi = hi.js_min(most)
                 }
                 d = g.et[g.succ_e[g.succ_start[d]]]
             }
@@ -1454,7 +1460,7 @@ fn wanted(
     let u = if side == 0 { g.ef[e] } else { g.et[e] };
     let point = xs[u] + if side == 0 { g.efd[e] } else { g.etd[e] };
     if again && (point - xs[v]).abs() <= span / 2. + IN_LINE {
-        return (-span / 2.).max((span / 2.).min(point - xs[v]));
+        return (-span / 2.).js_max((span / 2.).js_min(point - xs[v]));
     }
     let mut middle = point;
     let mut width = 0.;
@@ -1463,19 +1469,19 @@ fn wanted(
         && (if side == 0 { efk[e] } else { etk[e] }) != HELD
         && free[1 - side][u] >= 2
     {
-        width = nodes[u].span.min(g.w[u]).max(0.);
+        width = nodes[u].span.js_min(g.w[u]).js_max(0.);
         if width > 0. {
             middle = xs[u]
         }
     }
-    let lo = (xs[v] - span / 2.).max(middle - width / 2.);
-    let hi = (xs[v] + span / 2.).min(middle + width / 2.);
+    let lo = (xs[v] - span / 2.).js_max(middle - width / 2.);
+    let hi = (xs[v] + span / 2.).js_min(middle + width / 2.);
     if lo > hi + IN_LINE {
-        let lean = (span / 2. - LEAN_CLEAR).max(0.);
-        return (-lean).max(lean.min(point - xs[v]));
+        let lean = (span / 2. - LEAN_CLEAR).js_max(0.);
+        return (-lean).js_max(lean.js_min(point - xs[v]));
     }
     let place = (xs[v] * width + middle * span) / (width + span);
-    lo.max(hi.min(place)) - xs[v]
+    lo.js_max(hi.js_min(place)) - xs[v]
 }
 fn settle(
     g: &mut Graph,
@@ -1489,7 +1495,7 @@ fn settle(
     for pass in 0..6 {
         let mut moved = false;
         for v in 0..g.real {
-            let span = nodes[v].span.min(g.w[v]);
+            let span = nodes[v].span.js_min(g.w[v]);
             if span <= 0. || nodes[v].kind != Kind::Node {
                 continue;
             }
@@ -1575,7 +1581,7 @@ fn settle(
                             let level = if hi - total < lo {
                                 (lo + hi - total) / 2.
                             } else {
-                                lo.max((hi - total).min(sums[b] / counts[b] as f64))
+                                lo.js_max((hi - total).js_min(sums[b] / counts[b] as f64))
                             };
                             for _ in 0..counts[b] {
                                 if j > 0 {
@@ -2043,8 +2049,8 @@ fn assign_tracks(
     let geo = TrackGeometry {
         from: &p.from,
         to: &p.to,
-        lo: (0..total).map(|k| p.from[k].min(p.to[k])).collect(),
-        hi: (0..total).map(|k| p.from[k].max(p.to[k])).collect(),
+        lo: (0..total).map(|k| p.from[k].js_min(p.to[k])).collect(),
+        hi: (0..total).map(|k| p.from[k].js_max(p.to[k])).collect(),
     };
     for (r, mut all) in by_rank {
         if !curved {
@@ -2067,10 +2073,10 @@ fn assign_tracks(
                 {
                     continue;
                 }
-                let h = (room[r] / 2.).max(room[r] - 2. * LEVEL_LEAD);
+                let h = (room[r] / 2.).js_max(room[r] - 2. * LEVEL_LEAD);
                 let line_a = sample_curve(&geo, a, h);
                 let line_b = sample_curve(&geo, b, h);
-                let nearest = curve_reach(&line_a, &line_b).min(curve_reach(&line_b, &line_a));
+                let nearest = curve_reach(&line_a, &line_b).js_min(curve_reach(&line_b, &line_a));
                 if nearest
                     < if p.wide[a] || p.wide[b] {
                         LEVEL_CLEAR

@@ -1,5 +1,6 @@
 //! Pele diagrams/pie/render.ts + common/fit-width.ts, 458322a5 (MIT, kepano).
 use super::PieModel;
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     svg::{self, esc_text, js_num, label_svg, num, series_color},
     text::{layout_label, measure},
@@ -72,10 +73,10 @@ pub(super) fn render(
     let mut plot = 240.;
     result = draw(model, config, options, resources, plot / 2., true)?;
     for _ in 0..3 {
-        if result.width <= available || plot <= 140. {
+        if !(result.width > available && plot > 140.) {
             break;
         }
-        plot = (plot - (result.width - available)).max(140.);
+        plot = (plot - (result.width - available)).js_max(140.);
         result = draw(model, config, options, resources, plot / 2., true)?
     }
     Ok(result)
@@ -95,7 +96,7 @@ fn draw(
             .and_then(|o| o.get(key))
     };
     let size = options.font_size.unwrap_or(16.);
-    let small = (size * 0.875 + 0.5).floor();
+    let small = round(size * 0.875);
     let pad = options.padding.unwrap_or(8.);
     let text_position = match get("textPosition") {
         Some(Value::Number(n)) if *n >= 0. && *n <= 1. => *n,
@@ -132,13 +133,13 @@ fn draw(
             0,
         )?)
     }
-    let legend_width = legend.iter().map(|l| l.width).fold(0., f64::max)
+    let legend_width = legend.iter().map(|l| l.width).fold(0., NumberMath::js_max)
         + if legend.is_empty() { 0. } else { 20. };
     let legend_height = legend.len() as f64 * 26.;
     let title_room = options
         .max_width
         .filter(|n| *n > 0.)
-        .map_or(4000., |w| (w - 2. * pad).max(80.));
+        .map_or(4000., |w| (w - 2. * pad).js_max(80.));
     let title = layout_label(
         model.title.as_deref(),
         false,
@@ -197,16 +198,16 @@ fn draw(
         } else {
             0.
         };
-        height = height.max(legend_height)
+        height = height.js_max(legend_height)
     } else if stacked {
-        width = width.max(legend_width);
+        width = width.js_max(legend_width);
         height += if legend_height > 0. {
             20. + legend_height
         } else {
             0.
         }
     }
-    width = width.max(title.width);
+    width = width.js_max(title.width);
     let cx = pad
         + if side == "left" {
             legend_width + 32. + diameter / 2.

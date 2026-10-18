@@ -4,6 +4,7 @@ use super::{
     dates::Calendar,
     model::{GanttModel, GanttTask},
 };
+use crate::compat::number_math::{round, NumberMath};
 use crate::compat::{
     source::url::linked,
     svg::{
@@ -21,7 +22,7 @@ fn setting(c: &Object, key: &str, min: f64, max: f64) -> Option<f64> {
         .and_then(Value::as_object)
         .and_then(|c| c.get(key))
     {
-        Some(Value::Number(n)) if n.is_finite() => Some(n.max(min).min(max)),
+        Some(Value::Number(n)) if n.is_finite() => Some(n.js_max(min).js_min(max)),
         _ => None,
     }
 }
@@ -127,11 +128,11 @@ fn draw(
     pad: f64,
     now: f64,
 ) -> Result<Rendered, PeleError> {
-    let label_size = setting(c, "fontSize", 4., 72.).unwrap_or((size * 0.8125 + 0.5).floor());
+    let label_size = setting(c, "fontSize", 4., 72.).unwrap_or(round(size * 0.8125));
     let section_size = setting(c, "sectionFontSize", 4., 72.).unwrap_or(label_size);
-    let tick_size = (size * 0.75 + 0.5).floor();
-    let bar_h = setting(c, "barHeight", 4., 400.).unwrap_or((label_size * 1.85 + 0.5).floor());
-    let bar_gap = setting(c, "barGap", 0., 400.).unwrap_or((bar_h / 4. + 0.5).floor());
+    let tick_size = round(size * 0.75);
+    let bar_h = setting(c, "barHeight", 4., 400.).unwrap_or(round(label_size * 1.85));
+    let bar_gap = setting(c, "barGap", 0., 400.).unwrap_or(round(bar_h / 4.));
     let row_h = bar_h + bar_gap;
     let section_styles =
         (setting(c, "numberSectionStyles", 1., 1000.).unwrap_or(4.) + 0.5).floor() as usize;
@@ -213,8 +214,8 @@ fn draw(
     let (mut start, mut stop) = (f64::INFINITY, f64::NEG_INFINITY);
     for t in tasks {
         if scheduled(t) {
-            start = start.min(t.start_time.unwrap());
-            stop = stop.max(t.end_time.unwrap())
+            start = start.js_min(t.start_time.unwrap());
+            stop = stop.js_max(t.end_time.unwrap())
         }
     }
     let title = layout_label(m.title.as_deref(), false, cal.resources, o, size, 4000., 1)?;
@@ -224,8 +225,8 @@ fn draw(
         0.
     };
     if !(start <= stop) {
-        let width = (title.width.max(1.) + 2. * pad).ceil();
-        let height = (title.height.max(1.) + 2. * pad).ceil();
+        let width = (title.width.js_max(1.) + 2. * pad).ceil();
+        let height = (title.height.js_max(1.) + 2. * pad).ceil();
         let content = label_svg(
             &title,
             width / 2.,
@@ -260,7 +261,7 @@ fn draw(
             180.,
             0,
         )?;
-        section_width = section_width.max(label.width);
+        section_width = section_width.js_max(label.width);
         section_labels.insert(section.clone(), label);
     }
     let axis_format = if !m.axis_format.is_empty() {
@@ -274,7 +275,7 @@ fn draw(
     cal.check()?;
     let b = time_format(cal, axis_format, stop);
     cal.check()?;
-    let sample_width = measure(cal.resources, o, &a, tick_size, 0)?.max(measure(
+    let sample_width = measure(cal.resources, o, &a, tick_size, 0)?.js_max(measure(
         cal.resources,
         o,
         &b,
@@ -288,16 +289,17 @@ fn draw(
             } else {
                 0.
             })
-            .max(sample_width / 2.),
+            .js_max(sample_width / 2.),
         );
-    let right_pad = setting(c, "rightPadding", 0., 2000.).unwrap_or(16f64.max(sample_width / 2.));
+    let right_pad =
+        setting(c, "rightPadding", 0., 2000.).unwrap_or(16f64.js_max(sample_width / 2.));
     let natural = setting(c, "useWidth", 100., 20000.).unwrap_or(800.);
     let target = if let Some(a) = o.max_width.filter(|n| *n > 0.) {
-        natural.min(280.).max(natural.min(a))
+        natural.js_min(280.).js_max(natural.js_min(a))
     } else {
         natural
     };
-    let plot_width = 240f64.max(target - left - right_pad - pad);
+    let plot_width = 240f64.js_max(target - left - right_pad - pad);
     let right = left + plot_width;
     let scale = if stop > start {
         plot_width / (stop - start)
@@ -311,13 +313,13 @@ fn draw(
             left + (t - start) * scale
         }
     };
-    let tick_h = (tick_size * 1.75 + 0.5).floor();
+    let tick_h = round(tick_size * 1.75);
     let top_padding = setting(c, "topPadding", 0., 2000.);
     let grid_start = setting(c, "gridLineStartPadding", 0., 2000.);
     let head_h = pad + title_h + if top_axis { tick_h } else { 0. };
-    let plot_top = head_h.max(top_padding.unwrap_or(0.));
+    let plot_top = head_h.js_max(top_padding.unwrap_or(0.));
     let grid_lead = match (top_padding, grid_start) {
-        (Some(top), Some(grid)) => (top - grid).min(plot_top - head_h).max(0.),
+        (Some(top), Some(grid)) => (top - grid).js_min(plot_top - head_h).js_max(0.),
         _ => 0.,
     };
     let plot_h = row_count.max(1) as f64 * row_h;
@@ -330,7 +332,7 @@ fn draw(
         let row = row_of[&m.public_task_identity(i)];
         if !scheduled(t) {
             let label_x = left + 8. + label.width / 2.;
-            extent = extent.max(label_x + label.width / 2.);
+            extent = extent.js_max(label_x + label.width / 2.);
             bars.push(Bar {
                 task: i,
                 label,
@@ -344,7 +346,7 @@ fn draw(
         }
         let mut x0 = x(t.start_time.unwrap());
         let mut x1 = x(t.render_end_time.or(t.end_time).unwrap())
-            .max(x0 + if t.milestone { 0. } else { 2. });
+            .js_max(x0 + if t.milestone { 0. } else { 2. });
         if t.milestone {
             let mid = x0 + (x(t.end_time.unwrap()) - x0) / 2.;
             x0 = mid - bar_h / 2.;
@@ -360,7 +362,7 @@ fn draw(
             } else {
                 x0 - 8. - label.width / 2.
             };
-            extent = extent.max(label_x + label.width / 2.)
+            extent = extent.js_max(label_x + label.width / 2.)
         }
         bars.push(Bar {
             task: i,
@@ -415,7 +417,7 @@ fn draw(
         }
         last_right = tx + width / 2.;
         last_label = label.clone();
-        extent = extent.max(last_right);
+        extent = extent.js_max(last_right);
         let body = format!("text-anchor=\"middle\">{}</text>", esc(&label));
         axis_bottom += &format!(
             "<text x=\"{}\" y=\"{}\" {body}",
@@ -433,7 +435,7 @@ fn draw(
     let (mut vert_lines, mut vert_labels) = (String::new(), String::new());
     let mut vert_ends = vec![];
     let vert_top = plot_bottom + tick_h + 4.;
-    let vert_line = (label_size * 1.5 + 0.5).floor();
+    let vert_line = round(label_size * 1.5);
     verts.sort_by(|&a, &b| {
         tasks[a]
             .start_time
@@ -444,7 +446,7 @@ fn draw(
         let t = &tasks[i];
         let vx = x(t.start_time.unwrap());
         let label = one_line(&t.task, label_size, o, cal.resources)?;
-        let cx = (pad + label.width / 2.).max(vx);
+        let cx = (pad + label.width / 2.).js_max(vx);
         let line = vert_ends
             .iter()
             .position(|&end| cx - label.width / 2. >= end + 8.)
@@ -454,7 +456,7 @@ fn draw(
         } else {
             vert_ends[line] = cx + label.width / 2.
         }
-        extent = extent.max(vert_ends[line]);
+        extent = extent.js_max(vert_ends[line]);
         vert_lines += &format!(
             "<path class=\"pele-vert\" data-id=\"{}\" d=\"M{},{}V{}\"/>",
             esc_text(&t.id)?,
@@ -472,7 +474,7 @@ fn draw(
             ),
         )
     }
-    let width = (extent.max(pad + title.width) + pad).ceil();
+    let width = (extent.js_max(pad + title.width) + pad).ceil();
     let height = (plot_bottom
         + tick_h
         + if !vert_ends.is_empty() {
@@ -535,8 +537,8 @@ fn draw(
                 end_civil.millisecond = 999;
                 let b = cal.local(end_civil);
                 cal.check()?;
-                let ex0 = left.max(x(a));
-                let ex1 = right.min(x(b));
+                let ex0 = left.js_max(x(a));
+                let ex1 = right.js_min(x(b));
                 if ex1 > ex0 {
                     excluded += &format!(
                         "<rect x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\"/>",

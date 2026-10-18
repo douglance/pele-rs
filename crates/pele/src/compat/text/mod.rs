@@ -301,7 +301,7 @@ pub(crate) fn layout_label(
     let Some(raw) = raw.filter(|s| !s.is_empty()) else {
         return Ok(Label::default());
     };
-    let line_height = (size * 1.5 + 0.5).floor();
+    let line_height = crate::compat::number_math::round(size * 1.5);
     static MARKUP: OnceLock<Regex> = OnceLock::new();
     let markup = MARKUP.get_or_init(|| Regex::new(r"[<\\\n*_]|fa[bklrs]?:fa-").unwrap());
     if !markup.is_match(raw) && !raw.contains('&') && !raw.contains('ﬂ') {

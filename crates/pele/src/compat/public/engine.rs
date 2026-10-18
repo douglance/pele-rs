@@ -566,7 +566,7 @@ impl PublicDocument {
         options: &RenderOptions,
         host: &mut dyn RenderResources,
     ) -> Result<RenderOutcome, PeleError> {
-        self.render_operation_policy(expected_revision, options, host, None)
+        self.render_operation_policy(expected_revision, options, host, None, false)
     }
     /// Exact output comparison after rendering. Dispatched mutations/revision
     /// publish on limit and host errors, under the existing graph export budgets.
@@ -577,7 +577,18 @@ impl PublicDocument {
         limit: OutputLimit,
         host: &mut dyn RenderResources,
     ) -> Result<RenderOutcome, PeleError> {
-        self.render_operation_policy(expected_revision, options, host, Some(limit))
+        self.render_operation_policy(expected_revision, options, host, Some(limit), true)
+    }
+    /// Additive native lane: bound returned SVG bytes even when the caller keeps
+    /// legacy integer output semantics. Dispatched errors still publish state.
+    pub fn render_operation_bounded(
+        &mut self,
+        expected_revision: u64,
+        options: &RenderOptions,
+        output_limit: Option<OutputLimit>,
+        host: &mut dyn RenderResources,
+    ) -> Result<RenderOutcome, PeleError> {
+        self.render_operation_policy(expected_revision, options, host, output_limit, true)
     }
     fn render_operation_policy(
         &mut self,
@@ -585,6 +596,7 @@ impl PublicDocument {
         options: &RenderOptions,
         host: &mut dyn RenderResources,
         limit: Option<OutputLimit>,
+        enforce_native_bytes: bool,
     ) -> Result<RenderOutcome, PeleError> {
         if expected_revision != self.revision {
             return Err(PeleError::new(
@@ -604,6 +616,7 @@ impl PublicDocument {
             options,
             host,
             limit,
+            enforce_native_bytes,
             |settings, session| {
                 let codec = &self.registration.codec;
                 let result = match limit {

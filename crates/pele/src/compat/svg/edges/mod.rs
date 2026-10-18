@@ -4,6 +4,7 @@ pub(crate) mod cluster;
 pub(crate) mod theme;
 
 use super::{esc_text, label_svg_with_resources, num};
+use crate::compat::number_math::NumberMath;
 use crate::compat::{layout::layered::ease, text::Label, PeleError, RenderResources};
 use std::collections::HashMap;
 
@@ -80,7 +81,7 @@ impl Route {
         let dx = self.xs[j] - self.xs[i];
         let dy = self.ys[j] - self.ys[i];
         let len = dx.hypot(dy);
-        let len = if len == 0. { 1. } else { len };
+        let len = if len == 0. || len.is_nan() { 1. } else { len };
         (dx / len, dy / len)
     }
     fn length(&self, i: usize) -> f64 {
@@ -108,8 +109,8 @@ impl Route {
     }
 }
 fn lead(reach: f64, trim: f64, run: f64) -> f64 {
-    let room = (reach - LEAD - trim).max(0.).min(run / 4.);
-    room + (reach - trim - room).min((run - room) / 4.)
+    let room = (reach - LEAD - trim).js_max(0.).js_min(run / 4.);
+    room + (reach - trim - room).js_min((run - room) / 4.)
 }
 fn line_to(d: &mut String, at: &mut (f64, f64), x: f64, y: f64) {
     if near(x, y, at.0, at.1) {
@@ -256,7 +257,7 @@ pub(crate) fn route_path(
             r.length(i + 1)
         };
         if stepped {
-            before = CORNER.min(before).min(after);
+            before = CORNER.js_min(before).js_min(after);
             after = before;
         }
         let (ux, uy) = r.unit(i - 1, i, r.axes[i]);
@@ -351,10 +352,10 @@ pub(crate) fn loop_path(
     e: &mut LoopLabel,
 ) -> EdgePath {
     let half = if sideways { w } else { h } / 2.;
-    let spread = (half - 4.).min(8. + k as f64 * 6.);
+    let spread = (half - 4.).js_min(8. + k as f64 * 6.);
     let reach = base + k as f64 * 8.;
     let len = reach.hypot(spread);
-    let len = if len == 0. { 1. } else { len };
+    let len = if len == 0. || len.is_nan() { 1. } else { len };
     let at = |out: f64, along: f64| {
         if sideways {
             format!("{},{}", num(cx + along), num(cy + h / 2. + out))
