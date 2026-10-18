@@ -2,17 +2,6 @@
 //! This bounded UTF-8 source/JSON lane is not the complete lossless source/options ABI.
 use super::{calendar, compatibility_call, compatibility_input, PeleHostResourcesV3, PeleResult};
 use pele::compat::{
-    diagrams::{
-        agentflow::AgentFlow, c4::C4, class_diagram::Class, event_modeling::EventModeling,
-        gantt::Gantt, git_graph::GitGraph, ishikawa::Ishikawa, requirement::RequirementDiagram,
-        sequence::Sequence, state::State, tree_view::TreeView, usecase::Usecase, venn::Venn,
-    },
-    diagrams::{
-        architecture::Architecture, er::Er, flowchart::Flowchart, info::Info, journey::Journey,
-        kanban::Kanban, mindmap::Mindmap, packet::Packet, pie::Pie, quadrant_chart::QuadrantChart,
-        radar::Radar, sankey::Sankey, swimlane::Swimlane, timeline::Timeline, treemap::Treemap,
-        xychart::XyChart,
-    },
     public::{ModelGraph, PublicDocument, PublicEngine},
     ErrorCode, PeleError,
 };
@@ -110,37 +99,7 @@ pub unsafe extern "C" fn pele_public_parse_v4(
         let source = unsafe { compatibility_input(source, source_len, 16 * 1024 * 1024) }?;
         let options = unsafe { compatibility_input(options, options_len, 1024 * 1024) }?;
         let options = pele::compat::parse_options(options)?;
-        let mut registry = PublicEngine::empty();
-        registry.register(Pie);
-        registry.register(Info);
-        registry.register(Sankey);
-        registry.register(Packet);
-        registry.register(Radar);
-        registry.register(QuadrantChart);
-        registry.register(Treemap);
-        registry.register(Journey);
-        registry.register(XyChart);
-        registry.register(Kanban);
-        registry.register(Mindmap);
-        registry.register(Timeline);
-        registry.register(Flowchart);
-        registry.register(Swimlane);
-        registry.register(Er);
-        registry.register(Architecture);
-        registry.register(AgentFlow);
-        registry.register(Class);
-        registry.register(EventModeling);
-        registry.register(GitGraph);
-        registry.register(Ishikawa);
-        registry.register(State);
-        registry.register(TreeView);
-        registry.register(Venn);
-        registry.register(Sequence);
-        registry.register(Gantt);
-        registry.register(C4);
-        registry.register(RequirementDiagram);
-        registry.register(Usecase);
-
+        let registry = PublicEngine::with_builtins();
         let document = registry.parse(source, &options).map_err(|mut error| {
             if error.code == ErrorCode::UnsupportedDiagram {
                 if let Some(kind) = &error.diagram_type {

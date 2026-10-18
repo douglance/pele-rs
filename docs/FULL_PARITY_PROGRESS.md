@@ -796,3 +796,52 @@ Full mutable Swift corpus verification is a separate pending gate. Set
 mutable drawings, graph edits/cycles/UTF-16, exact error fields and ownership.
 Five pre-existing native graph-export budget differences are source-hash pinned.
 Full constructor/callback/active UTF-16 parity and release readiness remain open.
+
+
+## All thirty-three native mutable codecs
+
+Block and Wardley complete the source-built native codec inventory. This is
+module/API implementation coverage, not full JavaScript runtime certification.
+`PublicEngine::with_builtins()` provides the same extensible typed registration
+interface for all 33 codecs; the C/Swift parse entry uses this central registry.
+`empty()` plus `register()` remain available for custom modules/replacements.
+
+Block passes ten public and three original release integration tests, including
+all 12,294 historical outcomes (4,584 SVGs, 7,710 errors), nineteen edited/method
+SVG checks and five real own helper functions plus six prototype methods. Three
+pre-existing deep JSON projection omissions retain actual parse/render proof.
+Parser counters/private collections, original array aliases, iterative hierarchy
+building, partial-limit state, accessor metadata and descriptor-aware lengths
+remain covered without changing original immutable SVGs.
+
+Railroad passes six public and two original release tests, all 12,288 historical
+outcomes, 27 mutation vectors/71 calls/63 SVG hashes and eight exact measurement
+traces. Its bounded identity-aware breadth-first budget pass matches shared IR
+objects at different depths. Thirty-three original JSON-depth projection omissions
+retain source render/error checks; active callback/UTF-16 boundaries remain explicit.
+
+Cynefin passes four public and two original release tests, all 7,209 historical
+outcomes and 78 graph vectors/54 edits/146 SVGs. Wardley passes four public and
+two original release tests, all 7,730 historical outcomes and 99 graph vectors/
+82 edits/182 SVGs, including non-finite output dimensions. Both expose the actual
+plain object; discarded internal builder methods are not fabricated. Native
+pixels, aliases, retained ownership, reflow, budgets and recovery are tested.
+
+The six prior additions (Venn, Sequence, Gantt, C4, Requirement, Usecase) passed
+105,986 scenarios through the immutable Swift corpus plus actual mutable C/binary
+snapshot/edit/render/error crossings. All three declared Usecase export budget
+differences remain exercised. Final unfiltered 33-family native/Swift consolidation
+and separate packaged consumers are pending below this checkpoint.
+
+A clean checkout without local artifacts also builds and runs the published
+v0.1.0 binary consumer. The new PublicBinary.swift is excluded alongside other
+source-only APIs on that legacy path. Current source-built Swift retains all new
+APIs. Two actual-C XYChart feature slices verify array append/truncate/grow,
+descriptors, stale edits and recovery; plain-family declared-title edits compare
+against equivalent source output rather than only unused extension properties.
+
+The development performance harness in `scripts/perf` verifies all 21 workloads
+against pinned complete SVG hashes and reports native stages, JS references,
+allocations and transport independently. The initial shared-host baseline and
+warmup caveats are recorded in its results directory. No runtime optimization or
+general Rust/GPU speedup claim follows from this first baseline.

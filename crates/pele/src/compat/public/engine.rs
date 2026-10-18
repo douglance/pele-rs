@@ -181,6 +181,45 @@ pub struct PublicEngine {
     modules: Vec<Arc<Registration>>,
 }
 impl PublicEngine {
+    /// All built-in mutable codecs. Register extensions/replacements through the
+    /// same typed interface; registration alone does not certify runtime parity.
+    pub fn with_builtins() -> Self {
+        let mut engine = Self::empty();
+        engine.register(crate::compat::diagrams::venn::Venn);
+        engine.register(crate::compat::diagrams::ishikawa::Ishikawa);
+        engine.register(crate::compat::diagrams::swimlane::Swimlane);
+        engine.register(crate::compat::diagrams::wardley::Wardley);
+        engine.register(crate::compat::diagrams::event_modeling::EventModeling);
+        engine.register(crate::compat::diagrams::usecase::Usecase);
+        engine.register(crate::compat::diagrams::cynefin::Cynefin);
+        engine.register(crate::compat::diagrams::tree_view::TreeView);
+        engine.register(crate::compat::diagrams::agentflow::AgentFlow);
+        engine.register(crate::compat::diagrams::requirement::RequirementDiagram);
+        engine.register(crate::compat::diagrams::block::Block);
+        engine.register(crate::compat::diagrams::railroad::Railroad);
+        engine.register(crate::compat::diagrams::treemap::Treemap);
+        engine.register(crate::compat::diagrams::c4::C4);
+        engine.register(crate::compat::diagrams::info::Info);
+        engine.register(crate::compat::diagrams::git_graph::GitGraph);
+        engine.register(crate::compat::diagrams::architecture::Architecture);
+        engine.register(crate::compat::diagrams::sankey::Sankey);
+        engine.register(crate::compat::diagrams::state::State);
+        engine.register(crate::compat::diagrams::gantt::Gantt);
+        engine.register(crate::compat::diagrams::sequence::Sequence);
+        engine.register(crate::compat::diagrams::xychart::XyChart);
+        engine.register(crate::compat::diagrams::class_diagram::Class);
+        engine.register(crate::compat::diagrams::er::Er);
+        engine.register(crate::compat::diagrams::flowchart::Flowchart);
+        engine.register(crate::compat::diagrams::kanban::Kanban);
+        engine.register(crate::compat::diagrams::mindmap::Mindmap);
+        engine.register(crate::compat::diagrams::pie::Pie);
+        engine.register(crate::compat::diagrams::quadrant_chart::QuadrantChart);
+        engine.register(crate::compat::diagrams::packet::Packet);
+        engine.register(crate::compat::diagrams::radar::Radar);
+        engine.register(crate::compat::diagrams::timeline::Timeline);
+        engine.register(crate::compat::diagrams::journey::Journey);
+        engine
+    }
     pub fn empty() -> Self {
         Self::default()
     }

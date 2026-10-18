@@ -1,12 +1,13 @@
 # Development mutable model interfaces
 
-The source-built development branch has all 33 diagram renderers. Twenty-nine
+The source-built development branch has all 33 diagram renderers. All 33
 families expose mutable public models through Rust and Swift/C. Twenty-three
 also expose browser WASM models: Pie, Info, Sankey, Packet, Radar, Quadrant,
 Treemap, Journey, XYChart, Kanban, Mindmap, Timeline, Flowchart, Swimlane, ER,
 Architecture, GitGraph, AgentFlow, Ishikawa, Class, EventModeling, TreeView and
-State. The six additional native/Swift families are Venn, Sequence, Gantt, C4,
-Requirement and Usecase; their browser checkpoint remains pending.
+State. The ten additional native/Swift families are Venn, Sequence, Gantt, C4,
+Requirement, Usecase, Cynefin, Railroad, Wardley and Block; their browser checkpoint
+remains pending.
 Methods are available where inventoried. All thirty-four AgentFlow method
 descriptors now have native implementations, including returned Error values.
 The published v0.1.0 binary remains the earlier flowchart subset.
@@ -67,6 +68,13 @@ try document.apply(snapshot.graph, expectedRevision: snapshot.revision)
 let result = try document.render()
 try document.close()
 ```
+
+Array edits use `setArrayElement(_:value:on:)` and `setArrayLength(_:on:)`.
+`setField` routes canonical numeric indexes and `length` through the same checked
+operations, so appends are rendered and truncation removes the right elements.
+These are transactional Swift graph edits: readonly/nonconfigurable structural
+failures leave the graph unchanged. They do not emulate JavaScript's partial
+Array-length assignment failures. Non-index fields remain ordinary properties.
 
 `schema()` describes native method IDs. Returned Errors use
 `PublicGraph.Node.error(errorType:properties:)`, keeping eight runtime brands,

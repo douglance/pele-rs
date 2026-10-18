@@ -18,14 +18,18 @@ final class MutableRemainingTests: XCTestCase {
         guard case .string(let id) = atom else { throw PeleError(code: "test", message: "Expected graph string") }
         return try XCTUnwrap(graph.strings[Int(id)].stringIfWellFormed)
     }
-    func testSixMoreNativeModelsKeepMutationsValuesAndRenderedPixels() throws {
+    func testTenMoreNativeModelsKeepMutationsValuesAndRenderedPixels() throws {
         let sources = [
             ("venn", "venn-beta\nset A[\"Alpha\"]:20\nset B[\"Beta\"]:14\nunion A,B[\"Both\"]:3", 8),
             ("sequence", "sequenceDiagram\nAlice->>Bob:Hello", 17),
             ("gantt", "gantt\ndateFormat YYYY-MM-DD\nsection Work\nTask:a,2024-01-01,2d", 31),
             ("c4", "C4Context\nPerson(user,\"Customer\")\nSystem(app,\"Banking\")\nRel(user,app,\"Uses\")", 19),
             ("requirement", "requirementDiagram\nrequirement A {\n text: first\n}\nelement E {\n type: Thing\n}\nA - contains -> E", 17),
-            ("usecase", "usecase-beta\nactor A(\"Client\")\nU(\"Login\")\nA --> U", 0)
+            ("usecase", "usecase-beta\nactor A(\"Client\")\nU(\"Login\")\nA --> U", 0),
+            ("block", "block-beta\ncolumns 2\napp[\"Swift\"] core[\"Rust\"]\napp --> core", 11),
+            ("railroad", "railroad-abnf-beta\nrule = \"test\" / \"more\" ;", 5),
+            ("cynefin", "cynefin-beta\n  complex\n    \"Emergent practice\"\n  clear\n    \"Best practice\"", 0),
+            ("wardley", "wardley-beta\ncomponent App [0.8, 0.3]\ncomponent Core [0.4, 0.7]\nApp -> Core", 0)
         ]
         var resources = Pele.HostResources(); resources.timeZone = TimeZone(secondsFromGMT: 0)!
         resources.nowMillis = { 1_704_067_200_000 }
@@ -55,6 +59,15 @@ final class MutableRemainingTests: XCTestCase {
                 let outcome = try document.invoke(method: title.id, receiver: edited.root, arguments: [.string(value)], resources: resources)
                 guard case .returned = outcome.result else { return XCTFail("Title method \(family)") }
                 XCTAssertTrue(try document.render(options: options, resources: resources).svg.contains("Swift API title"), family)
+            } else {
+                var edited = saved; let title = try edited.intern("Swift API title")
+                try edited.setField("title", value: .string(title))
+                try document.apply(edited, expectedRevision: document.revision)
+                let changed = try document.render(options: options, resources: resources)
+                let equivalent = try engine.render("---\ntitle: Swift API title\n---\n" + source, options: options, resources: resources)
+                XCTAssertEqual(changed.svg, equivalent.svg, family)
+                XCTAssertNotEqual(changed.svg, rendered.svg, family)
+                XCTAssertTrue(changed.svg.contains("Swift API title"), family)
             }
             try document.close(); XCTAssertThrowsError(try document.snapshot())
         }
