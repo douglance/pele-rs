@@ -31,6 +31,15 @@ impl ParsedDocument {
     pub fn to_public(&self) -> Result<Option<MutableDocument>, JsValue> {
         use pele::compat::{
             diagrams::{
+                agentflow::{AgentFlow, AgentflowModel},
+                class_diagram::{Class, ClassModel},
+                event_modeling::{EventModeling, EventModelingModel},
+                git_graph::{GitGraph, GitModel},
+                ishikawa::{Ishikawa, IshikawaModel},
+                state::{State, StateModel},
+                tree_view::{TreeView, TreeViewModel},
+            },
+            diagrams::{
                 architecture::{Architecture, ArchitectureModel},
                 er::{Er, ErModel},
                 flowchart::{Flowchart, FlowchartModel},
@@ -87,6 +96,20 @@ impl ParsedDocument {
             PublicDocument::from_module(Journey, model, self.inner.config().clone())
         } else if let Some(model) = self.inner.model::<XyChartModel>() {
             PublicDocument::from_module(XyChart, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<AgentflowModel>() {
+            PublicDocument::from_module(AgentFlow, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<ClassModel>() {
+            PublicDocument::from_module(Class, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<EventModelingModel>() {
+            PublicDocument::from_module(EventModeling, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<GitModel>() {
+            PublicDocument::from_module(GitGraph, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<IshikawaModel>() {
+            PublicDocument::from_module(Ishikawa, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<StateModel>() {
+            PublicDocument::from_module(State, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<TreeViewModel>() {
+            PublicDocument::from_module(TreeView, model, self.inner.config().clone())
         } else {
             return Ok(None);
         };

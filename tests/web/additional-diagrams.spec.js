@@ -11,16 +11,35 @@ for(const family of ['packet','radar','quadrant','timeline','journey','flowchart
       const canonical=value=>JSON.stringify(value,(_,v)=>v instanceof Map?[...v]:v&&typeof v==='object'&&!Array.isArray(v)?Object.fromEntries(Object.entries(v).sort(([a],[b])=>a.localeCompare(b))):v);
       const mismatches=[];
       const oracle=family==='gantt'?await import('/dist/evidence/pele-oracle.js'):null;
-      let runtimeDateCases=0, flatProjectionCases=0;
+      let runtimeDateCases=0, flatProjectionCases=0, transportBoundaryCases=0, jsonTransportBoundaryCases=0;
       // The old corpus omits this declared private lookup. Raw public ownership
       // and alias identity have their own mutable-model E2E proof.
       const comparedModel=model=>{
-        const omitted=model?.type==='sankey'?['lookup']:model?.type==='flowchart'?['subgraphLookup','members','edgeById','pairCount','subCount','options']:model?.type==='er'?['subgraphLookup','claimed']:[];
-        return omitted.length?Object.fromEntries(Object.entries(model).filter(([key])=>!omitted.includes(key))):model;
+        const omitted=model?.type==='sankey'?['lookup']:model?.type==='flowchart'?['subgraphLookup','members','edgeById','pairCount','subCount','options']:model?.type==='er'?['subgraphLookup','claimed']:model?.type==='agentflow'?['subgraphLookup','globalNodes','members','edgeById','pairCount','subCount','bareMappings','firstMapping','reported','options']:model?.type==='state'?['dividerCount']:model?.type==='ishikawa'?['stack','baseLevel']:[];
+        const view=omitted.length?Object.fromEntries(Object.entries(model).filter(([key])=>!omitted.includes(key))):model;
+        if(model?.type==='state')view.direction=model.direction;
+        return view;
       };
       for(const c of fixture.cases) {
         let actual,model,semanticModel,projectionBounded=false;
         const host=c.host??{},options={...c.options,measurer:host.measure==='fixed'?{width:(text,size,style)=>text.length*size*(style&1?.71:.6)}:metricsMeasurer,...(host.allIcons?{icons:()=>'<path d="M0,0"/>'}:host.icons?{icons:n=>Object.hasOwn(host.icons,n)&&typeof host.icons[n]==='string'?host.icons[n]:undefined}:{})};
+        const classTransportBoundaries={
+          'stress/namespace name of 12,000 parts':'046702029bd9c44c84e60976877b377f08f77f0f4a874cde27c3985b9b232bc5',
+          'stress/4,000 nested namespaces':'56424df5324ecd9871e81aa3b3e06e3f8504a0fd521cc162e4330a725e13ffa0'
+        };
+        if(family==='class'&&Object.hasOwn(classTransportBoundaries,c.id)){
+          const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(c.source));
+          const hash=[...new Uint8Array(bytes)].map(v=>v.toString(16).padStart(2,'0')).join('');
+          if(hash!==classTransportBoundaries[c.id])mismatches.push(c.id+': boundary source hash');
+          const errorValue=e=>({name:e.name,message:e.message,code:e.code,type:e.type,line:e.line,column:e.column,snippet:e.snippet});
+          let nativeError,sourceError,unexpectedModel;
+          try{unexpectedModel=engine.parse(c.source,c.options)}catch(e){nativeError=errorValue(e)}finally{if(unexpectedModel)engine.dispose(unexpectedModel)}
+          try{engine.render(c.source,options)}catch(e){sourceError=errorValue(e)}
+          if(canonical(nativeError)!==canonical({name:'PeleError',message:'Public model graph exceeds work budget',code:'limit',type:null,line:0,column:0,snippet:''}))mismatches.push(c.id+': native transport boundary');
+          if(canonical(sourceError)!==canonical(c.expected.error))mismatches.push(c.id+': source error');
+          transportBoundaryCases++;
+          continue;
+        }
         let expected={...c.expected};
         // Diagnostic provenance is not part of the public parse/render envelope.
         delete expected.upstreamModelSha256;
@@ -41,7 +60,20 @@ for(const family of ['packet','radar','quadrant','timeline','journey','flowchart
         try {
           if((host.modelProjection==='excluded'||expected.modelProjectionLimit)) {
             let bounded=false, projected;
-            try {projected=engine.parse(c.source,c.options)} catch(e){bounded=e.code==='limit'&&e.type===publicType}
+            try {projected=engine.parse(c.source,c.options)} catch(e){
+              bounded=e.code==='limit'&&e.type===publicType;
+              const classJsonBoundaries={
+                'stress/1,600 classDefs applied to 1,600 classes':'b82045f65afca176762902f6be9aeb2bb9cf9aea68e003a06e00550eb607b522',
+                'stress/a classDef of 5,000 declarations on 800 classes, each with a style of its own':'d1b872a618e7c94e99fad4e176ac92125210ce7954dbdd5fde4adc1db3d1c69a'
+              };
+              if(family==='class'&&Object.hasOwn(classJsonBoundaries,c.id)){
+                const bytes=await crypto.subtle.digest('SHA-256',new TextEncoder().encode(c.source));
+                const hash=[...new Uint8Array(bytes)].map(v=>v.toString(16).padStart(2,'0')).join('');
+                if(hash!==classJsonBoundaries[c.id])mismatches.push(c.id+': foreign JSON boundary source hash');
+                bounded=e.name==='PeleError'&&e.code==='limit'&&e.type===null&&e.message==='Public result JSON exceeds 64 MiB transport budget'&&e.line===0&&e.column===0&&e.snippet==='';
+                jsonTransportBoundaryCases++;
+              }
+            }
             projectionBounded=bounded||!!projected;
             if(!projectionBounded)mismatches.push(`${c.id}: projection failed outside declared bounds`);
             let rendered;
@@ -84,8 +116,10 @@ for(const family of ['packet','radar','quadrant','timeline','journey','flowchart
           if(model.nodes.size!==c.expected.nodes||model.edges.length!==c.expected.edges||model.edges[0].type!==c.expected.firstEdgeType)mismatches.push(`generated/${c.id}`);
         } finally {if(model)engine.dispose(model)}
       }
-      return {count:fixture.cases.length,runtimeDateCases,flatProjectionCases,mismatches};
+      return {count:fixture.cases.length,runtimeDateCases,flatProjectionCases,transportBoundaryCases,jsonTransportBoundaryCases,mismatches};
     },family);
+    if(report.jsonTransportBoundaryCases)console.log(`${family}: ${report.jsonTransportBoundaryCases} explicit foreign 64 MiB JSON transport differences verified separately from source parity`);
+    if(report.transportBoundaryCases)console.log(`${family}: ${report.transportBoundaryCases} explicit mutable graph transport differences verified separately from source parity`);
     if(report.flatProjectionCases)console.log(`${family}: ${report.flatProjectionCases} previous projection exceptions now exercised through flat public models`);
     if(report.runtimeDateCases)console.log(`${family}: ${report.runtimeDateCases} browser Date.parse cases checked against pinned same-browser Pele`);
     expect(report.count).toBeGreaterThan(100);

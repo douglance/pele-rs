@@ -649,3 +649,26 @@ unexecuted. Active sparse/lone-surrogate rendering, nonnumeric singleton sizes
 with triple inference, exact render-error categories, exotic overrides and work
 ceilings remain open. A typed Vec cannot retain original array identity after
 permuting indistinguishable duplicate subsets. The renderer is unchanged.
+
+
+## Twenty-three mutable codecs through Swift and browser WASM
+
+GitGraph, AgentFlow, Ishikawa, Class, EventModeling, TreeView and State join the
+previous sixteen foreign mutable codecs. Strict C integration and ten Swift
+feature slices pass, including actual macOS image decoding and native method
+dispatch. The packed browser package passes twenty-seven feature/error/operation
+checks across Chrome, Firefox and WebKit. Eighteen corpus checks pass for six
+families across all three browsers. The separate three-browser Class rerun
+verifies its corpus plus four exact transport boundaries: the two known native
+16M-unit graph differences and two additional 64 MiB foreign JSON export ceilings
+for valid large style models. Source hashes, exact errors and source SVGs are
+checked; these differences do not count as public-model parity. The first corpus
+run exposed the two foreign ceilings rather than silently accepting them.
+
+Raw prototype descriptors, nested ClassMember calls, private Sets/cache aliases,
+State direction/rebuild behavior, detached AgentFlow styles/semantic-model results
+and edited SVGs match the pinned probes. The existing AgentFlow query convenience
+now calls its actual native semanticModel method. TypeScript 4.9.5 consumer checks
+pass with mutable fields and method declarations. Native Venn remains the next
+foreign checkpoint. Binary graph exchange is still required by the public-model
+LLD and will replace JSON expansion; source/options and runtime gaps remain open.

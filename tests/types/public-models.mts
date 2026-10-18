@@ -30,6 +30,13 @@ async function consume(source: string): Promise<string> {
   if (model.type === 'flowchart') {model.addVertex('C',{text:'Core',type:'text'});model.addLink(['A'],['C'],{type:'arrow_point',stroke:'normal'});model.members.add('A');}
   if (model.type === 'er') {model.addEntity('TEAM');model.addAttributes('TEAM',[{type:'int',name:'id'}]);model.claimed.add('TEAM');}
   if (model.type === 'architecture') {model.addService({id:'web',title:'Web'});model.addLayoutHint({direction:'row',members:['web']});model.nodes.set('web',{id:'web',type:'service'});}
+  if(model.type==='class'){model.addClass('Host');model.addMember('Host','+run()');model.classes.get('Host')?.methods[0]?.getDisplayDetails();model.withCssClass.set('host',new Set());}
+  if(model.type==='state'){const state=model.getState('A');if(state)model.addDescription(state.id,'Host');model.setDirection('LR');}
+  if(model.type==='gitGraph'){model.commits.get('0')?.tags.push('host');model.branches.set('host',null);}
+  if(model.type==='ishikawa'){model.addNode(2,'Host');model.stack[0]?.node.children.push({text:'Leaf',children:[]});}
+  if(model.type==='treeView')model.root.children.push({id:10,level:0,name:'host.rs',nodeType:'file',children:[]});
+  if(model.type==='eventmodeling')model.boxes[0]?.lane.label.toUpperCase();
+  if(model.type==='agentflow'){model.setClass('A','active');const semantic=model.semanticModel();model.diagnostics=semantic.diagnostics;}
   const rendered = renderer.render(model);
   renderer.dispose(model);
   return rendered.svg;

@@ -263,3 +263,72 @@ test('imported outline helpers retain ordinary function construction and shared 
   });
   expect(failures).toEqual([]);
 });
+
+
+test('seven additional mutable codecs preserve native prototypes, aliases and edited SVGs',async({page})=>{
+  await page.goto('/examples/web/');
+  const failures=await page.evaluate(async()=>{
+    const {loadRenderer,metricsMeasurer}=await import('/dist/package-web/package/full.js');
+    const oracle=await import('/dist/evidence/pele-oracle.js'),engine=await loadRenderer(),failures=[];
+    const sources=['gitGraph\ncommit','agentflow-beta LR\nA[Agent] --> B[Tool]','classDiagram\nclass A {\n+run() void\n}','eventmodeling\ntf 01 ui Screen\ntf 02 cmd Submit\ntf 03 evt Saved','ishikawa-beta\nRoot\n  Cause','stateDiagram-v2\nA --> B','treeView-beta\nsrc/\n  main.rs'];
+    const canonical=value=>JSON.stringify(value,(_,v)=>v instanceof Map?[...v]:v instanceof Set?[...v]:v);
+    for(const source of sources){
+      const actual=engine.parse(source),expected=oracle.parse(source),second=engine.parse(source),type=actual.type;
+      const compare=stage=>{
+        if(canonical(actual)!==canonical(expected))failures.push(type+' model '+stage);
+        if(canonical(engine.render(actual,{measurer:metricsMeasurer}))!==canonical(oracle.render(expected,{measurer:metricsMeasurer})))failures.push(type+' SVG '+stage);
+      };
+      if(canonical(Reflect.ownKeys(actual))!==canonical(Reflect.ownKeys(expected)))failures.push(type+' own keys');
+      const proto=Object.getPrototypeOf(actual),upstream=Object.getPrototypeOf(expected);
+      for(const name of Reflect.ownKeys(upstream).filter(key=>key!=='constructor')){
+        if(upstream===Object.prototype)break;
+        const a=Object.getOwnPropertyDescriptor(proto,name),b=Object.getOwnPropertyDescriptor(upstream,name);
+        if(!a||a.enumerable!==b.enumerable||a.configurable!==b.configurable||a.writable!==b.writable)failures.push(type+' descriptor '+String(name));
+        if(typeof b.value==='function'&&(a?.value.length!==b.value.length||actual[name]!==second[name]))failures.push(type+' method '+String(name));
+        if(b.get&&(a?.get.name!==b.get.name||a?.get.length!==b.get.length))failures.push(type+' getter '+String(name));
+      }
+      compare('initial');
+      if(type==='gitGraph'){
+        const a=[...actual.commits.values()][0],b=[...expected.commits.values()][0];
+        if(actual.head!==a)failures.push('Git head alias');
+        a.message=b.message='Host message';a.tags.push('Host');b.tags.push('Host');
+      }else if(type==='agentflow'){
+        const a=actual.nodes.get('A'),b=expected.nodes.get('A'),styles=a.styles;
+        a.text=b.text='Cached label';a.styles.push('fill:#247acd');b.styles.push('fill:#247acd');
+        actual.setAccTitle('Host');expected.setAccTitle('Host');
+        const semantic=actual.semanticModel(),reference=expected.semanticModel();
+        if(semantic.diagnostics!==actual.diagnostics||canonical(semantic)!==canonical(reference))failures.push('Agent semantic aliases');
+        if(canonical(engine.query(actual,'semanticModel'))!==canonical(reference))failures.push('Agent query compatibility');
+        compare('cached label and live styles');
+        if(a.styles!==styles)failures.push('Agent detached style identity');
+      }else if(type==='class'){
+        const a=actual.classes.get('A'),b=expected.classes.get('A'),member=a.methods[0];
+        if(!actual.withCssClass.get('default').has(a))failures.push('Class Set alias');
+        actual.addClass('B');expected.addClass('B');actual.addMember('B','+host int');expected.addMember('B','+host int');
+        actual.addNote('Host note','A');expected.addNote('Host note','A');
+        if(canonical(member.getDisplayDetails())!==canonical(b.methods[0].getDisplayDetails()))failures.push('Nested ClassMember return');
+        actual.addNamespace('Scope');expected.addNamespace('Scope');actual.addClassesToNamespace('Scope',['A'],[]);expected.addClassesToNamespace('Scope',['A'],[]);actual.popNamespace();expected.popNamespace();
+        if(actual.namespaces.get('Scope').classes.get('A')!==a)failures.push('Class namespace alias');
+      }else if(type==='eventmodeling'){
+        if(actual.boxes[0].lane!==actual.lanes[0])failures.push('Event lane alias');
+        actual.boxes[0].name=expected.boxes[0].name='Host screen';actual.lanes[0].label=expected.lanes[0].label='Host lane';
+      }else if(type==='ishikawa'){
+        const root=actual.root;actual.addNode(2,'Host cause');expected.addNode(2,'Host cause');
+        if(actual.root!==root||actual.stack.at(-1).node!==root.children.at(-1))failures.push('Ishikawa builder aliases');
+      }else if(type==='state'){
+        const graph=actual.graph;actual.setDirection('LR');expected.setDirection('LR');
+        if(actual.direction!==expected.direction||actual.graph!==graph)failures.push('State direction/cache');
+        actual.rootDoc.push({stmt:'state',id:'C',description:'Host state'});expected.rootDoc.push({stmt:'state',id:'C',description:'Host state'});
+        compare('stale derived graph');actual.setRootDoc(actual.rootDoc);expected.setRootDoc(expected.rootDoc);
+        if(actual.getState('C')!==actual.states.get('C'))failures.push('State returned alias');
+      }else if(type==='treeView'){
+        actual.root.children[0].name=expected.root.children[0].name='host/';
+        actual.root.children[0].children[0].name=expected.root.children[0].children[0].name='host.rs';
+      }
+      compare('edited');
+      engine.dispose(second);engine.dispose(actual);
+    }
+    return failures;
+  });
+  expect(failures).toEqual([]);
+});

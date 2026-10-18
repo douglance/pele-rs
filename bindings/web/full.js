@@ -163,7 +163,10 @@ export async function loadRenderer(moduleOrPath) {
     query(model, operation, argumentsValue = null) {
       const document = documents.get(model);
       if (!document) throw new TypeError('query() takes a model that parse() returned.');
-      if (document.bridge) throw new TypeError('This mutable model does not expose read-only queries.');
+      if (document.bridge) {
+        if(document.bridge.registration.schema.id==='pele/agentflow@1'&&operation==='semanticModel'&&argumentsValue===null)return model.semanticModel();
+        throw new TypeError('This mutable model does not expose read-only queries.');
+      }
       return result((document.handle ?? document).query(operation, JSON.stringify(argumentsValue)));
     },
     dispose(model) {

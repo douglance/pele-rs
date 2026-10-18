@@ -144,8 +144,8 @@ final class MutableDocumentTests: XCTestCase {
         XCTAssertTrue(result.svg.contains("Recovered state"))
     }
     func testUnavailableCodecsAndRepeatedCreateCloseAreExplicit() throws {
-        XCTAssertThrowsError(try Pele.Engine().parseMutable("gitGraph\ncommit")) {
-            XCTAssertEqual(($0 as? CompatibilityError)?.type, "gitGraph")
+        XCTAssertThrowsError(try Pele.Engine().parseMutable("sequenceDiagram\nAlice->>Bob:Hello")) {
+            XCTAssertEqual(($0 as? CompatibilityError)?.type, "sequence")
             XCTAssertTrue(($0 as? CompatibilityError)?.message.contains("codec") == true)
         }
         for _ in 0..<100 {
@@ -207,6 +207,34 @@ final class MutableDocumentTests: XCTestCase {
             XCTAssertTrue(rendered.svg.contains("Native mutable title"), document.type)
             XCTAssertNotNil(NSImage(data: Data(rendered.svg.utf8)), document.type)
             try document.close()
+        }
+    }
+
+    func testSevenMoreMutableFamiliesDecodeAndRenderThroughC() throws {
+        let sources = ["gitGraph\ncommit", "agentflow-beta LR\nA[Agent] --> B[Tool]", "classDiagram\nclass A {\n+run() void\n}", "eventmodeling\ntf 01 ui Screen\ntf 02 cmd Submit\ntf 03 evt Saved", "ishikawa-beta\nRoot\n  Cause", "stateDiagram-v2\nA --> B", "treeView-beta\nsrc/\n  main.rs"]
+        for source in sources {
+            let document = try Pele.Engine().parseMutable(source)
+            defer { try? document.close() }
+            var snapshot = try document.snapshot()
+            try setText(&snapshot.graph, "applicationTitle", "Host extension")
+            try document.apply(snapshot.graph, expectedRevision: snapshot.revision)
+            let schema = try document.schema()
+            XCTAssertNotEqual(schema.id, "pele/opaque@1", document.type)
+            var options = Pele.Engine.Options(); options.nativeTheme = Pele.NativeTheme()
+            let outcome = try document.renderOperation(options: options)
+            guard case .rendered(let result) = outcome.result else { return XCTFail(document.type) }
+            XCTAssertEqual(result.type, document.type)
+            XCTAssertNotNil(NSImage(data: Data(result.svg.utf8)), document.type)
+            XCTAssertEqual(try text(outcome.graph, outcome.graph.field("applicationTitle")), "Host extension")
+            if document.type == "class" {
+                var graph = outcome.graph
+                let className = try graph.intern("HostClass")
+                try document.apply(graph, expectedRevision: document.revision)
+                let id = try XCTUnwrap(schema.methods.first { $0.name == "addClass" }?.id)
+                let added = try document.invoke(method: id, receiver: graph.root, arguments: [.string(className)])
+                guard case .returned = added.result else { return XCTFail("Native class builder") }
+                XCTAssertTrue(try document.render().svg.contains("HostClass"))
+            }
         }
     }
 

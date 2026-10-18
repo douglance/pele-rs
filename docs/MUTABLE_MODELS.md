@@ -1,15 +1,14 @@
 # Development mutable model interfaces
 
-The source-built development branch has all 33 diagram renderers. Sixteen families
-expose mutable public models through Rust, Swift/C and browser WASM: Pie, Info,
-Sankey, Packet, Radar, Quadrant, Treemap, Journey, XYChart, Kanban, Mindmap,
-Timeline, Flowchart, Swimlane, ER and Architecture. Actual native model methods
-are available where inventoried; field-only opaque schemas remain explicit until
-their descriptor inventory is complete. The published v0.1.0 binary remains the
-earlier flowchart subset. GitGraph, AgentFlow, Ishikawa, Class, EventModeling, TreeView, State and Venn also expose native Rust
-mutable codecs, bringing native coverage to twenty-four; their foreign adapter
-checkpoint is pending. AgentFlow has thirty-four actual descriptors with one
-explicitly unavailable Error-valued return operation.
+The source-built development branch has all 33 diagram renderers. Twenty-three
+families expose mutable public models through Rust, Swift/C and browser WASM:
+Pie, Info, Sankey, Packet, Radar, Quadrant, Treemap, Journey, XYChart, Kanban,
+Mindmap, Timeline, Flowchart, Swimlane, ER, Architecture, GitGraph, AgentFlow,
+Ishikawa, Class, EventModeling, TreeView and State. Venn also has a native Rust
+codec, bringing native coverage to twenty-four; its foreign checkpoint is pending.
+Methods are available where inventoried. AgentFlow has thirty-four actual
+descriptors with one explicitly unavailable Error-valued return operation.
+The published v0.1.0 binary remains the earlier flowchart subset.
 
 ## Browser
 
@@ -94,7 +93,11 @@ Flat graph version 1 transports object/array/Map/Set/Date identity, UTF-16 strin
 undefined/null, number bits and property flags. Default array length is implicit;
 a readonly length uses its nondefault own `length` property descriptor. Revisions
 reject stale edits before dispatch. C/WASM JSON crossings have a 64 MiB limit.
-A post-call export/transport failure can leave native state advanced; only outcomes
+Two large Class style models exceed the foreign 64 MiB JSON export ceiling while
+their source renders succeed. Two other Class namespace cases exceed the native
+16M-unit graph budget. Exact source hashes/errors are checked separately from
+parity; binary model transport is the next shared layer. A post-call
+export/transport failure can leave native state advanced; only outcomes
 whose graph fits the output budget can carry complete post-call state.
 
 ## Remaining compatibility boundary
