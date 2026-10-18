@@ -154,6 +154,11 @@ pub trait RenderResources {
     /// engine transaction and must not be used as a committed presentation API.
     fn capture_presentation(&mut self, _outcome: super::PresentationOutcome) {}
 
+    /// Resolve an image only after the core URI policy accepts it. Portable
+    /// hosts preserve URI output; native hosts return approved embedded rasters.
+    fn image(&mut self, _approved_uri: &str) -> Result<super::ImageResource, PeleError> {
+        Ok(super::ImageResource::Passthrough)
+    }
     fn text_width(&mut self, request: TextRequest<'_>) -> Result<f64, PeleError>;
     fn icon(&mut self, _name: &str) -> Result<Option<TrustedSvg>, PeleError> {
         Ok(None)

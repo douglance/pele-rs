@@ -18,7 +18,7 @@ pub struct PelePresentationOptionsV11 {
     pub max_text_bytes: u64,
     pub reserved: [u64; 2],
 }
-unsafe fn budget(
+pub(crate) unsafe fn budget(
     packet: *const PelePresentationOptionsV11,
 ) -> Result<PresentationBudget, compat::PeleError> {
     if packet.is_null() {
@@ -45,12 +45,12 @@ unsafe fn budget(
     })
 }
 #[derive(Serialize)]
-struct Presented<'a> {
+pub(crate) struct Presented<'a> {
     #[serde(flatten)]
-    rendered: compat::RenderResultTransport<'a>,
-    presentation: &'a PresentationOutcome,
+    pub(crate) rendered: compat::RenderResultTransport<'a>,
+    pub(crate) presentation: &'a PresentationOutcome,
 }
-fn unavailable() -> PresentationOutcome {
+pub(crate) fn unavailable() -> PresentationOutcome {
     PresentationOutcome::Unavailable(PresentationUnavailable::UnsupportedDiagram)
 }
 

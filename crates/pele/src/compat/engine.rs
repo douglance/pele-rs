@@ -834,6 +834,9 @@ impl RenderResources for RawRenderSession<'_> {
         self.session.host_function(reference)
     }
 
+    fn image(&mut self, uri: &str) -> Result<super::ImageResource, PeleError> {
+        self.session.host.image(uri)
+    }
     fn text_width(&mut self, r: TextRequest<'_>) -> Result<f64, PeleError> {
         self.session.text_width(r)
     }
@@ -885,6 +888,9 @@ impl RenderResources for RenderSession<'_> {
     }
     fn raw_inline_icon(&mut self, name: &str) -> Result<Option<TrustedSvg>, PeleError> {
         self.host.raw_inline_icon(name)
+    }
+    fn image(&mut self, uri: &str) -> Result<super::ImageResource, PeleError> {
+        self.host.image(uri)
     }
     fn text_width(&mut self, request: TextRequest<'_>) -> Result<f64, PeleError> {
         self.host.text_width(request)

@@ -356,6 +356,29 @@ PeleResult *pele_create_prepared_v13(const uint8_t *, size_t, const uint8_t *, s
     const uint8_t *, size_t, PelePublicDocument **);
 PeleResult *pele_prepared_schema_v13(const uint8_t *, size_t);
 
+/* Native resource lane: image callbacks see only core-approved references.
+ * No resolver means images fail before platform decoding. Returned borrowed PNG/
+ * JPEG bytes stay readable until the next callback or render call completion.
+ * Hard caps: 8 MiB/image, 16 MiB aggregate emissions/operation, 16,777,216 pixels, 8192/axis, 128 refs.
+ * Requests may lower caps. Platform callers additionally validate image pixels.
+ * NULL packet selects strict defaults without an image resolver. All callbacks
+ * are synchronous; document reentry remains rejected. Existing APIs unchanged.
+ */
+typedef uint32_t (*PeleImageLoaderV14)(void *, const uint8_t *, size_t, PeleBorrowedBytes *);
+typedef struct PeleNativeResourcesV14 {
+    uint32_t version, struct_size; void *context; PeleImageLoaderV14 image_loader;
+    uint64_t max_image_bytes, max_image_pixels, max_total_bytes; uint64_t reserved[2];
+} PeleNativeResourcesV14;
+PeleResult *pele_render_native_v14(const uint8_t *, size_t, const uint8_t *, size_t,
+    const PeleRenderNumbersV9 *, uint32_t, uint64_t, const PelePresentationOptionsV11 *,
+    const PeleHostResourcesV3 *, const PeleNativeResourcesV14 *);
+PeleResult *pele_render_document_native_v14(const PeleResult *, const uint8_t *, size_t,
+    const PeleRenderNumbersV9 *, uint32_t, uint64_t, const PelePresentationOptionsV11 *,
+    const PeleHostResourcesV3 *, const PeleNativeResourcesV14 *);
+PeleResult *pele_public_render_native_v14(PelePublicDocument *, uint64_t, const uint8_t *, size_t,
+    const PeleRenderNumbersV9 *, uint32_t, uint64_t, const PelePresentationOptionsV11 *,
+    const PeleHostResourcesV3 *, const PeleNativeResourcesV14 *);
+
 uint32_t pele_result_status(const PeleResult *result);
 const uint8_t *pele_result_data(const PeleResult *result);
 size_t pele_result_len(const PeleResult *result);

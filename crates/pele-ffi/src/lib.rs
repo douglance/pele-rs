@@ -7,6 +7,8 @@ mod render_numbers;
 pub use render_numbers::*;
 mod providers;
 pub use providers::*;
+mod native_resources;
+pub use native_resources::*;
 mod presentation;
 pub use presentation::*;
 mod registry;

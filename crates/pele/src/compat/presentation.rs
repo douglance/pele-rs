@@ -141,6 +141,12 @@ impl RenderResources for PresentationCapture<'_> {
     fn capture_presentation(&mut self, outcome: PresentationOutcome) {
         self.outcome = Some(outcome);
     }
+    fn image(&mut self, uri: &str) -> Result<super::ImageResource, PeleError> {
+        self.host.image(uri)
+    }
+    fn raw_inline_icon(&mut self, name: &str) -> Result<Option<TrustedSvg>, PeleError> {
+        self.host.raw_inline_icon(name)
+    }
     fn text_width(&mut self, request: TextRequest<'_>) -> Result<f64, PeleError> {
         self.host.text_width(request)
     }

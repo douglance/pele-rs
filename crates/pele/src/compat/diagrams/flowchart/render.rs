@@ -526,6 +526,11 @@ fn draw(
                 -ah / 2.
             };
             if let Some(src) = image_url(&safe_url(img)?, options) {
+                let embedded = resources.image(&src)?;
+                let src = match &embedded {
+                    crate::compat::ImageResource::Passthrough => src.as_str(),
+                    crate::compat::ImageResource::Embedded(image) => image.data_uri(),
+                };
                 format!("<image href=\"{}\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" preserveAspectRatio=\"{}\"/>",esc(&src),num(-aw/2.),num(top),num(aw),num(ah),if node.constraint.as_deref()==Some("on"){"xMidYMid meet"}else{"none"})
             } else {
                 String::new()

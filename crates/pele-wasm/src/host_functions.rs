@@ -113,6 +113,9 @@ impl RenderResources for Resources<'_> {
             dispatcher: self.dispatcher.clone(),
         }))
     }
+    fn image(&mut self, uri: &str) -> Result<pele::compat::ImageResource, PeleError> {
+        self.host.image(uri)
+    }
     fn text_width(&mut self, r: TextRequest<'_>) -> Result<f64, PeleError> {
         self.host.text_width(r)
     }

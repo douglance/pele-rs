@@ -140,6 +140,30 @@ extension Pele {
             let limit = outputLimit ?? options.outputLimit.map { OutputLimit.number(Double($0)) } ?? .undefined
             return try renderedValue(renderOperation(options: options, resources: resources, outputLimit: limit, presentationBudget: budget))
         }
+        @MainActor public func renderNative(nativeResources: NativeResources, outputLimit: OutputLimit? = nil,
+            budget: PresentationBudget = .init(), options: Engine.Options = .init(), resources: HostResources = .init()) throws -> FullRenderedDiagram {
+            let (options, resources) = try nativeResources.resolved(options, resources: resources)
+            let limit = outputLimit ?? options.outputLimit.map { OutputLimit.number(Double($0)) } ?? .undefined
+            let settings = try RenderNumberEncoding(options, outputLimit: limit)
+            var presentation = try budget.packet()
+            return try withHandle { handle in
+                let (response, imageError) = nativeResources.captured { native in resources.withCapturedNativeResources { host, takeError in
+                    withHostFunctionResources(takeError) { withUnsafePointer(to: &presentation) { presentation in settings.withPacket { packet in settings.optionsJSON.withUnsafeBytes { bytes in
+                        pele_public_render_native_v14(handle, revision, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count,
+                            packet, settings.outputKind, settings.outputBits, presentation, host, native)
+                    }}}
+                }}}
+                defer { clearHostFunctionErrors() }
+                do {
+                    let exchange = try Pele.binaryResult(response.handle)
+                    let outcome = PublicRenderOutcome(revision: exchange.revision, graph: exchange.graph, result: try JSONDecoder().decode(PublicRenderResult.self, from: exchange.metadata))
+                    revision = outcome.revision
+                    if let original = originalHostFunctionError(outcome.result) { throw original }
+                    if let error = response.error ?? imageError { throw error }
+                    return try renderedValue(outcome)
+                } catch { throw response.error ?? imageError ?? error }
+            }
+        }
         private func renderedValue(_ outcome: PublicRenderOutcome) throws -> FullRenderedDiagram {
             switch outcome.result {
             case .rendered(let rendered): return rendered

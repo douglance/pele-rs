@@ -13,6 +13,8 @@ mod svg;
 pub use svg::NativeTheme;
 pub mod text;
 pub use id::DiagramId;
+mod native_image;
+pub use native_image::*;
 mod module;
 mod presentation;
 pub use presentation::*;

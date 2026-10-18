@@ -4,8 +4,12 @@ import AppKit
 internal protocol MountedDocument: AnyObject {
     func render(outputLimit: Pele.OutputLimit, options: Pele.Engine.Options, resources: Pele.HostResources) throws -> FullRenderedDiagram
     func renderPresentation(outputLimit: Pele.OutputLimit?, budget: Pele.PresentationBudget, options: Pele.Engine.Options, resources: Pele.HostResources) throws -> FullRenderedDiagram
+    @MainActor func renderNative(nativeResources: Pele.NativeResources, outputLimit: Pele.OutputLimit?, budget: Pele.PresentationBudget, options: Pele.Engine.Options, resources: Pele.HostResources) throws -> FullRenderedDiagram
 }
 extension MountedDocument {
+    @MainActor func renderNative(nativeResources: Pele.NativeResources, outputLimit: Pele.OutputLimit?, budget: Pele.PresentationBudget, options: Pele.Engine.Options, resources: Pele.HostResources) throws -> FullRenderedDiagram {
+        try renderPresentation(outputLimit: outputLimit, budget: budget, options: options, resources: resources)
+    }
     func renderPresentation(outputLimit: Pele.OutputLimit?, budget: Pele.PresentationBudget, options: Pele.Engine.Options, resources: Pele.HostResources) throws -> FullRenderedDiagram {
         // Custom providers have no Rust-produced artifact in this slice.
         try render(outputLimit: outputLimit ?? .undefined, options: options, resources: resources)
@@ -21,6 +25,8 @@ extension Pele {
         public var limits = ParseLimits()
         public var outputLimit: OutputLimit?
         public var resources = HostResources()
+        /// Nil creates an owned native resource policy for this mounted view.
+        public var nativeResources: NativeResources?
         public var zoom: ZoomPolicy = .automatic
         public var presentationBudget = PresentationBudget()
         /// A custom image explicitly depicts the complete SVG over its full image
@@ -198,8 +204,15 @@ extension Pele {
         fileprivate var busy = false
         private var destroyed = false
         private var initialized = false
+        private let defaultNativeResources = NativeResources()
         private var resourceGeneration: UInt64 = 0
         private var drawnGeneration: UInt64 = 0
+        private var drawnNativeGeneration: UInt64?
+        private weak var drawnNativeOwner: NativeResources?
+        private var nativeResourcesChanged: Bool {
+            let owner = settings.nativeResources ?? defaultNativeResources
+            return drawnNativeOwner !== owner || drawnNativeGeneration != owner.generation
+        }
         private var image: NSImage?
         private var nativePresentation: NativePresentationCommit?
         fileprivate init(view: DiagramView, options: MountOptions, parse: @escaping Parse) { self.view = view; settings = options; self.parse = parse }
@@ -207,6 +220,7 @@ extension Pele {
         /// Forces resource-sensitive re-rendering without reparsing the model.
         public func invalidateResources() throws {
             guard !busy else { throw busyError }
+            (settings.nativeResources ?? defaultNativeResources).invalidate()
             resourceGeneration &+= 1; stale = true
             try refresh()
         }
@@ -274,12 +288,12 @@ extension Pele {
             guard !busy else { throw busyError }
             guard !destroyed, let view, view.window != nil, !waits, model != nil else { return }
             let width = available
-            let fresh = stale || drawnGeneration != resourceGeneration
+            let fresh = stale || drawnGeneration != resourceGeneration || nativeResourcesChanged
             guard fresh || (adapts != false && settings.render.maxWidth == nil && drawnWidth?.bitPattern != width.bitPattern && result?.width.bitPattern != width.bitPattern) else { return }
             let preserveError = !current
             busy = true
             do {
-                let shown = try draw(fresh: stale || drawnGeneration != resourceGeneration, force: false, preserveError: preserveError)
+                let shown = try draw(fresh: fresh, force: false, preserveError: preserveError)
                 busy = false
                 if let shown { try settings.onRender?(shown) }
             } catch {
@@ -301,6 +315,7 @@ extension Pele {
         }
         fileprivate func fontsChanged() {
             guard !destroyed else { return }
+            (settings.nativeResources ?? defaultNativeResources).invalidate()
             resourceGeneration &+= 1; stale = true; observeRefresh()
         }
         fileprivate func environmentChanged() {
@@ -318,7 +333,7 @@ extension Pele {
             if options.idPrefix == nil { options.idPrefix = idPrefix }
             if options.nativeTheme == nil { options.nativeTheme = NativeTheme() }
             let output = settings.outputLimit ?? settings.render.outputLimit.map { .number(Double($0)) } ?? .undefined
-            return try document.renderPresentation(outputLimit: output, budget: settings.presentationBudget, options: options, resources: settings.resources)
+            return try document.renderNative(nativeResources: settings.nativeResources ?? defaultNativeResources, outputLimit: output, budget: settings.presentationBudget, options: options, resources: settings.resources)
         }
         private func draw(fresh: Bool, force: Bool, preserveError: Bool) throws -> FullRenderedDiagram? {
             guard let model else { return nil }
@@ -345,6 +360,8 @@ extension Pele {
                     }
                 }
                 drawnWidth = width; drawnGeneration = resourceGeneration
+                drawnNativeOwner = settings.nativeResources ?? defaultNativeResources
+                drawnNativeGeneration = drawnNativeOwner?.generation
                 stale = view?.window == nil
                 drawnModel = model; result = drawing; image = prepared
                 nativePresentation = NativePresentationCommit(outcome: drawing.presentation ?? .unavailable(.unsupportedDiagram),
