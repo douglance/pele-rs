@@ -190,6 +190,11 @@ pub trait RenderResources {
     fn calendar_instant(&mut self, civil: super::CivilDateTime) -> Result<Option<f64>, PeleError> {
         Ok(super::calendar::utc_instant(civil))
     }
+    /// Direct host clock for an explicit captured public method call. Unlike
+    /// render-session time, this is neither option-seeded nor cached.
+    fn direct_now_millis(&mut self) -> Result<f64, PeleError> {
+        self.now_millis()
+    }
     fn now_millis(&mut self) -> Result<f64, PeleError> {
         Err(PeleError::new(
             "Host did not supply a clock",

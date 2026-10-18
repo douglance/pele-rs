@@ -3,7 +3,7 @@
 mod engine;
 mod graph;
 mod host_function;
-pub use host_function::{ActiveModel, HostFunction};
+pub use host_function::{ActiveModel, HostFunction, ModelDelta};
 mod schema;
 pub use engine::{PublicDiagramModule, PublicDocument, PublicEngine, RawRenderOutcome};
 pub use graph::{Atom, ErrorObjectKind, GraphWriter, JsString, ModelGraph, Node, Property};

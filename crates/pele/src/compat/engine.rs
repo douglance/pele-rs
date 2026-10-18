@@ -853,6 +853,9 @@ impl RenderResources for RawRenderSession<'_> {
     fn calendar_instant(&mut self, c: super::CivilDateTime) -> Result<Option<f64>, PeleError> {
         self.session.calendar_instant(c)
     }
+    fn direct_now_millis(&mut self) -> Result<f64, PeleError> {
+        self.session.direct_now_millis()
+    }
     fn now_millis(&mut self) -> Result<f64, PeleError> {
         self.session.now_millis()
     }
@@ -937,6 +940,9 @@ impl RenderResources for RenderSession<'_> {
             .calendar_instant(civil)?
             .filter(|value| value.is_finite() && value.abs() <= 8.64e15)
             .map(f64::trunc))
+    }
+    fn direct_now_millis(&mut self) -> Result<f64, PeleError> {
+        self.host.direct_now_millis()
     }
     fn now_millis(&mut self) -> Result<f64, PeleError> {
         if self.clock.is_none() {

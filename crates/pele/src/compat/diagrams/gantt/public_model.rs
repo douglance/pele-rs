@@ -4,8 +4,9 @@
 //! Source parse preserves real aliases. From an externally edited typed model,
 //! the codec reconstructs canonical caches; erased object/history identity cannot
 //! be recovered from a task Vec and millisecond numbers.
-//! Constructor/custom callbacks, active lone-surrogate scalar drawing/calendar,
-//! and host pre-callback hydration/reentrancy remain explicit capabilities.
+//! Host getTasks overrides use a borrowed active arena; browser synchronization
+//! journals changed records. Arbitrary other method overrides and active lone-
+//! surrogate scalar drawing/calendar remain explicit capabilities.
 //! Pinned npm diagnostic labels do not promise Function.name or function source.
 use super::{
     dates::Calendar,
@@ -15,13 +16,13 @@ use super::{
 use crate::compat::{
     public::{
         ActiveModel, Atom, FieldKind, FieldSchema, JavaScriptErrorKind, JsString, MemberKind,
-        MemberSchema, MethodCall, MethodId, MethodSchema, ModelGraph, ModelSchema, Node, Property,
-        PrototypeId, PrototypeParent, PrototypeSchema, PublicDiagramModule, PublicError, RecordId,
-        RecordKind, RecordSchema,
+        MemberSchema, MethodCall, MethodId, MethodSchema, ModelDelta, ModelGraph, ModelSchema,
+        Node, Property, PrototypeId, PrototypeParent, PrototypeSchema, PublicDiagramModule,
+        PublicError, RecordId, RecordKind, RecordSchema,
     },
     ErrorCode,
 };
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeSet, HashMap, HashSet};
 const PROTO: PrototypeId = PrototypeId(1);
 pub struct GanttPublicState {
     graph: ModelGraph,
@@ -88,6 +89,12 @@ struct Context<'a> {
     work: usize,
     refs: usize,
     units: usize,
+    sync: Option<SyncJournal>,
+}
+struct SyncJournal {
+    strings: usize,
+    nodes: usize,
+    dirty: BTreeSet<u32>,
 }
 enum Iter {
     Array(u32, u32),
@@ -123,6 +130,12 @@ impl<'a> Context<'a> {
             work: 0,
             refs,
             units,
+            sync: None,
+        }
+    }
+    fn changed(&mut self, id: u32) {
+        if let Some(sync) = &mut self.sync {
+            sync.dirty.insert(id);
         }
     }
     fn tick(&mut self, n: usize) -> Result<(), PublicError> {
@@ -305,6 +318,7 @@ impl<'a> Context<'a> {
                 flags: 7,
             });
         }
+        self.changed(*id);
         Ok(())
     }
     fn node(&mut self, n: Node) -> Result<Atom, PublicError> {
@@ -318,6 +332,7 @@ impl<'a> Context<'a> {
         )?;
         let id = self.g.nodes.len() as u32;
         self.g.nodes.push(n);
+        self.changed(id);
         Ok(Atom::Ref(id))
     }
     fn record(&mut self, fields: Vec<(&str, Atom)>) -> Result<Atom, PublicError> {
@@ -410,6 +425,7 @@ impl<'a> Context<'a> {
             ));
             self.maps.get_mut(&id).unwrap().insert(key, n);
         }
+        self.changed(id);
         Ok(())
     }
     fn set_index(&mut self, id: u32) -> Result<(), PublicError> {
@@ -440,6 +456,7 @@ impl<'a> Context<'a> {
                 k
             });
         }
+        self.changed(id);
         Ok(())
     }
     fn push(&mut self, a: &Atom, v: Atom, expr: &str) -> Result<(), PublicError> {
@@ -2164,7 +2181,7 @@ impl Arena<'_> {
                 let now = if number.is_finite() {
                     number
                 } else {
-                    host.now_millis().map_err(PublicError::from)?
+                    host.direct_now_millis().map_err(PublicError::from)?
                 };
                 let mut cal = Calendar::public(host);
                 let result = scheduler::schedule(self, now, &mut cal);
@@ -2337,6 +2354,170 @@ impl Arena<'_> {
     }
 }
 impl ActiveModel for Arena<'_> {
+    fn begin_sync(&mut self) -> Result<(), PublicError> {
+        if self.c.sync.is_some() {
+            return Err(invalid("Active model synchronization already started").into());
+        }
+        self.c.sync = Some(SyncJournal {
+            strings: self.c.g.strings.len(),
+            nodes: self.c.g.nodes.len(),
+            dirty: BTreeSet::new(),
+        });
+        Ok(())
+    }
+    fn apply_delta(&mut self, delta: ModelDelta) -> Result<(), PublicError> {
+        let c = &mut self.c;
+        let sync = c
+            .sync
+            .as_ref()
+            .ok_or_else(|| invalid("Active model synchronization has not started"))?;
+        if !sync.dirty.is_empty()
+            || sync.strings != c.g.strings.len()
+            || sync.nodes != c.g.nodes.len()
+        {
+            return Err(invalid("Drain native edits before applying host edits").into());
+        }
+        let old_strings = c.g.strings.len();
+        let old_nodes = c.g.nodes.len();
+        if delta.strings_start as usize != old_strings || delta.nodes_start as usize != old_nodes {
+            return Err(invalid("Stale active model delta").into());
+        }
+        let units = delta
+            .strings
+            .iter()
+            .try_fold(c.units, |n, s| n.checked_add(s.0.len()))
+            .ok_or_else(limit)?;
+        if old_strings.saturating_add(delta.strings.len()) > 1_000_000
+            || units > 16_000_000
+            || delta.nodes.len() > 1_000_000
+        {
+            return Err(limit().into());
+        }
+        let mut ids = HashSet::new();
+        let mut final_nodes = old_nodes;
+        for (id, node) in &delta.nodes {
+            if !ids.insert(*id) {
+                return Err(invalid("Duplicate active model node").into());
+            }
+            if *id as usize >= old_nodes {
+                if *id as usize != final_nodes {
+                    return Err(invalid("Non-contiguous active model nodes").into());
+                }
+                final_nodes += 1;
+            } else {
+                let old = &c.g.nodes[*id as usize];
+                if std::mem::discriminant(old) != std::mem::discriminant(node) {
+                    return Err(invalid("Active model object identity changed kind").into());
+                }
+                if let (Node::Instance { prototype: a, .. }, Node::Instance { prototype: b, .. }) =
+                    (old, node)
+                {
+                    if a != b {
+                        return Err(invalid("Active model object prototype changed").into());
+                    }
+                }
+            }
+        }
+        if final_nodes > 1_000_000 {
+            return Err(limit().into());
+        }
+        let delta_work = delta.nodes.iter().fold(0usize, |n, (_, node)| {
+            n.saturating_add(node.properties().len())
+                .saturating_add(match node {
+                    Node::Map { entries, .. } => entries.len().saturating_mul(2),
+                    Node::Set { values, .. } => values.len(),
+                    _ => 0,
+                })
+        });
+        c.tick(
+            c.refs
+                .saturating_add(units)
+                .saturating_add(final_nodes)
+                .saturating_add(delta_work),
+        )?;
+        // Swap only changed records. Invalid deltas roll back without copying
+        // the rest of the arena or invalidating its existing native indexes.
+        c.g.strings.extend(delta.strings);
+        let mut previous = Vec::new();
+        for (id, node) in delta.nodes {
+            if (id as usize) < old_nodes {
+                previous.push((id, std::mem::replace(&mut c.g.nodes[id as usize], node)));
+            } else {
+                c.g.nodes.push(node);
+            }
+        }
+        if let Err(error) = c.g.validate_schema(&SCHEMA) {
+            for (id, node) in previous {
+                c.g.nodes[id as usize] = node;
+            }
+            c.g.nodes.truncate(old_nodes);
+            c.g.strings.truncate(old_strings);
+            return Err(error.into());
+        }
+        fn refs(n: &Node) -> usize {
+            n.properties().len()
+                + match n {
+                    Node::Map { entries, .. } => entries.len() * 2,
+                    Node::Set { values, .. } => values.len(),
+                    _ => 0,
+                }
+        }
+        for (id, old) in previous {
+            c.refs = c.refs - refs(&old) + refs(&c.g.nodes[id as usize]);
+        }
+        for node in &c.g.nodes[old_nodes..] {
+            c.refs += refs(node);
+        }
+        for id in ids {
+            c.maps.remove(&id);
+            c.sets.remove(&id);
+            c.properties.remove(&id);
+        }
+        for (id, string) in c.g.strings.iter().enumerate().skip(old_strings) {
+            c.canonical
+                .push(*c.strings.entry(string.clone()).or_insert(id as u32));
+        }
+        c.units = units;
+        let sync = c.sync.as_mut().unwrap();
+        sync.strings = c.g.strings.len();
+        sync.nodes = c.g.nodes.len();
+        Ok(())
+    }
+    fn take_delta(&mut self) -> Result<ModelDelta, PublicError> {
+        let c = &mut self.c;
+        let sync = c
+            .sync
+            .as_ref()
+            .ok_or_else(|| invalid("Active model synchronization has not started"))?;
+        let work = sync
+            .dirty
+            .iter()
+            .fold(0usize, |n, id| {
+                let node = &c.g.nodes[*id as usize];
+                n.saturating_add(node.properties().len() + 1)
+                    .saturating_add(match node {
+                        Node::Map { entries, .. } => entries.len() * 2,
+                        Node::Set { values, .. } => values.len(),
+                        _ => 0,
+                    })
+            })
+            .saturating_add(c.g.strings[sync.strings..].iter().map(|s| s.0.len()).sum());
+        c.tick(work)?;
+        let sync = c.sync.as_mut().unwrap();
+        let delta = ModelDelta {
+            strings_start: sync.strings as u32,
+            strings: c.g.strings[sync.strings..].to_vec(),
+            nodes_start: sync.nodes as u32,
+            nodes: std::mem::take(&mut sync.dirty)
+                .into_iter()
+                .map(|id| (id, c.g.nodes[id as usize].clone()))
+                .collect(),
+        };
+        sync.strings = c.g.strings.len();
+        sync.nodes = c.g.nodes.len();
+        Ok(delta)
+    }
+
     fn root(&self) -> Atom {
         self.c.g.root.clone()
     }

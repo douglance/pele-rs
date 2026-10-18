@@ -145,6 +145,33 @@ impl MutableDocument {
         clock: Option<js_sys::Function>,
         inline_icons: Option<js_sys::Function>,
     ) -> Result<Vec<u8>, JsValue> {
+        self.render_raw_operation_binary_with_functions(
+            revision,
+            config_json,
+            json,
+            mask,
+            numbers,
+            width,
+            icons,
+            clock,
+            inline_icons,
+            None,
+        )
+    }
+    #[allow(clippy::too_many_arguments)]
+    pub fn render_raw_operation_binary_with_functions(
+        &mut self,
+        revision: &str,
+        config_json: &str,
+        json: &str,
+        mask: u32,
+        numbers: &[f64],
+        width: Option<js_sys::Function>,
+        icons: Option<js_sys::Function>,
+        clock: Option<js_sys::Function>,
+        inline_icons: Option<js_sys::Function>,
+        dispatcher: Option<js_sys::Function>,
+    ) -> Result<Vec<u8>, JsValue> {
         let run = || -> Result<Vec<u8>, PeleError> {
             let config = config(config_json)?;
             // Raw entries have no core output policy. JS removes parse-only
@@ -153,21 +180,33 @@ impl MutableDocument {
             let revision = revision
                 .parse::<u64>()
                 .map_err(|_| invalid("Invalid public model revision"))?;
-            let outcome = self.inner.render_raw_operation(
-                revision,
-                &config,
-                &options.render,
-                &mut RawResources {
-                    resources: super::render_numbers::NumericResources {
-                        browser: super::BrowserResources { width, icons },
-                        clock,
-                    },
-                    inline: super::BrowserResources {
-                        width: None,
-                        icons: inline_icons,
-                    },
+            let mut host = RawResources {
+                resources: super::render_numbers::NumericResources {
+                    browser: super::BrowserResources { width, icons },
+                    clock,
                 },
-            )?;
+                inline: super::BrowserResources {
+                    width: None,
+                    icons: inline_icons,
+                },
+            };
+            let outcome = match dispatcher {
+                Some(dispatcher) => self.inner.render_raw_operation(
+                    revision,
+                    &config,
+                    &options.render,
+                    &mut super::host_functions::Resources {
+                        host: &mut host,
+                        dispatcher,
+                    },
+                )?,
+                None => self.inner.render_raw_operation(
+                    revision,
+                    &config,
+                    &options.render,
+                    &mut host,
+                )?,
+            };
             let metadata = super::render_numbers::encode(&outcome.result.as_ref().map(transport))?;
             encode_binary_exchange(
                 outcome.revision,
@@ -202,6 +241,9 @@ impl RenderResources for RawResources {
     }
     fn calendar_instant(&mut self, civil: CivilDateTime) -> Result<Option<f64>, PeleError> {
         self.resources.calendar_instant(civil)
+    }
+    fn direct_now_millis(&mut self) -> Result<f64, PeleError> {
+        self.resources.direct_now_millis()
     }
     fn now_millis(&mut self) -> Result<f64, PeleError> {
         self.resources.now_millis()

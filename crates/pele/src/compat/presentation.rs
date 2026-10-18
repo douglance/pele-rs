@@ -159,6 +159,9 @@ impl RenderResources for PresentationCapture<'_> {
     fn calendar_instant(&mut self, civil: CivilDateTime) -> Result<Option<f64>, PeleError> {
         self.host.calendar_instant(civil)
     }
+    fn direct_now_millis(&mut self) -> Result<f64, PeleError> {
+        self.host.direct_now_millis()
+    }
     fn now_millis(&mut self) -> Result<f64, PeleError> {
         self.host.now_millis()
     }

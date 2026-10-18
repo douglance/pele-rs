@@ -157,6 +157,12 @@ impl RenderResources for Resources<'_> {
     fn direct_icon(&mut self, s: &str) -> Result<Option<TrustedSvg>, PeleError> {
         self.host.direct_icon(s)
     }
+    fn direct_now_millis(&mut self) -> Result<f64, PeleError> {
+        self.host.direct_now_millis()
+    }
+    fn raw_inline_icon(&mut self, s: &str) -> Result<Option<TrustedSvg>, PeleError> {
+        self.host.raw_inline_icon(s)
+    }
     fn now_millis(&mut self) -> Result<f64, PeleError> {
         self.host.now_millis()
     }

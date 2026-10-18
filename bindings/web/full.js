@@ -1,3 +1,4 @@
+import {modelHostFunctions} from "./host-functions.js";
 import {builtinDiagramType,builtinDiagramOrigin,ownRawModel,withBuiltinIcons,builtinInlineIcons} from './builtin-entries.js';
 import {parseLimitOptions, parseLimitValues} from './parse-limits.js';
 export {loadRegistry} from './registry.js';
@@ -91,6 +92,10 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     if (registryBusy) throw new TypeError('Registry is already in use');
     registryBusy = true; try { return operation(); } finally { registryBusy = false; }
   };
+  function nativeModelCall(entry, run) {
+    if(entry.nativeBusy)throw new TypeError("Public model document is already in use");
+    entry.nativeBusy=true;try{return run();}finally{entry.nativeBusy=false;}
+  }
   function foreignParse(source, options) {
     syncProviders();
     if (!nativeRegistry?.has_foreign()) return null;
@@ -122,7 +127,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
           const snapshot = binaryResult(()=>mutable.snapshot_binary()), schema = result(mutable.schema());
           const rawType=mutable.entry_type(), live=preparedType===undefined?liveProviders.get(rawType):undefined;
           const entry = {handle: mutable, revision: snapshot.revision, disposed: false, preparedType,rawType,provider:live?.provider};
-          const bridge = new ModelBridge(snapshot.graph, schema, registry, (method, receiver, argumentsValue) => {
+          const bridge = new ModelBridge(snapshot.graph, schema, registry, (method, receiver, argumentsValue) => nativeModelCall(entry, () => {
             if (entry.disposed) throw new TypeError('Public model document is disposed');
             const input = bridge.snapshot([receiver, ...argumentsValue]);
             entry.revision = result(mutable.apply_binary(encodeGraphBinary(entry.revision,input.graph)));
@@ -131,7 +136,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
             bridge.reconcile(outcome.graph);
             if (Object.hasOwn(outcome.result, 'Err')) throw operationError(outcome.result.Err, bridge);
             return bridge.value(outcome.result.Ok);
-          });
+          }));
           entry.bridge = bridge;
           const model = bridge.root;
           documents.set(model, entry);
@@ -164,6 +169,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       const entry=documents.get(model);
       if(!entry?.bridge||entry.rawType!==type)throw new TypeError('Raw diagram render requires a model returned by this diagram entry');
       if(entry.disposed)throw new TypeError('Public model document is disposed');
+      return nativeModelCall(entry,()=>{
       let callbackFailed=false,callbackError;
       const capture=run=>{try{return run();}catch(error){callbackFailed=true;callbackError=error;throw error;}};
       const measurer=options.measurer??defaultMeasurer(options.fontFamily);
@@ -176,12 +182,13 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       const numeric=renderNumericOptions({...options,limit:undefined,maxEdges:undefined,config:undefined,outputLimit:undefined,nativeTheme:undefined});
       try {
         entry.revision=result(entry.handle.apply_binary(encodeGraphBinary(entry.revision,entry.bridge.snapshot().graph)));
-        const outcome=binaryResult(()=>entry.handle.render_raw_operation_binary(entry.revision,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline));
+        const outcome=binaryResult(()=>entry.handle.render_raw_operation_binary_with_functions(entry.revision,finiteConfigJSON(config),numeric.json,numeric.mask,numeric.numbers,width,icons,clock,inline,modelHostFunctions(entry.bridge,operationError,()=>{const error=callbackFailed?{error:callbackError}:null;callbackFailed=false;callbackError=undefined;return error;})));
         entry.revision=outcome.revision;entry.bridge.reconcile(outcome.graph);
         if(callbackFailed)throw callbackError;
         if(Object.hasOwn(outcome.result,'Err'))throw operationError(outcome.result.Err,entry.bridge);
         return renderedValue(outcome.result.Ok);
       } catch(error){if(callbackFailed)throw callbackError;throw error;}
+      });
     },
     parse(source, options = {}) {
       let foreign;
@@ -304,11 +311,11 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
           if (!document) throw new TypeError('render() takes diagram text or a model that parse() returned.');
           if (document.bridge) {
             bridge=document.bridge;
-            document.revision = result(document.handle.apply_binary(encodeGraphBinary(document.revision,bridge.snapshot().graph)));
-            const outcome=binaryResult(()=>document.handle.render_numbers_operation_binary(document.revision,...numericArguments));
-            document.revision=outcome.revision;
-            bridge.reconcile(outcome.graph);
-            operation=outcome.result;
+            operation=nativeModelCall(document,()=>{
+              document.revision = result(document.handle.apply_binary(encodeGraphBinary(document.revision,bridge.snapshot().graph)));
+              const outcome=binaryResult(()=>document.handle.render_numbers_operation_binary_with_functions(document.revision,...numericArguments,modelHostFunctions(bridge,operationError,()=>{const error=callbackFailed?{error:callbackError}:null;callbackFailed=false;callbackError=undefined;return error;})));
+              document.revision=outcome.revision;bridge.reconcile(outcome.graph);return outcome.result;
+            });
           } else json = document.handle.render_numbers_with_resources(...numericArguments);
         }
         // Publish native partial state before restoring the original host throw.
@@ -333,7 +340,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
     },
     dispose(model) {
       const document = documents.get(model);
-      if (document?.busy) throw new TypeError('Public model document is already in use');
+      if (document?.busy || document?.nativeBusy) throw new TypeError('Public model document is already in use');
       if (document) { documents.delete(model); document.disposed = true; if(document.bridge)document.bridge.disposed=true; finalizer?.unregister(model); document.handle.free();document.policy?.free(); }
     }
   };

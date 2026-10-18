@@ -1,9 +1,38 @@
 //! Borrowed, bounded access to an active model arena. IDs retain arena identity;
 //! implementations update their native indexes rather than copying a model graph.
-use super::{Atom, JsString, MethodCall, PublicError};
+use super::{Atom, JsString, MethodCall, Node, PublicError};
 use crate::compat::RenderResources;
+use serde::{Deserialize, Serialize};
 
+/// Append-only string/object identities plus changed records, exchanged only
+/// while a host callback owns the active arena. No full graph projection.
+#[derive(Clone, Debug, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase", deny_unknown_fields)]
+pub struct ModelDelta {
+    pub strings_start: u32,
+    pub strings: Vec<JsString>,
+    pub nodes_start: u32,
+    pub nodes: Vec<(u32, Node)>,
+}
+fn unavailable() -> PublicError {
+    crate::compat::PeleError::new(
+        "Active model synchronization is unavailable",
+        crate::compat::ErrorCode::Semantic,
+    )
+    .into()
+}
 pub trait ActiveModel {
+    /// Opt-in synchronization; ordinary native callbacks allocate no journal.
+    fn begin_sync(&mut self) -> Result<(), PublicError> {
+        Err(unavailable())
+    }
+    fn apply_delta(&mut self, _delta: ModelDelta) -> Result<(), PublicError> {
+        Err(unavailable())
+    }
+    fn take_delta(&mut self) -> Result<ModelDelta, PublicError> {
+        Err(unavailable())
+    }
+
     fn root(&self) -> Atom;
     fn validate(&self, value: &Atom) -> Result<(), PublicError>;
     fn read(&mut self, receiver: &Atom, key: &str) -> Result<Atom, PublicError>;

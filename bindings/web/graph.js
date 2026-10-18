@@ -22,6 +22,14 @@ export function stringValue(value) {
   for (let i = 0; i < value.length; i += 8192) output += String.fromCharCode(...value.slice(i, i + 8192));
   return output;
 }
+// Flat comparisons avoid serializing every unchanged record during an opted-in
+// live callback. The existing full snapshot remains the ordinary operation lane.
+const sameAtom=(a,b)=>a?.kind===b?.kind&&a?.value===b?.value;
+const sameList=(a,b,equal)=>a.length===b.length&&a.every((v,i)=>equal(v,b[i]));
+const sameNode=(a,b)=>a&&a.kind===b.kind&&a.prototype===b.prototype&&a.errorType===b.errorType&&a.length===b.length&&a.milliseconds===b.milliseconds&&
+  sameList(a.properties,b.properties,(x,y)=>x.key===y.key&&x.flags===y.flags&&sameAtom(x.value,y.value))&&
+  (a.kind!=='map'||sameList(a.entries,b.entries,(x,y)=>sameAtom(x[0],y[0])&&sameAtom(x[1],y[1])))&&
+  (a.kind!=='set'||sameList(a.values,b.values,sameAtom));
 /** Schema functions/prototypes share identity across documents of one renderer. */
 export class ModelRegistry {
   constructor() { this.schemas = new Map(); this.owners = new WeakMap(); this.sharedFunctions = new Map(); }
@@ -107,17 +115,21 @@ export class ModelBridge {
     if(this.registration.documents.length>256)this.registration.documents=this.registration.documents.filter(reference=>{const value=reference.deref();return value&&!value.disposed;});
     this.registration.documents.push(new WeakRef(this));
     this.disposed=false;
-    this.invoke = invoke;
+    this.invoke = (...args) => this.activeInvoke ? this.activeInvoke(...args) : invoke(...args);
     this.ids = new WeakMap();
     this.hostIds = new Map();
     this.hostValues = [];
     this.objects = [];
     this.reconcile(graph);
   }
-  reconcile(graph) {
+  reconcile(graph, changed) {
     this.graph = graph;
-    this.strings = graph.strings.map(stringValue);
-    this.stringIds = new Map(this.strings.map((value, index) => [value, index]));
+    if(changed) {
+      for(let i=this.strings.length;i<graph.strings.length;i++){const value=stringValue(graph.strings[i]);this.strings.push(value);this.stringIds.set(value,i);}
+    } else {
+      this.strings = graph.strings.map(stringValue);
+      this.stringIds = new Map(this.strings.map((value, index) => [value, index]));
+    }
     while (this.objects.length < graph.nodes.length) {
       const id = this.objects.length, node = graph.nodes[id];
       let value;
@@ -133,7 +145,8 @@ export class ModelBridge {
       }
       this.objects.push(value); this.ids.set(value, id); this.registry.owners.set(value, this);
     }
-    graph.nodes.forEach((node, id) => {
+    for (const id of changed ?? graph.nodes.keys()) {
+      const node = graph.nodes[id];
       const object = this.objects[id], keys = new Set(node.properties.map(property => this.strings[property.key]));
       for (const key of Object.getOwnPropertyNames(object)) {
         if (node.kind === 'array' && key === 'length') continue;
@@ -155,9 +168,26 @@ export class ModelBridge {
         value: this.value(property.value), enumerable: !!(property.flags & 1),
         writable: !!(property.flags & 2), configurable: !!(property.flags & 4)
       });
-    });
+    }
     this.root = this.value(graph.root);
     return this.root;
+  }
+  reconcileDelta(delta) {
+    if (delta.stringsStart !== this.graph.strings.length || delta.nodesStart !== this.graph.nodes.length) throw new TypeError('Stale native model delta');
+    const nodes=this.graph.nodes.slice();
+    for(const [id,node] of delta.nodes) nodes[id]=node;
+    return this.reconcile({...this.graph,strings:this.graph.strings.concat(delta.strings),nodes},delta.nodes.map(([id])=>id));
+  }
+  hostReference(value) {
+    if (!this.hostIds.has(value)) {
+      if(this.hostValues.length>=1_000_000)throw new RangeError('Host reference budget exceeded');
+      this.hostIds.set(value,this.hostValues.length);this.hostValues.push(value);
+    }
+    return {kind:'hostReference',value:this.hostIds.get(value)};
+  }
+  hostException(value) {
+    if(this.hostValues.length>=1_000_000)throw new RangeError('Host reference budget exceeded');
+    const id=this.hostValues.length;this.hostValues.push(value);return {kind:'hostException',value:id};
   }
   value(atom) {
     switch (atom.kind) {
@@ -174,7 +204,7 @@ export class ModelBridge {
   }
   // All retained nodes are scanned, including externally held detached arrays.
   // Extra arguments join the same arena; calls never serialize nested objects.
-  snapshot(values = []) {
+  snapshot(values = [], delta = false) {
     for (const baseline of this.registration.prototypeBaseline) {
       const descriptors = Object.getOwnPropertyDescriptors(baseline.value), original = baseline.descriptors;
       if (Object.getPrototypeOf(baseline.value) !== baseline.parent || Reflect.ownKeys(descriptors).length !== Reflect.ownKeys(original).length || Reflect.ownKeys(original).some(key => {
@@ -182,7 +212,9 @@ export class ModelBridge {
         return !b || a.value!==b.value || a.get!==b.get || a.set!==b.set || a.enumerable!==b.enumerable || a.writable!==b.writable || a.configurable!==b.configurable;
       })) throw new TypeError('Prototype edits require an explicit native prototype mutation codec');
     }
-    const pending = [], seen = new Set(), nodes = this.graph.nodes.slice();
+    const baseline=this.graph, changes=[];
+    const pending = [], seen = new Set(), nodes = baseline.nodes.slice();
+    const store=(id,node)=>{if(!delta||!sameNode(nodes[id],node)){nodes[id]=node;changes.push([id,node]);}};
     let codeUnits = this.strings.reduce((n,s)=>n+s.length,0), propertiesCount = 0;
     const budget = () => { throw new RangeError('Public model graph exceeds host exchange budget'); };
     const string = value => {
@@ -193,12 +225,7 @@ export class ModelBridge {
       this.strings.push(value); this.stringIds.set(value, id);
       return id;
     };
-    const host = value => {
-      if (!this.hostIds.has(value)) {
-        this.hostIds.set(value, this.hostValues.length); this.hostValues.push(value);
-      }
-      return {kind: 'hostReference', value: this.hostIds.get(value)};
-    };
+    const host = value => this.hostReference(value);
     const atom = value => {
       if (value === undefined) return {kind: 'undefined'};
       if (value === null) return {kind: 'null'};
@@ -246,23 +273,24 @@ export class ModelBridge {
           propertiesCount += 2; if (propertiesCount > 8_000_000) budget();
           entries.push([atom(key), atom(item)]);
         }
-        nodes[id] = {kind: 'map', entries, properties};
+        store(id, {kind: 'map', entries, properties});
       } else if (value instanceof Set) {
         const values = [];
         for (const item of Set.prototype.values.call(value)) {
           if (++propertiesCount > 8_000_000) budget(); values.push(atom(item));
         }
-        nodes[id] = {kind:'set', values, properties};
+        store(id, {kind:'set', values, properties});
       }
-      else if (value instanceof Date) nodes[id] = {kind: 'date', milliseconds: numberBits(Date.prototype.getTime.call(value)), properties};
-      else if (errorKind(value)) nodes[id]={kind:'error',errorType:errorKind(value),properties};
-      else if (Array.isArray(value)) nodes[id] = {kind: 'array', length: value.length, properties};
+      else if (value instanceof Date) store(id, {kind: 'date', milliseconds: numberBits(Date.prototype.getTime.call(value)), properties});
+      else if (errorKind(value)) store(id,{kind:'error',errorType:errorKind(value),properties});
+      else if (Array.isArray(value)) store(id, {kind: 'array', length: value.length, properties});
       else {
         const prototype = this.registration.prototypeIds.get(Object.getPrototypeOf(value));
-        nodes[id] = prototype === undefined ? {kind: 'object', properties} : {kind: 'instance', prototype, properties};
+        store(id, prototype === undefined ? {kind: 'object', properties} : {kind: 'instance', prototype, properties});
       }
     }
-    this.graph = {version: 1, root, strings: this.strings.map(units), nodes};
-    return {graph: this.graph, values: argumentsValue};
+    const appended=this.strings.slice(baseline.strings.length).map(units);
+    this.graph = {version: 1, root, strings: delta ? baseline.strings.concat(appended) : this.strings.map(units), nodes};
+    return {graph: this.graph, values: argumentsValue, ...(delta?{delta:{stringsStart:baseline.strings.length,strings:appended,nodesStart:baseline.nodes.length,nodes:changes.sort((a,b)=>a[0]-b[0])}}:{})};
   }
 }
