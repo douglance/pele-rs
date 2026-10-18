@@ -545,3 +545,32 @@ extras are retained but ignored, matching the actual upstream renderer. No
 renderer changes are needed. Active missing/sparse/lone-surrogate node text and
 cyclic/over-budget trees retain explicit boundaries. Foreign mutable coverage
 remains the separately verified sixteen-family checkpoint.
+
+
+## Class and EventModeling mutable native checkpoints
+
+Class and EventModeling bring native mutable coverage to twenty-one families.
+The consolidated native batch passes thirty-four release-profile integration
+tests across nine targets, including source baselines, retained extension methods,
+shared callables and Venn dimension-transport regressions. Foreign mutable
+coverage remains the verified sixteen-family checkpoint.
+
+Class exposes twenty-three root and four nested ClassMember methods, full
+namespace/class/note aliases, arbitrary numeric relation markers and note IDs,
+and ordered optional fields. Its 29 mutation vectors cover 114 native calls:
+104 whole SVG checkpoints plus ten UTF-16 storage/return checks with explicit
+active SVG gaps. Forty thousand actual member-builder inputs are checked against
+pinned results. The original 24,758-case source corpus remains green. The mutable
+lane matches 24,756 cases; two enormous namespace cases hit the 16M-unit graph
+transport limit before upstream's 4M-character SVG limit. Exact case IDs, source
+hashes and both errors are asserted, rather than counted as parity. The six
+legacy projection exclusions remain explicit. Namespace-parent capture, exact
+style compaction and a negative lexer-direction cache preserve valid stress
+cases. Cross-document lineType/relationType identity remains open.
+
+EventModeling preserves its real plain-object model and shared lane/box/relation
+objects. All 6,953 historical outcomes and thirty pinned mutation SVGs pass.
+Edited duplicate box IDs now resolve note/spec headings to the last matching
+name, matching upstream. Two generated UTF-16 hard-wrap output gaps remain
+explicitly outside corpus success. Both codecs retain their documented exotic
+coercion/callback, active sparse/UTF-16, render-error and work-budget boundaries.

@@ -32,3 +32,6 @@ impl DiagramModule for EventModeling {
         render::render(m, o, r)
     }
 }
+
+mod public_model;
+pub use public_model::EventModelingPublicState;

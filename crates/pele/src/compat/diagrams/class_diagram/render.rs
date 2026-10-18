@@ -134,6 +134,20 @@ impl StyleCache {
     }
 }
 
+// Budget the same compacted cascade that geometry consumes. Raw definitions can
+// contain millions of repeated/ignored declarations without expanding SVG styles.
+pub(super) fn projected_style_bytes(db: &ClassModel) -> usize {
+    let mut cache = StyleCache::default();
+    db.classes.iter().fold(0usize, |total, (_, class)| {
+        let style = cache.resolve(db, class);
+        total
+            .saturating_add(style.shape.len())
+            .saturating_add(style.line.len())
+            .saturating_add(style.text.len())
+            .saturating_add(style.stroke.as_ref().map_or(0, String::len))
+    })
+}
+
 fn member_line(
     m: &ClassMember,
     size: f64,

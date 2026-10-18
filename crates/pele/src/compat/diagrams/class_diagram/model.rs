@@ -125,6 +125,7 @@ pub struct ClassNode {
 #[serde(untagged)]
 pub enum RelationEnd {
     Number(u8),
+    RawNumber(f64),
     None(String),
 }
 impl RelationEnd {
@@ -132,7 +133,11 @@ impl RelationEnd {
         Self::None("none".into())
     }
     pub fn is(&self, n: u8) -> bool {
-        *self == Self::Number(n)
+        match self {
+            Self::Number(value) => *value == n,
+            Self::RawNumber(value) => *value == f64::from(n),
+            Self::None(_) => false,
+        }
     }
 }
 #[derive(Clone, Debug, Serialize)]
@@ -192,6 +197,8 @@ pub struct ClassModel {
     class_index: std::collections::HashMap<String, usize>,
     namespace_index: std::collections::HashMap<String, usize>,
     tags: std::collections::HashSet<(String, String)>,
+    optional_own_fields: std::collections::HashMap<String, Vec<String>>,
+    public_note_indices: std::collections::HashMap<String, f64>,
     pub direction: String,
     pub classes: Vec<(String, ClassNode)>,
     pub relations: Vec<ClassRelation>,
@@ -228,6 +235,8 @@ impl ClassModel {
             class_index: Default::default(),
             namespace_index: Default::default(),
             tags: Default::default(),
+            optional_own_fields: Default::default(),
+            public_note_indices: Default::default(),
             direction: "TB".into(),
             classes: vec![],
             relations: vec![],
@@ -241,6 +250,40 @@ impl ClassModel {
             namespace_stack: vec![],
             with_css_class: vec![],
         }
+    }
+    /// Observable append order belongs to the source builder. Typed Vec edits
+    /// reconstruct a canonical cache boundary; use the public graph for JS
+    /// own-property deletion/reordering or retained erased object history.
+    pub(super) fn public_optional_fields(&self, id: &str) -> Option<&[String]> {
+        self.optional_own_fields.get(id).map(Vec::as_slice)
+    }
+    fn track_optional(&mut self, id: &str, field: &str) {
+        let fields = self.optional_own_fields.entry(id.into()).or_default();
+        if !fields.iter().any(|f| f == field) {
+            fields.push(field.into())
+        }
+    }
+    pub(super) fn set_public_note_index(&mut self, key: String, index: f64) {
+        self.public_note_indices.insert(key, index);
+    }
+    pub(super) fn public_note_edge_id(&self, key: &str, index: usize) -> String {
+        self.public_note_indices
+            .get(key)
+            .map_or_else(|| index.to_string(), |n| crate::compat::svg::js_num(*n))
+    }
+    pub(super) fn reindex_public(&mut self) {
+        self.class_index = self
+            .classes
+            .iter()
+            .enumerate()
+            .map(|(i, (key, _))| (key.clone(), i))
+            .collect();
+        self.namespace_index = self
+            .namespaces
+            .iter()
+            .enumerate()
+            .map(|(i, (key, _))| (key.clone(), i))
+            .collect();
     }
     pub fn class(&self, id: &str) -> Option<&ClassNode> {
         self.class_index.get(id).map(|&i| &self.classes[i].1)
@@ -419,7 +462,8 @@ impl ClassModel {
     pub fn tooltip(&mut self, ids: &str, text: String) {
         for id in ids.split(',') {
             if let Some(n) = self.class_mut(split_name(id).0) {
-                n.tooltip = Some(text.clone())
+                n.tooltip = Some(text.clone());
+                self.track_optional(split_name(id).0, "tooltip");
             }
         }
     }
@@ -433,7 +477,9 @@ impl ClassModel {
                 } else {
                     Some(sanitize_url(url))
                 };
-                n.link_target = Some(target.clone().unwrap_or("_blank".into()))
+                n.link_target = Some(target.clone().unwrap_or("_blank".into()));
+                self.track_optional(&lookup(id), "link");
+                self.track_optional(&lookup(id), "linkTarget");
             }
         }
         self.css_class(ids, "clickable");
@@ -442,7 +488,8 @@ impl ClassModel {
     pub fn click(&mut self, ids: &str) {
         for id in ids.split(',') {
             if let Some(n) = self.class_mut(split_name(id).0) {
-                n.have_callback = Some(true)
+                n.have_callback = Some(true);
+                self.track_optional(split_name(id).0, "haveCallback");
             }
         }
         self.css_class(ids, "clickable")
@@ -516,8 +563,9 @@ impl ClassModel {
                 n.parent = Some(id.into());
                 let ns = self.ns_mut(id).unwrap();
                 if !ns.classes.contains(&name) {
-                    ns.classes.push(name)
+                    ns.classes.push(name.clone())
                 }
+                self.track_optional(&name, "parent");
             }
         }
         for name in notes {

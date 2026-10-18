@@ -237,6 +237,7 @@ impl Lexer<'_> {
             .map_or(self.src.len(), |n| self.p + n);
         let line = &self.src[self.p..end];
         if !line.contains("direction") {
+            self.dir_failed = end;
             return false;
         }
         for (dir, t) in [

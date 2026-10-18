@@ -92,7 +92,7 @@ fn heading(heading: &str, frame: &str, m: &EventModelingModel) -> String {
         "{heading} · {frame}{}",
         m.boxes
             .iter()
-            .find(|b| b.id == frame)
+            .rfind(|b| b.id == frame)
             .map_or(String::new(), |b| format!(" {}", b.name))
     )
 }

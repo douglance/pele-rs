@@ -27,14 +27,16 @@ pub struct ClassGraph {
     pub edges: Vec<GraphEdge>,
 }
 fn marker(end: &RelationEnd) -> &'static str {
-    match end {
-        RelationEnd::Number(0) => "aggregation",
-        RelationEnd::Number(1) => "extension",
-        RelationEnd::Number(2) => "composition",
-        RelationEnd::Number(3) => "dependency",
-        RelationEnd::Number(4) => "lollipop",
-        _ => "none",
-    }
+    const MARKERS: [&str; 5] = [
+        "aggregation",
+        "extension",
+        "composition",
+        "dependency",
+        "lollipop",
+    ];
+    (0u8..5)
+        .find(|n| end.is(*n))
+        .map_or("none", |n| MARKERS[n as usize])
 }
 pub fn build(db: &ClassModel, hierarchical: bool) -> ClassGraph {
     let mut nodes = vec![];
@@ -42,11 +44,13 @@ pub fn build(db: &ClassModel, hierarchical: bool) -> ClassGraph {
     let mut ns_at = HashMap::new();
     let mut class_at = HashMap::new();
     let mut interface_at = HashMap::new();
+    let mut namespace_parents = vec![];
     for (_, ns) in &db.namespaces {
         if !hierarchical && !ns.explicit {
             continue;
         }
         ns_at.insert(ns.id.clone(), nodes.len() as isize);
+        namespace_parents.push(ns.parent.as_deref());
         nodes.push(GraphNode {
             id: ns.id.clone(),
             label: if hierarchical {
@@ -61,12 +65,8 @@ pub fn build(db: &ClassModel, hierarchical: bool) -> ClassGraph {
         })
     }
     let group = |id: Option<&str>| id.and_then(|id| ns_at.get(id).copied()).unwrap_or(-1);
-    for n in &mut nodes {
-        n.parent = if hierarchical {
-            group(db.ns(&n.id).and_then(|n| n.parent.as_deref()))
-        } else {
-            -1
-        }
+    for (n, parent) in nodes.iter_mut().zip(namespace_parents) {
+        n.parent = if hierarchical { group(parent) } else { -1 }
     }
     let declared = |id: Option<&str>| {
         let mut current = id.map(str::to_string);
@@ -93,7 +93,7 @@ pub fn build(db: &ClassModel, hierarchical: bool) -> ClassGraph {
             class_node: Some(i),
         })
     }
-    for (_, note) in &db.notes {
+    for (note_key, note) in &db.notes {
         let parent = declared(note.parent.as_deref());
         if let Some(target) = note
             .class_name
@@ -102,7 +102,7 @@ pub fn build(db: &ClassModel, hierarchical: bool) -> ClassGraph {
             .copied()
         {
             edges.push(GraphEdge {
-                id: format!("edgeNote{}", note.index),
+                id: format!("edgeNote{}", db.public_note_edge_id(note_key, note.index)),
                 source: nodes.len() as isize,
                 target,
                 label: None,
