@@ -627,11 +627,12 @@ impl PublicDocument {
             .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
         self.snapshot()?;
         let mut operation_error = None;
+        let mut presentation = crate::compat::PresentationCapture::deferred(host);
         let result = crate::compat::engine::render_registered_policy(
             &self.registration.descriptor,
             &self.config,
             options,
-            host,
+            &mut presentation,
             limit,
             enforce_native_bytes,
             |settings, session| {
@@ -659,6 +660,7 @@ impl PublicDocument {
         .map_err(|error| operation_error.unwrap_or_else(|| error.into()));
         self.revision = next;
         let graph = self.snapshot()?;
+        presentation.publish();
         Ok(RenderOutcome {
             revision: next,
             graph,

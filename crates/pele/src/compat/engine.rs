@@ -650,7 +650,10 @@ pub(crate) fn render_registered_policy(
     if settings.responsive.is_none() {
         settings.responsive = Some(!fixed)
     }
+    let presentation_budget = resources.presentation_budget();
     let mut session = RenderSession {
+        presentation_budget,
+        presentation: None,
         host: resources,
         icons: HashMap::new(),
         clock: settings.now.filter(|value| value.is_finite()).map(Ok),
@@ -682,6 +685,15 @@ pub(crate) fn render_registered_policy(
     for link in &mut rendered.links {
         link.id = source::decode_entities(&link.id)?
     }
+    if session.presentation_budget.is_some() {
+        session
+            .host
+            .capture_presentation(session.presentation.take().unwrap_or(
+                super::PresentationOutcome::Unavailable(
+                    super::PresentationUnavailable::UnsupportedDiagram,
+                ),
+            ));
+    }
     Ok(RenderResult {
         diagram_type: descriptor.id.clone(),
         rendered,
@@ -689,11 +701,21 @@ pub(crate) fn render_registered_policy(
 }
 
 struct RenderSession<'a> {
+    presentation_budget: Option<super::PresentationBudget>,
+    presentation: Option<super::PresentationOutcome>,
     host: &'a mut dyn RenderResources,
     icons: HashMap<String, Option<TrustedSvg>>,
     clock: Option<Result<f64, PeleError>>,
 }
 impl RenderResources for RenderSession<'_> {
+    fn presentation_budget(&self) -> Option<super::PresentationBudget> {
+        self.presentation_budget
+    }
+    fn capture_presentation(&mut self, outcome: super::PresentationOutcome) {
+        if self.presentation_budget.is_some() {
+            self.presentation = Some(outcome);
+        }
+    }
     fn text_width(&mut self, request: TextRequest<'_>) -> Result<f64, PeleError> {
         self.host.text_width(request)
     }

@@ -123,39 +123,43 @@ pub(crate) fn render_flowchart(
         let Some(available) = options.max_width.filter(|w| *w > 0.) else {
             return Ok(loose);
         };
-        if loose.width <= available {
+        if loose.0.width <= available {
             return Ok(loose);
         }
         let tight = draw(db, config, options, resources, variant, down, true)?;
-        Ok::<_, PeleError>(if tight.width < loose.width {
+        Ok::<_, PeleError>(if tight.0.width < loose.0.width {
             tight
         } else {
             loose
         })
     };
     let across = fitted(false, resources)?;
-    if !matches!(db.direction.as_deref(), Some("LR" | "RL")) {
-        return Ok(across);
-    }
-    let Some(available) = options.max_width.filter(|w| *w > 0.) else {
-        return Ok(across);
-    };
-    if options.auto_direction == Some(false)
-        || across.width <= available
-        || available
-            >= options
-                .direction_breakpoint
-                .filter(|b| *b > 0.)
-                .unwrap_or(640.)
-    {
-        return Ok(across);
-    }
-    let down = fitted(true, resources)?;
-    Ok(if down.width < across.width {
-        down
+    let selected = if matches!(db.direction.as_deref(), Some("LR" | "RL"))
+        && options
+            .max_width
+            .filter(|w| *w > 0.)
+            .is_some_and(|available| {
+                !(options.auto_direction == Some(false)
+                    || across.0.width <= available
+                    || available
+                        >= options
+                            .direction_breakpoint
+                            .filter(|b| *b > 0.)
+                            .unwrap_or(640.))
+            }) {
+        let down = fitted(true, resources)?;
+        if down.0.width < across.0.width {
+            down
+        } else {
+            across
+        }
     } else {
         across
-    })
+    };
+    if let Some(frame) = selected.1 {
+        resources.capture_presentation(frame);
+    }
+    Ok(selected.0)
 }
 fn draw(
     db: &FlowchartModel,
@@ -165,7 +169,7 @@ fn draw(
     variant: Option<&dyn FlowVariant>,
     turned: bool,
     tight: bool,
-) -> Result<Rendered, PeleError> {
+) -> Result<(Rendered, Option<crate::compat::PresentationOutcome>), PeleError> {
     let group_pad = if tight { 12. } else { GROUP_PAD };
     let flow = variant
         .and_then(|v| config.get(v.diagram_type()))
@@ -430,6 +434,15 @@ fn draw(
     shift_layout(&mut cnodes, &mut cedges, ox, oy);
     let width = (inner + 2. * pad).ceil();
     let height = (layout.height + title_height + 2. * pad).ceil();
+    let mut presentation = resources.presentation_budget().map(|budget| {
+        crate::compat::presentation::FrameBuilder::new(
+            budget,
+            width,
+            height,
+            db.acc_title.as_deref().or(db.title.as_deref()),
+            db.acc_descr.as_deref(),
+        )
+    });
     let mut links = Vec::new();
     let mut crossings = Crossings::new();
     if cnodes.iter().any(|c| c.is_group) {
@@ -444,6 +457,9 @@ fn draw(
     for (i, view) in views.iter().enumerate() {
         let c = &cnodes[i];
         let node = &view.node;
+        if let Some(frame) = &mut presentation {
+            frame.label(&node.id, &view.label);
+        }
         let classes = class_names(
             node.css_classes
                 .strip_prefix("default")
@@ -581,6 +597,21 @@ fn draw(
                     String::new()
                 }
             );
+            if safe {
+                if let Some(frame) = &mut presentation {
+                    frame.link(
+                        &node.id,
+                        &name,
+                        true,
+                        crate::compat::PresentationRect::centered(
+                            c.x,
+                            c.y + view.dy,
+                            view.label.width,
+                            view.label.height,
+                        ),
+                    );
+                }
+            }
             links.push(LinkInfo {
                 id: node.id.clone(),
                 href: name,
@@ -597,7 +628,18 @@ fn draw(
                 .as_ref()
                 .filter(|s| !s.is_empty())
                 .map_or_else(String::new, |s| format!(" target=\"{}\"", esc(s)));
-            body = linked(&body, link, &node.id, &mut links, options, &attrs)
+            let link_index = links.len();
+            body = linked(&body, link, &node.id, &mut links, options, &attrs);
+            if let Some(frame) = &mut presentation {
+                if let Some(approved) = links.get(link_index) {
+                    frame.link(
+                        &node.id,
+                        &approved.href,
+                        false,
+                        crate::compat::PresentationRect::centered(c.x, c.y, view.w, view.h),
+                    );
+                }
+            }
         }
         nodes_out.push_str(&format!("<g class=\"pele-node pele-shape-{}{classes}\" data-id=\"{id}\" transform=\"translate({},{})\">{body}</g>",view.shape,num(c.x),num(c.y)));
     }
@@ -628,6 +670,9 @@ fn draw(
         let ce = &mut cedges[i];
         let edge = &drawn[i];
         let label = &edge_labels[i];
+        if let Some(frame) = &mut presentation {
+            frame.label(&edge.id, label);
+        }
         let style = if !edge.style.is_empty() || !edge.css_compiled_styles.is_empty() {
             let mut declarations = edge.css_compiled_styles.clone();
             declarations.extend(edge.style.iter().cloned());
@@ -753,19 +798,22 @@ fn draw(
         ))
     }
     content.push_str(&format!("<g class=\"pele-nodes\">{nodes_out}</g>"));
-    Ok(Rendered {
-        svg: svg::document(
-            variant.map_or("flowchart", |v| v.diagram_type()),
+    Ok((
+        Rendered {
+            svg: svg::document(
+                variant.map_or("flowchart", |v| v.diagram_type()),
+                width,
+                height,
+                size,
+                options,
+                db.acc_title.as_deref(),
+                db.acc_descr.as_deref(),
+                &content,
+            )?,
             width,
             height,
-            size,
-            options,
-            db.acc_title.as_deref(),
-            db.acc_descr.as_deref(),
-            &content,
-        )?,
-        width,
-        height,
-        links,
-    })
+            links,
+        },
+        presentation.map(|frame| frame.finish()),
+    ))
 }

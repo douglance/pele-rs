@@ -133,6 +133,15 @@ impl TrustedSvg {
 }
 /// Per-render host resources. No global resolver, filesystem, network or clock in the core.
 pub trait RenderResources {
+    /// Opt-in presentation capture. Ordinary hosts return None and allocate no frames.
+    fn presentation_budget(&self) -> Option<super::PresentationBudget> {
+        None
+    }
+    /// Modules submit provisional data; Engine intercepts and publishes only the
+    /// selected successful frame after output policy. Direct module calls have no
+    /// engine transaction and must not be used as a committed presentation API.
+    fn capture_presentation(&mut self, _outcome: super::PresentationOutcome) {}
+
     fn text_width(&mut self, request: TextRequest<'_>) -> Result<f64, PeleError>;
     fn icon(&mut self, _name: &str) -> Result<Option<TrustedSvg>, PeleError> {
         Ok(None)

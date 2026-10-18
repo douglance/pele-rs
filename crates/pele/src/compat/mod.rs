@@ -14,6 +14,8 @@ pub use svg::NativeTheme;
 pub mod text;
 pub use id::DiagramId;
 mod module;
+mod presentation;
+pub use presentation::*;
 mod number_math;
 mod provider;
 pub use provider::{render_provider_bounded, ProviderInput};
