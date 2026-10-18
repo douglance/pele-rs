@@ -31,19 +31,45 @@ impl ParsedDocument {
     pub fn to_public(&self) -> Result<Option<MutableDocument>, JsValue> {
         use pele::compat::{
             diagrams::{
+                architecture::{Architecture, ArchitectureModel},
+                er::{Er, ErModel},
+                flowchart::{Flowchart, FlowchartModel},
                 info::{Info, InfoModel},
                 journey::{Journey, JourneyModel},
+                kanban::{Kanban, KanbanModel},
+                mindmap::{Mindmap, MindmapModel},
                 packet::{Packet, PacketModel},
                 pie::{Pie, PieModel},
                 quadrant_chart::{QuadrantChart, QuadrantModel},
                 radar::{Radar, RadarModel},
                 sankey::{Sankey, SankeyModel},
+                swimlane::Swimlane,
+                timeline::{Timeline, TimelineModel},
                 treemap::{Treemap, TreemapModel},
                 xychart::{XyChart, XyChartModel},
             },
             public::PublicDocument,
         };
-        let document = if let Some(model) = self.inner.model::<PieModel>() {
+        // Swimlane deliberately uses FlowchartModel but retains its lane renderer.
+        let document = if self.inner.diagram_type().as_str() == "swimlane" {
+            let model = self
+                .inner
+                .model::<FlowchartModel>()
+                .ok_or_else(|| JsValue::from_str("Swimlane retained an incompatible model"))?;
+            PublicDocument::from_module(Swimlane, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<FlowchartModel>() {
+            PublicDocument::from_module(Flowchart, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<KanbanModel>() {
+            PublicDocument::from_module(Kanban, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<MindmapModel>() {
+            PublicDocument::from_module(Mindmap, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<TimelineModel>() {
+            PublicDocument::from_module(Timeline, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<ErModel>() {
+            PublicDocument::from_module(Er, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<ArchitectureModel>() {
+            PublicDocument::from_module(Architecture, model, self.inner.config().clone())
+        } else if let Some(model) = self.inner.model::<PieModel>() {
             PublicDocument::from_module(Pie, model, self.inner.config().clone())
         } else if let Some(model) = self.inner.model::<InfoModel>() {
             PublicDocument::from_module(Info, model, self.inner.config().clone())
@@ -153,7 +179,7 @@ pub struct MutableDocument {
 #[wasm_bindgen]
 impl MutableDocument {
     pub fn schema(&self) -> String {
-        public_result(self.inner.model_schema())
+        public_result(&self.inner.schema_view())
     }
     /// Dispatch edits through the retained native module and return post-call
     /// graph even when the operation throws. Revision uses decimal text in JS.

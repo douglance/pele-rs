@@ -3,8 +3,10 @@
 use super::{calendar, compatibility_call, compatibility_input, PeleHostResourcesV3, PeleResult};
 use pele::compat::{
     diagrams::{
-        info::Info, journey::Journey, packet::Packet, pie::Pie, quadrant_chart::QuadrantChart,
-        radar::Radar, sankey::Sankey, treemap::Treemap, xychart::XyChart,
+        architecture::Architecture, er::Er, flowchart::Flowchart, info::Info, journey::Journey,
+        kanban::Kanban, mindmap::Mindmap, packet::Packet, pie::Pie, quadrant_chart::QuadrantChart,
+        radar::Radar, sankey::Sankey, swimlane::Swimlane, timeline::Timeline, treemap::Treemap,
+        xychart::XyChart,
     },
     public::{ModelGraph, PublicDocument, PublicEngine},
     ErrorCode, PeleError,
@@ -113,6 +115,13 @@ pub unsafe extern "C" fn pele_public_parse_v4(
         registry.register(Treemap);
         registry.register(Journey);
         registry.register(XyChart);
+        registry.register(Kanban);
+        registry.register(Mindmap);
+        registry.register(Timeline);
+        registry.register(Flowchart);
+        registry.register(Swimlane);
+        registry.register(Er);
+        registry.register(Architecture);
 
         let document = registry.parse(source, &options).map_err(|mut error| {
             if error.code == ErrorCode::UnsupportedDiagram {
@@ -164,7 +173,7 @@ pub unsafe extern "C" fn pele_public_schema_v4(
 ) -> *mut PeleResult {
     compatibility_call(|| {
         let document = unsafe { document(handle) }?;
-        success(document.model_schema())
+        success(document.schema_view())
     })
 }
 /// Publish post-call graph and revision on both return and operation error.

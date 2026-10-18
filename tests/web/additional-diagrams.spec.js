@@ -14,7 +14,10 @@ for(const family of ['packet','radar','quadrant','timeline','journey','flowchart
       let runtimeDateCases=0, flatProjectionCases=0;
       // The old corpus omits this declared private lookup. Raw public ownership
       // and alias identity have their own mutable-model E2E proof.
-      const comparedModel=model=>model?.type==='sankey'?Object.fromEntries(Object.entries(model).filter(([key])=>key!=='lookup')):model;
+      const comparedModel=model=>{
+        const omitted=model?.type==='sankey'?['lookup']:model?.type==='flowchart'?['subgraphLookup','members','edgeById','pairCount','subCount','options']:model?.type==='er'?['subgraphLookup','claimed']:[];
+        return omitted.length?Object.fromEntries(Object.entries(model).filter(([key])=>!omitted.includes(key))):model;
+      };
       for(const c of fixture.cases) {
         let actual,model,semanticModel,projectionBounded=false;
         const host=c.host??{},options={...c.options,measurer:host.measure==='fixed'?{width:(text,size,style)=>text.length*size*(style&1?.71:.6)}:metricsMeasurer,...(host.allIcons?{icons:()=>'<path d="M0,0"/>'}:host.icons?{icons:n=>Object.hasOwn(host.icons,n)&&typeof host.icons[n]==='string'?host.icons[n]:undefined}:{})};

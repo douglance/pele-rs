@@ -22,9 +22,9 @@ is SIL OFL 1.1. See included notices. Independent project, not official Pele.
 ## Development full-library interface
 
 Source builds also provide `@unlocalhosted/pele-rs/full`. All 33 renderers have
-pinned Rust/Swift/browser corpus verification. Nine families currently expose
-mutable models; Journey, Quadrant and XYChart also expose their actual native
-methods. Remaining model/API compatibility is still under development. This does
+pinned Rust/Swift/browser corpus verification. Sixteen families currently expose
+mutable models and inventoried native methods, including shared Flowchart/Swimlane
+prototypes and Kanban/Mindmap helper identity. Remaining model/API compatibility is still under development. This does
 not change the earlier published v0.1.0 release.
 
 ```js

@@ -153,7 +153,7 @@ export async function loadRenderer(moduleOrPath) {
     },
     dispose(model) {
       const document = documents.get(model);
-      if (document) { documents.delete(model); document.disposed = true; finalizer?.unregister(model); document.handle.free(); }
+      if (document) { documents.delete(model); document.disposed = true; if(document.bridge)document.bridge.disposed=true; finalizer?.unregister(model); document.handle.free(); }
     }
   };
   return renderer;

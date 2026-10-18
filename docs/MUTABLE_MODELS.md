@@ -1,16 +1,12 @@
 # Development mutable model interfaces
 
-The source-built development branch has all 33 diagram renderers. Nine families
-currently expose mutable public models through Rust, Swift/C and browser WASM:
-Pie, Info, Sankey, Packet, Radar, Quadrant, Treemap, Journey and XYChart.
-Journey's six, Quadrant's thirteen and XYChart's thirteen real native methods
-are available in this checkpoint. Other method-bearing families remain in progress.
-Rust additionally exposes Kanban, Mindmap and Timeline mutable codecs, with
-shared outline-helper identity metadata; Sankey exposes two native methods.
-Rust also exposes Flowchart, Swimlane, ER and Architecture, bringing native
-mutable coverage to sixteen families. Their Swift/web adapter checkpoint remains
-in progress.
-The published v0.1.0 binary remains the earlier flowchart subset.
+The source-built development branch has all 33 diagram renderers. Sixteen families
+expose mutable public models through Rust, Swift/C and browser WASM: Pie, Info,
+Sankey, Packet, Radar, Quadrant, Treemap, Journey, XYChart, Kanban, Mindmap,
+Timeline, Flowchart, Swimlane, ER and Architecture. Actual native model methods
+are available where inventoried; field-only opaque schemas remain explicit until
+their descriptor inventory is complete. The published v0.1.0 binary remains the
+earlier flowchart subset.
 
 ## Browser
 
@@ -32,7 +28,10 @@ renderer.dispose(model);
 
 Map/array edits and replacements preserve retained aliases. Methods publish
 partial edits before throwing, matching the tested native operations. Function
-identity is shared across documents of one schema. Constructors and mutation of
+identity is shared across documents of one schema. Kanban and Mindmap also
+share the imported outline helper across schemas. Flowchart and Swimlane share
+the actual FlowDb prototype and all nineteen methods; Swimlane's retained render
+result remains `swimlane` while its model type remains `flowchart`. Constructors and mutation of
 prototype definitions report an unavailable capability. Methods require a live
 owned document. Unimplemented family codecs keep the existing immutable owned
 model path; their renderers remain available.

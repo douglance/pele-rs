@@ -9,6 +9,11 @@ extension Pele {
             public let name: String
             public let arity: UInt32
         }
+        public struct SharedFunction: Decodable, Sendable {
+            public let method: UInt32
+            public let identity: String
+        }
+        public let sharedFunctions: [SharedFunction]?
         public let id: String
         public let version: UInt32
         public let root: UInt32?

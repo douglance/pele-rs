@@ -34,3 +34,11 @@ swift run --package-path tests/swift-consumer
 Native code contains the font and all graph logic. The Swift layer only encodes
 options, copies owned C results, frees them, and decodes typed values/errors.
 No Kamui, web view, runtime JavaScript, or installed fonts are required.
+
+Source-built development artifacts also expose all 33 renderers through
+`Pele.Engine` and sixteen mutable family codecs through `parseMutable`. Flat
+graph edits and schema-described native methods preserve aliases, UTF-16 code
+units, number bits and partial-error state. See
+[mutable APIs](../../docs/MUTABLE_MODELS.md) for supported families, ownership
+and remaining compatibility boundaries. These APIs require current local
+artifacts and do not replace the earlier v0.1.0 downloaded binary.

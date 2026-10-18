@@ -115,8 +115,8 @@ final class MutableDocumentTests: XCTestCase {
         XCTAssertTrue(try document.render().svg.contains("Recovered"))
     }
     func testUnavailableCodecsAndRepeatedCreateCloseAreExplicit() throws {
-        XCTAssertThrowsError(try Pele.Engine().parseMutable("flowchart LR\nA-->B")) {
-            XCTAssertEqual(($0 as? CompatibilityError)?.type, "flowchart")
+        XCTAssertThrowsError(try Pele.Engine().parseMutable("gitGraph\ncommit")) {
+            XCTAssertEqual(($0 as? CompatibilityError)?.type, "gitGraph")
             XCTAssertTrue(($0 as? CompatibilityError)?.message.contains("codec") == true)
         }
         for _ in 0..<100 {
@@ -165,8 +165,8 @@ final class MutableDocumentTests: XCTestCase {
         XCTAssertNotNil(NSImage(data: Data(rendered.svg.utf8)))
         try document.close()
     }
-    func testNineMutableFamiliesKeepNativeModelsAndRenderMetadataEdits() throws {
-        let sources = ["pie\n\"A\":1", "info", "sankey\nA,B,5", "packet-beta\n0-7: \"Data\"", "radar-beta\naxis a[\"One\"], b[\"Two\"], c[\"Three\"]\ncurve team[\"Team\"]{4,3,5}", "quadrantChart\nA:[0.2,0.3]", "treemap-beta\n\"Group\"\n  \"Leaf\":10", "journey\nTask:3:Alice", "xychart-beta\nx-axis [A,B]\nline [1,2]"]
+    func testSixteenMutableFamiliesKeepNativeModelsAndRenderMetadataEdits() throws {
+        let sources = ["pie\n\"A\":1", "info", "sankey\nA,B,5", "packet-beta\n0-7: \"Data\"", "radar-beta\naxis a[\"One\"], b[\"Two\"], c[\"Three\"]\ncurve team[\"Team\"]{4,3,5}", "quadrantChart\nA:[0.2,0.3]", "treemap-beta\n\"Group\"\n  \"Leaf\":10", "journey\nTask:3:Alice", "xychart-beta\nx-axis [A,B]\nline [1,2]", "kanban\n  Todo\n    task[Build]", "mindmap\n  root((Rust))\n    Swift", "timeline\nsection Start\n2025: Rust", "flowchart LR\nA-->B", "swimlane-beta LR\nsubgraph group[Group]\nA-->B\nend", "erDiagram\nUSER ||--o{ DOCUMENT : owns", "architecture-beta\nservice app(server)[App]"]
         for source in sources {
             let document = try Pele.Engine().parseMutable(source)
             var snapshot = try document.snapshot()
@@ -179,6 +179,53 @@ final class MutableDocumentTests: XCTestCase {
             XCTAssertNotNil(NSImage(data: Data(rendered.svg.utf8)), document.type)
             try document.close()
         }
+    }
+
+    func testTimelineReceiverAliasesAndPartialFailuresThroughC() throws {
+        let document = try Pele.Engine().parseMutable("timeline\nsection Start\n2025: Rust")
+        defer { try? document.close() }
+        let schema = try document.schema()
+        func method(_ name: String) throws -> UInt32 { try XCTUnwrap(schema.methods.first { $0.name == name }?.id) }
+        var graph = try document.snapshot().graph
+        let root = graph.root
+        let returned = try document.invoke(method: method("getCommonDb"), receiver: root)
+        guard case .returned(let receiver) = returned.result else { return XCTFail("Returned receiver") }
+        XCTAssertEqual(try reference(receiver), try reference(root))
+        graph = returned.graph
+        let title = try graph.intern("Swift timeline"), next = try graph.intern("Before failure")
+        try graph.setField("sections", value: .null)
+        try document.apply(graph, expectedRevision: document.revision)
+        let failed = try document.invoke(method: method("addSection"), receiver: root, arguments: [.string(next)])
+        guard case .thrown(.javaScript(let name, _)) = failed.result else { return XCTFail("Partial operation error") }
+        XCTAssertEqual(name, "TypeError")
+        XCTAssertEqual(try text(failed.graph, failed.graph.field("currentSection")), "Before failure")
+        graph = failed.graph
+        graph.nodes.append(.array(length: 0, properties: []))
+        try graph.setField("sections", value: .ref(UInt32(graph.nodes.count - 1)))
+        try document.apply(graph, expectedRevision: document.revision)
+        let titled = try document.invoke(method: method("setDiagramTitle"), receiver: root, arguments: [.string(title)])
+        guard case .returned(.undefined) = titled.result else { return XCTFail("Setter result") }
+        XCTAssertTrue(try document.render().svg.contains("Swift timeline"))
+    }
+    func testSharedOutlineDescriptorAndSwimlaneRetainedRenderer() throws {
+        let kanban = try Pele.Engine().parseMutable("kanban\n  Todo"), mindmap = try Pele.Engine().parseMutable("mindmap\n  root((Rust))")
+        defer { try? kanban.close(); try? mindmap.close() }
+        let first = try kanban.schema(), second = try mindmap.schema()
+        XCTAssertEqual(first.sharedFunctions?.first?.identity, "pele/common/outline/getType@1")
+        XCTAssertEqual(first.sharedFunctions?.first?.identity, second.sharedFunctions?.first?.identity)
+        for document in [kanban, mindmap] {
+            var graph = try document.snapshot().graph
+            let start = try graph.intern("["), end = try graph.intern("]")
+            try document.apply(graph, expectedRevision: document.revision)
+            let outcome = try document.invoke(method: try XCTUnwrap(document.schema().methods.first { $0.name == "getType" }?.id), receiver: .null, arguments: [.string(start), .string(end)])
+            guard case .returned(.number(let value)) = outcome.result else { return XCTFail("Shared helper result") }
+            XCTAssertEqual(value, 2)
+        }
+        let flowchart = try Pele.Engine().parseMutable("flowchart LR\nA-->B"), swimlane = try Pele.Engine().parseMutable("swimlane-beta LR\nsubgraph lane[Lane]\nA-->B\nend")
+        defer { try? flowchart.close(); try? swimlane.close() }
+        XCTAssertEqual(try flowchart.schema().id, try swimlane.schema().id)
+        XCTAssertEqual(try text(swimlane.snapshot().graph, swimlane.snapshot().graph.field("type")), "flowchart")
+        XCTAssertEqual(try swimlane.render().type, "swimlane")
     }
 
 }

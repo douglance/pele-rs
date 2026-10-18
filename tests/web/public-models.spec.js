@@ -160,3 +160,81 @@ test('host callback throws match pinned guard behavior and recover',async({page}
   });
   expect(failures).toEqual([]);
 });
+
+test('outline timeline graph and architecture methods keep pinned shared identities and mutable renders',async({page})=>{
+  test.setTimeout(90_000);
+  await page.goto('/examples/web/');
+  const failures=await page.evaluate(async()=>{
+    const {loadRenderer,metricsMeasurer}=await import('/dist/package-web/package/full.js');
+    const oracle=await import('/dist/evidence/pele-oracle.js'),engine=await loadRenderer(),failures=[];
+    const sources={kanban:'kanban\n  Todo\n    task[Build]',mindmap:'mindmap\n  root((Rust))\n    Swift',timeline:'timeline\nsection Start\n2025: Rust',sankey:'sankey\nA,B,5',flowchart:'flowchart LR\nsubgraph group[Group]\nA[Start] --> B[End]\nend',swimlane:'swimlane-beta LR\nsubgraph group[Group]\nA[Start] --> B[End]\nend',er:'erDiagram\nUSER ||--o{ DOCUMENT : owns',architecture:'architecture-beta\nservice app(server)[App]'};
+    const models={},references={},options={measurer:metricsMeasurer};
+    const canonical=value=>JSON.stringify(value,(_,v)=>v instanceof Map?[...v]:v instanceof Set?[...v]:v);
+    for(const [family,source]of Object.entries(sources)) {
+      const model=engine.parse(source),expected=oracle.parse(source);models[family]=model;references[family]=expected;
+      const actualProto=Object.getPrototypeOf(model),expectedProto=Object.getPrototypeOf(expected);
+      if(canonical(Object.keys(model))!==canonical(Object.keys(expected)))failures.push(family+' own keys');
+      for(const name of Object.getOwnPropertyNames(expectedProto).filter(x=>x!=='constructor')) {
+        const a=Object.getOwnPropertyDescriptor(actualProto,name),b=Object.getOwnPropertyDescriptor(expectedProto,name);
+        if(!a||a.enumerable!==b.enumerable||a.configurable!==b.configurable||a.writable!==b.writable||a.value.length!==b.value.length)failures.push(family+' method descriptor '+name);
+        if(a&&canonical(Reflect.ownKeys(a.value))!==canonical(Reflect.ownKeys(b.value)))failures.push(family+' function shape '+name);
+      }
+      const compare=stage=>{
+        if(canonical(model)!==canonical(expected))failures.push(family+' raw model '+stage);
+        if(canonical(engine.render(model,options))!==canonical(oracle.render(expected,options)))failures.push(family+' complete SVG '+stage);
+      };
+      compare('initial');
+      const both=(method,args)=>{
+        const a=model[method](...args(model)),b=expected[method](...args(expected));
+        if(canonical(a)!==canonical(b))failures.push(family+' return '+method);
+      };
+      if(family==='kanban') {both('addNode',()=>[4,'check','Verify',0]);both('decorateNode',()=>[{class:'checked',icon:'check'}]);if(model.last!==model.sections[0].items.at(-1))failures.push('kanban last alias');}
+      if(family==='mindmap') {both('addNode',()=>[4,'web','Web',0]);both('decorateNode',()=>[{class:'checked'}]);if(model.open.at(-1)!==model.nodes.at(-1))failures.push('mindmap open alias');}
+      if(family==='timeline') {
+        if(model.getCommonDb()!==model||model.getCommonDb.call(model.periods)!==model.periods)failures.push('timeline returned receiver');
+        both('addSection',()=>['Next']);both('addTask',()=>['2026',900,'Swift']);both('addEvent',()=>['Web']);both('setDiagramTitle',()=>['Mutable timeline']);
+      }
+      if(family==='sankey') {
+        both('findOrCreateNode',()=>['C']);both('addLink',v=>[v.lookup.get('B'),v.lookup.get('C'),3]);
+        if(model.links.at(-1).target!==model.lookup.get('C'))failures.push('sankey lookup alias');
+      }
+      if(family==='flowchart'||family==='swimlane') {
+        both('addVertex',()=>['C',{text:'Native',type:'text'},'square',[],[]]);
+        both('addLink',()=>[['B'],['C'],{type:'arrow_point',stroke:'normal',length:1}]);
+        both('setDirection',()=>['TB']);both('addClass',()=>['hot',['fill:#ff0000']]);both('setClass',()=>['C','hot']);both('setTooltip',()=>['C','Native tool']);
+        if(model.edgeAt(0)!==model.edges[0]||model.subgraph('group')!==model.subgraphs[0])failures.push(family+' returned alias');
+      }
+      if(family==='er') {
+        both('addEntity',()=>['TEAM','Team']);both('addAttributes',()=>['TEAM',[{type:'int',name:'id',keys:['PK'],comment:'key'}]]);
+        both('addRelationship',()=>['USER','joins','TEAM',{cardA:'ONLY_ONE',relType:'IDENTIFYING',cardB:'ZERO_OR_MORE'}]);
+        both('setDirection',()=>['LR']);if(model.addEntity('TEAM')!==model.entities.get('TEAM'))failures.push('ER entity alias');expected.addEntity('TEAM');
+      }
+      if(family==='architecture') {
+        both('addService',()=>[{id:'web',icon:'server',title:'Web'}]);
+        both('addEdge',()=>[{lhsId:'app',lhsDir:'R',lhsInto:false,lhsGroup:false,rhsId:'web',rhsDir:'L',rhsInto:true,rhsGroup:false}]);
+        const hint={direction:'row',members:['app','web']},referenceHint={direction:'row',members:['app','web']};
+        model.addLayoutHint(hint);expected.addLayoutHint(referenceHint);
+        if(model.layoutHints.at(-1)!==hint)failures.push('architecture hint alias');hint.direction='column';referenceHint.direction='column';
+      }
+      compare('native methods');
+      model.title='Edited metadata';expected.title='Edited metadata';compare('field edit');
+      if(family==='timeline') {
+        model.sections=null;expected.sections=null;let a,b;try{model.addSection('Before failure')}catch(e){a=e.name}try{expected.addSection('Before failure')}catch(e){b=e.name}
+        if(a!=='TypeError'||a!==b||model.currentSection!==expected.currentSection)failures.push('timeline partial failure');
+        model.sections=[];expected.sections=[];compare('recovery');
+      }
+    }
+    const k=models.kanban,m=models.mindmap;
+    if(k.getType!==m.getType||references.kanban.getType!==references.mindmap.getType)failures.push('cross-schema shared helper identity');
+    for(const pair of [['(',')'],['[',']'],['((', undefined],[')',undefined],['))',undefined],['{{',undefined],['none',undefined]])if(k.getType(...pair)!==references.kanban.getType(...pair))failures.push('shared helper behavior');
+    const newest=engine.parse(sources.kanban);engine.dispose(newest);
+    if(k.getType.call({},'[',']')!==2)failures.push('disposed latest document must not break earlier borrowed helper');
+    if(Object.getPrototypeOf(models.flowchart)!==Object.getPrototypeOf(models.swimlane)||models.flowchart.addVertex!==models.swimlane.addVertex)failures.push('shared FlowDb prototype');
+    if(models.swimlane.type!=='flowchart'||engine.render(models.swimlane,options).type!=='swimlane')failures.push('retained swimlane renderer');
+    engine.dispose(k);
+    if(m.getType.call(null,'[',']')!==2)failures.push('shared helper survives other family disposal');
+    for(const model of Object.values(models))engine.dispose(model);
+    return failures;
+  });
+  expect(failures).toEqual([]);
+});

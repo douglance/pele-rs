@@ -34,7 +34,7 @@ int main(void) {
     failure(pele_public_invoke_v4(NULL, 0, NULL, 64 * 1024 * 1024 + 1, NULL), 2, "budget");
     failure(pele_public_render_v4(NULL, NULL, 0, NULL), 1, "null document");
     failure(pele_public_apply_v4(NULL, 0, NULL, 64 * 1024 * 1024 + 1), 2, "budget");
-    const char *unavailable = "flowchart LR\nA-->B";
+    const char *unavailable = "gitGraph\ncommit";
     failure(pele_public_parse_v4((const uint8_t *)unavailable, strlen(unavailable), NULL, 0, &document), 1, "codec"); assert(document == NULL);
     const char *source = "pie title Before\n\"A\":1\n\"B\":2";
     PeleResult *result = pele_public_parse_v4((const uint8_t *)source, strlen(source), NULL, 0, &document);

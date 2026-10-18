@@ -26,7 +26,7 @@ export interface QuadrantModel extends AccessibleModel {
  setDiagramTitle(text:string):void;setAccTitle(text:string):void;setAccDescription(text:string):void;
  type: 'quadrantChart'; quadrants: [QuadrantText | undefined, QuadrantText | undefined, QuadrantText | undefined, QuadrantText | undefined]; xAxisLeft?: QuadrantText; xAxisRight?: QuadrantText; yAxisBottom?: QuadrantText; yAxisTop?: QuadrantText; points: QuadrantPoint[]; classes: Map<string, PointStyle> }
 export interface TimelinePeriod { text: string; events: string[]; section: string; sectionIndex: number }
-export interface TimelineModel extends AccessibleModel { type: 'timeline'; direction: string; sections: string[]; periods: TimelinePeriod[]; currentSection: string }
+export interface TimelineModel extends AccessibleModel { getCommonDb():this; setDiagramTitle(text:string):void; setAccTitle(text:string):void; setAccDescription(text:string):void; setDirection(direction:'LR'|'TD'):void; addSection(text:string):void; addTask(period:string,length?:number,event?:string):void; addEvent(event:string):void; type: 'timeline'; direction: string; sections: string[]; periods: TimelinePeriod[]; currentSection: string }
 export interface JourneyTask { task: string; score: number; people: string[]; section: string }
 export interface JourneyModel extends AccessibleModel {
  setDiagramTitle(text:string):void;setAccTitle(text:string):void;setAccDescription(text:string):void;
@@ -36,12 +36,24 @@ export interface FlowNode { id: string; text?: string; labelType: string; type?:
 export interface FlowEdge { start: string; end: string; type?: string; text: string; labelType: string; stroke?: string; length?: ConfigValue; style?: string[]; classes: string[]; id?: string; isUserDefinedId: boolean; interpolate?: ConfigValue; animate?: ConfigValue; animation?: ConfigValue }
 export interface FlowClassDef { id: string; styles: string[]; textStyles: string[] }
 export interface FlowSubgraph { id: string; nodes: string[]; title: string; classes: string[]; dir?: string; labelType: string; metadata?: { [key: string]: ConfigValue } }
-export interface FlowchartModel extends AccessibleModel { type: 'flowchart'; direction?: string; nodes: ReadonlyMap<string, FlowNode>; edges: FlowEdge[]; subgraphs: FlowSubgraph[]; classes: ReadonlyMap<string, FlowClassDef>; tooltips: ReadonlyMap<string, string>; defaultEdgeStyle?: string[]; defaultInterpolate?: ConfigValue }
+export interface FlowText { text:string;type:'text'|'string'|'markdown' }
+export interface FlowLinkInfo { type:string;stroke:string;length?:number;text?:FlowText;id?:string }
+export type FlowDocItem=string|string[]|{stmt:'dir';value:string};
+export interface FlowchartModel extends AccessibleModel {
+ addVertex(id:string,text?:FlowText,type?:string,styles?:string[]|null,classes?:string[]|null,direction?:string,props?:Record<string,string>,metadata?:string):void;
+ addSingleLink(start:string,end:string,link:FlowLinkInfo|undefined,id?:string):void;addLink(starts:string[],ends:string[],link:FlowLinkInfo|undefined):void;
+ updateLinkInterpolate(positions:(number|'default')[],interpolation:string):void;updateLink(positions:(number|'default')[],styles:string[]):void;edgeAt(index:number):FlowEdge;
+ addClass(ids:string,styles:string[]):void;setDirection(direction:string):void;setClass(ids:string,className:string):void;setTooltip(ids:string,tooltip:string|undefined):void;
+ setLink(ids:string,link:string,target?:string):void;setClickEvent(ids:string,functionName?:string,functionArgs?:string):void;setAccTitle(text:string):void;setAccDescription(text:string):void;
+ addSubGraph(id:FlowText,list:FlowDocItem[],title:FlowText):string;exists(all:FlowSubgraph[],id:string):boolean;makeUniq(group:FlowSubgraph,all:FlowSubgraph[]):{nodes:string[]};
+ destructLink(end:string,start?:string):{type:string;stroke:string;length?:number};subgraph(id:string):FlowSubgraph|undefined;
+ subgraphLookup:Map<string,FlowSubgraph>;members:Set<string>;edgeById:Map<string,FlowEdge>;pairCount:Map<string,number>;subCount:number;options:{maxEdges?:number;inheritDir?:boolean;direction?:string};
+ type: 'flowchart'; direction?: string; nodes: Map<string, FlowNode>; edges: FlowEdge[]; subgraphs: FlowSubgraph[]; classes: Map<string, FlowClassDef>; tooltips: Map<string, string>; defaultEdgeStyle?: string[]; defaultInterpolate?: ConfigValue }
 export interface KanbanNode { id: string; level: number; label: string; icon?: string; assigned?: string; ticket?: string; priority?: string; cssClasses?: string }
 export interface KanbanSection extends KanbanNode { items: KanbanNode[] }
-export interface KanbanModel { type: 'kanban'; title?: string; sections: KanbanSection[]; last?: KanbanNode | KanbanSection; sectionLevel: number; misplaced?: KanbanNode }
+export interface KanbanModel { getType(start:string,end?:string):number; addNode(level:number,id:string,description:string,type:number,shapeData?:string):void; decorateNode(decoration?:{class?:string;icon?:string}):void; type: 'kanban'; title?: string; sections: KanbanSection[]; last?: KanbanNode | KanbanSection; sectionLevel: number; misplaced?: KanbanNode }
 export interface MindmapNode { id: number; nodeId: string; level: number; descr: string; type: number; children: MindmapNode[]; isRoot: boolean; section?: number; class?: string; icon?: string }
-export interface MindmapModel { type: 'mindmap'; title?: string; nodes: MindmapNode[]; baseLevel: number; open: MindmapNode[] }
+export interface MindmapModel { getType(start:string,end?:string):number; addNode(level:number,id:string,description:string,type:number):void; decorateNode(decoration?:{class?:string;icon?:string}):void; type: 'mindmap'; title?: string; nodes: MindmapNode[]; baseLevel: number; open: MindmapNode[] }
 export interface ClassMember { id: string; memberType: string; visibility: string; classifier: string; parameters: string; returnType: string }
 export interface ClassNode { id: string; type: string; label: string; cssClasses: string; methods: ClassMember[]; members: ClassMember[]; annotations: string[]; styles: string[]; parent?: string; link?: string; linkTarget?: string; haveCallback?: boolean; tooltip?: string }
 export interface ClassRelation { id1: string; id2: string; relationTitle1: string; relationTitle2: string; title?: string; relation: { type1: number | 'none'; type2: number | 'none'; lineType: number } }
@@ -53,7 +65,13 @@ export interface ErEntity { id: string; label: string; alias: string; attributes
 export type ErCardinality = 'ZERO_OR_ONE' | 'ZERO_OR_MORE' | 'ONE_OR_MORE' | 'ONLY_ONE' | 'MD_PARENT';
 export interface ErRelationship { entityA: string; roleA: string; entityB: string; relSpec: { cardA: ErCardinality; relType: 'NON_IDENTIFYING' | 'IDENTIFYING'; cardB: ErCardinality } }
 export interface ErSubgraph extends FlowSubgraph { cssStyles: string[] }
-export interface ErModel extends AccessibleModel { type: 'er'; direction: string; entities: ReadonlyMap<string, ErEntity>; relationships: ErRelationship[]; classes: ReadonlyMap<string, FlowClassDef>; subgraphs: ErSubgraph[] }
+export interface ErModel extends AccessibleModel {
+ addEntity(name:string,alias?:string):ErEntity;addAttributes(name:string,attributes:{type:string;name:string;keys?:string[];comment?:string}[]):void;
+ addRelationship(entityA:string,role:string,entityB:string,spec:ErRelationship['relSpec']):void;setDirection(direction:string):void;
+ addCssStyles(ids:string[],styles:string[]|undefined):void;addClass(ids:string[],styles:string[]|undefined):void;setClass(ids:string[],classes:string[]):void;
+ addSubGraph(id:{text:string},list:FlowDocItem[],title:{text:string;type?:string}):string;setAccTitle(text:string):void;setAccDescription(text:string):void;
+ subgraphLookup:Map<string,ErSubgraph>;claimed:Set<string>;
+ type: 'er'; direction: string; entities: Map<string, ErEntity>; relationships: ErRelationship[]; classes: Map<string, FlowClassDef>; subgraphs: ErSubgraph[] }
 export interface XyLinearAxis { type: 'linear'; title: string; min: number | null; max: number | null }
 export interface XyBandAxis { type: 'band'; title: string; categories: string[] }
 export interface XyPlot { type: 'line' | 'bar'; title: string; data: [string, number | null][]; pointLabels?: string[] }
@@ -68,7 +86,7 @@ export interface StateDeclaration { stmt: 'state'; id: string; type?: string; de
 export type StateStatement = string | StateDeclaration | { stmt: string; [key: string]: unknown };
 export interface StateNode { id: string; shape?: string; label?: string; description: string[]; cssClasses: string; cssCompiledStyles: string[]; cssStyles: string[]; type?: string; isGroup?: boolean; parentId?: string; dir?: string; position?: string; noteFor?: string; colorIndex?: number }
 export interface StateEdge { id: string; start: string; end: string; label: string; classes: string; pattern?: string }
-export interface StateModel extends AccessibleModel { type: 'state'; direction: string; rootDoc: StateStatement[]; states: ReadonlyMap<string, StateDeclaration>; relations: { id1: string; id2: string; relationTitle?: string }[]; classes: ReadonlyMap<string, FlowClassDef>; links: ReadonlyMap<string, { url: string; tooltip: string }>; graph: { nodes: StateNode[]; edges: StateEdge[] } }
+export interface StateModel extends AccessibleModel { type: 'state'; direction: string; rootDoc: StateStatement[]; states: ReadonlyMap<string, StateDeclaration>; relations: { id1: string; id2: string; relationTitle?: string }[]; classes: Map<string, FlowClassDef>; links: ReadonlyMap<string, { url: string; tooltip: string }>; graph: { nodes: StateNode[]; edges: StateEdge[] } }
 export interface GanttTask { id: string; task: string; section: string; startTime?: Date | null; endTime?: Date | null; renderEndTime: Date | null; manualEndTime: boolean; processed: boolean; active: boolean; done: boolean; crit: boolean; milestone: boolean; vert: boolean; order: number; classes: string[]; prevTaskId?: string; raw: { data: string; start?: string; end: string } }
 export interface GanttModel extends AccessibleModel { type: 'gantt'; dateFormat: string; axisFormat: string; tickInterval?: string; todayMarker: string; includes: string[]; excludes: string[]; inclusiveEndDates: boolean; topAxis: boolean; displayMode: string; weekday?: string; weekend: string; sections: string[]; links: ReadonlyMap<string, string>; tasks: GanttTask[]; byId: ReadonlyMap<string, GanttTask>; currentSection: string; taskCount: number; lastOrder: number; lastTaskId?: string; options: Record<string, ConfigValue>; now: number; work: number; includeSet: Record<string, never>; excludeSet: Record<string, never>; excludedDays: boolean[]; datedTokens: boolean }
 export interface SequenceBox { name?: string; wrap: boolean; fill: string; actorKeys: string[] }
@@ -82,9 +100,12 @@ export interface GitModel extends AccessibleModel { type: 'gitGraph'; direction:
 export interface ArchitectureNode { id: string; type: string; icon?: string; iconText?: string; title?: string; in?: string }
 export interface ArchitectureGroup { id: string; icon?: string; title?: string; in?: string }
 export interface ArchitectureEdge { lhsId: string; lhsDir: string; lhsInto: boolean; lhsGroup: boolean; rhsId: string; rhsDir: string; rhsInto: boolean; rhsGroup: boolean; title?: string }
-export interface ArchitectureModel extends AccessibleModel { type: 'architecture'; nodes: ReadonlyMap<string, ArchitectureNode>; groups: ReadonlyMap<string, ArchitectureGroup>; edges: ArchitectureEdge[]; layoutHints: { direction: string; members: string[] }[]; registered: ReadonlyMap<string, string> }
+export interface ArchitectureModel extends AccessibleModel {
+ register(kind:'service'|'junction'|'group',id:string,parent:string|undefined):void;addService(service:Omit<ArchitectureNode,'type'>&{type?:'service'}):void;
+ addJunction(junction:{id:string;in?:string;type?:'junction'}):void;addGroup(group:ArchitectureGroup):void;addEdge(edge:ArchitectureEdge):void;addLayoutHint(hint:{direction:'row'|'column';members:string[]}):void;
+ type: 'architecture'; nodes: Map<string, ArchitectureNode>; groups: Map<string, ArchitectureGroup>; edges: ArchitectureEdge[]; layoutHints: { direction: string; members: string[] }[]; registered: Map<string, string> }
 export interface SankeyNode { id: string; index: number }
-export interface SankeyModel extends AccessibleModel { type: 'sankey'; lookup: Map<string,SankeyNode>; nodes: SankeyNode[]; links: { source: SankeyNode; target: SankeyNode; value: number }[] }
+export interface SankeyModel extends AccessibleModel { findOrCreateNode(id:string):SankeyNode;addLink(source:SankeyNode,target:SankeyNode,value:number):void; type: 'sankey'; lookup: Map<string,SankeyNode>; nodes: SankeyNode[]; links: { source: SankeyNode; target: SankeyNode; value: number }[] }
 export interface TreemapNode { name: string; children?: TreemapNode[]; value?: number; classSelector?: string; cssCompiledStyles?: string[] }
 export interface TreemapModel extends AccessibleModel { type: 'treemap'; roots: TreemapNode[]; classes: Map<string, string[]> }
 export interface InfoModel extends AccessibleModel { type: 'info' }

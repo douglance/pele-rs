@@ -445,3 +445,24 @@ Swimlane's pinned full graph/method vectors and native raster checks. All sixtee
 codecs remain subject to their explicit constructor, callback/coercion, UTF-16
 rendering and work-budget limits. The separately verified foreign adapter
 checkpoint remains nine families while the expanded host checks run.
+
+
+## Sixteen mutable codecs through Swift and web
+
+The expanded C registry and WASM typed-model conversion expose the same sixteen
+mutable codecs. Swimlane selection precedes the shared Flowchart model downcast,
+so models keep the common FlowDb prototype while rendering real swimlanes. Shared
+callable metadata makes Kanban and Mindmap's imported helper one host function;
+disposing a later document does not break earlier live borrowed calls. Host
+registrations retain weak document owners without retaining native handles.
+
+The current source-built arm64 C archive passes strict C ownership/transport
+checks. Eight Swift feature integration tests pass, including all sixteen edited
+SVG decoders, actual Timeline operations/partial errors, shared metadata and
+Swimlane's retained renderer. Chrome, Firefox and WebKit pass fifteen model/method
+checks, twenty-four affected full-corpus checks and three decoder/pixel checks.
+All three former deep Mindmap projection exceptions now render through the flat
+public graph in each browser. The strict TypeScript 4.9.5 consumer also passes.
+
+These local results cover the frozen adapter layer. They do not assert final CI,
+Intel execution, complete mutable/API parity, new package publication or release.
