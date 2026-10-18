@@ -58,3 +58,7 @@ impl DiagramModule for Sequence {
         render::render(model, config, options, resources)
     }
 }
+
+mod public_model;
+pub use public_model::SequencePublicState;
+pub use model::SequencePublicOrigin;

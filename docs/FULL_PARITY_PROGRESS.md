@@ -688,3 +688,21 @@ the unchanged 64 MiB/default graph limits and render exact pinned SVG hashes.
 Foreign adapters still use their separately verified JSON checkpoint until the
 next binary-binding slice passes. This does not close source/options transport
 or general JavaScript object/runtime parity.
+
+
+## Sequence mutable native checkpoint
+
+Sequence brings native mutable coverage to twenty-five families; the committed
+foreign checkpoint remains twenty-three. All seventeen actual methods operate on
+private lifecycle/wrap state, actor/box/Map aliases and exact own fields. Five
+public and four original release integration slices pass all 19,166 historical
+outcomes, including forty-eight stress cases. The reproducible oracle covers
+135 full-graph cases, 202 operations and 254 complete SVGs. Raw UTF-16 JSON menus
+use a bounded native iterative parser; two old menu-link surrogate exclusions
+and one deep source projection now pass through the public identity graph.
+Actor.box aliases remain independent of root boxes edits. Native pixels, retained
+ownership, deep/cyclic extras and host/output recovery pass. Malformed dividers
+produce a typed TypeError through render_operation instead of a renderer panic;
+legacy errors/preflight callback ordering remain explicit boundaries. Active
+sparse/lone-surrogate rendering, exotic overrides/coercion and numeric renderer
+kinds/lifecycle indexes outside typed ranges remain open. Renderer unchanged.

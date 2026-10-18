@@ -99,9 +99,31 @@ pub struct SeqNote {
     pub message: String,
     pub wrap: bool,
 }
+/// Native identity/counter observables omitted from the immutable JSON view.
+#[derive(Clone, Debug, Default)]
+pub struct SequencePublicOrigin {
+    pub actor_keys: Vec<Vec<&'static str>>,
+    pub menus: Vec<Vec<(String, String)>>,
+    pub prev_actor: Option<String>,
+    pub current_box: Option<usize>,
+    pub last_created: Option<String>,
+    pub last_destroyed: Option<String>,
+    pub wrap_enabled: Option<bool>,
+    pub sequence_wrap: bool,
+    pub active: Vec<(String, usize)>,
+}
+impl SequencePublicOrigin {
+    fn key(keys: &mut Vec<&'static str>, name: &'static str) {
+        if !keys.contains(&name) {
+            keys.push(name);
+        }
+    }
+}
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct SequenceModel {
+    #[serde(skip)]
+    pub public_origin: SequencePublicOrigin,
     #[serde(rename = "type")]
     pub diagram_type: DiagramType,
     pub actors: Vec<(String, SeqActor)>,
@@ -198,6 +220,11 @@ impl Db {
         Self {
             model: SequenceModel {
                 diagram_type: DiagramType::Sequence,
+                public_origin: SequencePublicOrigin {
+                    wrap_enabled,
+                    sequence_wrap,
+                    ..Default::default()
+                },
                 actors: vec![],
                 created_actors: vec![],
                 destroyed_actors: vec![],
@@ -360,6 +387,21 @@ impl Db {
             self.model.actors.push((id.into(), actor.clone()));
             i
         };
+        if self.model.public_origin.actor_keys.len() <= index {
+            self.model.public_origin.actor_keys.push(Vec::new());
+            self.model.public_origin.menus.push(Vec::new());
+        }
+        self.model.public_origin.actor_keys[index] = vec![
+            "box",
+            "name",
+            "description",
+            "wrap",
+            "prevActor",
+            "links",
+            "properties",
+            "type",
+        ];
+        self.model.public_origin.menus[index].clear();
         self.model.actors[index].1 = actor;
         if let Some(prev) = self
             .prev
@@ -367,6 +409,7 @@ impl Db {
             .and_then(|p| self.actor_index.get(p))
             .copied()
         {
+            SequencePublicOrigin::key(&mut self.model.public_origin.actor_keys[prev], "nextActor");
             self.model.actors[prev].1.next_actor = Some(id.into())
         }
         if let Some(b) = self.current_box {
@@ -400,9 +443,19 @@ impl Db {
                 ));
             }
             self.active.insert(from.clone().unwrap(), count - 1);
+            set(
+                &mut self.model.public_origin.active,
+                from.clone().unwrap(),
+                count - 1,
+            );
         } else if kind == ACTIVE_START {
             if let Some(from) = &from {
                 *self.active.entry(from.clone()).or_default() += 1;
+                set(
+                    &mut self.model.public_origin.active,
+                    from.clone(),
+                    self.active[from],
+                );
             }
         }
         let wrap = text
@@ -523,6 +576,14 @@ impl Db {
                     let Some(i) = self.actor_index.get(&who).copied() else {
                         continue;
                     };
+                    if kind == "details" {
+                        SequencePublicOrigin::key(
+                            &mut self.model.public_origin.actor_keys[i],
+                            "details",
+                        );
+                    } else {
+                        self.model.public_origin.menus[i].push((kind.clone(), text.text.clone()));
+                    }
                     let actor = &mut self.model.actors[i].1;
                     match kind.as_str() {
                         "details" => actor.details = Some(text.text),
@@ -584,6 +645,10 @@ impl Db {
         for (_, a) in &mut self.model.actors {
             a.r#box = a.box_index.map(|i| boxes[i].clone())
         }
+        self.model.public_origin.prev_actor = self.prev;
+        self.model.public_origin.current_box = self.current_box;
+        self.model.public_origin.last_created = self.last_created;
+        self.model.public_origin.last_destroyed = self.last_destroyed;
         Ok(self.model)
     }
 }
