@@ -263,6 +263,22 @@ void *pele_foreign_call_context_v10(const PeleForeignCallV10 *);
 PeleResult *pele_foreign_text_width_v10(PeleForeignCallV10 *, const uint8_t *, size_t,
     uint64_t, uint32_t, uint64_t *);
 
+/* Borrowed resources: active synchronous render only, one call at a time across
+ * all helpers. Reentry returns a semantic error; never retain the call pointer.
+ * Icon names are entity-decoded with no cache. Result owns {value: string|null};
+ * each accepted icon is <=8 MiB. Names/date strings are UTF-8, <=1 MiB.
+ * Clock uses the render session's explicit finite now or cached host clock.
+ * Calendar/date methods reuse existing TimeClip and field validation. Optional
+ * numeric outputs initialize (present=0,bits=0) before failure; success true is
+ * published before outputs. Calendar fields result owns {value: object|null}.
+ * Caller frees every PeleResult, including failures.
+ */
+PeleResult *pele_foreign_icon_v10(PeleForeignCallV10 *, const uint8_t *, size_t);
+PeleResult *pele_foreign_now_millis_v10(PeleForeignCallV10 *, uint64_t *);
+PeleResult *pele_foreign_parse_date_v10(PeleForeignCallV10 *, const uint8_t *, size_t, uint32_t *, uint64_t *);
+PeleResult *pele_foreign_calendar_fields_v10(PeleForeignCallV10 *, uint64_t);
+PeleResult *pele_foreign_calendar_instant_v10(PeleForeignCallV10 *, const uint8_t *, size_t, uint32_t *, uint64_t *);
+
 uint32_t pele_result_status(const PeleResult *result);
 const uint8_t *pele_result_data(const PeleResult *result);
 size_t pele_result_len(const PeleResult *result);

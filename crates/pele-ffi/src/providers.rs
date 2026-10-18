@@ -95,7 +95,7 @@ pub struct PeleProviderRenderV10 {
 /// Borrowed only inside a synchronous callback. Never retain this pointer.
 pub struct PeleForeignCallV10<'a> {
     context: *mut c_void,
-    resources: Option<&'a mut dyn RenderResources>,
+    resources: Option<RefCell<&'a mut dyn RenderResources>>,
     font_family: Option<&'a str>,
     font_family_mono: Option<&'a str>,
 }
@@ -729,7 +729,7 @@ pub unsafe extern "C" fn pele_provider_render_v10(
                         };
                         let mut call = PeleForeignCallV10 {
                             context,
-                            resources: Some(resources),
+                            resources: Some(RefCell::new(resources)),
                             font_family: settings.font_family.as_deref(),
                             font_family_mono: settings.font_family_mono.as_deref(),
                         };
@@ -808,21 +808,155 @@ pub unsafe extern "C" fn pele_foreign_text_width_v10(
         if style > 7 {
             return Err(public::invalid("Foreign text style is invalid"));
         }
-        let call =
-            unsafe { call.as_mut() }.ok_or_else(|| public::invalid("Foreign call is null"))?;
-        let resources = call
-            .resources
-            .as_deref_mut()
-            .ok_or_else(|| public::invalid("Foreign resources are unavailable outside render"))?;
-        let value = resources.text_width(TextRequest {
-            text,
-            size: f64::from_bits(size_bits),
-            style: style as u8,
-            font_family: call.font_family,
-            font_family_mono: call.font_family_mono,
-        })?;
+        let value = unsafe {
+            with_call_resources(call, |call, resources| {
+                resources.text_width(TextRequest {
+                    text,
+                    size: f64::from_bits(size_bits),
+                    style: style as u8,
+                    font_family: call.font_family,
+                    font_family_mono: call.font_family_mono,
+                })
+            })
+        }?;
         let result = public::success(true)?;
         *out = value.to_bits();
         Ok(result)
     })
+}
+
+// Shared immutable call access plus a dynamic exclusive resource borrow prevents
+// C callbacks reentering any resource while another resource is on the stack.
+unsafe fn with_call_resources<T>(
+    call: *const PeleForeignCallV10<'_>,
+    run: impl FnOnce(&PeleForeignCallV10<'_>, &mut dyn RenderResources) -> Result<T, PeleError>,
+) -> Result<T, PeleError> {
+    let call = unsafe { call.as_ref() }.ok_or_else(|| public::invalid("Foreign call is null"))?;
+    let resources = call
+        .resources
+        .as_ref()
+        .ok_or_else(|| public::invalid("Foreign resources are unavailable outside render"))?;
+    let mut resources = resources
+        .try_borrow_mut()
+        .map_err(|_| public::invalid("Foreign resources are already in use"))?;
+    run(call, &mut **resources)
+}
+
+#[derive(Serialize)]
+struct ResourceValue<T> {
+    value: T,
+}
+/// # Safety
+/// Active render call and borrowed UTF-8 name. Result owns {value: string|null}.
+#[no_mangle]
+pub unsafe extern "C" fn pele_foreign_icon_v10(
+    call: *mut PeleForeignCallV10<'_>,
+    name: *const u8,
+    len: usize,
+) -> *mut PeleResult {
+    public::bounded_call(|| {
+        let name = unsafe { compatibility_input(name, len, MAX_OPTIONS) }?;
+        let icon =
+            unsafe { with_call_resources(call, |_, resources| resources.direct_icon(name)) }?;
+        public::success(ResourceValue {
+            value: icon.as_ref().map(|icon| icon.markup()),
+        })
+    })
+}
+/// # Safety
+/// Active render call. out_bits is writable and initialized before errors.
+#[no_mangle]
+pub unsafe extern "C" fn pele_foreign_now_millis_v10(
+    call: *mut PeleForeignCallV10<'_>,
+    out_bits: *mut u64,
+) -> *mut PeleResult {
+    if !out_bits.is_null() {
+        unsafe { *out_bits = 0 }
+    }
+    public::bounded_call(|| {
+        let out = unsafe { out_bits.as_mut() }
+            .ok_or_else(|| public::invalid("Foreign clock output is null"))?;
+        let value = unsafe { with_call_resources(call, |_, resources| resources.now_millis()) }?;
+        let result = public::success(true)?;
+        *out = value.to_bits();
+        Ok(result)
+    })
+}
+// Optional date results use a presence tag and IEEE bits; no JSON float roundtrip.
+unsafe fn optional_number(
+    present: *mut u32,
+    bits: *mut u64,
+    run: impl FnOnce() -> Result<Option<f64>, PeleError>,
+) -> *mut PeleResult {
+    if !present.is_null() {
+        unsafe { *present = 0 }
+    }
+    if !bits.is_null() {
+        unsafe { *bits = 0 }
+    }
+    public::bounded_call(|| {
+        let present = unsafe { present.as_mut() }
+            .ok_or_else(|| public::invalid("Foreign date presence output is null"))?;
+        let bits = unsafe { bits.as_mut() }
+            .ok_or_else(|| public::invalid("Foreign date number output is null"))?;
+        let value = run()?;
+        let result = public::success(true)?;
+        if let Some(value) = value {
+            *present = 1;
+            *bits = value.to_bits();
+        }
+        Ok(result)
+    })
+}
+/// # Safety
+/// Active render call, borrowed UTF-8 date input, and writable initialized outputs.
+#[no_mangle]
+pub unsafe extern "C" fn pele_foreign_parse_date_v10(
+    call: *mut PeleForeignCallV10<'_>,
+    input: *const u8,
+    len: usize,
+    out_present: *mut u32,
+    out_bits: *mut u64,
+) -> *mut PeleResult {
+    unsafe {
+        optional_number(out_present, out_bits, || {
+            let input = compatibility_input(input, len, MAX_OPTIONS)?;
+            with_call_resources(call, |_, resources| resources.parse_date(input))
+        })
+    }
+}
+/// # Safety
+/// Active render call. Result owns {value: CalendarFields|null}.
+#[no_mangle]
+pub unsafe extern "C" fn pele_foreign_calendar_fields_v10(
+    call: *mut PeleForeignCallV10<'_>,
+    instant_bits: u64,
+) -> *mut PeleResult {
+    public::bounded_call(|| {
+        let fields = unsafe {
+            with_call_resources(call, |_, resources| {
+                resources.calendar_fields(f64::from_bits(instant_bits))
+            })
+        }?;
+        public::success(ResourceValue { value: fields })
+    })
+}
+/// # Safety
+/// Active render call, borrowed CivilDateTime JSON (<=4096 bytes), writable outputs.
+#[no_mangle]
+pub unsafe extern "C" fn pele_foreign_calendar_instant_v10(
+    call: *mut PeleForeignCallV10<'_>,
+    civil: *const u8,
+    len: usize,
+    out_present: *mut u32,
+    out_bits: *mut u64,
+) -> *mut PeleResult {
+    unsafe {
+        optional_number(out_present, out_bits, || {
+            let civil = compatibility_input(civil, len, 4096)?;
+            let civil: compat::CivilDateTime = serde_json::from_str(civil)
+                .map_err(|_| public::invalid("Invalid foreign civil time"))?;
+            with_call_resources(call, |_, resources| resources.calendar_instant(civil))
+        })
+    }
 }

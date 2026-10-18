@@ -23,6 +23,8 @@ cc -Wall -Wextra -Werror -std=c11 -I include tests/ffi-render-numbers.c target/r
 target/ffi-render-numbers-integration
 cc -Wall -Wextra -Werror -std=c11 -I include tests/ffi_providers_v10.c target/release/libpele_ffi.a -o target/ffi-providers-integration
 target/ffi-providers-integration
+cc -Wall -Wextra -Werror -std=c11 -I include tests/ffi_provider_resources_v10.c target/release/libpele_ffi.a -o target/ffi-provider-resources-integration
+target/ffi-provider-resources-integration
 if [[ "$(uname -s)" == Darwin ]]; then
     PELE_VERIFY_MUTABLE=1 swift test -c release --package-path bindings/swift --skip '(^|[./])(MountTests|ZoomTests)([./]|$)'
     scripts/test-swift-ui.sh

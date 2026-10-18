@@ -4,8 +4,9 @@ Design target: Pele 1.6, upstream `458322a5b8abb1ae57ddf127c32017ab9fb14a92`.
 Inspected and first provider slice executed 2026-10-19. Core/C v10 is implemented;
 an isolated public Swift facade passes real ARM64 consumers. Root Swift SDK
 integration and x86_64 verification remain release gates. Shared mutable Config,
-lossless UTF-16 source/options, additional borrowed resource capabilities and
-Gantt host callables remain separate completion gates.
+lossless UTF-16 source/options and Gantt host callables remain separate completion
+gates. Borrowed text, icon, clock, date and calendar resources now share the same
+active Rust render session through additive C helpers.
 
 The implementation record below supersedes the earlier proposed unified graph /
 foreign document storage. v10 deliberately adds a separate provider-only handle;
@@ -321,6 +322,38 @@ exception thrown after catching the first one must retain its own identity.
 The custom provider's public icons capability delegates to direct_icon, preserving
 repeated resolver calls; label-internal icon caching is a separate existing path.
 
+### Implemented borrowed resource API
+
+`ProviderRenderContext` exposes `textWidth(_:size:style:)`, `icon(_:)`,
+`nowMillis()`, `parseDate(_:)`, `calendarFields(_:)` and `calendarInstant(_:)`.
+`icon` returns `TrustedSVG?`, date/instant return `Double?`, and calendar fields
+return `CalendarFields?`. Names and date strings use the existing UTF-8 boundary.
+
+Five additive `pele_foreign_*_v10` exports extend the existing text-width helper;
+no public provider struct layout changes. Numeric outputs use raw IEEE bits plus
+an optional presence flag, initialized before failures. Icon and field results own
+`{value: ...}` envelopes so missing values remain distinct from absent results.
+Every result must be freed. Icon names/date strings are limited to 1 MiB, civil
+JSON to 4096 bytes, returned icon markup to the existing 8 MiB host limit, and all
+result envelopes to the existing bounded result limit.
+
+All six capabilities use a shared Swift active-call guard and a Rust `RefCell`
+borrow of the active session. Cross-resource reentry fails immediately, including
+C callers which bypass Swift. Capturing a Swift context is safe: resource methods
+reject it after callback completion. Raw C call pointers remain synchronous borrows
+and must never be retained or used after the callback.
+
+Icon lookup uses `direct_icon`: decode names on each invocation and do not add a
+provider-level cache. Clock uses the session's explicit finite `now`, otherwise its
+cached host clock result. Swift retains an original clock error for repeated calls
+within that same context because Rust also caches clock failure; other resource
+errors may be caught and retried independently. Every capability consumes its own
+original Swift error, so a handled error cannot poison a later successful render.
+Date parsing/instants reuse existing TimeClip truncation and range checks; calendar
+fields reuse native input clipping and field validation. The portable defaults and
+HostResources timezone conversion remain shared with built-in diagrams.
+
+
 For a foreign document, begin an operation only after transport/revision/busy checks.
 After provider dispatch begins, advance revision on success or exception, including
 post-render output-limit failure. Provider mutations are already in the authoritative
@@ -407,8 +440,10 @@ Implement in this order, with one consolidated focused verification per layer:
    pass five public Swift feature tests. They prove original Error identity, caught
    resource-error recovery, replacement/live properties, reference-model identity,
    exact numeric options, mismatch cleanup, close/reentry and release-callback
-   guards. Root source/SDK publication is pending. Integrate packaged exports and
-   old-binary exclusions together; preserve existing Registry/33-family coverage.
+   guards. Source exports and old-binary exclusions are integrated. The current
+   ARM64 release SDK also passes all 13 provider/resource/registry integrations,
+   including icons, clock, date and calendar resources. Final universal packaging
+   and release publication remain open.
 3. **One callable prototype:** Gantt getTasks via active model view; original-method
    delegation, aliases/Date bits, alternate result, partial mutation/error identity,
    lifetime/recovery. Only then publish generic host-call binding conveniences.

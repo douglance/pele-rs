@@ -37,16 +37,17 @@ extension Pele {
             self.svg = svg; self.width = width; self.height = height; self.links = links
         }
     }
-    /// Context values may be retained; textWidth borrows the active render only.
-    /// This first foreign-provider slice exposes text measurement as its resource
-    /// capability. Icon/calendar capabilities and shared mutable Config are separate.
+    /// Context values may be retained; resource methods borrow the active render.
+    /// All resource calls share one reentry guard and preserve original host errors.
+    /// Config remains a value snapshot, separate from these borrowed capabilities.
     public final class ProviderRenderContext {
         public let config: [String: ConfigValue]
         public let options: Engine.Options
         public let outputLimit: OutputLimit
         private var call: OpaquePointer?
         private let invocation: ProviderInvocation
-        private var measuring = false
+        private var resourceActive = false
+        private var clockError: (any Error)?
         fileprivate init(request: PeleProviderRenderV10, call: OpaquePointer?, invocation: ProviderInvocation) throws {
             config = try JSONDecoder().decode([String: ConfigValue].self, from: providerData(request.config, request.config_len))
             var decoded = try JSONDecoder().decode(Engine.Options.self, from: providerData(request.options, request.options_len))
@@ -65,20 +66,76 @@ extension Pele {
             options = decoded; self.call = call; self.invocation = invocation
         }
         fileprivate func finish() { call = nil }
-        public func textWidth(_ text: String, size: Double, style: UInt8 = 0) throws -> Double {
+        private func withResource<T>(_ body: (OpaquePointer) throws -> T) throws -> T {
             guard let call else { throw PeleError(code: "semantic", message: "Provider resources are no longer active") }
-            guard !measuring else { throw PeleError(code: "semantic", message: "Provider text measurement is already in use") }
-            guard style <= 7 else { throw PeleError(code: "semantic", message: "Invalid provider text style") }
-            measuring = true; defer { measuring = false }
+            guard !resourceActive else { throw PeleError(code: "semantic", message: "Provider resources are already in use") }
+            resourceActive = true; defer { resourceActive = false }
             _ = invocation.takeResourceError?()
-            let bytes = Data(text.utf8); var bits: UInt64 = 0
-            do {
+            do { return try body(call) }
+            catch { throw invocation.takeResourceError?() ?? error }
+        }
+        public func textWidth(_ text: String, size: Double, style: UInt8 = 0) throws -> Double {
+            try withResource { call in
+                guard style <= 7 else { throw PeleError(code: "semantic", message: "Invalid provider text style") }
+                let bytes = Data(text.utf8); var bits: UInt64 = 0
                 let _: Bool = try bytes.withUnsafeBytes { input in
                     try Pele.compatibilityResult(pele_foreign_text_width_v10(call, input.bindMemory(to: UInt8.self).baseAddress,
                         input.count, size.bitPattern, UInt32(style), &bits), as: Bool.self)
                 }
                 return Double(bitPattern: bits)
-            } catch { throw invocation.takeResourceError?() ?? error }
+            }
+        }
+        /// Decodes authored entity names and resolves each call independently.
+        public func icon(_ name: String) throws -> TrustedSVG? {
+            try withResource { call in
+                let bytes = Data(name.utf8)
+                let markup: ProviderResourceValue<String> = try bytes.withUnsafeBytes { input in
+                    try Pele.compatibilityResult(pele_foreign_icon_v10(call, input.bindMemory(to: UInt8.self).baseAddress,
+                        input.count), as: ProviderResourceValue<String>.self)
+                }
+                return markup.value.map { TrustedSVG(trustedMarkup: $0) }
+            }
+        }
+        /// Uses explicit finite options.now or the render session's cached host clock.
+        public func nowMillis() throws -> Double {
+            try withResource { call in
+                if let clockError { throw clockError }
+                var bits: UInt64 = 0
+                do {
+                    let _: Bool = try Pele.compatibilityResult(pele_foreign_now_millis_v10(call, &bits), as: Bool.self)
+                    return Double(bitPattern: bits)
+                } catch {
+                    // Rust caches clock failures for this render. Retain the exact
+                    // Swift error too when the provider catches and retries it.
+                    let original = invocation.takeResourceError?() ?? error
+                    clockError = original; throw original
+                }
+            }
+        }
+        public func parseDate(_ text: String) throws -> Double? {
+            try withResource { call in
+                let bytes = Data(text.utf8); var present: UInt32 = 0, bits: UInt64 = 0
+                let _: Bool = try bytes.withUnsafeBytes { input in
+                    try Pele.compatibilityResult(pele_foreign_parse_date_v10(call, input.bindMemory(to: UInt8.self).baseAddress,
+                        input.count, &present, &bits), as: Bool.self)
+                }
+                return present == 0 ? nil : Double(bitPattern: bits)
+            }
+        }
+        public func calendarFields(_ instantMillis: Double) throws -> CalendarFields? {
+            try withResource { call in
+                try Pele.compatibilityResult(pele_foreign_calendar_fields_v10(call, instantMillis.bitPattern), as: ProviderResourceValue<CalendarFields>.self).value
+            }
+        }
+        public func calendarInstant(_ civil: CivilDateTime) throws -> Double? {
+            try withResource { call in
+                let bytes = try JSONEncoder().encode(civil); var present: UInt32 = 0, bits: UInt64 = 0
+                let _: Bool = try bytes.withUnsafeBytes { input in
+                    try Pele.compatibilityResult(pele_foreign_calendar_instant_v10(call, input.bindMemory(to: UInt8.self).baseAddress,
+                        input.count, &present, &bits), as: Bool.self)
+                }
+                return present == 0 ? nil : Double(bitPattern: bits)
+            }
         }
     }
     /// Owns the exact reference model and parse-time registration/config. Closing
@@ -197,6 +254,7 @@ extension Pele.Registry {
     }
 }
 
+private struct ProviderResourceValue<Value: Decodable>: Decodable { let value: Value? }
 private struct ProviderMetadata: Decodable { let type: String; let revision: String; let modelKind: String }
 private struct ProviderOutcome<Value: Decodable>: Decodable { let revision: String?; let result: ProviderResult<Value> }
 private enum ProviderResult<Value: Decodable>: Decodable {
