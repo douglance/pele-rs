@@ -1,0 +1,5970 @@
+{
+  "schemaVersion": 1,
+  "mode": "local-timing",
+  "timestamp": "2026-10-18T17:34:35.144Z",
+  "revision": "8783a22108c0d91722077f3f81016f8f503f009d",
+  "worktree": [
+    "M bindings/swift/Tests/PeleTests/AdditionalDiagramTests.swift",
+    " M bindings/swift/Tests/PeleTests/MutableRemainingTests.swift",
+    " M bindings/web/full.d.ts",
+    " M bindings/web/graph-binary.js",
+    " M bindings/web/graph.js",
+    " M crates/pele-ffi/src/public.rs",
+    " M crates/pele/src/compat/diagrams/block/mod.rs",
+    " M crates/pele/src/compat/diagrams/block/model.rs",
+    " M crates/pele/src/compat/diagrams/block/parser.rs",
+    " M crates/pele/src/compat/diagrams/block/render.rs",
+    " M crates/pele/src/compat/public/engine.rs",
+    " M scripts/verify.sh",
+    " M tests/rust-consumer/src/main.rs",
+    " M tests/swift-consumer/Sources/PeleConsumer/main.swift",
+    "?? crates/pele/src/compat/diagrams/block/public_model.rs",
+    "?? crates/pele/tests/public_block.rs",
+    "?? scripts/parity/probe-public-block.mjs",
+    "?? scripts/perf/"
+  ],
+  "rustSourceSha256": "aed3b9544525b92d0b1caa40f46b5a5c55bbed0fc29de99e19244cf0dcd53e39",
+  "buildManifest": {
+    "schemaVersion": 1,
+    "sourceInputSha256": "e86842e8b71deb47586a6234059defc586c7fb483cd5cb1f66a9f2319fcfc8e5",
+    "revision": "8783a22108c0d91722077f3f81016f8f503f009d",
+    "builtAt": "2026-10-18T17:33:34.845Z",
+    "binaries": {
+      "pele-perf": "ac56915229fbfc5c886927478d77e7a85f0de7bc8673290fe2560ba2ab7b0ac6",
+      "pele-perf-alloc": "3f2bb49916ccf5b2201c1d9e63decf78f7e232a58eefd7f1e9de622a88bf3322"
+    }
+  },
+  "nativeSha256": "ac56915229fbfc5c886927478d77e7a85f0de7bc8673290fe2560ba2ab7b0ac6",
+  "nativeLockSha256": "0c2939f795c527790c67184c287c05fcbbf0d464859555a329f5b548cf48afcc",
+  "harnessSha256": {
+    "run.mjs": "53c9885a5e42fe3a22de790235e53c9a1bfdf90813976bc1c5e6e317d14baa1b",
+    "cases.mjs": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+    "build.mjs": "e13e2055f0acc55a634d74deed5cb4a9d0a0acda88d37eec4f7c009cc0b18f74"
+  },
+  "upstream": "458322a5b8abb1ae57ddf127c32017ab9fb14a92",
+  "oracleSha256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "node": "v25.9.0",
+  "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)",
+  "platform": "darwin",
+  "arch": "arm64",
+  "cpu": "Apple M1 Pro",
+  "logicalCPUs": 8,
+  "totalMemory": 17179869184,
+  "settings": {
+    "trials": 7,
+    "targetBatchMs": 12,
+    "explicitNodeGC": true,
+    "fixedClock": 1704067200000,
+    "timeZone": "UTC",
+    "resource": "fixed UTF16 length × size × (bold?.71:.6)",
+    "freshRetainedStatePerBatch": true,
+    "warmRenderBeforeBatch": true
+  },
+  "scope": {
+    "paired": "Same source, public options, fixed measurement/clock and exact SVG+dimension verification. JS raw model render compared with Rust typed retained and mutable publication APIs; publication returns an additional cloned graph.",
+    "nativeComponents": "Separate native API components, not matched JS operations or end-to-end Swift costs.",
+    "excluded": "Startup, module loading, process setup, NDJSON control pipe, SVG DOM insertion, layout/paint and GPU. JS GC during a batch remains part of observed runtime.",
+    "externalLoad": "Host is not assumed globally idle. External xctest may consume one core; unrelated processes are never stopped."
+  },
+  "systemBefore": {
+    "loadAverage": [
+      5.9111328125,
+      6.46875,
+      7.10498046875
+    ],
+    "freeMemory": 770818048,
+    "processes": [
+      {
+        "pid": 410,
+        "cpuPercent": 42.2,
+        "name": "WindowServer"
+      },
+      {
+        "pid": 98266,
+        "cpuPercent": 30.7,
+        "name": "node"
+      },
+      {
+        "pid": 813,
+        "cpuPercent": 24.6,
+        "name": "Google Chrome Helper"
+      },
+      {
+        "pid": 77091,
+        "cpuPercent": 1,
+        "name": "xctest"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "flowchart/medium",
+      "family": "flowchart",
+      "scale": "medium",
+      "units": 48,
+      "source": "flowchart TB\nn0[Node 0]\nn1[Node 1]\nn2[Node 2]\nn3[Node 3]\nn4[Node 4]\nn5[Node 5]\nn6[Node 6]\nn7[Node 7]\nn8[Node 8]\nn9[Node 9]\nn10[Node 10]\nn11[Node 11]\nn12[Node 12]\nn13[Node 13]\nn14[Node 14]\nn15[Node 15]\nn16[Node 16]\nn17[Node 17]\nn18[Node 18]\nn19[Node 19]\nn20[Node 20]\nn21[Node 21]\nn22[Node 22]\nn23[Node 23]\nn24[Node 24]\nn25[Node 25]\nn26[Node 26]\nn27[Node 27]\nn28[Node 28]\nn29[Node 29]\nn30[Node 30]\nn31[Node 31]\nn32[Node 32]\nn33[Node 33]\nn34[Node 34]\nn35[Node 35]\nn36[Node 36]\nn37[Node 37]\nn38[Node 38]\nn39[Node 39]\nn40[Node 40]\nn41[Node 41]\nn42[Node 42]\nn43[Node 43]\nn44[Node 44]\nn45[Node 45]\nn46[Node 46]\nn47[Node 47]\nn0 --> n1\nn1 --> n2\nn2 --> n3\nn3 --> n4\nn4 --> n5\nn5 --> n6\nn6 --> n7\nn7 --> n8\nn8 --> n9\nn9 --> n10\nn10 --> n11\nn11 --> n12\nn12 --> n13\nn13 --> n14\nn14 --> n15\nn15 --> n16\nn16 --> n17\nn17 --> n18\nn18 --> n19\nn19 --> n20\nn20 --> n21\nn21 --> n22\nn22 --> n23\nn23 --> n24\nn24 --> n25\nn25 --> n26\nn26 --> n27\nn27 --> n28\nn28 --> n29\nn29 --> n30\nn30 --> n31\nn31 --> n32\nn32 --> n33\nn33 --> n34\nn34 --> n35\nn35 --> n36\nn36 --> n37\nn37 --> n38\nn38 --> n39\nn39 --> n40\nn40 --> n41\nn41 --> n42\nn42 --> n43\nn43 --> n44\nn44 --> n45\nn45 --> n46\nn46 --> n47",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSha256": "d3ffdd90a8476c76234d30bf49cb41c7faaeb437c67ec4b5d92dd1e75dd2c5ca",
+      "sourceBytes": 1161,
+      "output": {
+        "type": "flowchart",
+        "widthBits": "405e000000000000",
+        "heightBits": "40b1e00000000000",
+        "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+        "svgBytes": 21889
+      },
+      "native": {
+        "graphBinaryBytes": 17098,
+        "graphJsonBytes": 79779,
+        "graphNodes": 297,
+        "graphStrings": 274,
+        "graphUtf16Units": 1631,
+        "output": {
+          "heightBits": "40b1e00000000000",
+          "svgBytes": 21889,
+          "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+          "type": "flowchart",
+          "widthBits": "405e000000000000"
+        }
+      }
+    },
+    {
+      "id": "er/medium",
+      "family": "er",
+      "scale": "medium",
+      "units": 48,
+      "source": "erDiagram\nE0 {\n int id PK\n string label\n}\nE1 {\n int id PK\n string label\n}\nE2 {\n int id PK\n string label\n}\nE3 {\n int id PK\n string label\n}\nE4 {\n int id PK\n string label\n}\nE5 {\n int id PK\n string label\n}\nE6 {\n int id PK\n string label\n}\nE7 {\n int id PK\n string label\n}\nE8 {\n int id PK\n string label\n}\nE9 {\n int id PK\n string label\n}\nE10 {\n int id PK\n string label\n}\nE11 {\n int id PK\n string label\n}\nE12 {\n int id PK\n string label\n}\nE13 {\n int id PK\n string label\n}\nE14 {\n int id PK\n string label\n}\nE15 {\n int id PK\n string label\n}\nE16 {\n int id PK\n string label\n}\nE17 {\n int id PK\n string label\n}\nE18 {\n int id PK\n string label\n}\nE19 {\n int id PK\n string label\n}\nE20 {\n int id PK\n string label\n}\nE21 {\n int id PK\n string label\n}\nE22 {\n int id PK\n string label\n}\nE23 {\n int id PK\n string label\n}\nE24 {\n int id PK\n string label\n}\nE25 {\n int id PK\n string label\n}\nE26 {\n int id PK\n string label\n}\nE27 {\n int id PK\n string label\n}\nE28 {\n int id PK\n string label\n}\nE29 {\n int id PK\n string label\n}\nE30 {\n int id PK\n string label\n}\nE31 {\n int id PK\n string label\n}\nE32 {\n int id PK\n string label\n}\nE33 {\n int id PK\n string label\n}\nE34 {\n int id PK\n string label\n}\nE35 {\n int id PK\n string label\n}\nE36 {\n int id PK\n string label\n}\nE37 {\n int id PK\n string label\n}\nE38 {\n int id PK\n string label\n}\nE39 {\n int id PK\n string label\n}\nE40 {\n int id PK\n string label\n}\nE41 {\n int id PK\n string label\n}\nE42 {\n int id PK\n string label\n}\nE43 {\n int id PK\n string label\n}\nE44 {\n int id PK\n string label\n}\nE45 {\n int id PK\n string label\n}\nE46 {\n int id PK\n string label\n}\nE47 {\n int id PK\n string label\n}\nE0 ||--o{ E1 : owns\nE1 ||--o{ E2 : owns\nE2 ||--o{ E3 : owns\nE3 ||--o{ E4 : owns\nE4 ||--o{ E5 : owns\nE5 ||--o{ E6 : owns\nE6 ||--o{ E7 : owns\nE7 ||--o{ E8 : owns\nE8 ||--o{ E9 : owns\nE9 ||--o{ E10 : owns\nE10 ||--o{ E11 : owns\nE11 ||--o{ E12 : owns\nE12 ||--o{ E13 : owns\nE13 ||--o{ E14 : owns\nE14 ||--o{ E15 : owns\nE15 ||--o{ E16 : owns\nE16 ||--o{ E17 : owns\nE17 ||--o{ E18 : owns\nE18 ||--o{ E19 : owns\nE19 ||--o{ E20 : owns\nE20 ||--o{ E21 : owns\nE21 ||--o{ E22 : owns\nE22 ||--o{ E23 : owns\nE23 ||--o{ E24 : owns\nE24 ||--o{ E25 : owns\nE25 ||--o{ E26 : owns\nE26 ||--o{ E27 : owns\nE27 ||--o{ E28 : owns\nE28 ||--o{ E29 : owns\nE29 ||--o{ E30 : owns\nE30 ||--o{ E31 : owns\nE31 ||--o{ E32 : owns\nE32 ||--o{ E33 : owns\nE33 ||--o{ E34 : owns\nE34 ||--o{ E35 : owns\nE35 ||--o{ E36 : owns\nE36 ||--o{ E37 : owns\nE37 ||--o{ E38 : owns\nE38 ||--o{ E39 : owns\nE39 ||--o{ E40 : owns\nE40 ||--o{ E41 : owns\nE41 ||--o{ E42 : owns\nE42 ||--o{ E43 : owns\nE43 ||--o{ E44 : owns\nE44 ||--o{ E45 : owns\nE45 ||--o{ E46 : owns\nE46 ||--o{ E47 : owns",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSha256": "51f222a39995ad6774e0fc6094dd5b8902d32febcd97d3a67b282f8c7851b748",
+      "sourceBytes": 2598,
+      "output": {
+        "type": "er",
+        "widthBits": "4066600000000000",
+        "heightBits": "40c1c38000000000",
+        "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+        "svgBytes": 70404
+      },
+      "native": {
+        "graphBinaryBytes": 18382,
+        "graphJsonBytes": 92001,
+        "graphNodes": 437,
+        "graphStrings": 181,
+        "graphUtf16Units": 1070,
+        "output": {
+          "heightBits": "40c1c38000000000",
+          "svgBytes": 70404,
+          "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+          "type": "er",
+          "widthBits": "4066600000000000"
+        }
+      }
+    },
+    {
+      "id": "gantt/medium",
+      "family": "gantt",
+      "scale": "medium",
+      "units": 48,
+      "source": "gantt\ndateFormat YYYY-MM-DD\naxisFormat %Y-%m-%d\ntodayMarker off\nTask 0:t0,2024-01-01,1d\nTask 1:t1,2024-01-02,2d\nTask 2:t2,2024-01-03,3d\nTask 3:t3,2024-01-04,4d\nTask 4:t4,2024-01-05,1d\nTask 5:t5,2024-01-06,2d\nTask 6:t6,2024-01-07,3d\nTask 7:t7,2024-01-08,4d\nTask 8:t8,2024-01-09,1d\nTask 9:t9,2024-01-10,2d\nTask 10:t10,2024-01-11,3d\nTask 11:t11,2024-01-12,4d\nTask 12:t12,2024-01-13,1d\nTask 13:t13,2024-01-14,2d\nTask 14:t14,2024-01-15,3d\nTask 15:t15,2024-01-16,4d\nTask 16:t16,2024-01-17,1d\nTask 17:t17,2024-01-18,2d\nTask 18:t18,2024-01-19,3d\nTask 19:t19,2024-01-20,4d\nTask 20:t20,2024-01-21,1d\nTask 21:t21,2024-01-22,2d\nTask 22:t22,2024-01-23,3d\nTask 23:t23,2024-01-24,4d\nTask 24:t24,2024-01-25,1d\nTask 25:t25,2024-01-26,2d\nTask 26:t26,2024-01-27,3d\nTask 27:t27,2024-01-28,4d\nTask 28:t28,2024-01-01,1d\nTask 29:t29,2024-01-02,2d\nTask 30:t30,2024-01-03,3d\nTask 31:t31,2024-01-04,4d\nTask 32:t32,2024-01-05,1d\nTask 33:t33,2024-01-06,2d\nTask 34:t34,2024-01-07,3d\nTask 35:t35,2024-01-08,4d\nTask 36:t36,2024-01-09,1d\nTask 37:t37,2024-01-10,2d\nTask 38:t38,2024-01-11,3d\nTask 39:t39,2024-01-12,4d\nTask 40:t40,2024-01-13,1d\nTask 41:t41,2024-01-14,2d\nTask 42:t42,2024-01-15,3d\nTask 43:t43,2024-01-16,4d\nTask 44:t44,2024-01-17,1d\nTask 45:t45,2024-01-18,2d\nTask 46:t46,2024-01-19,3d\nTask 47:t47,2024-01-20,4d",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSha256": "5e15788ce4ee74b56b1f8c9ccdbd6569f3211b54a428ca6d4f0ea32fc4e485f1",
+      "sourceBytes": 1291,
+      "output": {
+        "type": "gantt",
+        "widthBits": "4089000000000000",
+        "heightBits": "4097140000000000",
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "svgBytes": 12574
+      },
+      "native": {
+        "graphBinaryBytes": 17187,
+        "graphJsonBytes": 82916,
+        "graphNodes": 254,
+        "graphStrings": 280,
+        "graphUtf16Units": 2104,
+        "output": {
+          "heightBits": "4097140000000000",
+          "svgBytes": 12574,
+          "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      }
+    }
+  ],
+  "rows": [
+    {
+      "case": "flowchart/medium",
+      "stage": "parse",
+      "pairedJS": true,
+      "counts": {
+        "native": 128,
+        "js": 64
+      },
+      "native": {
+        "medianMs": 0.095711265625,
+        "sampleP95Ms": 0.0979290390625,
+        "minMs": 0.0942532578125,
+        "maxMs": 0.0979290390625,
+        "madMs": 0.0013248750000000031
+      },
+      "js": {
+        "medianMs": 0.203861328125,
+        "sampleP95Ms": 0.2358014375,
+        "minMs": 0.1609733125,
+        "maxMs": 0.2358014375,
+        "madMs": 0.016397140625
+      },
+      "nativeOverJS": {
+        "medianRatio": 0.4694920145242726,
+        "bootstrap95": [
+          0.416931462116754,
+          0.5184531912261909
+        ]
+      },
+      "nativeSamplesMs": [
+        0.096930015625,
+        0.094386390625,
+        0.09719140625,
+        0.0979290390625,
+        0.095711265625,
+        0.0947916640625,
+        0.0942532578125
+      ],
+      "jsSamplesMs": [
+        0.1874641875,
+        0.22638346875,
+        0.203861328125,
+        0.1609733125,
+        0.208354171875,
+        0.2358014375,
+        0.1902923125
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 1152,
+          "count": 128,
+          "elapsedNs": 12407042,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1152,
+          "count": 128,
+          "elapsedNs": 12081458,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1152,
+          "count": 128,
+          "elapsedNs": 12440500,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1152,
+          "count": 128,
+          "elapsedNs": 12534917,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1152,
+          "count": 128,
+          "elapsedNs": 12251042,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1152,
+          "count": 128,
+          "elapsedNs": 12133333,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1152,
+          "count": 128,
+          "elapsedNs": 12064417,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "parse-fresh-registry",
+      "pairedJS": true,
+      "counts": {
+        "native": 128,
+        "js": 128
+      },
+      "native": {
+        "medianMs": 0.0976923828125,
+        "sampleP95Ms": 0.1016376953125,
+        "minMs": 0.0956432265625,
+        "maxMs": 0.1016376953125,
+        "madMs": 0.0017262343750000103
+      },
+      "js": {
+        "medianMs": 0.1340673828125,
+        "sampleP95Ms": 0.17647884375,
+        "minMs": 0.102630859375,
+        "maxMs": 0.17647884375,
+        "madMs": 0.028830726562499992
+      },
+      "nativeOverJS": {
+        "medianRatio": 0.7286812106202426,
+        "bootstrap95": [
+          0.5767293658468791,
+          0.8502885450113838
+        ]
+      },
+      "nativeSamplesMs": [
+        0.0956432265625,
+        0.097783203125,
+        0.0959661484375,
+        0.0972594375,
+        0.0976923828125,
+        0.100578453125,
+        0.1016376953125
+      ],
+      "jsSamplesMs": [
+        0.1226901015625,
+        0.1686396484375,
+        0.1340673828125,
+        0.17647884375,
+        0.102630859375,
+        0.162898109375,
+        0.1182874375
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 1152,
+          "count": 128,
+          "elapsedNs": 12242333,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1152,
+          "count": 128,
+          "elapsedNs": 12516250,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1152,
+          "count": 128,
+          "elapsedNs": 12283667,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1152,
+          "count": 128,
+          "elapsedNs": 12449208,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1152,
+          "count": 128,
+          "elapsedNs": 12504625,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1152,
+          "count": 128,
+          "elapsedNs": 12874042,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1152,
+          "count": 128,
+          "elapsedNs": 13009625,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "parse-public",
+      "pairedJS": true,
+      "counts": {
+        "native": 32,
+        "js": 128
+      },
+      "native": {
+        "medianMs": 0.49900390625,
+        "sampleP95Ms": 0.50634765625,
+        "minMs": 0.48269140625,
+        "maxMs": 0.50634765625,
+        "madMs": 0.007343749999999982
+      },
+      "js": {
+        "medianMs": 0.1158548203125,
+        "sampleP95Ms": 0.1757903671875,
+        "minMs": 0.0725065078125,
+        "maxMs": 0.1757903671875,
+        "madMs": 0.0433483125
+      },
+      "nativeOverJS": {
+        "medianRatio": 4.30714841992777,
+        "bootstrap95": [
+          2.879163127575844,
+          5.4364093699005105
+        ]
+      },
+      "nativeSamplesMs": [
+        0.49900390625,
+        0.49057553125,
+        0.50427475,
+        0.5015104375,
+        0.50634765625,
+        0.48369659375,
+        0.48269140625
+      ],
+      "jsSamplesMs": [
+        0.1024365234375,
+        0.1629873046875,
+        0.0927587890625,
+        0.1679990234375,
+        0.0725065078125,
+        0.1757903671875,
+        0.1158548203125
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 288,
+          "count": 32,
+          "elapsedNs": 15968125,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 288,
+          "count": 32,
+          "elapsedNs": 15698417,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 288,
+          "count": 32,
+          "elapsedNs": 16136792,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 288,
+          "count": 32,
+          "elapsedNs": 16048334,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 288,
+          "count": 32,
+          "elapsedNs": 16203125,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 288,
+          "count": 32,
+          "elapsedNs": 15478291,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 288,
+          "count": 32,
+          "elapsedNs": 15446125,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "parse-public-fresh-registry",
+      "pairedJS": true,
+      "counts": {
+        "native": 32,
+        "js": 128
+      },
+      "native": {
+        "medianMs": 0.50279559375,
+        "sampleP95Ms": 0.5325051875,
+        "minMs": 0.48655859375,
+        "maxMs": 0.5325051875,
+        "madMs": 0.00968100000000005
+      },
+      "js": {
+        "medianMs": 0.1215458984375,
+        "sampleP95Ms": 0.1644296875,
+        "minMs": 0.09430078125,
+        "maxMs": 0.1644296875,
+        "madMs": 0.0272451171875
+      },
+      "nativeOverJS": {
+        "medianRatio": 4.136672649703125,
+        "bootstrap95": [
+          3.1243835313199084,
+          4.414363798813612
+        ]
+      },
+      "nativeSamplesMs": [
+        0.518615875,
+        0.51081640625,
+        0.5325051875,
+        0.49311459375,
+        0.5001640625,
+        0.48655859375,
+        0.50279559375
+      ],
+      "jsSamplesMs": [
+        0.1215458984375,
+        0.1539697265625,
+        0.11748371875,
+        0.1578278046875,
+        0.09430078125,
+        0.1644296875,
+        0.12073046875
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 288,
+          "count": 32,
+          "elapsedNs": 16595708,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 288,
+          "count": 32,
+          "elapsedNs": 16346125,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 288,
+          "count": 32,
+          "elapsedNs": 17040166,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 288,
+          "count": 32,
+          "elapsedNs": 15779667,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 288,
+          "count": 32,
+          "elapsedNs": 16005250,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 288,
+          "count": 32,
+          "elapsedNs": 15569875,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 288,
+          "count": 32,
+          "elapsedNs": 16089459,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "render-source",
+      "pairedJS": true,
+      "counts": {
+        "native": 32,
+        "js": 32
+      },
+      "native": {
+        "medianMs": 0.43588934375,
+        "sampleP95Ms": 0.43923696875,
+        "minMs": 0.4309544375,
+        "maxMs": 0.43923696875,
+        "madMs": 0.0014778750000000174
+      },
+      "js": {
+        "medianMs": 0.63266015625,
+        "sampleP95Ms": 0.6704674375,
+        "minMs": 0.60557421875,
+        "maxMs": 0.6704674375,
+        "madMs": 0.0154414062499999
+      },
+      "nativeOverJS": {
+        "medianRatio": 0.6889786553553016,
+        "bootstrap95": [
+          0.6698349747459528,
+          0.7143417104615538
+        ]
+      },
+      "nativeSamplesMs": [
+        0.4309544375,
+        0.43412109375,
+        0.43441146875,
+        0.436584625,
+        0.4370078125,
+        0.43923696875,
+        0.43588934375
+      ],
+      "jsSamplesMs": [
+        0.6704674375,
+        0.6481015625,
+        0.6111705625,
+        0.6399010625,
+        0.62059896875,
+        0.60557421875,
+        0.63266015625
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 2160601921231696000,
+          "count": 32,
+          "elapsedNs": 13790542,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 1536
+        },
+        {
+          "checksum": 2160601921231696000,
+          "count": 32,
+          "elapsedNs": 13891875,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 1536
+        },
+        {
+          "checksum": 2160601921231696000,
+          "count": 32,
+          "elapsedNs": 13901167,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 1536
+        },
+        {
+          "checksum": 2160601921231696000,
+          "count": 32,
+          "elapsedNs": 13970708,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 1536
+        },
+        {
+          "checksum": 2160601921231696000,
+          "count": 32,
+          "elapsedNs": 13984250,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 1536
+        },
+        {
+          "checksum": 2160601921231696000,
+          "count": 32,
+          "elapsedNs": 14055583,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 1536
+        },
+        {
+          "checksum": 2160601921231696000,
+          "count": 32,
+          "elapsedNs": 13948459,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 1536
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "render-retained",
+      "pairedJS": true,
+      "counts": {
+        "native": 64,
+        "js": 32
+      },
+      "native": {
+        "medianMs": 0.337353515625,
+        "sampleP95Ms": 0.346089203125,
+        "minMs": 0.328399078125,
+        "maxMs": 0.346089203125,
+        "madMs": 0.0047154843749999675
+      },
+      "js": {
+        "medianMs": 0.406490875,
+        "sampleP95Ms": 0.4193763125,
+        "minMs": 0.39908725,
+        "maxMs": 0.4193763125,
+        "madMs": 0.0037213437499999946
+      },
+      "nativeOverJS": {
+        "medianRatio": 0.8299165771556373,
+        "bootstrap95": [
+          0.8090416764686904,
+          0.8544048725135537
+        ]
+      },
+      "nativeSamplesMs": [
+        0.34412825,
+        0.334270828125,
+        0.337353515625,
+        0.33263803125,
+        0.3386796875,
+        0.328399078125,
+        0.346089203125
+      ],
+      "jsSamplesMs": [
+        0.4193763125,
+        0.4050520625,
+        0.41697915625,
+        0.4073958125,
+        0.39908725,
+        0.406490875,
+        0.40276953125
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 4321203842463392000,
+          "count": 64,
+          "elapsedNs": 22024208,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 3072
+        },
+        {
+          "checksum": 4321203842463392000,
+          "count": 64,
+          "elapsedNs": 21393333,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 3072
+        },
+        {
+          "checksum": 4321203842463392000,
+          "count": 64,
+          "elapsedNs": 21590625,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 3072
+        },
+        {
+          "checksum": 4321203842463392000,
+          "count": 64,
+          "elapsedNs": 21288834,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 3072
+        },
+        {
+          "checksum": 4321203842463392000,
+          "count": 64,
+          "elapsedNs": 21675500,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 3072
+        },
+        {
+          "checksum": 4321203842463392000,
+          "count": 64,
+          "elapsedNs": 21017541,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 3072
+        },
+        {
+          "checksum": 4321203842463392000,
+          "count": 64,
+          "elapsedNs": 22149709,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 3072
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "render-mutable-core",
+      "pairedJS": true,
+      "counts": {
+        "native": 64,
+        "js": 64
+      },
+      "native": {
+        "medianMs": 0.333024078125,
+        "sampleP95Ms": 0.340607421875,
+        "minMs": 0.32938021875,
+        "maxMs": 0.340607421875,
+        "madMs": 0.0018242031250000346
+      },
+      "js": {
+        "medianMs": 0.365083984375,
+        "sampleP95Ms": 0.378501296875,
+        "minMs": 0.345092453125,
+        "maxMs": 0.378501296875,
+        "madMs": 0.010320953124999976
+      },
+      "nativeOverJS": {
+        "medianRatio": 0.9121848461666033,
+        "bootstrap95": [
+          0.8822469869619123,
+          0.9644148306247462
+        ]
+      },
+      "nativeSamplesMs": [
+        0.333154296875,
+        0.32979753125,
+        0.32938021875,
+        0.331199875,
+        0.333723953125,
+        0.340607421875,
+        0.333024078125
+      ],
+      "jsSamplesMs": [
+        0.3754049375,
+        0.35852409375,
+        0.345092453125,
+        0.378501296875,
+        0.346037765625,
+        0.36603384375,
+        0.365083984375
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 4321203842463392000,
+          "count": 64,
+          "elapsedNs": 21321875,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 3072
+        },
+        {
+          "checksum": 4321203842463392000,
+          "count": 64,
+          "elapsedNs": 21107042,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 3072
+        },
+        {
+          "checksum": 4321203842463392000,
+          "count": 64,
+          "elapsedNs": 21080334,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 3072
+        },
+        {
+          "checksum": 4321203842463392000,
+          "count": 64,
+          "elapsedNs": 21196792,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 3072
+        },
+        {
+          "checksum": 4321203842463392000,
+          "count": 64,
+          "elapsedNs": 21358333,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 3072
+        },
+        {
+          "checksum": 4321203842463392000,
+          "count": 64,
+          "elapsedNs": 21798875,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 3072
+        },
+        {
+          "checksum": 4321203842463392000,
+          "count": 64,
+          "elapsedNs": 21313541,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 3072
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "render-mutable-publish",
+      "pairedJS": true,
+      "counts": {
+        "native": 32,
+        "js": 32
+      },
+      "native": {
+        "medianMs": 0.37150259375,
+        "sampleP95Ms": 0.38229296875,
+        "minMs": 0.366884125,
+        "maxMs": 0.38229296875,
+        "madMs": 0.0016458125000000101
+      },
+      "js": {
+        "medianMs": 0.36746875,
+        "sampleP95Ms": 0.37846746875,
+        "minMs": 0.3267799375,
+        "maxMs": 0.37846746875,
+        "madMs": 0.005128906250000009
+      },
+      "nativeOverJS": {
+        "medianRatio": 1.010977379028829,
+        "bootstrap95": [
+          0.9956168023554314,
+          1.0282631766189803
+        ]
+      },
+      "nativeSamplesMs": [
+        0.3711745,
+        0.36985678125,
+        0.373703125,
+        0.366884125,
+        0.37150259375,
+        0.37258071875,
+        0.38229296875
+      ],
+      "jsSamplesMs": [
+        0.37846746875,
+        0.36233984375,
+        0.3267799375,
+        0.36626303125,
+        0.36746875,
+        0.37280859375,
+        0.372591125
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 2160601921231689000,
+          "count": 32,
+          "elapsedNs": 11877584,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 1536
+        },
+        {
+          "checksum": 2160601921231689000,
+          "count": 32,
+          "elapsedNs": 11835417,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 1536
+        },
+        {
+          "checksum": 2160601921231689000,
+          "count": 32,
+          "elapsedNs": 11958500,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 1536
+        },
+        {
+          "checksum": 2160601921231689000,
+          "count": 32,
+          "elapsedNs": 11740292,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 1536
+        },
+        {
+          "checksum": 2160601921231689000,
+          "count": 32,
+          "elapsedNs": 11888083,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 1536
+        },
+        {
+          "checksum": 2160601921231689000,
+          "count": 32,
+          "elapsedNs": 11922583,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 1536
+        },
+        {
+          "checksum": 2160601921231689000,
+          "count": 32,
+          "elapsedNs": 12233375,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 1536
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "registry",
+      "pairedJS": false,
+      "counts": {
+        "native": 1024,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.0018245439453125,
+        "sampleP95Ms": 0.0019077958984375,
+        "minMs": 0.0017967939453125,
+        "maxMs": 0.0019077958984375,
+        "madMs": 0.00002091503906250002
+      },
+      "nativeSamplesMs": [
+        0.0017967939453125,
+        0.001845458984375,
+        0.0019077958984375,
+        0.0018245439453125,
+        0.00181396484375,
+        0.00181026171875,
+        0.001873982421875
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1839917,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1889750,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1953583,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1868333,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1857500,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1853708,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1918958,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "public-registry",
+      "pairedJS": false,
+      "counts": {
+        "native": 1024,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.0063724775390625,
+        "sampleP95Ms": 0.0065016279296875,
+        "minMs": 0.0062892255859375,
+        "maxMs": 0.0065016279296875,
+        "madMs": 0.0000633544921874998
+      },
+      "nativeSamplesMs": [
+        0.0062892255859375,
+        0.00649169921875,
+        0.0063443603515625,
+        0.0065016279296875,
+        0.0063409013671875,
+        0.0063724775390625,
+        0.00643583203125
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6440167,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6647500,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6496625,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6657667,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6493083,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6525417,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6590292,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "model-json",
+      "pairedJS": false,
+      "counts": {
+        "native": 64,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.211685546875,
+        "sampleP95Ms": 0.21381184375,
+        "minMs": 0.211043625,
+        "maxMs": 0.21381184375,
+        "madMs": 0.0005423281249999912
+      },
+      "nativeSamplesMs": [
+        0.21114321875,
+        0.211043625,
+        0.21381184375,
+        0.211685546875,
+        0.212082671875,
+        0.21131771875,
+        0.21303059375
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 827136,
+          "count": 64,
+          "elapsedNs": 13513166,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 827136,
+          "count": 64,
+          "elapsedNs": 13506792,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 827136,
+          "count": 64,
+          "elapsedNs": 13683958,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 827136,
+          "count": 64,
+          "elapsedNs": 13547875,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 827136,
+          "count": 64,
+          "elapsedNs": 13573291,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 827136,
+          "count": 64,
+          "elapsedNs": 13524334,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 827136,
+          "count": 64,
+          "elapsedNs": 13633958,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "graph-snapshot",
+      "pairedJS": false,
+      "counts": {
+        "native": 1024,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.0171605634765625,
+        "sampleP95Ms": 0.017358642578125,
+        "minMs": 0.016980794921875,
+        "maxMs": 0.017358642578125,
+        "madMs": 0.00006974316406250028
+      },
+      "nativeSamplesMs": [
+        0.0171001796875,
+        0.0172111005859375,
+        0.0171605634765625,
+        0.016980794921875,
+        0.017358642578125,
+        0.0172455244140625,
+        0.0170908203125
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 304128,
+          "count": 1024,
+          "elapsedNs": 17510584,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 304128,
+          "count": 1024,
+          "elapsedNs": 17624167,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 304128,
+          "count": 1024,
+          "elapsedNs": 17572417,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 304128,
+          "count": 1024,
+          "elapsedNs": 17388334,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 304128,
+          "count": 1024,
+          "elapsedNs": 17775250,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 304128,
+          "count": 1024,
+          "elapsedNs": 17659417,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 304128,
+          "count": 1024,
+          "elapsedNs": 17501000,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "graph-json-encode",
+      "pairedJS": false,
+      "counts": {
+        "native": 256,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.093923828125,
+        "sampleP95Ms": 0.09517610546875,
+        "minMs": 0.0933567734375,
+        "maxMs": 0.09517610546875,
+        "madMs": 0.000288574218750004
+      },
+      "nativeSamplesMs": [
+        0.09363525390625,
+        0.09416845703125,
+        0.09382340625,
+        0.0933567734375,
+        0.09435498046875,
+        0.093923828125,
+        0.09517610546875
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 20423424,
+          "count": 256,
+          "elapsedNs": 23970625,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 20423424,
+          "count": 256,
+          "elapsedNs": 24107125,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 20423424,
+          "count": 256,
+          "elapsedNs": 24018792,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 20423424,
+          "count": 256,
+          "elapsedNs": 23899334,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 20423424,
+          "count": 256,
+          "elapsedNs": 24154875,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 20423424,
+          "count": 256,
+          "elapsedNs": 24044500,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 20423424,
+          "count": 256,
+          "elapsedNs": 24365083,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "graph-json-roundtrip",
+      "pairedJS": false,
+      "counts": {
+        "native": 32,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.49201171875,
+        "sampleP95Ms": 0.4984166875,
+        "minMs": 0.48906771875,
+        "maxMs": 0.4984166875,
+        "madMs": 0.001083343750000021
+      },
+      "nativeSamplesMs": [
+        0.49201171875,
+        0.49654428125,
+        0.49180859375,
+        0.49123046875,
+        0.4930950625,
+        0.4984166875,
+        0.48906771875
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 9504,
+          "count": 32,
+          "elapsedNs": 15744375,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 9504,
+          "count": 32,
+          "elapsedNs": 15889417,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 9504,
+          "count": 32,
+          "elapsedNs": 15737875,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 9504,
+          "count": 32,
+          "elapsedNs": 15719375,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 9504,
+          "count": 32,
+          "elapsedNs": 15779042,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 9504,
+          "count": 32,
+          "elapsedNs": 15949334,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 9504,
+          "count": 32,
+          "elapsedNs": 15650167,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "graph-binary-encode",
+      "pairedJS": false,
+      "counts": {
+        "native": 1024,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.0119185791015625,
+        "sampleP95Ms": 0.012127482421875,
+        "minMs": 0.01181534765625,
+        "maxMs": 0.012127482421875,
+        "madMs": 0.00009549902343750083
+      },
+      "nativeSamplesMs": [
+        0.012127482421875,
+        0.01181534765625,
+        0.0119547119140625,
+        0.0119185791015625,
+        0.0118492841796875,
+        0.011823080078125,
+        0.0120336103515625
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 17508352,
+          "count": 1024,
+          "elapsedNs": 12418542,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 17508352,
+          "count": 1024,
+          "elapsedNs": 12098916,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 17508352,
+          "count": 1024,
+          "elapsedNs": 12241625,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 17508352,
+          "count": 1024,
+          "elapsedNs": 12204625,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 17508352,
+          "count": 1024,
+          "elapsedNs": 12133667,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 17508352,
+          "count": 1024,
+          "elapsedNs": 12106834,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 17508352,
+          "count": 1024,
+          "elapsedNs": 12322417,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "graph-binary-decode",
+      "pairedJS": false,
+      "counts": {
+        "native": 512,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.024795166015625,
+        "sampleP95Ms": 0.02491259765625,
+        "minMs": 0.02452099609375,
+        "maxMs": 0.02491259765625,
+        "madMs": 0.00009733007812500263
+      },
+      "nativeSamplesMs": [
+        0.024795166015625,
+        0.0246978359375,
+        0.0247474765625,
+        0.02452099609375,
+        0.024901205078125,
+        0.0248369140625,
+        0.02491259765625
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 152064,
+          "count": 512,
+          "elapsedNs": 12695125,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 152064,
+          "count": 512,
+          "elapsedNs": 12645292,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 152064,
+          "count": 512,
+          "elapsedNs": 12670708,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 152064,
+          "count": 512,
+          "elapsedNs": 12554750,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 152064,
+          "count": 512,
+          "elapsedNs": 12749417,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 152064,
+          "count": 512,
+          "elapsedNs": 12716500,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 152064,
+          "count": 512,
+          "elapsedNs": 12755250,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "graph-apply",
+      "pairedJS": false,
+      "counts": {
+        "native": 128,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.0645250625,
+        "sampleP95Ms": 0.0651806640625,
+        "minMs": 0.063087890625,
+        "maxMs": 0.0651806640625,
+        "madMs": 0.0004339218750000068
+      },
+      "nativeSamplesMs": [
+        0.06475,
+        0.064359703125,
+        0.063695640625,
+        0.0645250625,
+        0.0651806640625,
+        0.064958984375,
+        0.063087890625
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 8288000,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 8238042,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 8153042,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 8259208,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 8343125,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 8314750,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 8075250,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "result-json",
+      "pairedJS": false,
+      "counts": {
+        "native": 1024,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.018763509765625,
+        "sampleP95Ms": 0.0191100263671875,
+        "minMs": 0.01858231640625,
+        "maxMs": 0.0191100263671875,
+        "madMs": 0.0001284589843749996
+      },
+      "nativeSamplesMs": [
+        0.0187947587890625,
+        0.01858231640625,
+        0.0186595048828125,
+        0.018763509765625,
+        0.01863505078125,
+        0.0191100263671875,
+        0.019009765625
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 24594432,
+          "count": 1024,
+          "elapsedNs": 19245833,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 24594432,
+          "count": 1024,
+          "elapsedNs": 19028292,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 24594432,
+          "count": 1024,
+          "elapsedNs": 19107333,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 24594432,
+          "count": 1024,
+          "elapsedNs": 19213834,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 24594432,
+          "count": 1024,
+          "elapsedNs": 19082292,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 24594432,
+          "count": 1024,
+          "elapsedNs": 19568667,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 24594432,
+          "count": 1024,
+          "elapsedNs": 19466000,
+          "graphNodesAfter": 297,
+          "graphNodesBefore": 297,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse",
+      "pairedJS": true,
+      "counts": {
+        "native": 128,
+        "js": 128
+      },
+      "native": {
+        "medianMs": 0.1716360703125,
+        "sampleP95Ms": 0.17734765625,
+        "minMs": 0.1705358046875,
+        "maxMs": 0.17734765625,
+        "madMs": 0.0007229843750000131
+      },
+      "js": {
+        "medianMs": 0.1364147109375,
+        "sampleP95Ms": 0.1695026015625,
+        "minMs": 0.11648828125,
+        "maxMs": 0.1695026015625,
+        "madMs": 0.005040046875000009
+      },
+      "nativeOverJS": {
+        "medianRatio": 1.2581932632700963,
+        "bootstrap95": [
+          1.2125582445226386,
+          1.3105133335881054
+        ]
+      },
+      "nativeSamplesMs": [
+        0.1717301484375,
+        0.17734765625,
+        0.1716360703125,
+        0.1705358046875,
+        0.1709130859375,
+        0.1715221328125,
+        0.1733196640625
+      ],
+      "jsSamplesMs": [
+        0.1310403671875,
+        0.1695026015625,
+        0.136189453125,
+        0.1364147109375,
+        0.11648828125,
+        0.1414547578125,
+        0.137187171875
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 256,
+          "count": 128,
+          "elapsedNs": 21981459,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 256,
+          "count": 128,
+          "elapsedNs": 22700500,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 256,
+          "count": 128,
+          "elapsedNs": 21969417,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 256,
+          "count": 128,
+          "elapsedNs": 21828583,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 256,
+          "count": 128,
+          "elapsedNs": 21876875,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 256,
+          "count": 128,
+          "elapsedNs": 21954833,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 256,
+          "count": 128,
+          "elapsedNs": 22184917,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse-fresh-registry",
+      "pairedJS": true,
+      "counts": {
+        "native": 128,
+        "js": 128
+      },
+      "native": {
+        "medianMs": 0.1729401015625,
+        "sampleP95Ms": 0.176315109375,
+        "minMs": 0.1701598359375,
+        "maxMs": 0.176315109375,
+        "madMs": 0.0016318359374999925
+      },
+      "js": {
+        "medianMs": 0.1271669921875,
+        "sampleP95Ms": 0.1389892578125,
+        "minMs": 0.0915035859375,
+        "maxMs": 0.1389892578125,
+        "madMs": 0.009027015624999996
+      },
+      "nativeOverJS": {
+        "medianRatio": 1.3599448928343791,
+        "bootstrap95": [
+          1.250903801476979,
+          1.484735103360242
+        ]
+      },
+      "nativeSamplesMs": [
+        0.176315109375,
+        0.1729401015625,
+        0.1736546171875,
+        0.1701598359375,
+        0.171308265625,
+        0.17209146875,
+        0.1754065703125
+      ],
+      "jsSamplesMs": [
+        0.0915035859375,
+        0.1389892578125,
+        0.1181399765625,
+        0.13694759375,
+        0.1271669921875,
+        0.1303365859375,
+        0.121752609375
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 256,
+          "count": 128,
+          "elapsedNs": 22568334,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 256,
+          "count": 128,
+          "elapsedNs": 22136333,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 256,
+          "count": 128,
+          "elapsedNs": 22227791,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 256,
+          "count": 128,
+          "elapsedNs": 21780459,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 256,
+          "count": 128,
+          "elapsedNs": 21927458,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 256,
+          "count": 128,
+          "elapsedNs": 22027708,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 256,
+          "count": 128,
+          "elapsedNs": 22452041,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse-public",
+      "pairedJS": true,
+      "counts": {
+        "native": 32,
+        "js": 128
+      },
+      "native": {
+        "medianMs": 0.42966015625,
+        "sampleP95Ms": 0.43659115625,
+        "minMs": 0.424834625,
+        "maxMs": 0.43659115625,
+        "madMs": 0.0014687499999999631
+      },
+      "js": {
+        "medianMs": 0.1268287734375,
+        "sampleP95Ms": 0.1414798203125,
+        "minMs": 0.11268196875,
+        "maxMs": 0.1414798203125,
+        "madMs": 0.00721321875
+      },
+      "nativeOverJS": {
+        "medianRatio": 3.3877182961304313,
+        "bootstrap95": [
+          3.2053173635244323,
+          3.7551383182056566
+        ]
+      },
+      "nativeSamplesMs": [
+        0.4327955625,
+        0.43659115625,
+        0.42819140625,
+        0.429647125,
+        0.42966015625,
+        0.430615875,
+        0.424834625
+      ],
+      "jsSamplesMs": [
+        0.1152542265625,
+        0.1414798203125,
+        0.121250328125,
+        0.1340419921875,
+        0.1268287734375,
+        0.130865234375,
+        0.11268196875
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 64,
+          "count": 32,
+          "elapsedNs": 13849458,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 64,
+          "count": 32,
+          "elapsedNs": 13970917,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 64,
+          "count": 32,
+          "elapsedNs": 13702125,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 64,
+          "count": 32,
+          "elapsedNs": 13748708,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 64,
+          "count": 32,
+          "elapsedNs": 13749125,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 64,
+          "count": 32,
+          "elapsedNs": 13779708,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 64,
+          "count": 32,
+          "elapsedNs": 13594708,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse-public-fresh-registry",
+      "pairedJS": true,
+      "counts": {
+        "native": 32,
+        "js": 128
+      },
+      "native": {
+        "medianMs": 0.44290625,
+        "sampleP95Ms": 0.79088409375,
+        "minMs": 0.4351185,
+        "maxMs": 0.79088409375,
+        "madMs": 0.007216125000000018
+      },
+      "js": {
+        "medianMs": 0.1436878203125,
+        "sampleP95Ms": 0.532606125,
+        "minMs": 0.106150390625,
+        "maxMs": 0.532606125,
+        "madMs": 0.003910804687499991
+      },
+      "nativeOverJS": {
+        "medianRatio": 3.0824202708117063,
+        "bootstrap95": [
+          2.990376390076989,
+          3.70561926719043
+        ]
+      },
+      "nativeSamplesMs": [
+        0.79088409375,
+        0.5186875,
+        0.444263,
+        0.435690125,
+        0.4351185,
+        0.43696875,
+        0.44290625
+      ],
+      "jsSamplesMs": [
+        0.532606125,
+        0.1440999375,
+        0.1436878203125,
+        0.1175755234375,
+        0.106150390625,
+        0.146125,
+        0.139777015625
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 64,
+          "count": 32,
+          "elapsedNs": 25308291,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 64,
+          "count": 32,
+          "elapsedNs": 16598000,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 64,
+          "count": 32,
+          "elapsedNs": 14216416,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 64,
+          "count": 32,
+          "elapsedNs": 13942084,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 64,
+          "count": 32,
+          "elapsedNs": 13923792,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 64,
+          "count": 32,
+          "elapsedNs": 13983000,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 64,
+          "count": 32,
+          "elapsedNs": 14173000,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-source",
+      "pairedJS": true,
+      "counts": {
+        "native": 16,
+        "js": 16
+      },
+      "native": {
+        "medianMs": 1.0454453125,
+        "sampleP95Ms": 1.0929375,
+        "minMs": 1.021697875,
+        "maxMs": 1.0929375,
+        "madMs": 0.02020574999999991
+      },
+      "js": {
+        "medianMs": 1.1665364375,
+        "sampleP95Ms": 1.263765625,
+        "minMs": 1.0718984375,
+        "maxMs": 1.263765625,
+        "madMs": 0.0896745000000001
+      },
+      "nativeOverJS": {
+        "medianRatio": 0.8961960200235923,
+        "bootstrap95": [
+          0.8703644978322288,
+          0.9964137115766524
+        ]
+      },
+      "nativeSamplesMs": [
+        1.021697875,
+        1.0929375,
+        1.0656510625,
+        1.0454453125,
+        1.073,
+        1.036778625,
+        1.0416979375
+      ],
+      "jsSamplesMs": [
+        1.075390625,
+        1.0768619375,
+        1.0718984375,
+        1.263765625,
+        1.1665364375,
+        1.1912005,
+        1.195296875
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 16347166,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 17487000,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 17050417,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 16727125,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 17168000,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 16588458,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 16667167,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-retained",
+      "pairedJS": true,
+      "counts": {
+        "native": 16,
+        "js": 16
+      },
+      "native": {
+        "medianMs": 0.87541925,
+        "sampleP95Ms": 0.8929166875,
+        "minMs": 0.843184875,
+        "maxMs": 0.8929166875,
+        "madMs": 0.014372437500000057
+      },
+      "js": {
+        "medianMs": 0.9461015625,
+        "sampleP95Ms": 0.977041625,
+        "minMs": 0.861166625,
+        "maxMs": 0.977041625,
+        "madMs": 0.013216125000000023
+      },
+      "nativeOverJS": {
+        "medianRatio": 0.9252909885137199,
+        "bootstrap95": [
+          0.8798815538361477,
+          0.9514978069992232
+        ]
+      },
+      "nativeSamplesMs": [
+        0.88079425,
+        0.8624245,
+        0.87541925,
+        0.843184875,
+        0.8897916875,
+        0.8440859375,
+        0.8929166875
+      ],
+      "jsSamplesMs": [
+        0.9455078125,
+        0.977041625,
+        0.9676301875,
+        0.9593176875,
+        0.9351484375,
+        0.9461015625,
+        0.861166625
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 14092708,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 13798792,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 14006708,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 13490958,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 14236667,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 13505375,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 14286667,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-mutable-core",
+      "pairedJS": true,
+      "counts": {
+        "native": 16,
+        "js": 16
+      },
+      "native": {
+        "medianMs": 0.85006775,
+        "sampleP95Ms": 0.883770875,
+        "minMs": 0.838216125,
+        "maxMs": 0.883770875,
+        "madMs": 0.01019268750000002
+      },
+      "js": {
+        "medianMs": 0.9074270625,
+        "sampleP95Ms": 0.962278625,
+        "minMs": 0.8358854375,
+        "maxMs": 0.962278625,
+        "madMs": 0.03622131250000005
+      },
+      "nativeOverJS": {
+        "medianRatio": 0.9367890656225607,
+        "bootstrap95": [
+          0.8893163241669149,
+          0.9874365929058664
+        ]
+      },
+      "nativeSamplesMs": [
+        0.85943225,
+        0.8602604375,
+        0.883770875,
+        0.838216125,
+        0.8398203125,
+        0.843309875,
+        0.85006775
+      ],
+      "jsSamplesMs": [
+        0.962278625,
+        0.9415625,
+        0.87120575,
+        0.94434375,
+        0.9033203125,
+        0.9074270625,
+        0.8358854375
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 13750916,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 13764167,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 14140334,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 13411458,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 13437125,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 13492958,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190261200,
+          "count": 16,
+          "elapsedNs": 13601084,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-mutable-publish",
+      "pairedJS": true,
+      "counts": {
+        "native": 16,
+        "js": 16
+      },
+      "native": {
+        "medianMs": 0.906033875,
+        "sampleP95Ms": 0.9183203125,
+        "minMs": 0.8907265625,
+        "maxMs": 0.9183203125,
+        "madMs": 0.007648437499999994
+      },
+      "js": {
+        "medianMs": 0.7223359375,
+        "sampleP95Ms": 0.825265625,
+        "minMs": 0.7019791875,
+        "maxMs": 0.825265625,
+        "madMs": 0.020356750000000035
+      },
+      "nativeOverJS": {
+        "medianRatio": 1.254310948636693,
+        "bootstrap95": [
+          1.1542268934554232,
+          1.2934615364877848
+        ]
+      },
+      "nativeSamplesMs": [
+        0.8907265625,
+        0.9044479375,
+        0.896028625,
+        0.9136823125,
+        0.9183203125,
+        0.9086041875,
+        0.906033875
+      ],
+      "jsSamplesMs": [
+        0.7613306875,
+        0.7835963125,
+        0.825265625,
+        0.706385375,
+        0.7019791875,
+        0.7112551875,
+        0.7223359375
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 754977460190260000,
+          "count": 16,
+          "elapsedNs": 14251625,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190260000,
+          "count": 16,
+          "elapsedNs": 14471167,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190260000,
+          "count": 16,
+          "elapsedNs": 14336458,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190260000,
+          "count": 16,
+          "elapsedNs": 14618917,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190260000,
+          "count": 16,
+          "elapsedNs": 14693125,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190260000,
+          "count": 16,
+          "elapsedNs": 14537667,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        },
+        {
+          "checksum": 754977460190260000,
+          "count": 16,
+          "elapsedNs": 14496542,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 5360
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "registry",
+      "pairedJS": false,
+      "counts": {
+        "native": 1024,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.00180830859375,
+        "sampleP95Ms": 0.0019234619140625,
+        "minMs": 0.001794759765625,
+        "maxMs": 0.0019234619140625,
+        "madMs": 0.000006550781249999938
+      },
+      "nativeSamplesMs": [
+        0.0018524169921875,
+        0.0018068037109375,
+        0.0018017578125,
+        0.00180830859375,
+        0.0019234619140625,
+        0.0018084716796875,
+        0.001794759765625
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1896875,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1850167,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1845000,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1851708,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1969625,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1851875,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1837834,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "public-registry",
+      "pairedJS": false,
+      "counts": {
+        "native": 1024,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.0064965419921875,
+        "sampleP95Ms": 0.00680008984375,
+        "minMs": 0.006344482421875,
+        "maxMs": 0.00680008984375,
+        "madMs": 0.0001293945312499994
+      },
+      "nativeSamplesMs": [
+        0.0064451904296875,
+        0.006344482421875,
+        0.0064965419921875,
+        0.006463296875,
+        0.00666475390625,
+        0.00680008984375,
+        0.0066259365234375
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6599875,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6496750,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6652459,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6618416,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6824708,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6963292,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6784959,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "model-json",
+      "pairedJS": false,
+      "counts": {
+        "native": 64,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.31232421875,
+        "sampleP95Ms": 0.318664703125,
+        "minMs": 0.30883203125,
+        "maxMs": 0.318664703125,
+        "madMs": 0.0011953124999999898
+      },
+      "nativeSamplesMs": [
+        0.312748046875,
+        0.31232421875,
+        0.31114128125,
+        0.30883203125,
+        0.309721359375,
+        0.31351953125,
+        0.318664703125
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 1115648,
+          "count": 64,
+          "elapsedNs": 20015875,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1115648,
+          "count": 64,
+          "elapsedNs": 19988750,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1115648,
+          "count": 64,
+          "elapsedNs": 19913042,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1115648,
+          "count": 64,
+          "elapsedNs": 19765250,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1115648,
+          "count": 64,
+          "elapsedNs": 19822167,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1115648,
+          "count": 64,
+          "elapsedNs": 20065250,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1115648,
+          "count": 64,
+          "elapsedNs": 20394541,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "graph-snapshot",
+      "pairedJS": false,
+      "counts": {
+        "native": 1024,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.0213994951171875,
+        "sampleP95Ms": 0.0218400478515625,
+        "minMs": 0.0212803134765625,
+        "maxMs": 0.0218400478515625,
+        "madMs": 0.0000214843749999985
+      },
+      "nativeSamplesMs": [
+        0.021785400390625,
+        0.0213994951171875,
+        0.0218400478515625,
+        0.0213782958984375,
+        0.0214209794921875,
+        0.0213826083984375,
+        0.0212803134765625
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 447488,
+          "count": 1024,
+          "elapsedNs": 22308250,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 447488,
+          "count": 1024,
+          "elapsedNs": 21913083,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 447488,
+          "count": 1024,
+          "elapsedNs": 22364209,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 447488,
+          "count": 1024,
+          "elapsedNs": 21891375,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 447488,
+          "count": 1024,
+          "elapsedNs": 21935083,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 447488,
+          "count": 1024,
+          "elapsedNs": 21895791,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 447488,
+          "count": 1024,
+          "elapsedNs": 21791041,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "graph-json-encode",
+      "pairedJS": false,
+      "counts": {
+        "native": 128,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.1080895234375,
+        "sampleP95Ms": 0.249262046875,
+        "minMs": 0.1068359375,
+        "maxMs": 0.249262046875,
+        "madMs": 0.0012535859374999958
+      },
+      "nativeSamplesMs": [
+        0.1080895234375,
+        0.1074775390625,
+        0.13502571875,
+        0.249262046875,
+        0.112271484375,
+        0.1079287109375,
+        0.1068359375
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 11776128,
+          "count": 128,
+          "elapsedNs": 13835459,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 11776128,
+          "count": 128,
+          "elapsedNs": 13757125,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 11776128,
+          "count": 128,
+          "elapsedNs": 17283292,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 11776128,
+          "count": 128,
+          "elapsedNs": 31905542,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 11776128,
+          "count": 128,
+          "elapsedNs": 14370750,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 11776128,
+          "count": 128,
+          "elapsedNs": 13814875,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 11776128,
+          "count": 128,
+          "elapsedNs": 13675000,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "graph-json-roundtrip",
+      "pairedJS": false,
+      "counts": {
+        "native": 32,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.5748958125,
+        "sampleP95Ms": 0.58905596875,
+        "minMs": 0.5651549375,
+        "maxMs": 0.58905596875,
+        "madMs": 0.0032487187499999903
+      },
+      "nativeSamplesMs": [
+        0.575740875,
+        0.5748958125,
+        0.58905596875,
+        0.57324740625,
+        0.57814453125,
+        0.56570184375,
+        0.5651549375
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 13984,
+          "count": 32,
+          "elapsedNs": 18423708,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 13984,
+          "count": 32,
+          "elapsedNs": 18396666,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 13984,
+          "count": 32,
+          "elapsedNs": 18849791,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 13984,
+          "count": 32,
+          "elapsedNs": 18343917,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 13984,
+          "count": 32,
+          "elapsedNs": 18500625,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 13984,
+          "count": 32,
+          "elapsedNs": 18102459,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 13984,
+          "count": 32,
+          "elapsedNs": 18084958,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "graph-binary-encode",
+      "pairedJS": false,
+      "counts": {
+        "native": 1024,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.0136571044921875,
+        "sampleP95Ms": 0.014284994140625,
+        "minMs": 0.013517578125,
+        "maxMs": 0.014284994140625,
+        "madMs": 0.000046956054687500096
+      },
+      "nativeSamplesMs": [
+        0.0136278486328125,
+        0.013517578125,
+        0.0136671142578125,
+        0.013940591796875,
+        0.0136571044921875,
+        0.014284994140625,
+        0.0136101484375
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 18823168,
+          "count": 1024,
+          "elapsedNs": 13954917,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 18823168,
+          "count": 1024,
+          "elapsedNs": 13842000,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 18823168,
+          "count": 1024,
+          "elapsedNs": 13995125,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 18823168,
+          "count": 1024,
+          "elapsedNs": 14275166,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 18823168,
+          "count": 1024,
+          "elapsedNs": 13984875,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 18823168,
+          "count": 1024,
+          "elapsedNs": 14627834,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 18823168,
+          "count": 1024,
+          "elapsedNs": 13936792,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "graph-binary-decode",
+      "pairedJS": false,
+      "counts": {
+        "native": 512,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.031378091796875,
+        "sampleP95Ms": 0.032213216796875,
+        "minMs": 0.030996826171875,
+        "maxMs": 0.032213216796875,
+        "madMs": 0.0002175292968750013
+      },
+      "nativeSamplesMs": [
+        0.031378091796875,
+        0.031945638671875,
+        0.031442546875,
+        0.031166015625,
+        0.032213216796875,
+        0.0311605625,
+        0.030996826171875
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 223744,
+          "count": 512,
+          "elapsedNs": 16065583,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 223744,
+          "count": 512,
+          "elapsedNs": 16356167,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 223744,
+          "count": 512,
+          "elapsedNs": 16098584,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 223744,
+          "count": 512,
+          "elapsedNs": 15957000,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 223744,
+          "count": 512,
+          "elapsedNs": 16493167,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 223744,
+          "count": 512,
+          "elapsedNs": 15954208,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 223744,
+          "count": 512,
+          "elapsedNs": 15870375,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "graph-apply",
+      "pairedJS": false,
+      "counts": {
+        "native": 128,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.08704296875,
+        "sampleP95Ms": 0.0882698515625,
+        "minMs": 0.0859306640625,
+        "maxMs": 0.0882698515625,
+        "madMs": 0.0007760468750000055
+      },
+      "nativeSamplesMs": [
+        0.0878330078125,
+        0.08704296875,
+        0.0882698515625,
+        0.0859306640625,
+        0.086266921875,
+        0.086569984375,
+        0.0871516953125
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 11242625,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 11141500,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 11298541,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 10999125,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 11042166,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 11080958,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 11155417,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "result-json",
+      "pairedJS": false,
+      "counts": {
+        "native": 256,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.07149267578125,
+        "sampleP95Ms": 0.0969357109375,
+        "minMs": 0.06536979296875,
+        "maxMs": 0.0969357109375,
+        "madMs": 0.0037296562500000047
+      },
+      "nativeSamplesMs": [
+        0.06803776171875,
+        0.06536979296875,
+        0.07149267578125,
+        0.06793603515625,
+        0.07522233203125,
+        0.0807060546875,
+        0.0969357109375
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 19862016,
+          "count": 256,
+          "elapsedNs": 17417667,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 19862016,
+          "count": 256,
+          "elapsedNs": 16734667,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 19862016,
+          "count": 256,
+          "elapsedNs": 18302125,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 19862016,
+          "count": 256,
+          "elapsedNs": 17391625,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 19862016,
+          "count": 256,
+          "elapsedNs": 19256917,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 19862016,
+          "count": 256,
+          "elapsedNs": 20660750,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 19862016,
+          "count": 256,
+          "elapsedNs": 24815542,
+          "graphNodesAfter": 437,
+          "graphNodesBefore": 437,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parse",
+      "pairedJS": true,
+      "counts": {
+        "native": 256,
+        "js": 64
+      },
+      "native": {
+        "medianMs": 0.0764825859375,
+        "sampleP95Ms": 0.19623698046875,
+        "minMs": 0.0587447890625,
+        "maxMs": 0.19623698046875,
+        "madMs": 0.017737796875000003
+      },
+      "js": {
+        "medianMs": 0.1130045625,
+        "sampleP95Ms": 0.170177734375,
+        "minMs": 0.0743984375,
+        "maxMs": 0.170177734375,
+        "madMs": 0.025862640625000002
+      },
+      "nativeOverJS": {
+        "medianRatio": 0.6768097167536931,
+        "bootstrap95": [
+          0.6768097167536931,
+          1.517234990726283
+        ]
+      },
+      "nativeSamplesMs": [
+        0.19623698046875,
+        0.19043473046875,
+        0.1786085625,
+        0.0715244140625,
+        0.0764825859375,
+        0.0723756484375,
+        0.0587447890625
+      ],
+      "jsSamplesMs": [
+        0.125514328125,
+        0.134244140625,
+        0.170177734375,
+        0.074998703125,
+        0.1130045625,
+        0.087141921875,
+        0.0743984375
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 1280,
+          "count": 256,
+          "elapsedNs": 50236667,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1280,
+          "count": 256,
+          "elapsedNs": 48751291,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1280,
+          "count": 256,
+          "elapsedNs": 45723792,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1280,
+          "count": 256,
+          "elapsedNs": 18310250,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1280,
+          "count": 256,
+          "elapsedNs": 19579542,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1280,
+          "count": 256,
+          "elapsedNs": 18528166,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1280,
+          "count": 256,
+          "elapsedNs": 15038666,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parse-fresh-registry",
+      "pairedJS": true,
+      "counts": {
+        "native": 256,
+        "js": 256
+      },
+      "native": {
+        "medianMs": 0.06040153125,
+        "sampleP95Ms": 0.06107796484375,
+        "minMs": 0.05909895703125,
+        "maxMs": 0.06107796484375,
+        "madMs": 0.0002791328124999992
+      },
+      "js": {
+        "medianMs": 0.046420734375,
+        "sampleP95Ms": 0.06404948046875,
+        "minMs": 0.0372049140625,
+        "maxMs": 0.06404948046875,
+        "madMs": 0.009215820312500005
+      },
+      "nativeOverJS": {
+        "medianRatio": 1.3011756936471344,
+        "bootstrap95": [
+          0.9327810758741649,
+          1.5952740543956256
+        ]
+      },
+      "nativeSamplesMs": [
+        0.06040153125,
+        0.0606806640625,
+        0.05909895703125,
+        0.06107796484375,
+        0.0601689453125,
+        0.05973062890625,
+        0.06053157421875
+      ],
+      "jsSamplesMs": [
+        0.0372049140625,
+        0.0574471015625,
+        0.03786279296875,
+        0.0640349921875,
+        0.04446126171875,
+        0.06404948046875,
+        0.046420734375
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 1280,
+          "count": 256,
+          "elapsedNs": 15462792,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1280,
+          "count": 256,
+          "elapsedNs": 15534250,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1280,
+          "count": 256,
+          "elapsedNs": 15129333,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1280,
+          "count": 256,
+          "elapsedNs": 15635959,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1280,
+          "count": 256,
+          "elapsedNs": 15403250,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1280,
+          "count": 256,
+          "elapsedNs": 15291041,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 1280,
+          "count": 256,
+          "elapsedNs": 15496083,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parse-public",
+      "pairedJS": true,
+      "counts": {
+        "native": 32,
+        "js": 512
+      },
+      "native": {
+        "medianMs": 0.36822265625,
+        "sampleP95Ms": 0.42319271875,
+        "minMs": 0.3584635625,
+        "maxMs": 0.42319271875,
+        "madMs": 0.009759093750000003
+      },
+      "js": {
+        "medianMs": 0.0475103359375,
+        "sampleP95Ms": 0.084772869140625,
+        "minMs": 0.041893228515625,
+        "maxMs": 0.084772869140625,
+        "madMs": 0.005617107421875003
+      },
+      "nativeOverJS": {
+        "medianRatio": 7.7503694508579795,
+        "bootstrap95": [
+          6.139039569337489,
+          8.700722558416407
+        ]
+      },
+      "nativeSamplesMs": [
+        0.40390496875,
+        0.42319271875,
+        0.363071625,
+        0.38717578125,
+        0.3617174375,
+        0.36822265625,
+        0.3584635625
+      ],
+      "jsSamplesMs": [
+        0.084772869140625,
+        0.065061685546875,
+        0.0591414375,
+        0.044499267578125,
+        0.0475103359375,
+        0.041893228515625,
+        0.046705158203125
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 160,
+          "count": 32,
+          "elapsedNs": 12924959,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 160,
+          "count": 32,
+          "elapsedNs": 13542167,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 160,
+          "count": 32,
+          "elapsedNs": 11618292,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 160,
+          "count": 32,
+          "elapsedNs": 12389625,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 160,
+          "count": 32,
+          "elapsedNs": 11574958,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 160,
+          "count": 32,
+          "elapsedNs": 11783125,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 160,
+          "count": 32,
+          "elapsedNs": 11470834,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parse-public-fresh-registry",
+      "pairedJS": true,
+      "counts": {
+        "native": 64,
+        "js": 512
+      },
+      "native": {
+        "medianMs": 0.3682825625,
+        "sampleP95Ms": 0.400303375,
+        "minMs": 0.364697265625,
+        "maxMs": 0.400303375,
+        "madMs": 0.0010234531250000178
+      },
+      "js": {
+        "medianMs": 0.045287517578125,
+        "sampleP95Ms": 0.0471675625,
+        "minMs": 0.03854150390625,
+        "maxMs": 0.0471675625,
+        "madMs": 0.0018800449218750043
+      },
+      "nativeOverJS": {
+        "medianRatio": 8.132098692861224,
+        "bootstrap95": [
+          7.915722413203241,
+          9.529319116488956
+        ]
+      },
+      "nativeSamplesMs": [
+        0.400303375,
+        0.372234375,
+        0.3682825625,
+        0.3678580625,
+        0.364697265625,
+        0.369228515625,
+        0.367259109375
+      ],
+      "jsSamplesMs": [
+        0.04616080859375,
+        0.03906201171875,
+        0.0471675625,
+        0.040316080078125,
+        0.046396158203125,
+        0.03854150390625,
+        0.045287517578125
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 320,
+          "count": 64,
+          "elapsedNs": 25619416,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 320,
+          "count": 64,
+          "elapsedNs": 23823000,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 320,
+          "count": 64,
+          "elapsedNs": 23570084,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 320,
+          "count": 64,
+          "elapsedNs": 23542916,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 320,
+          "count": 64,
+          "elapsedNs": 23340625,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 320,
+          "count": 64,
+          "elapsedNs": 23630625,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 320,
+          "count": 64,
+          "elapsedNs": 23504583,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-source",
+      "pairedJS": true,
+      "counts": {
+        "native": 64,
+        "js": 64
+      },
+      "native": {
+        "medianMs": 0.3071764375,
+        "sampleP95Ms": 0.311583984375,
+        "minMs": 0.306085296875,
+        "maxMs": 0.311583984375,
+        "madMs": 0.0010911406249999867
+      },
+      "js": {
+        "medianMs": 0.284045578125,
+        "sampleP95Ms": 0.30391015625,
+        "minMs": 0.263640625,
+        "maxMs": 0.30391015625,
+        "madMs": 0.00656315624999998
+      },
+      "nativeOverJS": {
+        "medianRatio": 1.0814336189554088,
+        "bootstrap95": [
+          1.036488863749941,
+          1.1156159385096183
+        ]
+      },
+      "nativeSamplesMs": [
+        0.3095638125,
+        0.3071764375,
+        0.306085296875,
+        0.306765625,
+        0.311583984375,
+        0.309111984375,
+        0.30705078125
+      ],
+      "jsSamplesMs": [
+        0.277482421875,
+        0.284045578125,
+        0.29596615625,
+        0.287583984375,
+        0.263640625,
+        0.279205734375,
+        0.30391015625
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 541839330168817540,
+          "count": 64,
+          "elapsedNs": 19812084,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 3456
+        },
+        {
+          "checksum": 541839330168817540,
+          "count": 64,
+          "elapsedNs": 19659292,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 3456
+        },
+        {
+          "checksum": 541839330168817540,
+          "count": 64,
+          "elapsedNs": 19589459,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 3456
+        },
+        {
+          "checksum": 541839330168817540,
+          "count": 64,
+          "elapsedNs": 19633000,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 3456
+        },
+        {
+          "checksum": 541839330168817540,
+          "count": 64,
+          "elapsedNs": 19941375,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 3456
+        },
+        {
+          "checksum": 541839330168817540,
+          "count": 64,
+          "elapsedNs": 19783167,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 3456
+        },
+        {
+          "checksum": 541839330168817540,
+          "count": 64,
+          "elapsedNs": 19651250,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 3456
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-retained",
+      "pairedJS": true,
+      "counts": {
+        "native": 64,
+        "js": 64
+      },
+      "native": {
+        "medianMs": 0.251740234375,
+        "sampleP95Ms": 0.25416015625,
+        "minMs": 0.246039703125,
+        "maxMs": 0.25416015625,
+        "madMs": 0.0020117187499999745
+      },
+      "js": {
+        "medianMs": 0.2021595,
+        "sampleP95Ms": 0.223388671875,
+        "minMs": 0.196204421875,
+        "maxMs": 0.223388671875,
+        "madMs": 0.004321624999999996
+      },
+      "nativeOverJS": {
+        "medianRatio": 1.2452555253401398,
+        "bootstrap95": [
+          1.1651621441054396,
+          1.258098861985371
+        ]
+      },
+      "nativeSamplesMs": [
+        0.2525859375,
+        0.253353515625,
+        0.249728515625,
+        0.2496640625,
+        0.25416015625,
+        0.246039703125,
+        0.251740234375
+      ],
+      "jsSamplesMs": [
+        0.206481125,
+        0.2021595,
+        0.198496734375,
+        0.223388671875,
+        0.21427409375,
+        0.196204421875,
+        0.201435546875
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 541839330168817540,
+          "count": 64,
+          "elapsedNs": 16165500,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 3456
+        },
+        {
+          "checksum": 541839330168817540,
+          "count": 64,
+          "elapsedNs": 16214625,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 3456
+        },
+        {
+          "checksum": 541839330168817540,
+          "count": 64,
+          "elapsedNs": 15982625,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 3456
+        },
+        {
+          "checksum": 541839330168817540,
+          "count": 64,
+          "elapsedNs": 15978500,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 3456
+        },
+        {
+          "checksum": 541839330168817540,
+          "count": 64,
+          "elapsedNs": 16266250,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 3456
+        },
+        {
+          "checksum": 541839330168817540,
+          "count": 64,
+          "elapsedNs": 15746541,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 3456
+        },
+        {
+          "checksum": 541839330168817540,
+          "count": 64,
+          "elapsedNs": 16111375,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 3456
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-mutable-core",
+      "pairedJS": true,
+      "counts": {
+        "native": 16,
+        "js": 64
+      },
+      "native": {
+        "medianMs": 0.7935599375,
+        "sampleP95Ms": 0.8149921875,
+        "minMs": 0.7863984375,
+        "maxMs": 0.8149921875,
+        "madMs": 0.004653624999999995
+      },
+      "js": {
+        "medianMs": 0.20133203125,
+        "sampleP95Ms": 0.223969390625,
+        "minMs": 0.15914128125,
+        "maxMs": 0.223969390625,
+        "madMs": 0.014423171875000002
+      },
+      "nativeOverJS": {
+        "medianRatio": 3.9415483595584098,
+        "bootstrap95": [
+          3.658551687593282,
+          4.277800419543024
+        ]
+      },
+      "nativeSamplesMs": [
+        0.7982135625,
+        0.7863984375,
+        0.8149921875,
+        0.791315125,
+        0.7893515625,
+        0.8048854375,
+        0.7935599375
+      ],
+      "jsSamplesMs": [
+        0.186594390625,
+        0.2024609375,
+        0.15914128125,
+        0.198188796875,
+        0.223969390625,
+        0.215755203125,
+        0.20133203125
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 135459832542204380,
+          "count": 16,
+          "elapsedNs": 12771417,
+          "graphNodesAfter": 1838,
+          "graphNodesBefore": 254,
+          "textMeasurements": 864
+        },
+        {
+          "checksum": 135459832542204380,
+          "count": 16,
+          "elapsedNs": 12582375,
+          "graphNodesAfter": 1838,
+          "graphNodesBefore": 254,
+          "textMeasurements": 864
+        },
+        {
+          "checksum": 135459832542204380,
+          "count": 16,
+          "elapsedNs": 13039875,
+          "graphNodesAfter": 1838,
+          "graphNodesBefore": 254,
+          "textMeasurements": 864
+        },
+        {
+          "checksum": 135459832542204380,
+          "count": 16,
+          "elapsedNs": 12661042,
+          "graphNodesAfter": 1838,
+          "graphNodesBefore": 254,
+          "textMeasurements": 864
+        },
+        {
+          "checksum": 135459832542204380,
+          "count": 16,
+          "elapsedNs": 12629625,
+          "graphNodesAfter": 1838,
+          "graphNodesBefore": 254,
+          "textMeasurements": 864
+        },
+        {
+          "checksum": 135459832542204380,
+          "count": 16,
+          "elapsedNs": 12878167,
+          "graphNodesAfter": 1838,
+          "graphNodesBefore": 254,
+          "textMeasurements": 864
+        },
+        {
+          "checksum": 135459832542204380,
+          "count": 16,
+          "elapsedNs": 12696959,
+          "graphNodesAfter": 1838,
+          "graphNodesBefore": 254,
+          "textMeasurements": 864
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-mutable-publish",
+      "pairedJS": true,
+      "counts": {
+        "native": 16,
+        "js": 64
+      },
+      "native": {
+        "medianMs": 0.89413025,
+        "sampleP95Ms": 0.9290625,
+        "minMs": 0.875346375,
+        "maxMs": 0.9290625,
+        "madMs": 0.007585999999999982
+      },
+      "js": {
+        "medianMs": 0.199322265625,
+        "sampleP95Ms": 0.22739909375,
+        "minMs": 0.19099284375,
+        "maxMs": 0.22739909375,
+        "madMs": 0.008329421874999993
+      },
+      "nativeOverJS": {
+        "medianRatio": 4.4858523316316035,
+        "bootstrap95": [
+          3.9880510638489297,
+          4.577374733349135
+        ]
+      },
+      "nativeSamplesMs": [
+        0.905247375,
+        0.875346375,
+        0.88654425,
+        0.89413025,
+        0.9003046875,
+        0.9290625,
+        0.891354125
+      ],
+      "jsSamplesMs": [
+        0.19099284375,
+        0.197765625,
+        0.222300125,
+        0.2191328125,
+        0.199322265625,
+        0.1982825625,
+        0.22739909375
+      ],
+      "nativeDetails": [
+        {
+          "checksum": 135459832542217920,
+          "count": 16,
+          "elapsedNs": 14483958,
+          "graphNodesAfter": 1838,
+          "graphNodesBefore": 254,
+          "textMeasurements": 864
+        },
+        {
+          "checksum": 135459832542217920,
+          "count": 16,
+          "elapsedNs": 14005542,
+          "graphNodesAfter": 1838,
+          "graphNodesBefore": 254,
+          "textMeasurements": 864
+        },
+        {
+          "checksum": 135459832542217920,
+          "count": 16,
+          "elapsedNs": 14184708,
+          "graphNodesAfter": 1838,
+          "graphNodesBefore": 254,
+          "textMeasurements": 864
+        },
+        {
+          "checksum": 135459832542217920,
+          "count": 16,
+          "elapsedNs": 14306084,
+          "graphNodesAfter": 1838,
+          "graphNodesBefore": 254,
+          "textMeasurements": 864
+        },
+        {
+          "checksum": 135459832542217920,
+          "count": 16,
+          "elapsedNs": 14404875,
+          "graphNodesAfter": 1838,
+          "graphNodesBefore": 254,
+          "textMeasurements": 864
+        },
+        {
+          "checksum": 135459832542217920,
+          "count": 16,
+          "elapsedNs": 14865000,
+          "graphNodesAfter": 1838,
+          "graphNodesBefore": 254,
+          "textMeasurements": 864
+        },
+        {
+          "checksum": 135459832542217920,
+          "count": 16,
+          "elapsedNs": 14261666,
+          "graphNodesAfter": 1838,
+          "graphNodesBefore": 254,
+          "textMeasurements": 864
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "registry",
+      "pairedJS": false,
+      "counts": {
+        "native": 1024,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.001774943359375,
+        "sampleP95Ms": 0.0018353681640625,
+        "minMs": 0.00174609375,
+        "maxMs": 0.0018353681640625,
+        "madMs": 0.000006917968750000088
+      },
+      "nativeSamplesMs": [
+        0.001774943359375,
+        0.00177775,
+        0.0018353681640625,
+        0.00174609375,
+        0.0017554111328125,
+        0.0017806806640625,
+        0.001768025390625
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1817542,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1820416,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1879417,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1788000,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1797541,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1823417,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 1810458,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "public-registry",
+      "pairedJS": false,
+      "counts": {
+        "native": 1024,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.00650712109375,
+        "sampleP95Ms": 0.006772705078125,
+        "minMs": 0.0063538818359375,
+        "maxMs": 0.006772705078125,
+        "madMs": 0.00008247851562499971
+      },
+      "nativeSamplesMs": [
+        0.006772705078125,
+        0.0065162353515625,
+        0.00650712109375,
+        0.006431396484375,
+        0.006589599609375,
+        0.006397908203125,
+        0.0063538818359375
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6935250,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6672625,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6663292,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6585750,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6747750,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6551458,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 33792,
+          "count": 1024,
+          "elapsedNs": 6506375,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "model-json",
+      "pairedJS": false,
+      "counts": {
+        "native": 32,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.40777734375,
+        "sampleP95Ms": 0.41447915625,
+        "minMs": 0.40327084375,
+        "maxMs": 0.41447915625,
+        "madMs": 0.003001281250000043
+      },
+      "nativeSamplesMs": [
+        0.41447915625,
+        0.40634634375,
+        0.41162109375,
+        0.40327084375,
+        0.40777734375,
+        0.4086328125,
+        0.4047760625
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 902208,
+          "count": 32,
+          "elapsedNs": 13263333,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 902208,
+          "count": 32,
+          "elapsedNs": 13003083,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 902208,
+          "count": 32,
+          "elapsedNs": 13171875,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 902208,
+          "count": 32,
+          "elapsedNs": 12904667,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 902208,
+          "count": 32,
+          "elapsedNs": 13048875,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 902208,
+          "count": 32,
+          "elapsedNs": 13076250,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 902208,
+          "count": 32,
+          "elapsedNs": 12952834,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "graph-snapshot",
+      "pairedJS": false,
+      "counts": {
+        "native": 512,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.03193994140625,
+        "sampleP95Ms": 0.03238175390625,
+        "minMs": 0.031588623046875,
+        "maxMs": 0.03238175390625,
+        "madMs": 0.00026904296875000094
+      },
+      "nativeSamplesMs": [
+        0.03198583984375,
+        0.03238175390625,
+        0.03166219140625,
+        0.032208984375,
+        0.0317049140625,
+        0.03193994140625,
+        0.031588623046875
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 130048,
+          "count": 512,
+          "elapsedNs": 16376750,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 130048,
+          "count": 512,
+          "elapsedNs": 16579458,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 130048,
+          "count": 512,
+          "elapsedNs": 16211042,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 130048,
+          "count": 512,
+          "elapsedNs": 16491000,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 130048,
+          "count": 512,
+          "elapsedNs": 16232916,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 130048,
+          "count": 512,
+          "elapsedNs": 16353250,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 130048,
+          "count": 512,
+          "elapsedNs": 16173375,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "graph-json-encode",
+      "pairedJS": false,
+      "counts": {
+        "native": 128,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.0987913359375,
+        "sampleP95Ms": 0.1035130234375,
+        "minMs": 0.0970045546875,
+        "maxMs": 0.1035130234375,
+        "madMs": 0.0013737031250000004
+      },
+      "nativeSamplesMs": [
+        0.1035130234375,
+        0.0986360703125,
+        0.0970045546875,
+        0.0987913359375,
+        0.09737109375,
+        0.1001650390625,
+        0.099706703125
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 10613248,
+          "count": 128,
+          "elapsedNs": 13249667,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 10613248,
+          "count": 128,
+          "elapsedNs": 12625417,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 10613248,
+          "count": 128,
+          "elapsedNs": 12416583,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 10613248,
+          "count": 128,
+          "elapsedNs": 12645291,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 10613248,
+          "count": 128,
+          "elapsedNs": 12463500,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 10613248,
+          "count": 128,
+          "elapsedNs": 12821125,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 10613248,
+          "count": 128,
+          "elapsedNs": 12762458,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "graph-json-roundtrip",
+      "pairedJS": false,
+      "counts": {
+        "native": 32,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.5112643125,
+        "sampleP95Ms": 0.5199986875,
+        "minMs": 0.50629428125,
+        "maxMs": 0.5199986875,
+        "madMs": 0.0028684999999999405
+      },
+      "nativeSamplesMs": [
+        0.5112643125,
+        0.5141328125,
+        0.51065625,
+        0.50629428125,
+        0.5199986875,
+        0.508890625,
+        0.51611459375
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 8128,
+          "count": 32,
+          "elapsedNs": 16360458,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8128,
+          "count": 32,
+          "elapsedNs": 16452250,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8128,
+          "count": 32,
+          "elapsedNs": 16341000,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8128,
+          "count": 32,
+          "elapsedNs": 16201417,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8128,
+          "count": 32,
+          "elapsedNs": 16639958,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8128,
+          "count": 32,
+          "elapsedNs": 16284500,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8128,
+          "count": 32,
+          "elapsedNs": 16515667,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "graph-binary-encode",
+      "pairedJS": false,
+      "counts": {
+        "native": 1024,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.011637939453125,
+        "sampleP95Ms": 0.011817138671875,
+        "minMs": 0.0115606279296875,
+        "maxMs": 0.011817138671875,
+        "madMs": 0.00003698730468749967
+      },
+      "nativeSamplesMs": [
+        0.0116492509765625,
+        0.011611287109375,
+        0.0116009521484375,
+        0.0115606279296875,
+        0.011817138671875,
+        0.011637939453125,
+        0.0117490234375
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 17599488,
+          "count": 1024,
+          "elapsedNs": 11928833,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 17599488,
+          "count": 1024,
+          "elapsedNs": 11889958,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 17599488,
+          "count": 1024,
+          "elapsedNs": 11879375,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 17599488,
+          "count": 1024,
+          "elapsedNs": 11838083,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 17599488,
+          "count": 1024,
+          "elapsedNs": 12100750,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 17599488,
+          "count": 1024,
+          "elapsedNs": 11917250,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 17599488,
+          "count": 1024,
+          "elapsedNs": 12031000,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "graph-binary-decode",
+      "pairedJS": false,
+      "counts": {
+        "native": 512,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.025601400390625,
+        "sampleP95Ms": 0.025901041015625,
+        "minMs": 0.0253841953125,
+        "maxMs": 0.025901041015625,
+        "madMs": 0.0000754414062500014
+      },
+      "nativeSamplesMs": [
+        0.02553857421875,
+        0.0253841953125,
+        0.025601400390625,
+        0.025525958984375,
+        0.025653728515625,
+        0.0257329921875,
+        0.025901041015625
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 130048,
+          "count": 512,
+          "elapsedNs": 13075750,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 130048,
+          "count": 512,
+          "elapsedNs": 12996708,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 130048,
+          "count": 512,
+          "elapsedNs": 13107917,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 130048,
+          "count": 512,
+          "elapsedNs": 13069291,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 130048,
+          "count": 512,
+          "elapsedNs": 13134709,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 130048,
+          "count": 512,
+          "elapsedNs": 13175292,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 130048,
+          "count": 512,
+          "elapsedNs": 13261333,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "graph-apply",
+      "pairedJS": false,
+      "counts": {
+        "native": 128,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.03203678125,
+        "sampleP95Ms": 0.0323525390625,
+        "minMs": 0.03129525,
+        "maxMs": 0.0323525390625,
+        "madMs": 0.0003157578124999977
+      },
+      "nativeSamplesMs": [
+        0.0317164765625,
+        0.0323212890625,
+        0.03129525,
+        0.0323525390625,
+        0.0314723359375,
+        0.03213509375,
+        0.03203678125
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 4059709,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 4137125,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 4005792,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 4141125,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 4028459,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 4113292,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 8384,
+          "count": 128,
+          "elapsedNs": 4100708,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "result-json",
+      "pairedJS": false,
+      "counts": {
+        "native": 1024,
+        "js": 1
+      },
+      "native": {
+        "medianMs": 0.012307373046875,
+        "sampleP95Ms": 0.0124584150390625,
+        "minMs": 0.0120824384765625,
+        "maxMs": 0.0124584150390625,
+        "madMs": 0.00012113378906250007
+      },
+      "nativeSamplesMs": [
+        0.0120824384765625,
+        0.0121862392578125,
+        0.0124584150390625,
+        0.0123264560546875,
+        0.012154744140625,
+        0.0123477783203125,
+        0.012307373046875
+      ],
+      "jsSamplesMs": [],
+      "nativeDetails": [
+        {
+          "checksum": 14351360,
+          "count": 1024,
+          "elapsedNs": 12372417,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 14351360,
+          "count": 1024,
+          "elapsedNs": 12478709,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 14351360,
+          "count": 1024,
+          "elapsedNs": 12757417,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 14351360,
+          "count": 1024,
+          "elapsedNs": 12622291,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 14351360,
+          "count": 1024,
+          "elapsedNs": 12446458,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 14351360,
+          "count": 1024,
+          "elapsedNs": 12644125,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        },
+        {
+          "checksum": 14351360,
+          "count": 1024,
+          "elapsedNs": 12602750,
+          "graphNodesAfter": 254,
+          "graphNodesBefore": 254,
+          "textMeasurements": 0
+        }
+      ]
+    }
+  ],
+  "allocationRows": [
+    {
+      "case": "flowchart/medium",
+      "stage": "parse",
+      "count": 1,
+      "allocations": 2026,
+      "checksum": 9,
+      "freedBytes": 204699,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 105124,
+      "reallocations": 170,
+      "requestedBytes": 204699
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "parse-fresh-registry",
+      "count": 1,
+      "allocations": 2062,
+      "checksum": 9,
+      "freedBytes": 208614,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 108559,
+      "reallocations": 174,
+      "requestedBytes": 208614
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "parse-public",
+      "count": 1,
+      "allocations": 5961,
+      "checksum": 9,
+      "freedBytes": 665327,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 207462,
+      "reallocations": 2310,
+      "requestedBytes": 665327
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "parse-public-fresh-registry",
+      "count": 1,
+      "allocations": 6134,
+      "checksum": 9,
+      "freedBytes": 677400,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 218575,
+      "reallocations": 2318,
+      "requestedBytes": 677400
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "render-source",
+      "count": 1,
+      "allocations": 6866,
+      "checksum": 67518810038490500,
+      "freedBytes": 1010309,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 294628,
+      "reallocations": 1219,
+      "requestedBytes": 1010309
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "render-retained",
+      "count": 1,
+      "allocations": 4840,
+      "checksum": 67518810038490500,
+      "freedBytes": 805610,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 224608,
+      "reallocations": 1049,
+      "requestedBytes": 805610
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "render-mutable-core",
+      "count": 1,
+      "allocations": 4840,
+      "checksum": 67518810038490500,
+      "freedBytes": 805610,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 224608,
+      "reallocations": 1049,
+      "requestedBytes": 805610
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "allocations": 5628,
+      "checksum": 67518810038490280,
+      "freedBytes": 917390,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 224608,
+      "reallocations": 1049,
+      "requestedBytes": 917390
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "registry",
+      "count": 1,
+      "allocations": 36,
+      "checksum": 33,
+      "freedBytes": 3915,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 3435,
+      "reallocations": 4,
+      "requestedBytes": 3915
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "public-registry",
+      "count": 1,
+      "allocations": 173,
+      "checksum": 33,
+      "freedBytes": 12073,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 11113,
+      "reallocations": 8,
+      "requestedBytes": 12073
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "model-json",
+      "count": 1,
+      "allocations": 1873,
+      "checksum": 12924,
+      "freedBytes": 227193,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 98995,
+      "reallocations": 177,
+      "requestedBytes": 227193
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "graph-snapshot",
+      "count": 1,
+      "allocations": 394,
+      "checksum": 297,
+      "freedBytes": 55890,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 54198,
+      "reallocations": 0,
+      "requestedBytes": 55890
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "graph-json-encode",
+      "count": 1,
+      "allocations": 97,
+      "checksum": 79779,
+      "freedBytes": 263560,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 131088,
+      "reallocations": 11,
+      "requestedBytes": 263560
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "graph-json-roundtrip",
+      "count": 1,
+      "allocations": 3233,
+      "checksum": 297,
+      "freedBytes": 1096640,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 229520,
+      "reallocations": 419,
+      "requestedBytes": 1096640
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "graph-binary-encode",
+      "count": 1,
+      "allocations": 1,
+      "checksum": 17098,
+      "freedBytes": 65528,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 32768,
+      "reallocations": 12,
+      "requestedBytes": 65528
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "graph-binary-decode",
+      "count": 1,
+      "allocations": 377,
+      "checksum": 297,
+      "freedBytes": 53096,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 53096,
+      "reallocations": 0,
+      "requestedBytes": 53096
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "graph-apply",
+      "count": 1,
+      "allocations": 1015,
+      "checksum": 2,
+      "freedBytes": 183980,
+      "liveBytesDelta": -28570,
+      "peakAdditionalRequestedBytes": 104928,
+      "reallocations": 8,
+      "requestedBytes": 155410
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "result-json",
+      "count": 1,
+      "allocations": 3,
+      "checksum": 24018,
+      "freedBytes": 88021,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 44164,
+      "reallocations": 8,
+      "requestedBytes": 88021
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse",
+      "count": 1,
+      "allocations": 2069,
+      "checksum": 2,
+      "freedBytes": 192835,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 99641,
+      "reallocations": 17,
+      "requestedBytes": 192835
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse-fresh-registry",
+      "count": 1,
+      "allocations": 2105,
+      "checksum": 2,
+      "freedBytes": 196750,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 103076,
+      "reallocations": 21,
+      "requestedBytes": 196750
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse-public",
+      "count": 1,
+      "allocations": 6359,
+      "checksum": 2,
+      "freedBytes": 469486,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 164589,
+      "reallocations": 1773,
+      "requestedBytes": 469486
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse-public-fresh-registry",
+      "count": 1,
+      "allocations": 6532,
+      "checksum": 2,
+      "freedBytes": 481559,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 175702,
+      "reallocations": 1781,
+      "requestedBytes": 481559
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-source",
+      "count": 1,
+      "allocations": 13792,
+      "checksum": 47186091261891330,
+      "freedBytes": 2045068,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 699539,
+      "reallocations": 3146,
+      "requestedBytes": 2045068
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-retained",
+      "count": 1,
+      "allocations": 11723,
+      "checksum": 47186091261891330,
+      "freedBytes": 1852233,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 653035,
+      "reallocations": 3129,
+      "requestedBytes": 1852233
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-mutable-core",
+      "count": 1,
+      "allocations": 11723,
+      "checksum": 47186091261891330,
+      "freedBytes": 1852233,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 653035,
+      "reallocations": 3129,
+      "requestedBytes": 1852233
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "allocations": 12813,
+      "checksum": 47186091261891250,
+      "freedBytes": 1980009,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 653035,
+      "reallocations": 3129,
+      "requestedBytes": 1980009
+    },
+    {
+      "case": "er/medium",
+      "stage": "registry",
+      "count": 1,
+      "allocations": 36,
+      "checksum": 33,
+      "freedBytes": 3915,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 3435,
+      "reallocations": 4,
+      "requestedBytes": 3915
+    },
+    {
+      "case": "er/medium",
+      "stage": "public-registry",
+      "count": 1,
+      "allocations": 173,
+      "checksum": 33,
+      "freedBytes": 12073,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 11113,
+      "reallocations": 8,
+      "requestedBytes": 12073
+    },
+    {
+      "case": "er/medium",
+      "stage": "model-json",
+      "count": 1,
+      "allocations": 2882,
+      "checksum": 17432,
+      "freedBytes": 290152,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 131368,
+      "reallocations": 85,
+      "requestedBytes": 290152
+    },
+    {
+      "case": "er/medium",
+      "stage": "graph-snapshot",
+      "count": 1,
+      "allocations": 545,
+      "checksum": 437,
+      "freedBytes": 63888,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 62000,
+      "reallocations": 0,
+      "requestedBytes": 63888
+    },
+    {
+      "case": "er/medium",
+      "stage": "graph-json-encode",
+      "count": 1,
+      "allocations": 1,
+      "checksum": 92001,
+      "freedBytes": 262016,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 131072,
+      "reallocations": 10,
+      "requestedBytes": 262016
+    },
+    {
+      "case": "er/medium",
+      "stage": "graph-json-roundtrip",
+      "count": 1,
+      "allocations": 3844,
+      "checksum": 437,
+      "freedBytes": 1188616,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 225360,
+      "reallocations": 214,
+      "requestedBytes": 1188616
+    },
+    {
+      "case": "er/medium",
+      "stage": "graph-binary-encode",
+      "count": 1,
+      "allocations": 1,
+      "checksum": 18382,
+      "freedBytes": 65528,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 32768,
+      "reallocations": 12,
+      "requestedBytes": 65528
+    },
+    {
+      "case": "er/medium",
+      "stage": "graph-binary-decode",
+      "count": 1,
+      "allocations": 520,
+      "checksum": 437,
+      "freedBytes": 61366,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 61366,
+      "reallocations": 0,
+      "requestedBytes": 61366
+    },
+    {
+      "case": "er/medium",
+      "stage": "graph-apply",
+      "count": 1,
+      "allocations": 1935,
+      "checksum": 2,
+      "freedBytes": 141996,
+      "liveBytesDelta": -13496,
+      "peakAdditionalRequestedBytes": 104589,
+      "reallocations": 8,
+      "requestedBytes": 128500
+    },
+    {
+      "case": "er/medium",
+      "stage": "result-json",
+      "count": 1,
+      "allocations": 3,
+      "checksum": 77586,
+      "freedBytes": 172771,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 86532,
+      "reallocations": 9,
+      "requestedBytes": 172771
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parse",
+      "count": 1,
+      "allocations": 1103,
+      "checksum": 5,
+      "freedBytes": 93583,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 41964,
+      "reallocations": 16,
+      "requestedBytes": 93583
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parse-fresh-registry",
+      "count": 1,
+      "allocations": 1139,
+      "checksum": 5,
+      "freedBytes": 97498,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 45399,
+      "reallocations": 20,
+      "requestedBytes": 97498
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parse-public",
+      "count": 1,
+      "allocations": 3471,
+      "checksum": 5,
+      "freedBytes": 499645,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 169236,
+      "reallocations": 1539,
+      "requestedBytes": 499645
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parse-public-fresh-registry",
+      "count": 1,
+      "allocations": 3644,
+      "checksum": 5,
+      "freedBytes": 511718,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 180349,
+      "reallocations": 1547,
+      "requestedBytes": 511718
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-source",
+      "count": 1,
+      "allocations": 3908,
+      "checksum": 8466239533887774,
+      "freedBytes": 395066,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 126794,
+      "reallocations": 801,
+      "requestedBytes": 395066
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-retained",
+      "count": 1,
+      "allocations": 2805,
+      "checksum": 8466239533887774,
+      "freedBytes": 301483,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 100872,
+      "reallocations": 785,
+      "requestedBytes": 301483
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-mutable-core",
+      "count": 1,
+      "allocations": 6421,
+      "checksum": 8466239533887774,
+      "freedBytes": 558239,
+      "liveBytesDelta": 14528,
+      "peakAdditionalRequestedBytes": 184421,
+      "reallocations": 3391,
+      "requestedBytes": 572767
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-mutable-publish",
+      "count": 1,
+      "allocations": 7292,
+      "checksum": 8466239533887615,
+      "freedBytes": 694095,
+      "liveBytesDelta": 14528,
+      "peakAdditionalRequestedBytes": 184421,
+      "reallocations": 3391,
+      "requestedBytes": 708623
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "registry",
+      "count": 1,
+      "allocations": 36,
+      "checksum": 33,
+      "freedBytes": 3915,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 3435,
+      "reallocations": 4,
+      "requestedBytes": 3915
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "public-registry",
+      "count": 1,
+      "allocations": 173,
+      "checksum": 33,
+      "freedBytes": 12073,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 11113,
+      "reallocations": 8,
+      "requestedBytes": 12073
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "model-json",
+      "count": 1,
+      "allocations": 3213,
+      "checksum": 28194,
+      "freedBytes": 400000,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 168559,
+      "reallocations": 231,
+      "requestedBytes": 400000
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "graph-snapshot",
+      "count": 1,
+      "allocations": 435,
+      "checksum": 254,
+      "freedBytes": 65072,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 53868,
+      "reallocations": 0,
+      "requestedBytes": 65072
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "graph-json-encode",
+      "count": 1,
+      "allocations": 149,
+      "checksum": 82916,
+      "freedBytes": 264400,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 131088,
+      "reallocations": 12,
+      "requestedBytes": 264400
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "graph-json-roundtrip",
+      "count": 1,
+      "allocations": 3266,
+      "checksum": 254,
+      "freedBytes": 1096768,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 221976,
+      "reallocations": 493,
+      "requestedBytes": 1096768
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "graph-binary-encode",
+      "count": 1,
+      "allocations": 1,
+      "checksum": 17187,
+      "freedBytes": 65528,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 32768,
+      "reallocations": 12,
+      "requestedBytes": 65528
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "graph-binary-decode",
+      "count": 1,
+      "allocations": 382,
+      "checksum": 254,
+      "freedBytes": 51770,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 51770,
+      "reallocations": 0,
+      "requestedBytes": 51770
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "graph-apply",
+      "count": 1,
+      "allocations": 435,
+      "checksum": 2,
+      "freedBytes": 92304,
+      "liveBytesDelta": -27232,
+      "peakAdditionalRequestedBytes": 53868,
+      "reallocations": 0,
+      "requestedBytes": 65072
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "result-json",
+      "count": 1,
+      "allocations": 3,
+      "checksum": 14015,
+      "freedBytes": 43357,
+      "liveBytesDelta": 0,
+      "peakAdditionalRequestedBytes": 21828,
+      "reallocations": 7,
+      "requestedBytes": 43357
+    }
+  ],
+  "systemAfter": {
+    "loadAverage": [
+      5.41845703125,
+      6.33154296875,
+      7.04443359375
+    ],
+    "freeMemory": 456851456,
+    "processes": [
+      {
+        "pid": 98316,
+        "cpuPercent": 95.9,
+        "name": "pele-perf"
+      },
+      {
+        "pid": 410,
+        "cpuPercent": 43.8,
+        "name": "WindowServer"
+      },
+      {
+        "pid": 813,
+        "cpuPercent": 17.7,
+        "name": "Google Chrome Helper"
+      },
+      {
+        "pid": 23310,
+        "cpuPercent": 16.6,
+        "name": "Claude Helper"
+      },
+      {
+        "pid": 77091,
+        "cpuPercent": 0.5,
+        "name": "xctest"
+      }
+    ]
+  },
+  "completedAt": "2026-10-18T17:34:50.026Z"
+}
