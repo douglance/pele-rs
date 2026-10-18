@@ -36,3 +36,6 @@ impl DiagramModule for Block {
         render::render(m, c, o, r)
     }
 }
+
+mod public_model;
+pub use public_model::BlockPublicState;

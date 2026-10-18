@@ -237,11 +237,21 @@ pub(super) fn render(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    let loose = draw(m, c, o, r, false)?;
+    render_accessible(m, c, o, r, None, None)
+}
+pub(super) fn render_accessible(
+    m: &BlockModel,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+    acc_title: Option<&str>,
+    acc_descr: Option<&str>,
+) -> Result<Rendered, PeleError> {
+    let loose = draw(m, c, o, r, false, acc_title, acc_descr)?;
     if o.max_width.is_none_or(|w| !(w > 0.) || loose.width <= w) {
         return Ok(loose);
     }
-    let tight = draw(m, c, o, r, true)?;
+    let tight = draw(m, c, o, r, true, acc_title, acc_descr)?;
     Ok(if tight.width < loose.width {
         tight
     } else {
@@ -254,6 +264,8 @@ fn draw(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
     tight: bool,
+    acc_title: Option<&str>,
+    acc_descr: Option<&str>,
 ) -> Result<Rendered, PeleError> {
     let size = o.font_size.unwrap_or(16.);
     let edge_size = (size * 0.875 + 0.5).floor();
@@ -539,7 +551,9 @@ fn draw(
         }
     );
     Ok(Rendered {
-        svg: document("block", width, height, size, o, None, None, &content)?,
+        svg: document(
+            "block", width, height, size, o, acc_title, acc_descr, &content,
+        )?,
         width,
         height,
         links: vec![],

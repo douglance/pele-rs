@@ -81,6 +81,10 @@ impl Parser<'_> {
         let id = self.expect(T::NODE_ID)?;
         let mut node = BlockNode {
             id: Some(id),
+            own_keys: ["id", "label", "type", "directions"]
+                .into_iter()
+                .map(str::to_owned)
+                .collect(),
             ..Default::default()
         };
         let mut shape = String::new();
@@ -103,6 +107,7 @@ impl Parser<'_> {
     }
     fn node_statement(&mut self) -> Result<Vec<usize>, PeleError> {
         let mut first = self.node()?;
+        first.remember("widthInColumns");
         first.width_in_columns = Some(if self.current() == T::SIZE {
             int(&self.take())
         } else {
@@ -123,7 +128,10 @@ impl Parser<'_> {
                 String::new()
             };
             let link = self.tokens[self.i - 1].text.trim_matches(space).to_string();
-            let to = self.node()?;
+            let mut to = self.node()?;
+            if to.directions.is_some() {
+                to.array_origins[0] = Some(self.model.array_origin());
+            }
             let to_id = to.id.clone().unwrap();
             let from_id = self.model.nodes[from].id.clone().unwrap();
             let arrow_end = match link.chars().next_back() {
@@ -140,6 +148,9 @@ impl Parser<'_> {
             };
             let c = chain.get_or_insert_with(|| {
                 self.model.nodes[first_idx].width_in_columns = None;
+                self.model.nodes[first_idx]
+                    .own_keys
+                    .retain(|key| key != "widthInColumns");
                 vec![first_idx]
             });
             let edge = self.model.push(BlockNode {
@@ -165,8 +176,24 @@ impl Parser<'_> {
                     .into(),
                 ),
                 directions: to.directions.clone(),
+                array_origins: [to.array_origins[0], None, None, None],
                 arrow_type_end: Some(arrow_end.into()),
                 arrow_type_start: Some(arrow_start.into()),
+                own_keys: [
+                    "id",
+                    "start",
+                    "end",
+                    "label",
+                    "type",
+                    "thickness",
+                    "pattern",
+                    "directions",
+                    "arrowTypeEnd",
+                    "arrowTypeStart",
+                ]
+                .into_iter()
+                .map(str::to_owned)
+                .collect(),
                 ..Default::default()
             });
             from = self.model.push(to);
@@ -192,14 +219,20 @@ impl Parser<'_> {
                 T::SPACE_BLOCK => {
                     let width = int(&self.take());
                     let id = self.id();
-                    list.push(self.model.push(BlockNode {
-                        id: Some(id),
-                        kind: Some("space".into()),
-                        label: Some(String::new()),
-                        width: Some(width),
-                        children: Some(vec![]),
-                        ..Default::default()
-                    }));
+                    list.push(
+                        self.model.push(BlockNode {
+                            id: Some(id),
+                            kind: Some("space".into()),
+                            label: Some(String::new()),
+                            width: Some(width),
+                            children: Some(vec![]),
+                            own_keys: ["id", "type", "label", "width", "children"]
+                                .into_iter()
+                                .map(str::to_owned)
+                                .collect(),
+                            ..Default::default()
+                        }),
+                    );
                 }
                 T::KEY => {
                     self.i += 1;
@@ -228,6 +261,10 @@ impl Parser<'_> {
                         None => BlockNode {
                             id: Some(id),
                             label: Some(String::new()),
+                            own_keys: ["id", "type", "label", "children"]
+                                .into_iter()
+                                .map(str::to_owned)
+                                .collect(),
                             ..Default::default()
                         },
                         Some(h) if h.len() == 1 => self.model.nodes[h[0]].clone(),
@@ -241,6 +278,8 @@ impl Parser<'_> {
                         },
                     };
                     node.kind = Some("composite".into());
+                    node.remember("type");
+                    node.remember("children");
                     let n = self.model.push(node);
                     self.inner.insert(n, list);
                     list = parent;
@@ -330,10 +369,16 @@ impl Parser<'_> {
             id: Some(id.into()),
             kind: Some("na".into()),
             children: Some(vec![]),
+            own_keys: ["id", "type", "children"]
+                .into_iter()
+                .map(str::to_owned)
+                .collect(),
             ..Default::default()
         });
         self.set_id(id.into(), i);
-        pending.insert(id.into());
+        if pending.insert(id.into()) {
+            self.model.pending.push(id.into());
+        }
         i
     }
     fn hierarchy(&mut self, list: Vec<usize>) -> Result<(), PeleError> {
@@ -352,12 +397,13 @@ impl Parser<'_> {
         let mut stack = vec![frame(list, self.model.root, &self.model)];
         let mut pending = HashSet::new();
         let mut edge_count = HashMap::<String, usize>::new();
+        let mut edge_order = HashMap::<String, usize>::new();
         let mut colors = 0;
         let mut spaces = 0.;
         while let Some(f) = stack.last_mut() {
             if f.at == f.list.len() {
                 let f = stack.pop().unwrap();
-                self.model.nodes[f.parent].children = Some(f.children);
+                self.model.children(f.parent, f.children);
                 continue;
             }
             let i = f.list[f.at];
@@ -398,6 +444,11 @@ impl Parser<'_> {
                     for id in n.id.unwrap().split(',') {
                         let id = id.trim_matches(space);
                         let at = self.named(id, &mut pending);
+                        self.model.nodes[at].remember("classes");
+                        if self.model.nodes[at].classes.is_none() {
+                            let origin = self.model.array_origin();
+                            self.model.nodes[at].array_origins[1] = Some(origin);
+                        }
                         self.model.nodes[at]
                             .classes
                             .get_or_insert_with(Vec::new)
@@ -408,19 +459,28 @@ impl Parser<'_> {
                 Some("applyStyles") => {
                     if let Some(styles) = n.styles_str.filter(|s| !s.is_empty()) {
                         let at = self.named(&n.id.unwrap(), &mut pending);
+                        self.model.nodes[at].remember("styles");
+                        let origin = self.model.array_origin();
+                        self.model.nodes[at].array_origins[2] = Some(origin);
                         self.model.nodes[at].styles =
                             Some(styles.split(',').map(str::to_owned).collect());
                     }
                     continue;
                 }
                 Some("column-setting") => {
+                    self.model.nodes[f.parent].remember("columns");
                     self.model.nodes[f.parent].columns = Some(n.columns.unwrap_or(-1.));
                     continue;
                 }
                 Some("edge") => {
                     let id = n.id.unwrap();
                     let count = edge_count.entry(id.clone()).or_default();
+                    if *count == 0 {
+                        edge_order.insert(id.clone(), self.model.edge_count.len());
+                        self.model.edge_count.push((id.clone(), 0));
+                    }
                     *count += 1;
+                    self.model.edge_count[edge_order[&id]].1 = *count;
                     self.model.nodes[i].id = Some(format!("{count}-{id}"));
                     self.model.edges.push(i);
                     continue;
@@ -428,6 +488,7 @@ impl Parser<'_> {
                 _ => {}
             }
             if self.model.nodes[i].id.is_none() {
+                self.model.nodes[i].remember("id");
                 self.model.nodes[i].id = Some(self.id());
             }
             let id = self.model.nodes[i].id.clone().unwrap();
@@ -437,6 +498,7 @@ impl Parser<'_> {
                 .as_ref()
                 .is_none_or(String::is_empty)
             {
+                self.model.nodes[i].remember("label");
                 self.model.nodes[i].label =
                     Some(if composite { String::new() } else { id.clone() });
             }
@@ -452,17 +514,22 @@ impl Parser<'_> {
                 }
             } else {
                 if let Some(known) = known {
+                    self.model.nodes[i].remember("classes");
+                    self.model.nodes[i].remember("styles");
+                    self.model.nodes[i].array_origins[1] = self.model.nodes[known].array_origins[1];
+                    self.model.nodes[i].array_origins[2] = self.model.nodes[known].array_origins[2];
                     self.model.nodes[i].classes = self.model.nodes[known].classes.clone();
                     self.model.nodes[i].styles = self.model.nodes[known].styles.clone();
                 }
                 if composite {
+                    self.model.nodes[i].remember("colorIndex");
                     self.model.nodes[i].color_index = Some(colors);
                     colors += 1;
                 }
                 self.set_id(id.clone(), i);
             }
             let inner = self.inner.remove(&i);
-            self.model.nodes[i].children = Some(vec![]);
+            self.model.children(i, vec![]);
             if n.kind.as_deref() == Some("space") {
                 let width = n.width.unwrap_or(1.);
                 if !(width <= 100000. - spaces) {
@@ -479,6 +546,7 @@ impl Parser<'_> {
                 for j in 0..width as usize {
                     let mut copy = self.model.nodes[i].clone();
                     copy.id = Some(format!("{id}-{j}"));
+                    copy.array_origins[3] = None;
                     let at = self.model.push(copy);
                     self.set_id(format!("{id}-{j}"), at);
                     stack.last_mut().unwrap().children.push(at);
@@ -490,6 +558,9 @@ impl Parser<'_> {
                 stack.push(frame(inner, i, &self.model));
             }
         }
+        self.model.pending.retain(|key| pending.contains(key));
+        self.model.colors = colors as f64;
+        self.model.spaces = spaces;
         self.model.blocks = self.model.nodes[self.model.root]
             .children
             .clone()
@@ -509,12 +580,22 @@ pub(super) fn parse(src: &str, title: Option<&str>) -> Result<BlockModel, PeleEr
         by_id: vec![],
         lookup: HashMap::new(),
         positions: HashMap::new(),
+        pending: vec![],
+        edge_count: vec![],
+        ids: 0.,
+        colors: 0.,
+        spaces: 0.,
+        next_array: 0,
     };
     model.root = model.push(BlockNode {
         id: Some("root".into()),
         kind: Some("composite".into()),
         children: Some(vec![]),
         columns: Some(-1.),
+        own_keys: ["id", "type", "children", "columns"]
+            .into_iter()
+            .map(str::to_owned)
+            .collect(),
         ..Default::default()
     });
     let mut parser = Parser {
@@ -527,5 +608,6 @@ pub(super) fn parse(src: &str, title: Option<&str>) -> Result<BlockModel, PeleEr
     };
     let list = parser.parse()?;
     parser.hierarchy(list)?;
+    parser.model.ids = parser.ids as f64;
     Ok(parser.model)
 }

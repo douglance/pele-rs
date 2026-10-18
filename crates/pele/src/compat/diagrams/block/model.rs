@@ -50,6 +50,18 @@ pub struct BlockNode {
     pub styles_str: Option<String>,
     #[serde(skip)]
     pub extra: Vec<(String, usize)>,
+    #[serde(skip)]
+    pub(super) own_keys: Vec<String>,
+    // directions/classes/styles/children origins survive native shallow copies.
+    #[serde(skip)]
+    pub(super) array_origins: [Option<usize>; 4],
+}
+impl BlockNode {
+    pub(super) fn remember(&mut self, key: &str) {
+        if !self.own_keys.iter().any(|k| k == key) {
+            self.own_keys.push(key.into())
+        }
+    }
 }
 fn number<S: Serializer>(n: &Option<f64>, s: S) -> Result<S::Ok, S::Error> {
     match n {
@@ -76,6 +88,12 @@ pub struct BlockModel {
     pub by_id: Vec<(String, usize)>,
     pub(super) lookup: HashMap<String, usize>,
     pub(super) positions: HashMap<String, usize>,
+    pub(super) pending: Vec<String>,
+    pub(super) edge_count: Vec<(String, usize)>,
+    pub(super) ids: f64,
+    pub(super) colors: f64,
+    pub(super) spaces: f64,
+    pub(super) next_array: usize,
 }
 struct Node<'a>(&'a BlockModel, usize);
 struct Nodes<'a>(&'a BlockModel, &'a [usize]);
@@ -131,7 +149,32 @@ impl Serialize for BlockModel {
     }
 }
 impl BlockModel {
-    pub(super) fn push(&mut self, n: BlockNode) -> usize {
+    pub(super) fn array_origin(&mut self) -> usize {
+        let i = self.next_array;
+        self.next_array += 1;
+        i
+    }
+    pub(super) fn children(&mut self, i: usize, children: Vec<usize>) {
+        let origin = self.array_origin();
+        let n = &mut self.nodes[i];
+        n.children = Some(children);
+        n.array_origins[3] = Some(origin);
+        n.remember("children");
+    }
+    pub(super) fn push(&mut self, mut n: BlockNode) -> usize {
+        for (i, present) in [
+            n.directions.is_some(),
+            n.classes.is_some(),
+            n.styles.is_some(),
+            n.children.is_some(),
+        ]
+        .into_iter()
+        .enumerate()
+        {
+            if present && n.array_origins[i].is_none() {
+                n.array_origins[i] = Some(self.array_origin())
+            }
+        }
         let i = self.nodes.len();
         self.nodes.push(n);
         i
