@@ -6,8 +6,8 @@ Sankey, Packet, Radar, Quadrant, Treemap, Journey, XYChart, Kanban, Mindmap,
 Timeline, Flowchart, Swimlane, ER and Architecture. Actual native model methods
 are available where inventoried; field-only opaque schemas remain explicit until
 their descriptor inventory is complete. The published v0.1.0 binary remains the
-earlier flowchart subset. GitGraph, AgentFlow, Ishikawa, Class and EventModeling also expose native Rust
-mutable codecs, bringing native coverage to twenty-one; their foreign adapter
+earlier flowchart subset. GitGraph, AgentFlow, Ishikawa, Class, EventModeling and TreeView also expose native Rust
+mutable codecs, bringing native coverage to twenty-two; their foreign adapter
 checkpoint is pending. AgentFlow has thirty-four actual descriptors with one
 explicitly unavailable Error-valued return operation.
 

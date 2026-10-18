@@ -588,3 +588,17 @@ callback failure, output limits, recovery and invalid post-operation graphs;
 all pass in the thirty-four-test release batch above. The old native render API
 remains unchanged. Foreign adapter validation and pre-callback synchronization
 remain separate pending work.
+
+
+## TreeView mutable native checkpoint
+
+TreeView brings native mutable coverage to twenty-two families; foreign
+coverage remains sixteen. Its returned plain wrapper preserves the virtual root,
+optional own fields and shared node identities without inventing private builder
+methods. Seven public integration slices and four source baseline slices pass in
+release mode: all 6,800 historical outcomes, twenty-eight pinned mutation/config
+SVG comparisons, repeated icon callback traces, deep/DAG graphs, native pixels,
+resource failures and recovery. Existing twenty-seven source UTF-16 exclusions
+and three JSON projection ceilings remain explicit. Active sparse/lone-surrogate
+text, exotic coercion/prototypes and cyclic or over-budget expanded trees remain
+recorded gaps. Existing parser, model and renderer sources are unchanged.

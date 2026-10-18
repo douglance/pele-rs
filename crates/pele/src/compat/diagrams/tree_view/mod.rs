@@ -32,3 +32,6 @@ impl DiagramModule for TreeView {
         render::render(m, c, o, r)
     }
 }
+
+mod public_model;
+pub use public_model::TreeViewPublicState;
