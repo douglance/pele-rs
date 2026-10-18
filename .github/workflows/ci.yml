@@ -1,0 +1,31 @@
+name: Shared flowchart conformance
+on:
+  push:
+    paths-ignore: ['**/*.md', 'docs/**']
+  pull_request:
+    paths-ignore: ['**/*.md', 'docs/**']
+permissions:
+  contents: read
+jobs:
+  swift-and-web:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: 1.98.1
+          targets: wasm32-unknown-unknown
+          components: rustfmt
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: cargo install wasm-bindgen-cli --version 0.2.128 --locked
+      - run: npm ci --ignore-scripts
+      - run: npx playwright install chromium firefox webkit
+      - run: scripts/verify.sh
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: native-and-browser-evidence
+          path: dist/evidence/

@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>pele-rs · Flowchart playground</title>
+  <link rel="stylesheet" href="style.css">
+  <script type="module" src="main.js"></script>
+</head>
+<body>
+  <header><a href="https://github.com/vijayksingh/pele-rs">pele-rs</a><span>Rust engine · Browser WASM · Swift native</span></header>
+  <main>
+    <section class="editor" aria-labelledby="editor-title">
+      <p class="eyebrow">FLOWCHARTS / V0.1.0</p>
+      <h1 id="editor-title">One graph. Same engine.</h1>
+      <p>Mermaid source becomes deterministic geometry and font outlines. No installed fonts or JavaScript diagram renderer.</p>
+      <form id="form">
+        <label for="example">Example</label>
+        <select id="example">
+          <option value="branch">Decision + feedback</option><option value="links">Link styles</option>
+          <option value="cycles">Cycles + parallel links</option><option value="quoted">Quoted labels</option>
+          <option value="diamond">Bottom to top</option><option value="long">Long edge + disconnected</option>
+        </select>
+        <label for="source">Mermaid source</label>
+        <textarea id="source" spellcheck="false" rows="14"></textarea>
+        <div class="controls"><button id="render" disabled>Render flowchart</button><label class="theme-label"><input id="dark" type="checkbox"> Dark diagram</label></div>
+      </form>
+      <p id="status" role="status" aria-live="polite">Loading Rust WASM…</p>
+      <p id="error" role="alert" hidden></p>
+      <details><summary>Supported syntax</summary><p>TB/TD, BT, LR, RL. Rectangles, rounded rectangles, diamonds, circles, stadiums. Solid, dashed, thick links; pipe labels; chains, cycles and self-loops.</p><p>Subgraphs, styling directives, rich text and uncovered scripts return explicit errors. Labels stay plain text.</p></details>
+    </section>
+    <section class="drawing" aria-label="Rendered flowchart"><div id="preview"></div></section>
+  </main>
+  <footer>Independent Rust adaptation inspired by Pele. MIT engine · OFL Noto Sans · No full Mermaid compatibility claim.</footer>
+</body>
+</html>

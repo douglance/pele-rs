@@ -1,0 +1,10 @@
+[package]
+name = "pele-release-consumer"
+version = "0.0.0"
+edition = "2021"
+publish = false
+
+[workspace]
+
+[dependencies]
+pele = { package = "pele-rs", path = "../../target/package/pele-rs-0.1.0" }

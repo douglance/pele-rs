@@ -1,7 +1,16 @@
 /target/
+**/target/
 /.build/
 **/.build/
 /dist/
+/bindings/swift/Artifacts/
+/bindings/web/pkg/
+/bindings/web/LICENSE
+/bindings/web/NOTICE
+/bindings/web/PELE-LICENSE
+/bindings/web/FONT-OFL.txt
+*.tgz
+**/Package.resolved
 /node_modules/
 /test-results/
 /playwright-report/
