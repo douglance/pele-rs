@@ -49,6 +49,16 @@ extension Pele {
                 guard registered else { throw PeleError(code: "internal", message: "Invalid registry registration result") }
             }}
         }
+        /// Select an already linked built-in on demand. Existing registrations
+        /// remain intact; nil and unknown exact IDs return false on an open owner.
+        /// This does not download code or provide dynamic module loading.
+        public func load(_ id: String?) throws -> Bool {
+            guard let id else { return try withHandle { _ in false } }
+            if try registered(id) { return true }
+            guard try capabilities().contains(where: { $0.type == id && $0.known }) else { return false }
+            try registerBuiltin(id)
+            return true
+        }
         /// Preprocess and detect without applying parse limits or grammar checks.
         public func detectType(_ source: String) throws -> String? {
             struct Detection: Decodable { let type: String? }
