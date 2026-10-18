@@ -483,3 +483,19 @@ UTF-16 extras, native raster/resource recovery and bounded alias expansion are
 covered. NaN/nonnumeric sorting, exotic callbacks/coercion, active sparse/isolated
 UTF-16 text and some render-error classes remain explicit gaps. The verified
 foreign mutable checkpoint remains sixteen families.
+
+
+## Imported callable construction
+
+Native function-shape descriptors distinguish ordinary constructible functions
+from class methods. Kanban and Mindmap's shared outline helper keeps its real
+prototype object, constructor backlink, arity and construction behavior; class
+methods remain nonconstructible. This closes the imported-helper construction
+gap without claiming model constructors. Shape/identity registration validation
+is linear and bounded, and retained documents survive invalid replacement metadata.
+
+Three native extension integration tests pass in release profile alongside the
+GitGraph batch; all eight Swift mutable feature tests pass with shape metadata.
+The consolidated eighteen browser model/method tests pass in Chrome, Firefox and
+WebKit. An initial Firefox own-property ordering failure was corrected by retaining
+the helper's intrinsic two-argument length rather than rewriting it.

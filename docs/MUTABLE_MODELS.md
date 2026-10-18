@@ -32,7 +32,9 @@ partial edits before throwing, matching the tested native operations. Function
 identity is shared across documents of one schema. Kanban and Mindmap also
 share the imported outline helper across schemas. Flowchart and Swimlane share
 the actual FlowDb prototype and all nineteen methods; Swimlane's retained render
-result remains `swimlane` while its model type remains `flowchart`. Constructors and mutation of
+result remains `swimlane` while its model type remains `flowchart`. The imported
+outline helper also retains its ordinary constructible-function prototype and
+constructor backlink; class methods remain nonconstructible. Model constructors and mutation of
 prototype definitions report an unavailable capability. Methods require a live
 owned document. Unimplemented family codecs keep the existing immutable owned
 model path; their renderers remain available.

@@ -31,27 +31,33 @@ export class ModelRegistry {
     const registration = {schema, functions: new Map(), functionIds: new WeakMap(), prototypes: new Map(), prototypeIds: new WeakMap(), documents: [], sharedIds: new Map((schema.sharedFunctions??[]).map(entry=>[entry.identity,entry.method]))};
     this.schemas.set(key, registration);
     const aliases=new Map((schema.sharedFunctions??[]).map(entry=>[entry.method,entry.identity]));
+    const shapes=new Map((schema.functionShapes??[]).map(entry=>[entry.method,entry.constructible]));
     const live=registration=>{
       registration.documents=registration.documents.filter(reference=>{const value=reference.deref();return value&&!value.disposed;});
       return registration.documents.at(-1)?.deref();
     };
     for (const method of schema.methods) {
-      const registry = this, identity=aliases.get(method.id);
+      const registry = this, identity=aliases.get(method.id), constructible=shapes.get(method.id)??false;
       let shared=identity&&this.sharedFunctions.get(identity);
-      if(shared&&(shared.name!==method.name||shared.arity!==method.arity))throw new TypeError('Conflicting shared native function descriptor');
-      if(identity&&!shared){shared={name:method.name,arity:method.arity,registrations:new Set(),callable:null};this.sharedFunctions.set(identity,shared);}
+      if(shared&&(shared.name!==method.name||shared.arity!==method.arity||shared.constructible!==constructible))throw new TypeError('Conflicting shared native function descriptor');
+      if(identity&&!shared){shared={name:method.name,arity:method.arity,constructible,registrations:new Set(),callable:null};this.sharedFunctions.set(identity,shared);}
       if(shared)shared.registrations.add(registration);
-      const callable=(shared&&shared.callable)||{[method.name](...argumentsValue) {
-        const direct=this&&registry.owners.get(this);
+      const dispatch=(receiver,argumentsValue)=>{
+        const direct=receiver&&registry.owners.get(receiver);
         let owner;
         if(shared) {
           if(direct&&!direct.disposed&&direct.registration.sharedIds.has(identity))owner=direct;
           if(!owner)for(const candidate of [...shared.registrations].reverse()){owner=live(candidate);if(owner)break;}
         } else owner=direct?.registration===registration&&!direct.disposed?direct:live(registration);
         if (!owner) throw new TypeError('Public method has no live document');
-        return owner.invoke(shared?owner.registration.sharedIds.get(identity):method.id, this, argumentsValue);
-      }}[method.name];
-      Object.defineProperty(callable, 'length', {value: method.arity, configurable: true});
+        return owner.invoke(shared?owner.registration.sharedIds.get(identity):method.id, receiver, argumentsValue);
+      };
+      // Keep the outline helper's intrinsic arity: rewriting it changes
+      // Firefox's observed ordering of ordinary function properties.
+      const callable=(shared&&shared.callable)||(constructible?
+        {[method.name]:function(_first,_second){return dispatch(this,Array.from(arguments));}}[method.name]:
+        {[method.name](...argumentsValue){return dispatch(this,argumentsValue);}}[method.name]);
+      if(!constructible||method.arity!==2)Object.defineProperty(callable, 'length', {value: method.arity, configurable: true});
       if(shared)shared.callable=callable;
       registration.functions.set(method.id, callable);
       registration.functionIds.set(callable, method.id);

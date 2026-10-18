@@ -238,3 +238,28 @@ test('outline timeline graph and architecture methods keep pinned shared identit
   });
   expect(failures).toEqual([]);
 });
+
+
+test('imported outline helpers retain ordinary function construction and shared prototypes',async({page})=>{
+  await page.goto('/examples/web/');
+  const failures=await page.evaluate(async()=>{
+    const {loadRenderer}=await import('/dist/package-web/package/full.js'),oracle=await import('/dist/evidence/pele-oracle.js'),engine=await loadRenderer(),failures=[];
+    const kanban=engine.parse('kanban\n  Todo'),mindmap=engine.parse('mindmap\n  root((Core))');
+    const expected=oracle.parse('kanban\n  Todo'),helper=kanban.getType,reference=expected.getType;
+    if(helper!==mindmap.getType||helper.prototype!==mindmap.getType.prototype)failures.push('shared ordinary function/prototype');
+    if(JSON.stringify(Reflect.ownKeys(helper))!==JSON.stringify(Reflect.ownKeys(reference)))failures.push('own callable keys '+JSON.stringify(Reflect.ownKeys(helper))+' / '+JSON.stringify(Reflect.ownKeys(reference)));
+    for(const key of ['length','prototype']){
+      const a=Object.getOwnPropertyDescriptor(helper,key),b=Object.getOwnPropertyDescriptor(reference,key);
+      if(a.enumerable!==b.enumerable||a.writable!==b.writable||a.configurable!==b.configurable)failures.push('descriptor '+key);
+    }
+    if(helper.prototype.constructor!==helper)failures.push('constructor backlink');
+    const actual=new helper('[',']'),baseline=new reference('[',']');
+    if(!(actual instanceof helper)||Object.getPrototypeOf(actual)!==helper.prototype||JSON.stringify(actual)!==JSON.stringify(baseline))failures.push('ordinary function construction');
+    engine.dispose(kanban);
+    if(!(new helper('(',')') instanceof mindmap.getType))failures.push('construction after other document disposal');
+    let a,b;try{new mindmap.addNode()}catch(e){a=e.name}try{new (Object.getPrototypeOf(oracle.parse('mindmap\n  root((Core))')).addNode)()}catch(e){b=e.name}
+    if(a!=='TypeError'||a!==b)failures.push('class methods stay nonconstructible');
+    engine.dispose(mindmap);return failures;
+  });
+  expect(failures).toEqual([]);
+});

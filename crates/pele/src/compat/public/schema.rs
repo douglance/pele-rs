@@ -118,38 +118,67 @@ pub struct SharedFunction {
     pub method: MethodId,
     pub identity: &'static str,
 }
+/// Function construction is distinct from invocation. Most class methods are
+/// nonconstructible; imported ordinary functions can retain their real shape.
+#[derive(Clone, Copy, Debug, Serialize)]
+pub struct FunctionShape {
+    pub method: MethodId,
+    pub constructible: bool,
+}
 #[derive(Clone, Copy, Debug, Serialize)]
 pub struct ModelSchemaView {
     #[serde(flatten)]
     pub model: &'static ModelSchema,
     #[serde(rename = "sharedFunctions")]
     pub shared_functions: &'static [SharedFunction],
+    #[serde(rename = "functionShapes")]
+    pub function_shapes: &'static [FunctionShape],
 }
 impl ModelSchemaView {
     pub fn validate(&self) -> Result<(), PeleError> {
         self.model.validate()?;
+        if self.function_shapes.len() > self.model.methods.len() {
+            return Err(invalid("Too many public function shapes"));
+        }
+        let methods: HashMap<_, _> = self.model.methods.iter().map(|m| (m.id, m)).collect();
+        let mut shapes = HashMap::new();
+        for shape in self.function_shapes {
+            if !methods.contains_key(&shape.method)
+                || shapes.insert(shape.method, shape.constructible).is_some()
+            {
+                return Err(invalid("Invalid public function shape"));
+            }
+        }
         if self.shared_functions.len() > self.model.methods.len() {
             return Err(invalid("Too many shared public function identities"));
         }
-        let mut methods = HashSet::new();
+        let mut shared_methods = HashSet::new();
         let mut identities = HashMap::new();
+        let mut units = 0usize;
         for entry in self.shared_functions {
-            let method = self
-                .model
-                .method(entry.method)
+            let method = methods
+                .get(&entry.method)
                 .ok_or_else(|| invalid("Unknown shared public method"))?;
+            units = units.saturating_add(entry.identity.len());
+            if units > 16_000_000 {
+                return Err(limit());
+            }
             if entry.identity.is_empty()
                 || entry.identity.len() > 4096
-                || !methods.insert(entry.method)
+                || !shared_methods.insert(entry.method)
             {
                 return Err(invalid("Invalid shared public function identity"));
             }
-            if let Some((name, arity)) =
-                identities.insert(entry.identity, (method.name, method.arity))
+            let descriptor = (
+                method.name,
+                method.arity,
+                shapes.get(&entry.method).copied().unwrap_or(false),
+            );
+            if identities
+                .insert(entry.identity, descriptor)
+                .is_some_and(|previous| previous != descriptor)
             {
-                if (name, arity) != (method.name, method.arity) {
-                    return Err(invalid("Conflicting shared public function descriptor"));
-                }
+                return Err(invalid("Conflicting shared public function descriptor"));
             }
         }
         Ok(())

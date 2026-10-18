@@ -213,6 +213,8 @@ final class MutableDocumentTests: XCTestCase {
         let first = try kanban.schema(), second = try mindmap.schema()
         XCTAssertEqual(first.sharedFunctions?.first?.identity, "pele/common/outline/getType@1")
         XCTAssertEqual(first.sharedFunctions?.first?.identity, second.sharedFunctions?.first?.identity)
+        XCTAssertEqual(first.functionShapes?.first?.constructible, true)
+        XCTAssertEqual(second.functionShapes?.first?.constructible, true)
         for document in [kanban, mindmap] {
             var graph = try document.snapshot().graph
             let start = try graph.intern("["), end = try graph.intern("]")

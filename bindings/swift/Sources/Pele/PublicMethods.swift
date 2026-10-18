@@ -13,6 +13,11 @@ extension Pele {
             public let method: UInt32
             public let identity: String
         }
+        public struct FunctionShape: Decodable, Sendable {
+            public let method: UInt32
+            public let constructible: Bool
+        }
+        public let functionShapes: [FunctionShape]?
         public let sharedFunctions: [SharedFunction]?
         public let id: String
         public let version: UInt32

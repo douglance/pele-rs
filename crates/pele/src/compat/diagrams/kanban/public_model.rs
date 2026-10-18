@@ -618,6 +618,12 @@ fn export_array(out: &mut GraphWriter, values: Vec<Atom>) -> Atom {
     }))
 }
 impl PublicDiagramModule for Kanban {
+    fn function_shapes(&self) -> &'static [FunctionShape] {
+        &[FunctionShape {
+            method: GET_TYPE,
+            constructible: true,
+        }]
+    }
     fn shared_functions(&self) -> &'static [SharedFunction] {
         &[SharedFunction {
             method: MethodId(0),

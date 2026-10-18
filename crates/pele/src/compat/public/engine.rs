@@ -1,6 +1,6 @@
 use super::{
-    Atom, InvocationOutcome, MethodCall, ModelGraph, ModelSchema, ModelSchemaView, PublicError,
-    SharedFunction, OPAQUE_MODEL_SCHEMA,
+    Atom, FunctionShape, InvocationOutcome, MethodCall, ModelGraph, ModelSchema, ModelSchemaView,
+    PublicError, SharedFunction, OPAQUE_MODEL_SCHEMA,
 };
 use crate::compat::{
     DiagramId, DiagramModule, Engine, ErrorCode, ModuleDescriptor, Object, ParseContext,
@@ -15,6 +15,9 @@ pub trait PublicDiagramModule: DiagramModule {
         &OPAQUE_MODEL_SCHEMA
     }
     fn shared_functions(&self) -> &'static [SharedFunction] {
+        &[]
+    }
+    fn function_shapes(&self) -> &'static [FunctionShape] {
         &[]
     }
     /// Method IDs, receiver identity and arguments come from this document's
@@ -136,6 +139,7 @@ struct Registration {
     descriptor: ModuleDescriptor,
     schema: &'static ModelSchema,
     shared_functions: &'static [SharedFunction],
+    function_shapes: &'static [FunctionShape],
     codec: Box<dyn Erased>,
 }
 #[derive(Default)]
@@ -151,6 +155,7 @@ impl PublicEngine {
         let descriptor = module.descriptor();
         let schema = module.model_schema();
         let shared_functions = module.shared_functions();
+        let function_shapes = module.function_shapes();
         let shared = Arc::new(module);
         self.engine.register(Shared {
             module: shared.clone(),
@@ -160,6 +165,7 @@ impl PublicEngine {
             descriptor,
             schema,
             shared_functions,
+            function_shapes,
             codec: Box::new(Codec(shared)),
         });
         if let Some(slot) = self
@@ -197,6 +203,7 @@ impl PublicEngine {
         ModelSchemaView {
             model: registration.schema,
             shared_functions: registration.shared_functions,
+            function_shapes: registration.function_shapes,
         }
         .validate()?;
         let state = registration.codec.create(&document)?;
@@ -226,9 +233,11 @@ impl PublicDocument {
         let descriptor = module.descriptor();
         let schema = module.model_schema();
         let shared_functions = module.shared_functions();
+        let function_shapes = module.function_shapes();
         ModelSchemaView {
             model: schema,
             shared_functions,
+            function_shapes,
         }
         .validate()?;
         let state: State = Box::new(module.create_public(model)?);
@@ -237,6 +246,7 @@ impl PublicDocument {
                 descriptor,
                 schema,
                 shared_functions,
+                function_shapes,
                 codec: Box::new(Codec(Arc::new(module))),
             }),
             state,
@@ -254,6 +264,7 @@ impl PublicDocument {
         ModelSchemaView {
             model: self.registration.schema,
             shared_functions: self.registration.shared_functions,
+            function_shapes: self.registration.function_shapes,
         }
     }
     pub fn revision(&self) -> u64 {
