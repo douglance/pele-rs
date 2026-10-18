@@ -1,6 +1,6 @@
 use super::{
     Atom, FunctionShape, InvocationOutcome, MethodCall, ModelGraph, ModelSchema, ModelSchemaView,
-    PublicError, SharedFunction, OPAQUE_MODEL_SCHEMA,
+    PublicError, RenderOutcome, SharedFunction, OPAQUE_MODEL_SCHEMA,
 };
 use crate::compat::{
     DiagramId, DiagramModule, Engine, ErrorCode, ModuleDescriptor, Object, ParseContext,
@@ -38,6 +38,18 @@ pub trait PublicDiagramModule: DiagramModule {
         state: &mut Self::PublicState,
         graph: ModelGraph,
     ) -> Result<(), PeleError>;
+    /// Stateful render with native JavaScript/lossless error categories. Existing
+    /// modules keep their render implementation through this default adapter.
+    fn render_public_operation(
+        &self,
+        state: &mut Self::PublicState,
+        config: &Object,
+        options: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<Rendered, PublicError> {
+        self.render_public(state, config, options, host)
+            .map_err(Into::into)
+    }
     fn render_public(
         &self,
         state: &mut Self::PublicState,
@@ -91,6 +103,13 @@ trait Erased: Send + Sync {
         config: &Object,
         host: &mut dyn RenderResources,
     ) -> Result<Atom, PublicError>;
+    fn render_operation(
+        &self,
+        state: &mut State,
+        config: &Object,
+        options: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<Rendered, PublicError>;
     fn render(
         &self,
         state: &mut State,
@@ -123,6 +142,20 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
     ) -> Result<Atom, PublicError> {
         self.0
             .invoke_public(s.downcast_mut().expect("paired public state"), call, c, h)
+    }
+    fn render_operation(
+        &self,
+        state: &mut State,
+        config: &Object,
+        options: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<Rendered, PublicError> {
+        self.0.render_public_operation(
+            state.downcast_mut().expect("paired public state"),
+            config,
+            options,
+            host,
+        )
     }
     fn render(
         &self,
@@ -343,6 +376,52 @@ impl PublicDocument {
             }
         }
         Ok(InvocationOutcome {
+            revision: next,
+            graph,
+            result,
+        })
+    }
+    /// Render through the retained handler, publishing post-render state on
+    /// success or operation error. Stale revisions reject before dispatch.
+    pub fn render_operation(
+        &mut self,
+        expected_revision: u64,
+        options: &RenderOptions,
+        host: &mut dyn RenderResources,
+    ) -> Result<RenderOutcome, PeleError> {
+        if expected_revision != self.revision {
+            return Err(PeleError::new(
+                "Stale public model revision",
+                ErrorCode::Semantic,
+            ));
+        }
+        let next = self
+            .revision
+            .checked_add(1)
+            .ok_or_else(|| PeleError::new("Public model revision exhausted", ErrorCode::Limit))?;
+        self.snapshot()?;
+        let mut operation_error = None;
+        let result = crate::compat::engine::render_registered(
+            &self.registration.descriptor,
+            &self.config,
+            options,
+            host,
+            |settings, session| {
+                self.registration
+                    .codec
+                    .render_operation(&mut self.state, &self.config, settings, session)
+                    .map_err(|error| {
+                        operation_error = Some(error);
+                        // The orchestration layer only needs to stop. Preserve
+                        // the real typed error outside its legacy error lane.
+                        PeleError::new("Public render operation failed", ErrorCode::Semantic)
+                    })
+            },
+        )
+        .map_err(|error| operation_error.unwrap_or_else(|| error.into()));
+        self.revision = next;
+        let graph = self.snapshot()?;
+        Ok(RenderOutcome {
             revision: next,
             graph,
             result,

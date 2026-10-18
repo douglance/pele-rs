@@ -501,3 +501,31 @@ pub struct InvocationOutcome {
     pub graph: ModelGraph,
     pub result: Result<Atom, PublicError>,
 }
+
+/// Rendering can schedule tasks or update caches before returning or throwing.
+/// The graph and revision publish those edits; export failure remains a protocol error.
+#[derive(Clone, Debug)]
+pub struct RenderOutcome {
+    pub revision: u64,
+    pub graph: ModelGraph,
+    pub result: Result<crate::compat::RenderResult, PublicError>,
+}
+impl Serialize for RenderOutcome {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        #[derive(Serialize)]
+        struct Outcome<'a> {
+            revision: u64,
+            graph: &'a ModelGraph,
+            result: Result<crate::compat::RenderResultTransport<'a>, &'a PublicError>,
+        }
+        Outcome {
+            revision: self.revision,
+            graph: &self.graph,
+            result: self
+                .result
+                .as_ref()
+                .map(crate::compat::render_result_transport),
+        }
+        .serialize(serializer)
+    }
+}

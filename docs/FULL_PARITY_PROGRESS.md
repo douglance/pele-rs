@@ -574,3 +574,17 @@ Edited duplicate box IDs now resolve note/spec headings to the last matching
 name, matching upstream. Two generated UTF-16 hard-wrap output gaps remain
 explicitly outside corpus success. Both codecs retain their documented exotic
 coercion/callback, active sparse/UTF-16, render-error and work-budget boundaries.
+
+
+## Stateful render operation primitive
+
+The additive native `PublicDocument::render_operation` publishes post-render
+graph state and advances its revision after dispatched success or failure.
+Modules can preserve native JavaScript error categories through an optional
+trait override; existing modules retain their implementation by default.
+Stale revisions reject before dispatch. Nested results retain exact non-finite
+dimension bits. Three integration slices cover retained handlers, partial edits,
+callback failure, output limits, recovery and invalid post-operation graphs;
+all pass in the thirty-four-test release batch above. The old native render API
+remains unchanged. Foreign adapter validation and pre-callback synchronization
+remain separate pending work.

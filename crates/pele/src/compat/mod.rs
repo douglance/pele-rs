@@ -105,17 +105,18 @@ pub fn success_envelope<T: Serialize>(result: &T) -> String {
 }
 /// V2 JSON projections use null for non-finite numbers. Render transport adds
 /// exact IEEE bits only where JSON loses a dimension; host adapters remove this metadata.
-pub fn render_result_envelope(result: &RenderResult) -> String {
-    #[derive(Serialize)]
-    struct Transport<'a> {
-        #[serde(flatten)]
-        result: &'a RenderResult,
-        #[serde(
-            rename = "$numbers",
-            skip_serializing_if = "std::collections::BTreeMap::is_empty"
-        )]
-        numbers: std::collections::BTreeMap<&'static str, String>,
-    }
+/// Borrowed nested render transport; JSON-inexpressible dimensions retain bits.
+#[derive(Serialize)]
+pub struct RenderResultTransport<'a> {
+    #[serde(flatten)]
+    result: &'a RenderResult,
+    #[serde(
+        rename = "$numbers",
+        skip_serializing_if = "std::collections::BTreeMap::is_empty"
+    )]
+    numbers: std::collections::BTreeMap<&'static str, String>,
+}
+pub fn render_result_transport(result: &RenderResult) -> RenderResultTransport<'_> {
     let mut numbers = std::collections::BTreeMap::new();
     for (key, value) in [
         ("width", result.rendered.width),
@@ -125,7 +126,10 @@ pub fn render_result_envelope(result: &RenderResult) -> String {
             numbers.insert(key, format!("{:016x}", value.to_bits()));
         }
     }
-    success_envelope(&Transport { result, numbers })
+    RenderResultTransport { result, numbers }
+}
+pub fn render_result_envelope(result: &RenderResult) -> String {
+    success_envelope(&render_result_transport(result))
 }
 pub fn error_envelope(error: &PeleError) -> String {
     serde_json::to_string(&ErrorEnvelope {

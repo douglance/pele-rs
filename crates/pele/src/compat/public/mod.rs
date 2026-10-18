@@ -10,5 +10,5 @@ pub use schema::{
     FieldKind, FieldSchema, FunctionShape, HostExceptionToken, InvocationOutcome,
     JavaScriptErrorKind, MemberKind, MemberSchema, MethodCall, MethodId, MethodSchema, ModelSchema,
     ModelSchemaView, PrototypeId, PrototypeParent, PrototypeSchema, PublicError, PublicPeleError,
-    RecordId, RecordKind, RecordSchema, SharedFunction, OPAQUE_MODEL_SCHEMA,
+    RecordId, RecordKind, RecordSchema, RenderOutcome, SharedFunction, OPAQUE_MODEL_SCHEMA,
 };
