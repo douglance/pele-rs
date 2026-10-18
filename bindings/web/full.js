@@ -42,6 +42,7 @@ export async function loadRenderer(moduleOrPath) {
           for(const key of ['actors','useCases','systemBoundaries','notes','jsonNodes','classDefs'])model[key]=new Map(model[key]);
           for(const node of model.jsonNodes.values())node.propertyOrder=new Map(node.propertyOrder);
         }
+        if (projection.type === 'venn') for(const style of model.styles)style.styles=new Map(style.styles);
         if (projection.type === 'cynefin') model.domains = new Map(model.domains);
         if (projection.type === 'agentflow') for(const key of ['nodes','connectors','classes','tooltips'])model[key]=new Map(model[key]);
         if (projection.type === 'requirement') for(const key of ['requirements','elements','classes'])model[key]=new Map(model[key]);
@@ -78,7 +79,7 @@ export async function loadRenderer(moduleOrPath) {
           for (const key of ['classes', 'notes', 'styleClasses', 'withCssClass']) model[key] = new Map(model[key]);
           model.namespaces = namespaces(model.namespaces);
         }
-        if (projection.type === 'flowchart') for (const key of ['nodes', 'classes', 'tooltips']) model[key] = new Map(model[key]);
+        if ((projection.type === 'flowchart' || projection.type === 'swimlane')) for (const key of ['nodes', 'classes', 'tooltips']) model[key] = new Map(model[key]);
         documents.set(model, document);
         return model;
       } catch (error) { document.free(); throw error; }

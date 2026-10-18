@@ -31,11 +31,12 @@ The development compatibility interface adds typed `DiagramModule` and
 capability discovery. Its separate v2 contract preserves the released v1 renderer.
 Open extension IDs and `parse_as` allow additional languages without editing the
 built-in detector. New modules retain their concrete model types; parsed documents keep the
-handler/config that created them, including after registry replacement. Thirty
+handler/config that created them, including after registry replacement. Thirty-three
 compatibility renderers are implemented: **flowchart, pie, quadrantChart, packet,
-radar, timeline, journey, kanban, mindmap, class, ER, XYChart, state, Gantt, sequence, GitGraph, Architecture, Sankey, Treemap, C4, Info, Requirement, Block, Railroad, Cynefin, TreeView, AgentFlow, Wardley, EventModeling and Usecase**. Their 384,721 pinned model/SVG/error
-scenarios pass through Rust, Swift/C and browser WASM. The remaining 3 families
-and remaining public APIs still require implementation/verification.
+radar, timeline, journey, kanban, mindmap, class, ER, XYChart, state, Gantt, sequence, GitGraph, Architecture, Sankey, Treemap, C4, Info, Requirement, Block, Railroad, Cynefin, TreeView, AgentFlow, Wardley, EventModeling, Usecase, Venn, Ishikawa and Swimlane**. Their 437,833 model/SVG/error
+scenarios pass through Rust, Swift/C and browser WASM, including one explicit native
+Venn work-ceiling case rather than an upstream render/error comparison. Full public
+API parity and final release verification remain open.
 
 Source preparation is checked against pinned upstream examples and generated cases.
 Build native/WASM artifacts from source to use the development Swift `Pele.inspect`

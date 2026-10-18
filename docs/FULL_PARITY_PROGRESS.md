@@ -6,7 +6,7 @@ release or new GIF has been published from this branch.
 
 ## Implemented renderers
 
-`Engine::with_builtins()` currently registers thirty actual Rust diagram modules.
+`Engine::with_builtins()` currently registers all thirty-three actual Rust diagram modules.
 `Engine::empty()` and typed `DiagramModule<Model>` remain extension interfaces.
 Registration never certifies a global parity flag; all public API gates remain open.
 
@@ -42,14 +42,17 @@ Registration never certifies a global parity flag; all public API gates remain o
 | wardley | 7,730 | 3,205 | 4,525 |
 | eventmodeling | 6,953 | 2,437 | 4,516 |
 | usecase | 16,744 | 3,424 | 13,320 |
-| Total | 384,721 | 145,908 | 238,813 |
+| venn | 22,121 | 4,581 | 17,540 |
+| ishikawa | 20,586 | 12,418 | 8,168 |
+| swimlane | 10,405 | 4,568 | 5,837 |
+| Total | 437,833 | 167,475 | 270,358 |
 
-There are 150,676 complete model comparisons. Parsed models are retained when a
+There are 172,247 complete model comparisons. Parsed models are retained when a
 subsequent render fails. Six class stress cases explicitly exceed the JSON
 projection depth/size budget; their typed models and exact source renders/errors
 remain covered. These transport exceptions do not earn full public API parity.
 
-These fixtures run through Rust, Swift/C and real browser WASM. Available model projections and all errors
+These fixtures run through Rust, Swift/C and real browser WASM. One Venn error is an explicit native work-ceiling extension whose upstream render was deliberately not executed; it is not an upstream error-parity result. Available model projections and all errors
 compare completely. SVG compares byte-for-byte, or by SHA256 of every UTF-8 byte
 for large outputs. Extractors pin the upstream revision and source-file hashes.
 
@@ -119,6 +122,9 @@ only to raster evidence, while exported diagrams retain SVG transparency.
 
 | Diagram | Native pixels | Additional text proof |
 | --- | --- | --- |
+| venn | 319 x 252; 48,377 painted | Intersections and 342 title pixels |
+| ishikawa | 356 x 272; 6,991 painted | Fishbone branches and 445 title pixels |
+| swimlane | 467 x 340; 10,323 painted | Lane routing and 472 title pixels |
 | wardley | 846 x 610; 7,521 painted | Map, dependencies and 507 title pixels |
 | eventmodeling | 418 x 263; 12,858 painted | Workflow lanes and 530 title pixels |
 | usecase | 344 x 164; 4,207 painted | Actor, boundary and 362 title pixels |
@@ -314,3 +320,33 @@ architecture is [LLD_PUBLIC_MODELS.md](LLD_PUBLIC_MODELS.md).
 Development Swift APIs require source-built native artifacts. Root SwiftPM using
 old v0.1 downloaded binaries excludes newer symbols. WASM needs a source build.
 No replacement binary is substituted under the old release tag.
+
+
+## All 33 renderer checkpoint
+
+Venn, Ishikawa and Swimlane complete the family renderer inventory. Eight new
+release-profile Rust integration slices pass; their 53,112 cases also pass through
+Swift/C owned documents and source rendering, and Chrome, Firefox and WebKit WASM.
+The targeted Swift corpus run takes 57.469 seconds. Three additional browser
+checks decode and paint real SVG, and AppKit decodes all 33 family examples.
+These targeted batch results do not replace the final consolidated release run.
+
+Swimlane retains the real shared Flowchart model (`model.type === 'flowchart'`)
+and dedicated lane renderer (`result.type === 'swimlane'`). Map hydration follows
+the retained module, preserving this distinction. Ishikawa's four deep models
+explicitly exceed JSON projection depth; their source render remains tested.
+
+Venn uses translated circle intersections, overlap fitting and text geometry.
+Pinned numeric oracle is Node 25.9 on darwin arm64; explicit fused operations and
+fdlibm/V8 math preserve the tested native/WASM results. Required Sun/fdlibm notices
+ship with Rust, Swift and web packages. Three finite decimal inputs overflow Venn
+geometry into NaN, preserved by result-number transport rather than rasterized.
+A Rust-only ceiling rejects more than 3,000,000 inferred pair iterations. The
+2,450-set case verifies pinned parsing/model plus the native limit; its upstream
+render was deliberately not executed. This one error is counted in the corpus
+total as a platform extension, not an upstream render/error parity claim.
+
+All public API gates remain open: mutable model fields/identity, real methods and
+prototypes, lossless source/options transport, live registry, lazy/mount/zoom,
+final independent consumers and distribution checks. The v0.1.0 release remains
+the earlier limited flowchart API. No new release or GIF is published here.

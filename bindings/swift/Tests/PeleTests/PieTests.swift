@@ -41,7 +41,7 @@ final class PieTests: XCTestCase {
         }
         let capabilities = try engine.capabilities()
         XCTAssertTrue(capabilities.contains { $0.type == "pie" && $0.registered })
-        XCTAssertFalse(capabilities.contains { !["pie", "quadrantChart", "packet", "radar", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence", "gitGraph", "architecture", "sankey", "treemap", "c4", "info", "requirement", "block", "railroad", "cynefin", "treeView", "agentflow", "wardley", "eventmodeling", "usecase"].contains($0.type) && $0.registered })
+        XCTAssertFalse(capabilities.contains { !["pie", "quadrantChart", "packet", "radar", "timeline", "journey", "flowchart", "kanban", "mindmap", "class", "er", "xychart", "state", "gantt", "sequence", "gitGraph", "architecture", "sankey", "treemap", "c4", "info", "requirement", "block", "railroad", "cynefin", "treeView", "agentflow", "wardley", "eventmodeling", "usecase", "venn", "ishikawa", "swimlane"].contains($0.type) && $0.registered })
         let document = try engine.parse("---\nconfig: {pie: {legendPosition: bottom}}\n---\npie\n\"One\":1")
         var ignoredParseOptions = Pele.Engine.Options(); ignoredParseOptions.limit = 0
         XCTAssertNoThrow(try engine.render(document, options: ignoredParseOptions))

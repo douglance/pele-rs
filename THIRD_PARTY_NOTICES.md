@@ -19,3 +19,8 @@
 
 The Rust source is MIT licensed under the root [LICENSE](LICENSE). See
 [UPSTREAM.md](UPSTREAM.md) for the implementation relationship and limitations.
+
+- **Venn numeric primitives**: translated V8 `Math.hypot` and fdlibm functions
+  from Node.js v25.9.0; BSD-3-Clause plus preserved Sun Microsystems permission.
+  See `third_party/v8/LICENSE` and `third_party/fdlibm/LICENSE`. Exact source
+  hashes and the arm64 numeric oracle are recorded in the Venn fixture.

@@ -22,3 +22,8 @@ See crates/pele/assets/fonts/OFL.txt and crates/pele/assets/fonts/README.md for 
 V8 DateParser: Copyright 2011 the V8 project authors.
 Rust ISO/legacy date parsing is translated from Node.js v25.9.0 V8 sources.
 BSD-3-Clause; see third_party/v8/LICENSE or V8-LICENSE in binary packages.
+
+Venn numeric primitives: V8 Project / Google Inc. (2016), BSD-3-Clause.
+Derived fdlibm: Copyright (C) 1993 Sun Microsystems, Inc.
+Permission to use, copy, modify, and distribute this software is freely granted,
+provided that this notice is preserved. See FDLIBM-LICENSE in binary packages.

@@ -39,7 +39,8 @@
     "V8-LICENSE",
     "full.js",
     "full.d.ts",
-    "resources.js"
+    "resources.js",
+    "FDLIBM-LICENSE"
   ],
   "publishConfig": {
     "access": "public"
