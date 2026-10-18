@@ -5,7 +5,12 @@ export interface PrepareOptions { limit?: number; config?: { [key: string]: Conf
 export interface PreparedSource { text: string; title?: string; config: { [key: string]: ConfigValue }; withComments: string; lineOffset: number }
 export interface Inspection { type: DiagramType | null; registered: boolean; prepared: PreparedSource; encodedText: string }
 export interface Capability { type: DiagramId; known: boolean; registered: boolean; syntaxParity: boolean; semanticParity: boolean; renderParity: boolean; hostParity: boolean }
-export class PeleCompatibilityError extends Error { code: 'unsupported-diagram' | 'syntax' | 'semantic' | 'limit'; type: string | null; line: number; column: number; snippet: string }
+export type PeleErrorCode = 'unsupported-diagram' | 'syntax' | 'semantic' | 'limit';
+export class PeleError extends Error {
+ constructor(message:string,code?:PeleErrorCode,info?:{type?:string|null;line?:number;column?:number;snippet?:string});
+ code:PeleErrorCode;type:string|null;line:number;column:number;snippet:string;
+}
+export {PeleError as PeleCompatibilityError};
 export interface Core {
   inspect(source: string, options?: PrepareOptions): Inspection;
   detectType(source: string): DiagramType | null;

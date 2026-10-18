@@ -1,4 +1,4 @@
-import {loadRenderer, type DiagramModel} from '../../bindings/web/full.js';
+import {loadRenderer, PeleError, PeleCompatibilityError, type PeleErrorCode, type DiagramModel} from '../../bindings/web/full.js';
 
 // A consumer slice typechecks the installed entry's model narrowing, mutable
 // collections and method signatures; no private codec types are imported.
@@ -35,3 +35,7 @@ async function consume(source: string): Promise<string> {
   return rendered.svg;
 }
 void consume;
+
+const code:PeleErrorCode='semantic';
+const error:PeleCompatibilityError=new PeleError('Native',code,{type:'flowchart',line:2,column:3,snippet:'A'});
+void error;

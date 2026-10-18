@@ -1,12 +1,13 @@
 import initialize, { parse_v2, render_with_resources, builtin_capabilities } from './pkg/pele.js';
-import { PeleCompatibilityError } from './core.js';
+import {fromNativeError} from './errors.js';
+export {PeleError, PeleError as PeleCompatibilityError} from './errors.js';
 import { ModelBridge, ModelRegistry, stringValue } from './graph.js';
 import { defaultMeasurer } from './resources.js';
 export { canvasMeasurer, metricsMeasurer, forgetTextWidths } from './resources.js';
 function result(json) {
   const envelope = JSON.parse(json);
   if (envelope.version !== 2) throw new Error('Unsupported compatibility contract');
-  if (!envelope.ok) throw new PeleCompatibilityError(envelope.error);
+  if (!envelope.ok) throw fromNativeError(envelope.error);
   const value=envelope.result;
   if(value&&typeof value.svg==='string'&&value.$numbers) {
     const bits=new DataView(new ArrayBuffer(8));
@@ -19,10 +20,10 @@ function result(json) {
   return value;
 }
 function operationError(error, bridge) {
-  if (error.kind === 'pele') return new PeleCompatibilityError(error.value);
+  if (error.kind === 'pele') return fromNativeError(error.value);
   if (error.kind === 'peleUtf16') {
     const value = error.value;
-    return new PeleCompatibilityError({...value, message: stringValue(value.message),
+    return fromNativeError({...value, message: stringValue(value.message),
       type: value.type == null ? null : stringValue(value.type), snippet: stringValue(value.snippet)});
   }
   if (error.kind === 'javaScript') {
@@ -140,7 +141,7 @@ export async function loadRenderer(moduleOrPath) {
       if (callbackFailed) {
         // Pele's public render guard turns every RangeError into this limit;
         // other thrown values retain their original host identity.
-        if (callbackError instanceof RangeError) throw new PeleCompatibilityError({name:'PeleError',message:'Diagram is nested too deeply.',code:'limit',type:null,line:0,column:0,snippet:''});
+        if (callbackError instanceof RangeError) throw fromNativeError({name:'PeleError',message:'Diagram is nested too deeply.',code:'limit',type:null,line:0,column:0,snippet:''});
         throw callbackError;
       }
       return result(json);

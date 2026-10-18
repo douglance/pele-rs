@@ -1,4 +1,5 @@
 import type { ConfigValue, DiagramId, Capability } from './core.js';
+export {PeleError, PeleCompatibilityError, type PeleErrorCode} from './core.js';
 export interface ParseOptions { limit?: number; maxEdges?: number; config?: { [key: string]: ConfigValue } }
 export interface RenderOptions extends ParseOptions {
   measurer?: { width(text: string, size: number, style: number): number };

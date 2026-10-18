@@ -39,6 +39,11 @@ prototype definitions report an unavailable capability. Methods require a live
 owned document. Unimplemented family codecs keep the existing immutable owned
 model path; their renderers remain available.
 
+`PeleError` is exported by both development entries with the upstream
+message/code/info constructor. `PeleCompatibilityError` aliases the same class;
+native failures support `instanceof PeleError`. Host-generated stack locations
+remain specific to each runtime.
+
 Host callback exceptions follow the pinned public render guard: RangeError
 becomes PeleError with code `limit`; every other thrown JS value retains identity,
 including undefined, null and false. This differs from calling a model method

@@ -1,11 +1,10 @@
 import initialize, { inspect as rawInspect, capabilities as rawCapabilities } from './pkg/pele.js';
-export class PeleCompatibilityError extends Error {
-  constructor(error) { super(error.message); Object.assign(this, error); }
-}
+import {PeleError, fromNativeError} from './errors.js';
+export {PeleError, PeleError as PeleCompatibilityError};
 function result(json) {
   const value = JSON.parse(json);
   if (value.version !== 2) throw new Error('Unsupported Pele compatibility contract');
-  if (!value.ok) throw new PeleCompatibilityError(value.error);
+  if (!value.ok) throw fromNativeError(value.error);
   return value.result;
 }
 /** Minimal compatibility entry. Capabilities report implementation progress truthfully. */

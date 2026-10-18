@@ -41,7 +41,8 @@
     "full.js",
     "full.d.ts",
     "resources.js",
-    "graph.js"
+    "graph.js",
+    "errors.js"
   ],
   "publishConfig": {
     "access": "public"

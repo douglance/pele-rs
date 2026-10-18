@@ -499,3 +499,20 @@ GitGraph batch; all eight Swift mutable feature tests pass with shape metadata.
 The consolidated eighteen browser model/method tests pass in Chrome, Firefox and
 WebKit. An initial Firefox own-property ordering failure was corrected by retaining
 the helper's intrinsic two-argument length rather than rewriting it.
+
+
+## Public browser error constructor
+
+The development core/full entries export the same `PeleError` constructor, with
+Pele's message/code/info defaults, actual Error inheritance, ordered fields,
+descriptors and raw UTF-16/IEEE values. `PeleCompatibilityError` remains an alias
+for existing catch checks. Native parse/render/method errors and the RangeError
+guard produce this same public prototype. Transport decoding is separate from
+the public string constructor. Host-generated stack/location values are excluded
+from cross-file equality; semantic Pele line/column fields remain checked.
+
+The packed browser package passes all twenty-one error and mutable-model checks
+in Chrome, Firefox and WebKit. Explicit class-field declarations preserve native
+field ordering and WebKit's enumerable line/column descriptors. The strict
+TypeScript 4.9.5 consumer passes. This does not close model constructors or the
+remaining native Error-value arena seam.
