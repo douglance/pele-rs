@@ -219,6 +219,11 @@ fn string_array(out: &mut GraphWriter, values: &[String]) -> u32 {
 }
 impl PublicDiagramModule for Treemap {
     type PublicState = TreemapPublicState;
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let model = imported(&graph);
+        Ok(TreemapPublicState { graph, model })
+    }
     fn create_public(&self, m: &TreemapModel) -> Result<Self::PublicState, PeleError> {
         let mut out = GraphWriter::default();
         let mut flat = vec![];

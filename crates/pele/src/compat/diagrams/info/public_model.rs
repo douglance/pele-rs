@@ -35,6 +35,10 @@ fn accessible(graph: &ModelGraph, key: &str) -> Result<Option<String>, PeleError
 }
 impl PublicDiagramModule for Info {
     type PublicState = InfoPublicState;
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        Ok(InfoPublicState { graph })
+    }
     fn create_public(&self, model: &InfoModel) -> Result<InfoPublicState, PeleError> {
         let mut out = GraphWriter::default();
         let kind = out.string("info");

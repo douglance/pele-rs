@@ -484,6 +484,11 @@ impl PublicDiagramModule for RequirementDiagram {
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let model = imported(&graph);
+        Ok(RequirementPublicState { graph, model })
+    }
     fn create_public(&self, m: &RequirementModel) -> Result<RequirementPublicState, PeleError> {
         let graph = initial(m)?;
         let model = imported(&graph);

@@ -398,6 +398,11 @@ impl PublicDiagramModule for Sankey {
         s.model = imported(&s.graph);
         result
     }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let model = imported(&graph);
+        Ok(SankeyPublicState { graph, model })
+    }
     fn create_public(&self, model: &SankeyModel) -> Result<Self::PublicState, PeleError> {
         let mut out = GraphWriter::default();
         let node_objects: Vec<_> = model.nodes.iter().map(|n| node(&mut out, n)).collect();

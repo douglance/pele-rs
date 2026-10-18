@@ -200,7 +200,7 @@ static SCHEMA: ModelSchema = ModelSchema {
 };
 pub struct AgentflowPublicState {
     graph: ModelGraph,
-    base: AgentflowModel,
+    base: Option<AgentflowModel>,
     style_bindings: Vec<Option<u32>>,
     projected: Result<AgentflowModel, PeleError>,
 }
@@ -2931,7 +2931,7 @@ fn create_state(
     let projected = project_render(&graph, m, &style_bindings);
     Ok(AgentflowPublicState {
         graph,
-        base: m.clone(),
+        base: Some(m.clone()),
         style_bindings,
         projected,
     })
@@ -2940,6 +2940,15 @@ impl PublicDiagramModule for AgentFlow {
     type PublicState = AgentflowPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        Ok(AgentflowPublicState {
+            graph,
+            base: None,
+            style_bindings: vec![],
+            projected: Err(error("AgentFlow graph has not been built")),
+        })
     }
     fn create_public(&self, m: &AgentflowModel) -> Result<Self::PublicState, PeleError> {
         create_state(m, None)
@@ -2962,7 +2971,9 @@ impl PublicDiagramModule for AgentFlow {
         Ok(s.graph.clone())
     }
     fn apply_public(&self, s: &mut Self::PublicState, g: ModelGraph) -> Result<(), PeleError> {
-        s.projected = project_render(&g, &s.base, &s.style_bindings);
+        if let Some(base) = &s.base {
+            s.projected = project_render(&g, base, &s.style_bindings);
+        }
         s.graph = g;
         Ok(())
     }
@@ -2974,7 +2985,9 @@ impl PublicDiagramModule for AgentFlow {
         _: &mut dyn RenderResources,
     ) -> Result<Atom, PublicError> {
         let result = invoke(&mut s.graph, call);
-        s.projected = project_render(&s.graph, &s.base, &s.style_bindings);
+        if let Some(base) = &s.base {
+            s.projected = project_render(&s.graph, base, &s.style_bindings);
+        }
         result
     }
     fn render_public(
@@ -2984,6 +2997,203 @@ impl PublicDiagramModule for AgentFlow {
         o: &RenderSettings,
         r: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError> {
-        self.render(s.projected.as_ref().map_err(Clone::clone)?, c, o, r)
+        self.render_public_operation(s, c, o, r)
+            .map_err(|error| match error {
+                PublicError::Pele(e) => e,
+                other => crate::compat::PeleError::new(
+                    format!("AgentFlow render requires structured exception transport: {other:?}"),
+                    ErrorCode::Semantic,
+                ),
+            })
     }
+    fn render_public_operation(
+        &self,
+        s: &mut Self::PublicState,
+        c: &Object,
+        o: &RenderSettings,
+        r: &mut dyn RenderResources,
+    ) -> Result<Rendered, PublicError> {
+        if s.base.is_none() {
+            let (base, bindings) = fresh_render_model(&s.graph, c)?;
+            s.projected = project_render(&s.graph, &base, &bindings);
+            s.style_bindings = bindings;
+            s.base = Some(base);
+        }
+        self.render(s.projected.as_ref().map_err(Clone::clone)?, c, o, r)
+            .map_err(PublicError::from)
+    }
+}
+
+// The declared AgentflowModel is data plus semanticModel(); it does not promise
+// DB-only helpers. Missing helper calls must fail at graph construction, rather
+// than silently inheriting a database prototype or a parser-created graph cache.
+fn fresh_render_model(
+    g: &ModelGraph,
+    config: &Object,
+) -> Result<(AgentflowModel, Vec<Option<u32>>), PublicError> {
+    use super::model::{AgentClassDef, AgentDb, AgentEdge, AgentNode, AgentSubgraph};
+    use crate::compat::diagrams::flowchart::{Flowchart, LabelType as FlowLabel};
+    fn label(v: FlowLabel) -> super::model::LabelType {
+        match v {
+            FlowLabel::Text => super::model::LabelType::Text,
+            FlowLabel::String => super::model::LabelType::String,
+            FlowLabel::Markdown => super::model::LabelType::Markdown,
+        }
+    }
+    let common = Flowchart.create_public_from_graph(g.clone())?;
+    let common = common.render_model()?.clone();
+    let root = reference(&g.root)?;
+    let raw_nodes = entries(g, get(g, root, "nodes"))?;
+    let mut styles = std::collections::HashMap::new();
+    let mut nodes = vec![];
+    for ((key, n), (_, raw)) in common.nodes.into_iter().zip(&raw_nodes) {
+        let id = reference(raw)?;
+        styles.insert(
+            n.id.clone(),
+            match get(g, id, "styles") {
+                Atom::Ref(id) => Some(*id),
+                _ => None,
+            },
+        );
+        nodes.push((
+            key,
+            AgentNode {
+                id: n.id,
+                text: n.text,
+                label_type: label(n.label_type),
+                shape: n.shape,
+                styles: n.styles,
+                classes: n.classes,
+                dir: n.dir,
+                props: n.props,
+                link: n.link,
+                link_target: n.link_target,
+                metadata: None,
+                is_connector: match get(g, id, "isConnector") {
+                    Atom::Bool(v) => Some(*v),
+                    _ => None,
+                },
+            },
+        ));
+    }
+    let connectors = entries(g, get(g, root, "connectors"))?
+        .into_iter()
+        .map(|(key, value)| {
+            let key = text(g, &key)?;
+            let id = reference(&value)?;
+            let actual = text(g, get(g, id, "id"))?;
+            let node = nodes
+                .iter()
+                .find(|(_, n)| n.id == actual)
+                .map(|(_, n)| n.clone())
+                .ok_or_else(|| error("AgentFlow connector is not present in nodes"))?;
+            Ok((key, node))
+        })
+        .collect::<Result<Vec<_>, PeleError>>()?;
+    let raw_groups = dense(g, get(g, root, "subgraphs"))?;
+    let mut subgraphs = vec![];
+    for (group, raw) in common.subgraphs.into_iter().zip(raw_groups) {
+        let id = reference(&raw)?;
+        subgraphs.push(AgentSubgraph {
+            id: group.id,
+            group_type: text(g, get(g, id, "type"))?,
+            nodes: group.nodes,
+            title: group.title,
+            classes: group.classes,
+            dir: group.dir,
+            label_type: label(group.label_type),
+            metadata: group.metadata,
+        });
+    }
+    // The first collapsed walk calls the actual model's subgraph method.
+    if subgraphs.iter().any(|s| {
+        s.metadata.as_ref().and_then(|m| m.get("view")) == Some(&Value::String("collapsed".into()))
+    }) {
+        return Err(ty("db.subgraph is not a function"));
+    }
+    let edges = common
+        .edges
+        .into_iter()
+        .map(|e| AgentEdge {
+            start: e.start,
+            end: e.end,
+            edge_type: e.edge_type,
+            text: e.text,
+            label_type: label(e.label_type),
+            stroke: e.stroke,
+            length: e.length,
+            edge_semantic: None,
+            metadata: None,
+            style: e.style,
+            classes: e.classes,
+            id: e.id,
+            is_user_defined_id: e.is_user_defined_id,
+            interpolate: e.interpolate,
+            animate: e.animate,
+            animation: e.animation,
+        })
+        .collect();
+    let model = AgentflowModel {
+        public_origin: Default::default(),
+        diagram_type: crate::compat::DiagramType::Agentflow,
+        direction: common.direction,
+        connectors,
+        mappings: vec![],
+        diagnostics: vec![],
+        line_offset: 0,
+        graph: None,
+        nodes,
+        edges,
+        subgraphs,
+        classes: common
+            .classes
+            .into_iter()
+            .map(|(k, c)| {
+                (
+                    k,
+                    AgentClassDef {
+                        id: c.id,
+                        styles: c.styles,
+                        text_styles: c.text_styles,
+                    },
+                )
+            })
+            .collect(),
+        tooltips: common.tooltips,
+        default_edge_style: common.default_edge_style,
+        default_interpolate: common.default_interpolate,
+        title: common.title,
+        acc_title: common.acc_title,
+        acc_descr: common.acc_descr,
+    };
+    let mut db = AgentDb::from_render_model(model);
+    let graph = super::graph::build(&mut db, config);
+    if let Some(diagnostic) = db.model.diagnostics.first() {
+        return Err(ty(if diagnostic.severity == "error" {
+            "sink.emitError is not a function"
+        } else {
+            "sink.emitWarning is not a function"
+        }));
+    }
+    let connectors: std::collections::HashSet<_> = db
+        .model
+        .connectors
+        .iter()
+        .map(|(id, _)| id.as_str())
+        .collect();
+    if graph.nodes.iter().any(|n| {
+        !n.is_group
+            && n.shape != "collapsedGroup"
+            && !connectors.contains(n.id.as_str())
+            && db.model.nodes.iter().any(|(id, _)| id == &n.id)
+    }) {
+        return Err(ty("n.vertexKind is not a function"));
+    }
+    let bindings = graph
+        .nodes
+        .iter()
+        .map(|n| styles.get(&n.id).copied().flatten())
+        .collect();
+    db.model.graph = Some(graph);
+    Ok((db.model, bindings))
 }

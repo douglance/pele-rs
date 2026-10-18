@@ -144,6 +144,15 @@ pub struct FlowchartPublicState {
 impl FlowchartPublicState {
     /// Shared DB projection for actual renderer variants such as Swimlane.
     /// Registration remains owned by the calling public document.
+    pub(crate) fn prepared_render_model(&self) -> Result<&FlowchartModel, PublicError> {
+        let model = self.render_model()?;
+        if matches!(self.graph.root,Atom::Ref(id) if matches!(self.graph.nodes[id as usize],Node::Object{..}))
+            && model.subgraphs.iter().any(|group| !group.nodes.is_empty())
+        {
+            return Err(ty("o.subgraph is not a function"));
+        }
+        Ok(model)
+    }
     pub(crate) fn render_model(&self) -> Result<&FlowchartModel, PeleError> {
         self.imported.as_ref().map_err(Clone::clone)
     }
@@ -1981,6 +1990,11 @@ impl PublicDiagramModule for Flowchart {
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let imported = imported(&graph);
+        Ok(FlowchartPublicState { graph, imported })
+    }
     fn create_public(&self, m: &FlowchartModel) -> Result<Self::PublicState, PeleError> {
         create_state(m, None)
     }
@@ -2024,11 +2038,16 @@ impl PublicDiagramModule for Flowchart {
         options: &RenderSettings,
         host: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError> {
-        self.render(
-            s.imported.as_ref().map_err(Clone::clone)?,
-            config,
-            options,
-            host,
-        )
+        self.render(s.render_model()?, config, options, host)
+    }
+    fn render_public_operation(
+        &self,
+        s: &mut Self::PublicState,
+        config: &Object,
+        options: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<Rendered, PublicError> {
+        self.render(s.prepared_render_model()?, config, options, host)
+            .map_err(Into::into)
     }
 }

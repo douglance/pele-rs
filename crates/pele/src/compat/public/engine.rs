@@ -32,6 +32,14 @@ pub trait PublicDiagramModule: DiagramModule {
         Err(PeleError::new("Public model methods are unavailable", ErrorCode::Semantic).into())
     }
     fn create_public(&self, model: &Self::Model) -> Result<Self::PublicState, PeleError>;
+    /// Construct this module's real mutable state directly from a caller arena.
+    /// No source parsing, seeded model or missing-property defaults are implied.
+    fn create_public_from_graph(&self, _graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        Err(PeleError::new(
+            "Public model construction is unavailable",
+            ErrorCode::Semantic,
+        ))
+    }
     /// Seed exact parse-time edge options before deriving public state. Once
     /// created, the mutable graph owns its options; provenance is not reapplied.
     fn create_public_with_edge_limit(
@@ -207,6 +215,7 @@ impl<D: DiagramModule> DiagramModule for Shared<D> {
 type State = Box<dyn Any + Send>;
 trait Erased: Send + Sync {
     fn create(&self, doc: &crate::compat::ParsedDocument) -> Result<State, PeleError>;
+    fn create_graph(&self, graph: ModelGraph) -> Result<State, PeleError>;
     fn graph(&self, state: &State) -> Result<ModelGraph, PeleError>;
     fn apply(&self, state: &mut State, graph: ModelGraph) -> Result<(), PeleError>;
     fn invoke(
@@ -260,6 +269,9 @@ impl<D: PublicDiagramModule> Erased for Codec<D> {
             Some(limit) => self.0.create_public_with_edge_limit(model, limit)?,
             None => self.0.create_public(model)?,
         }))
+    }
+    fn create_graph(&self, graph: ModelGraph) -> Result<State, PeleError> {
+        Ok(Box::new(self.0.create_public_from_graph(graph)?))
     }
     fn graph(&self, s: &State) -> Result<ModelGraph, PeleError> {
         self.0
@@ -527,6 +539,47 @@ impl PublicEngine {
                 .parse_as_with_source_limit(id, source, options, limit)?,
         )
     }
+    /// Schema for an explicitly selected registered provider, without parsing.
+    pub fn schema_for(&self, id: &DiagramId) -> Result<ModelSchemaView, PeleError> {
+        let registration = self.graph_registration(id)?;
+        Ok(ModelSchemaView {
+            model: registration.schema,
+            shared_functions: registration.shared_functions,
+            function_shapes: registration.function_shapes,
+        })
+    }
+    fn graph_registration(&self, id: &DiagramId) -> Result<Arc<Registration>, PeleError> {
+        self.modules
+            .iter()
+            .find(|m| m.descriptor.id == *id)
+            .cloned()
+            .ok_or_else(|| {
+                let mut error = PeleError::new(
+                    format!("Diagram type \"{id}\" is not supported yet."),
+                    ErrorCode::UnsupportedDiagram,
+                );
+                error.diagram_type = Some(id.to_string());
+                error
+            })
+    }
+    /// Construct an owned native model from supplied graph data. Registration
+    /// selection is explicit and remains retained across replacement or drop.
+    pub fn create_from_graph_as(
+        &self,
+        id: &DiagramId,
+        graph: ModelGraph,
+        config: Object,
+    ) -> Result<PublicDocument, PeleError> {
+        let registration = self.graph_registration(id)?;
+        graph.validate_schema(registration.schema)?;
+        let state = registration.codec.create_graph(graph)?;
+        Ok(PublicDocument {
+            registration,
+            state,
+            config,
+            revision: 0,
+        })
+    }
     fn create_document(
         &self,
         document: crate::compat::ParsedDocument,
@@ -584,6 +637,37 @@ impl PublicDocument {
         }
         .validate()?;
         let state: State = Box::new(module.create_public(model)?);
+        Ok(Self {
+            registration: Arc::new(Registration {
+                descriptor,
+                schema,
+                shared_functions,
+                function_shapes,
+                codec: Box::new(Codec(Arc::new(module))),
+            }),
+            state,
+            config,
+            revision: 0,
+        })
+    }
+    /// Construct a concrete provider directly from an arena, without parsing.
+    pub fn from_graph<D: PublicDiagramModule>(
+        module: D,
+        graph: ModelGraph,
+        config: Object,
+    ) -> Result<Self, PeleError> {
+        let descriptor = module.descriptor();
+        let schema = module.model_schema();
+        let shared_functions = module.shared_functions();
+        let function_shapes = module.function_shapes();
+        ModelSchemaView {
+            model: schema,
+            shared_functions,
+            function_shapes,
+        }
+        .validate()?;
+        graph.validate_schema(schema)?;
+        let state: State = Box::new(module.create_public_from_graph(graph)?);
         Ok(Self {
             registration: Arc::new(Registration {
                 descriptor,

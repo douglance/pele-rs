@@ -659,6 +659,11 @@ impl PublicDiagramModule for Journey {
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let model = imported(&graph);
+        Ok(JourneyPublicState { graph, model })
+    }
     fn create_public(&self, m: &JourneyModel) -> Result<JourneyPublicState, PeleError> {
         let mut out = GraphWriter::default();
         let mut sections = vec![];

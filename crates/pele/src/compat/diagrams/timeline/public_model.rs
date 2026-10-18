@@ -489,6 +489,11 @@ impl PublicDiagramModule for Timeline {
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let imported = imported(&graph);
+        Ok(TimelinePublicState { graph, imported })
+    }
     fn create_public(&self, m: &TimelineModel) -> Result<Self::PublicState, PeleError> {
         let mut out = GraphWriter::default();
         let values: Vec<_> = m.sections.iter().map(|s| string(&mut out, s)).collect();

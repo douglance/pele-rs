@@ -635,6 +635,11 @@ impl PublicDiagramModule for Mindmap {
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let model = imported(&graph);
+        Ok(MindmapPublicState { graph, model })
+    }
     fn create_public(&self, m: &MindmapModel) -> Result<MindmapPublicState, PeleError> {
         if m.nodes.len() > 1_000_000 {
             return Err(limit());

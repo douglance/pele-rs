@@ -64,6 +64,10 @@ fn typed(graph: &ModelGraph) -> Result<PieModel, PeleError> {
 }
 impl PublicDiagramModule for Pie {
     type PublicState = PiePublicState;
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        Ok(PiePublicState { graph })
+    }
     fn create_public(&self, model: &PieModel) -> Result<PiePublicState, PeleError> {
         let mut out = GraphWriter::default();
         let mut entries = Vec::with_capacity(model.sections.len());

@@ -117,6 +117,31 @@ private final class Marker: Error {}
         guard case .string(let id) = try graph.field("rawAlias") else { return XCTFail() }
         XCTAssertEqual(graph.strings[Int(id)].codeUnits, [0xd800, 65])
     }
+    func testCapturedMethodCanCatchDirectClockFailureAndRecoverWithinSameCallback() throws {
+        let state = State(), marker = Marker(), document = try Pele.Engine().parseMutable(source)
+        defer { try? document.close() }
+        let function = Pele.HostFunction { view, receiver, arguments in
+            do {
+                _ = try view.invokeBuiltin(method: 19, receiver: receiver, arguments: [.number(.nan)])
+                XCTFail("NaN getTasks must consult the direct clock")
+            } catch {
+                XCTAssertTrue((error as AnyObject) === marker)
+                state.caught = true
+            }
+            let tasks = try view.invokeBuiltin(method: 19, receiver: receiver, arguments: arguments)
+            let first = try view.read("0", on: tasks), second = try view.read("1", on: tasks)
+            XCTAssertEqual(try self.reference(view.read("endTime", on: first)), try self.reference(view.read("startTime", on: second)))
+            return tasks
+        }
+        try install(function, on: document)
+        var host = resources(state)
+        host.nowMillis = { try MainActor.assumeIsolated { state.clocks += 1; throw marker } }
+        var options = Pele.Engine.Options(); options.now = now
+        let drawing = try document.render(outputLimit: .undefined, options: options, resources: host)
+        XCTAssertTrue(state.caught); XCTAssertEqual(state.clocks, 1)
+        XCTAssertTrue(drawing.svg.contains("A")); XCTAssertEqual(document.revision, 2)
+    }
+
     func testOwnerBindingsAndCloseReleaseWithoutEscapedLeaseRetention() throws {
         let first = try Pele.Engine().parseMutable(source), second = try Pele.Engine().parseMutable(source)
         var function: Pele.HostFunction? = Pele.HostFunction { view, receiver, arguments in try view.invokeBuiltin(method: 19, receiver: receiver, arguments: arguments) }

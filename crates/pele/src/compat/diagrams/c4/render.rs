@@ -62,19 +62,19 @@ pub(super) fn render(
     options: &RenderSettings,
     resources: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    let loose = draw(db, options, resources, false, 36.)?.0;
+    let loose = draw(db, options, resources, false, 36., true)?.0;
     let Some(available) = options.max_width.filter(|v| *v > 0.) else {
         return Ok(loose);
     };
     if loose.width <= available {
         return Ok(loose);
     }
-    let (mut best, mut squeezed) = draw(db, options, resources, true, 36.)?;
+    let (mut best, mut squeezed) = draw(db, options, resources, true, 36., true)?;
     for gap in [60., 84., 108.] {
         if squeezed == 0 {
             break;
         }
-        let (wider, left) = draw(db, options, resources, true, gap)?;
+        let (wider, left) = draw(db, options, resources, true, gap, true)?;
         if left < squeezed {
             best = wider;
             squeezed = left
@@ -126,6 +126,7 @@ fn draw(
     resources: &mut dyn RenderResources,
     tight: bool,
     gap: f64,
+    shape_lookup: bool,
 ) -> Result<(Rendered, usize), PeleError> {
     let size = options.font_size.unwrap_or(16.);
     let small = round(size * 0.8125);
@@ -153,6 +154,12 @@ fn draw(
     let mut ends = Vec::new();
     let mut pairs: HashMap<ElementRef, HashSet<ElementRef>> = HashMap::new();
     for rel in &db.rels {
+        if !shape_lookup && (rel.from_attr.is_none() || rel.to_attr.is_none()) {
+            return Err(PeleError::new(
+                "t.getC4Shape is not a function",
+                ErrorCode::Semantic,
+            ));
+        }
         let from = if rel.from_attr.is_some() {
             None
         } else {
@@ -578,4 +585,31 @@ fn draw(
         },
         lanes.squeezed,
     ))
+}
+
+/// A declared plain C4Model has no DB getC4Shape helper. Its first relation
+/// lookup follows layout measurements, so do not reject before layout.
+pub(super) fn render_plain(
+    db: &C4Model,
+    config: &Object,
+    options: &RenderSettings,
+    host: &mut dyn RenderResources,
+) -> Result<Rendered, crate::compat::public::PublicError> {
+    if !db
+        .rels
+        .iter()
+        .any(|r| r.from_attr.is_none() || r.to_attr.is_none())
+    {
+        return render(db, config, options, host).map_err(Into::into);
+    }
+    match draw(db, options, host, false, 36., false) {
+        Err(e) if e.message == "t.getC4Shape is not a function" => {
+            Err(crate::compat::public::PublicError::JavaScript {
+                name: crate::compat::public::JavaScriptErrorKind::TypeError,
+                message: e.message.as_str().into(),
+            })
+        }
+        Err(e) => Err(e.into()),
+        Ok((result, _)) => Ok(result),
+    }
 }

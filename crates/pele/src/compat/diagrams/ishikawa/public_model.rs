@@ -633,6 +633,11 @@ impl PublicDiagramModule for Ishikawa {
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let cache = imported(&graph);
+        Ok(IshikawaPublicState { graph, cache })
+    }
     fn create_public(&self, m: &IshikawaModel) -> Result<IshikawaPublicState, PeleError> {
         let mut out = GraphWriter::default();
         let ids = m

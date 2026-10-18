@@ -88,3 +88,23 @@ extension Pele.Engine {
         return Pele.PreparedDocument(try ownedPublicDocument(result, document: document))
     }
 }
+
+extension Pele.Engine {
+    /// Create directly from caller-owned model data, without parsing source.
+    public func createPrepared(_ type: String, graph: Pele.PublicGraph, config: [String: ConfigValue] = [:]) throws -> Pele.PreparedDocument {
+        let type = Data(type.utf8), graph = try graph.binaryBytes(revision: 0), config = try JSONEncoder().encode(config)
+        var document: OpaquePointer?
+        let result = type.withUnsafeBytes { type in graph.withUnsafeBytes { graph in config.withUnsafeBytes { config in
+            pele_create_prepared_v13(type.bindMemory(to: UInt8.self).baseAddress, type.count,
+                graph.bindMemory(to: UInt8.self).baseAddress, graph.count,
+                config.bindMemory(to: UInt8.self).baseAddress, config.count, &document)
+        }}}
+        return Pele.PreparedDocument(try ownedPublicDocument(result, document: document))
+    }
+    /// Inspect a named model schema without constructing or parsing a document.
+    public func preparedSchema(for type: String) throws -> Pele.PublicModelSchema {
+        try Data(type.utf8).withUnsafeBytes { type in
+            try Pele.compatibilityResult(pele_prepared_schema_v13(type.bindMemory(to: UInt8.self).baseAddress, type.count), as: Pele.PublicModelSchema.self)
+        }
+    }
+}

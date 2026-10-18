@@ -559,6 +559,11 @@ impl PublicDiagramModule for EventModeling {
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let model = imported(&graph);
+        Ok(EventModelingPublicState { graph, model })
+    }
     fn create_public(&self, m: &EventModelingModel) -> Result<EventModelingPublicState, PeleError> {
         let mut e = Export {
             out: GraphWriter::default(),

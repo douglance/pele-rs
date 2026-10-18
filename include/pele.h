@@ -349,6 +349,13 @@ PeleResult *pele_render_prepared_v13(PelePublicDocument *, uint64_t,
     const uint8_t *, size_t, const uint8_t *, size_t,
     const PeleRenderNumbersV9 *, const PeleHostResourcesV3 *);
 
+/* Construct directly from a caller-owned PELGBIN1 model, revision0/no metadata.
+ * The graph is copied into the new document. Existing builtin method IDs must
+ * belong to this type; bind host functions after construction, then apply them. */
+PeleResult *pele_create_prepared_v13(const uint8_t *, size_t, const uint8_t *, size_t,
+    const uint8_t *, size_t, PelePublicDocument **);
+PeleResult *pele_prepared_schema_v13(const uint8_t *, size_t);
+
 uint32_t pele_result_status(const PeleResult *result);
 const uint8_t *pele_result_data(const PeleResult *result);
 size_t pele_result_len(const PeleResult *result);

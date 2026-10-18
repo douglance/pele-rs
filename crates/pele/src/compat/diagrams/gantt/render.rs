@@ -89,7 +89,7 @@ pub fn render(
     let mut cal = Calendar::new(r);
     let mut m = model.clone();
     m.schedule(now, &mut cal)?;
-    let result = draw(&mut m, c, o, &mut cal, size, pad, now)?;
+    let result = draw(&mut m, c, o, &mut cal, size, pad, now, true, &mut false)?;
     if let Some(e) = cal.error {
         return Err(e);
     }
@@ -97,14 +97,18 @@ pub fn render(
 }
 /// Draw an already scheduled public model. Scheduling and its mutations belong
 /// to the public store; draw's calendar-cache work remains observable afterward.
-pub(super) fn render_scheduled(
+/// A plain declared GanttModel has getTasks, but not the DB-only date filter.
+/// Check at the actual filter call after preceding callbacks, never eagerly.
+pub(super) fn render_scheduled_checked(
     model: &mut GanttModel,
     c: &Object,
     o: &RenderSettings,
     r: &mut dyn RenderResources,
-) -> Result<Rendered, PeleError> {
+    filter_callable: bool,
+) -> Result<Rendered, crate::compat::public::PublicError> {
     let mut cal = Calendar::public(r);
     let now = model.now;
+    let mut missing_filter = false;
     let result = draw(
         model,
         c,
@@ -113,12 +117,21 @@ pub(super) fn render_scheduled(
         o.font_size.unwrap_or(16.),
         o.padding.unwrap_or(8.),
         now,
+        filter_callable,
+        &mut missing_filter,
     );
     if let Some(e) = cal.error {
-        return Err(e);
+        return Err(e.into());
     }
-    result
+    if missing_filter {
+        return Err(crate::compat::public::PublicError::JavaScript {
+            name: crate::compat::public::JavaScriptErrorKind::TypeError,
+            message: "t.isInvalidDate is not a function".into(),
+        });
+    }
+    result.map_err(Into::into)
 }
+
 fn draw(
     m: &mut GanttModel,
     c: &Object,
@@ -127,6 +140,8 @@ fn draw(
     size: f64,
     pad: f64,
     now: f64,
+    filter_callable: bool,
+    missing_filter: &mut bool,
 ) -> Result<Rendered, PeleError> {
     let label_size = setting(c, "fontSize", 4., 72.).unwrap_or(round(size * 0.8125));
     let section_size = setting(c, "sectionFontSize", 4., 72.).unwrap_or(label_size);
@@ -517,6 +532,13 @@ fn draw(
         let mut to = None;
         let mut day = start;
         loop {
+            if day <= stop && !filter_callable {
+                *missing_filter = true;
+                return Err(PeleError::new(
+                    "Gantt missing date filter",
+                    crate::compat::ErrorCode::Semantic,
+                ));
+            }
             let invalid = day <= stop && m.invalid(day, cal)?;
             if invalid {
                 if from.is_none() {

@@ -1809,6 +1809,13 @@ fn imported(g: &ModelGraph) -> Result<C4Model, PeleError> {
                     _ => false,
                 };
                 if !default_get {
+                    if matches!(g.nodes[r as usize], Node::Object { .. })
+                        && matches!(property(g, r, "getC4Shape"), None | Some(Atom::Undefined))
+                    {
+                        // The plain-model helper read occurs after layout's host
+                        // measurements, so retain data and defer this failure.
+                        break 'relations;
+                    }
                     return Err(invalid(
                         "C4 missing or replaced getC4Shape render callbacks are not implemented",
                     ));
@@ -2022,6 +2029,11 @@ impl PublicDiagramModule for C4 {
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let model = imported(&graph);
+        Ok(C4PublicState { graph, model })
+    }
     fn create_public(&self, m: &C4Model) -> Result<C4PublicState, PeleError> {
         let mut out = GraphWriter::default();
         let shapes = m
@@ -2203,5 +2215,24 @@ impl PublicDiagramModule for C4 {
         r: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError> {
         super::render::render(s.model.as_ref().map_err(Clone::clone)?, c, o, r)
+    }
+    fn render_public_operation(
+        &self,
+        state: &mut Self::PublicState,
+        config: &Object,
+        options: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<Rendered, PublicError> {
+        if matches!(state.graph.root,Atom::Ref(id) if matches!(state.graph.nodes[id as usize],Node::Object{..}))
+        {
+            return super::render::render_plain(
+                state.model.as_ref().map_err(Clone::clone)?,
+                config,
+                options,
+                host,
+            );
+        }
+        self.render_public(state, config, options, host)
+            .map_err(Into::into)
     }
 }

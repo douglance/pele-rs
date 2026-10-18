@@ -611,6 +611,11 @@ impl PublicDiagramModule for Er {
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let model = imported(&graph);
+        Ok(ErPublicState { graph, model })
+    }
     fn create_public(&self, m: &ErModel) -> Result<ErPublicState, PeleError> {
         let graph = initial(m)?;
         let model = imported(&graph);

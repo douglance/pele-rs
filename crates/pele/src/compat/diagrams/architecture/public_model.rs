@@ -1127,6 +1127,11 @@ impl PublicDiagramModule for Architecture {
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let model = imported(&graph);
+        Ok(ArchitecturePublicState { graph, model })
+    }
     fn create_public(&self, m: &ArchitectureModel) -> Result<ArchitecturePublicState, PeleError> {
         let mut out = GraphWriter::default();
         let mut node_entries = vec![];

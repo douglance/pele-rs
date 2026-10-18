@@ -12,6 +12,9 @@ impl PublicDiagramModule for Swimlane {
     fn model_schema(&self) -> &'static ModelSchema {
         Flowchart.model_schema()
     }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        crate::compat::diagrams::flowchart::Flowchart.create_public_from_graph(graph)
+    }
     fn create_public(&self, model: &SwimlaneModel) -> Result<Self::PublicState, PeleError> {
         Flowchart.create_public(model)
     }
@@ -56,5 +59,15 @@ impl PublicDiagramModule for Swimlane {
         host: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError> {
         self.render(state.render_model()?, config, options, host)
+    }
+    fn render_public_operation(
+        &self,
+        state: &mut Self::PublicState,
+        config: &Object,
+        options: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<Rendered, PublicError> {
+        self.render(state.prepared_render_model()?, config, options, host)
+            .map_err(Into::into)
     }
 }

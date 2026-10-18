@@ -35,19 +35,44 @@ Bound host functions use the existing `HostFunction`/`ActiveModel` API through
 callback errors, partial model edits and revised snapshots use the same owner as
 ordinary mutable rendering. Revision publication precedes original Swift errors.
 
-The additive C exports are `pele_parse_prepared_v13` and
-`pele_render_prepared_v13`. The optional 48-byte parse packet uses version 13,
+`Engine.createPrepared(type, graph:config:)` constructs a model directly from a
+caller-owned graph. All 33 built-ins implement explicit graph constructors; no
+source parse, empty parse, hidden DB prototype or parser history is injected.
+`Engine.preparedSchema(for:)` discovers its schema without creating a document.
+Graph aliases, cycles, UTF-16 strings, IEEE values and caller extras remain owned
+by that model. Bind host functions on the resulting document and apply their
+returned atoms before rendering. Invalid model data fails at the corresponding
+render operation, preserving partial state and the pinned error boundary.
+
+The additive C exports are `pele_parse_prepared_v13`,
+`pele_render_prepared_v13`, `pele_create_prepared_v13` and
+`pele_prepared_schema_v13`. Construction accepts a bounded binary graph exchange
+with revision zero and no metadata, and copies its model into the new owner. The
+Rust extension seam is `PublicDiagramModule::create_public_from_graph`;
+`PublicEngine::create_from_graph_as` retains its actual registered provider.
+The default extension implementation explicitly rejects unsupported construction. The optional 48-byte parse packet uses version 13,
 zero reserved fields, explicit title presence and the existing raw numeric edge
 tags. Successful parse returns an owned `PelePublicDocument`; existing graph,
 schema, invocation and free functions apply. Packet validation and byte ceilings
 precede borrowed input access. Input/config/title strings remain well-formed UTF-8;
-config retains the existing JSON-object domain. Arbitrary caller-built models
-require the separate per-codec graph construction layer.
+config retains the existing JSON-object domain. Graph strings use the existing
+lossless UTF-16 binary transport.
 
-Actual ARM64 verification: 99 pinned full-model/raw-SVG/callback vectors across
-all 33 families, raw edge/context policies, native number transport, host failures
-and recovery, and a bound Gantt method on the raw lane. The combined Swift batch
-passes 12/12 (four prepared, four host-function, four presentation features), and
-the strict C ownership/packet/policy scenario passes. These tests use a fresh
-isolated SDK incorporating the current core and v12/v13 helpers; final matching
-universal packaging remains a release gate.
+Actual ARM64 verification: 99 pinned complete-model/raw-SVG/callback vectors and
+67 caller-built model vectors cover all 33 families. Swift reconstructs each
+caller graph, binds its callable fields, and compares complete before/after
+models, SVG, dimension bits, errors and ordered callbacks. Additional scenarios
+cover raw edge/context policies, construction without parsing, aliases/cycles,
+invalid input, stale revisions, ownership and close.
+
+The combined Swift batch passes 16/16 (seven prepared/construction features,
+five host-function features, four presentation features). The new clock feature
+catches the original Swift clock error inside a captured Gantt method, then
+recovers in that same callback. Strict C construction/ownership/packet/policy
+checks pass. Root's combined Rust construction/entry/callback batch passes 9/9.
+These tests use a fresh isolated ARM64 debug SDK incorporating the current core
+and v12/v13 helpers. Its archive SHA-256 is
+`7d4180858a7bd09271ab3fc822a10dece20babb0b51b1d667134e01a43745203`;
+header SHA-256 is
+`bcfa5583ae1f57e6451251954addf65c5744c6f9865a16d647c5b2d185cc9267`.
+Matching universal release packaging remains a separate gate.

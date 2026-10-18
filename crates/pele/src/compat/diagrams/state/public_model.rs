@@ -1978,6 +1978,11 @@ impl PublicDiagramModule for State {
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let projected = project(&graph);
+        Ok(StatePublicState { graph, projected })
+    }
     fn create_public(&self, m: &StateModel) -> Result<Self::PublicState, PeleError> {
         let graph = new_graph(m).map_err(public_to_pele)?;
         let projected = project(&graph);
@@ -2010,5 +2015,24 @@ impl PublicDiagramModule for State {
         h: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError> {
         self.render(s.projected.as_ref().map_err(Clone::clone)?, c, o, h)
+    }
+    fn render_public_operation(
+        &self,
+        state: &mut Self::PublicState,
+        config: &Object,
+        options: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<Rendered, PublicError> {
+        let root = reference(&state.graph.root)?;
+        if matches!(state.graph.nodes[root as usize], Node::Object { .. })
+            && matches!(get(&state.graph, root, "graph"), Atom::Undefined)
+        {
+            return Err(PublicError::JavaScript {
+                name: JavaScriptErrorKind::TypeError,
+                message: "Cannot read properties of undefined (reading 'nodes')".into(),
+            });
+        }
+        self.render_public(state, config, options, host)
+            .map_err(Into::into)
     }
 }

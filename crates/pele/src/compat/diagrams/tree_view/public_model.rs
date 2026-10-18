@@ -316,6 +316,11 @@ impl PublicDiagramModule for TreeView {
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let cache = imported(&graph);
+        Ok(TreeViewPublicState { graph, cache })
+    }
     fn create_public(&self, m: &TreeViewModel) -> Result<TreeViewPublicState, PeleError> {
         if m.root >= m.nodes.len()
             || m.nodes

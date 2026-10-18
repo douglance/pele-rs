@@ -690,6 +690,11 @@ impl PublicDiagramModule for QuadrantChart {
         s.model = imported(&s.graph);
         result
     }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let model = imported(&graph);
+        Ok(QuadrantPublicState { graph, model })
+    }
     fn create_public(&self, m: &QuadrantModel) -> Result<Self::PublicState, PeleError> {
         let mut w = GraphWriter::default();
         let values = m

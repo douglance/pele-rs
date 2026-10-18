@@ -253,6 +253,29 @@ impl AgentDb {
                 == Some(&Value::Bool(true)),
         }
     }
+    /// Rendering a caller-authored model has no parser/builder history. Only
+    /// the real graph builder consumes this transient database adapter.
+    pub(super) fn from_render_model(model: AgentflowModel) -> Self {
+        Self {
+            model,
+            nodes: HashMap::new(),
+            classes: HashMap::new(),
+            tooltips: HashMap::new(),
+            subgraphs: HashMap::new(),
+            members: HashSet::new(),
+            edge_by_id: HashMap::new(),
+            pair_count: HashMap::new(),
+            sub_count: 0,
+            edge_policy: EdgePolicy::Exact(crate::compat::EdgeLimit::Number(f64::NAN)),
+            inherit_dir: false,
+            config_direction: None,
+            connectors: HashMap::new(),
+            connector_order: vec![],
+            global_nodes: HashSet::new(),
+            bare_mappings: HashSet::new(),
+            first_mapping: HashMap::new(),
+        }
+    }
     pub fn new_with_edge_limit(
         context: &ParseContext<'_>,
         limit: crate::compat::EdgeLimit,

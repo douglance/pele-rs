@@ -2017,6 +2017,11 @@ impl PublicDiagramModule for Sequence {
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
     }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let projected = project(&graph);
+        Ok(SequencePublicState { graph, projected })
+    }
     fn create_public(&self, m: &SequenceModel) -> Result<Self::PublicState, PeleError> {
         let graph = new_graph(m).map_err(public_to_pele)?;
         let projected = project(&graph);

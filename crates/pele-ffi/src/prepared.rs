@@ -158,3 +158,75 @@ pub unsafe extern "C" fn pele_render_prepared_v13(
         public::binary_metadata(outcome.revision, &outcome.graph, &wire)
     })
 }
+
+/// # Safety
+/// The input is a bounded PELGBIN1 exchange with revision zero and no metadata.
+/// Each borrowed span remains readable through this synchronous construction.
+#[no_mangle]
+pub unsafe extern "C" fn pele_create_prepared_v13(
+    kind: *const u8,
+    kind_len: usize,
+    graph: *const u8,
+    graph_len: usize,
+    config_bytes: *const u8,
+    config_len: usize,
+    out: *mut *mut public::PelePublicDocument,
+) -> *mut PeleResult {
+    public::bounded_call(|| {
+        if out.is_null() {
+            return Err(public::invalid("Native prepared output document is null"));
+        }
+        unsafe {
+            *out = ptr::null_mut();
+        }
+        if kind_len > 1024 || graph_len > 64 * 1024 * 1024 || config_len > 1024 * 1024 {
+            return Err(PeleError::new(
+                "Native prepared declared input exceeds budget",
+                compat::ErrorCode::Limit,
+            ));
+        }
+        let name = unsafe { compatibility_input(kind, kind_len, 1024) }?;
+        let id = super::registry::builtin(name)
+            .map(DiagramId::from)
+            .unwrap_or_else(|| DiagramId::extension(name));
+        let bytes = if graph_len == 0 {
+            &[][..]
+        } else {
+            if graph.is_null() {
+                return Err(public::invalid("Native prepared graph input is null"));
+            }
+            unsafe { std::slice::from_raw_parts(graph, graph_len) }
+        };
+        let exchange = compat::public::decode_binary_exchange(bytes, 64 * 1024 * 1024)?;
+        if exchange.revision != 0 || !exchange.metadata.is_empty() {
+            return Err(public::invalid(
+                "Prepared construction requires revision zero and empty metadata",
+            ));
+        }
+        let config = unsafe { config(config_bytes, config_len) }?;
+        let document =
+            PublicEngine::with_builtins().create_from_graph_as(&id, exchange.graph, config)?;
+        let result = public::success(
+            serde_json::json!({"type":document.diagram_type(),"revision":"0","modelKind":"prepared"}),
+        )?;
+        unsafe {
+            *out = public::owned_document(document);
+        }
+        Ok(result)
+    })
+}
+/// # Safety
+/// The named type span remains readable for this synchronous schema query.
+#[no_mangle]
+pub unsafe extern "C" fn pele_prepared_schema_v13(
+    kind: *const u8,
+    kind_len: usize,
+) -> *mut PeleResult {
+    public::bounded_call(|| {
+        let name = unsafe { compatibility_input(kind, kind_len, 1024) }?;
+        let id = super::registry::builtin(name)
+            .map(DiagramId::from)
+            .unwrap_or_else(|| DiagramId::extension(name));
+        public::success(PublicEngine::with_builtins().schema_for(&id)?)
+    })
+}

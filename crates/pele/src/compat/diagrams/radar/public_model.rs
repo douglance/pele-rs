@@ -219,6 +219,11 @@ fn array_node(out: &mut GraphWriter, values: impl IntoIterator<Item = Atom>) -> 
 }
 impl PublicDiagramModule for Radar {
     type PublicState = RadarPublicState;
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let model = imported(&graph);
+        Ok(RadarPublicState { graph, model })
+    }
     fn create_public(&self, model: &RadarModel) -> Result<RadarPublicState, PeleError> {
         let mut out = GraphWriter::default();
         let mut axis_ids = vec![];

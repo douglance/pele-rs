@@ -2789,6 +2789,13 @@ fn imported(
             },
         });
     }
+    // Native drawing caches are DB implementation details. An ordinary declared
+    // model need not own them; its real missing date-filter call is checked by
+    // draw, after the preceding host callbacks.
+    if matches!(root,Atom::Ref(id) if matches!(c.g.nodes[id as usize],Node::Object{..})) {
+        m.import_public_cache(render_now, 0., vec![], vec![], vec![], false);
+        return Ok(m);
+    }
     let mut cache = vec![];
     for key in ["includeSet", "excludeSet"] {
         let set = c.read(&root, key)?;
@@ -2833,6 +2840,10 @@ impl PublicDiagramModule for Gantt {
     type PublicState = GanttPublicState;
     fn model_schema(&self) -> &'static ModelSchema {
         &SCHEMA
+    }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        Ok(GanttPublicState { graph })
     }
     fn create_public(&self, model: &GanttModel) -> Result<GanttPublicState, PeleError> {
         Ok(GanttPublicState {
@@ -2917,9 +2928,21 @@ impl PublicDiagramModule for Gantt {
             _ => return Err(type_error("db.getTasks is not a function")),
         };
         let mut model = imported(&mut arena.c, tasks, compact, top_axis, now)?;
-        let result = super::render::render_scheduled(&mut model, config, options, host)
-            .map_err(PublicError::from);
-        arena.set("work", Atom::Number(model.work))?;
+        let filter = arena.get("isInvalidDate")?;
+        let filter_callable = matches!(filter, Atom::BuiltinFunction(_) | Atom::HostReference(_))
+            || (matches!(filter, Atom::Undefined)
+                && matches!(arena.receiver,Atom::Ref(id) if matches!(arena.c.g.nodes[id as usize],Node::Instance{prototype:PROTO,..}) && own(arena.c.g,id,"isInvalidDate").is_none()));
+        let result = super::render::render_scheduled_checked(
+            &mut model,
+            config,
+            options,
+            host,
+            filter_callable,
+        );
+        if matches!(arena.receiver,Atom::Ref(id) if matches!(arena.c.g.nodes[id as usize],Node::Instance{prototype:PROTO,..}))
+        {
+            arena.set("work", Atom::Number(model.work))?;
+        }
         result
     }
 }

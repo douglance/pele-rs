@@ -1889,6 +1889,11 @@ impl PublicDiagramModule for Block {
             },
         ]
     }
+    fn create_public_from_graph(&self, graph: ModelGraph) -> Result<Self::PublicState, PeleError> {
+        graph.validate_schema(self.model_schema())?;
+        let model = imported(&graph);
+        Ok(BlockPublicState { graph, model })
+    }
     fn create_public(&self, m: &BlockModel) -> Result<BlockPublicState, PeleError> {
         if m.nodes.len() > 1_000_000 || m.root >= m.nodes.len() {
             return Err(limit());
