@@ -618,3 +618,17 @@ private; existing 1M-item/8M-work/16M-text budgets are unchanged. The source mod
 only adds skipped divider-counter provenance. Constructor/override/coercion,
 active sparse/nonstring renderer data, lone-surrogate rendering and legacy
 render-error category boundaries remain explicit.
+
+
+## Stateful render operations through C, Swift and WASM
+
+The additive C/WASM render operation now transports post-render graph, revision
+and typed success/error without losing non-finite dimension bits. Swift exposes
+`renderOperation`; its convenience render also advances revisions. Both invoke
+and render publish the returned revision before rethrowing original Swift host
+errors. Browser renders reconcile the graph before restoring the original host
+throw, including falsy values and the pinned RangeError guard. Legacy C/native
+render entry behavior is unchanged. The frozen sixteen-family host checkpoint
+passes strict C integration, nine Swift mutable-document integration slices and
+twenty-four packed-package checks across Chrome, Firefox and WebKit. This proves
+post-call publication; pre-callback synchronization/reentry remains open.

@@ -69,7 +69,8 @@ PeleResult *pele_render_document_with_resources_v3(const PeleResult *, const uin
 /* Mutable public documents: synchronize destruction with all operations.
  * Graph JSON preserves UTF-16 code units, IEEE number bits and object identity.
  * Operation results use existing owned version-2 envelopes. Revisions are decimal
- * strings in results; apply accepts the exact uint64 value. Graph input <=64 MiB.
+ * strings for snapshot/apply, uint64 JSON integers for invocation/render outcomes.
+ * Expected revisions accept exact uint64 values. Graph input <=64 MiB.
  * NULL resources select default native resources. Parse sets *out_document=NULL
  * before work; a successful handle must be freed once. Recursive/concurrent
  * operations on one handle return an error; never free during an active call. */
@@ -86,6 +87,10 @@ PeleResult *pele_public_invoke_v4(PelePublicDocument *document, uint64_t expecte
                                 const PeleHostResourcesV3 *resources);
 PeleResult *pele_public_apply_v4(PelePublicDocument *, uint64_t expected_revision, const uint8_t *, size_t);
 PeleResult *pele_public_render_v4(PelePublicDocument *, const uint8_t *, size_t, const PeleHostResourcesV3 *);
+/* Publishes post-render graph/revision on success or operation error. Outer
+ * export/transport failure may follow mutation, as for invoke_v4. */
+PeleResult *pele_public_render_operation_v4(PelePublicDocument *, uint64_t expected_revision,
+                                          const uint8_t *, size_t, const PeleHostResourcesV3 *);
 void pele_public_document_free_v4(PelePublicDocument *);
 
 uint32_t pele_result_status(const PeleResult *result);

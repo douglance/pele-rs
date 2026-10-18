@@ -256,6 +256,29 @@ pub unsafe extern "C" fn pele_public_render_v4(
         })
     })
 }
+/// Stateful render outcome: graph/revision publish prior mutations on success/error.
+/// # Safety
+/// Same handle, byte and callback ownership rules as render_v4; no concurrent free.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_render_operation_v4(
+    handle: *mut PelePublicDocument,
+    expected_revision: u64,
+    options: *const u8,
+    options_len: usize,
+    host: *const PeleHostResourcesV3,
+) -> *mut PeleResult {
+    compatibility_call(|| {
+        let options = unsafe { compatibility_input(options, options_len, 1024 * 1024) }?;
+        let options = pele::compat::render_options(options)?;
+        let mut document = unsafe { document(handle) }?;
+        let outcome = unsafe {
+            calendar::with_resources(host, |resources| {
+                document.render_operation(expected_revision, &options, resources)
+            })
+        }?;
+        success(outcome)
+    })
+}
 /// # Safety
 /// Free null or one live owned handle exactly once, after all operations and callbacks return.
 #[no_mangle]

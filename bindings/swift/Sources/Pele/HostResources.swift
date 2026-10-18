@@ -24,6 +24,13 @@ extension Pele {
         public var nowMillis: (@Sendable () throws -> Double)?
         public init() {}
         func withNativeResources(_ invoke: (UnsafePointer<PeleHostResourcesV3>) -> OpaquePointer?) throws -> OpaquePointer? {
+            let response = withCapturedNativeResources(invoke)
+            if let error = response.error { pele_result_free(response.handle); throw error }
+            return response.handle
+        }
+        // Mutable operations decode and publish their post-call state before
+        // rethrowing the original Swift callback error.
+        func withCapturedNativeResources(_ invoke: (UnsafePointer<PeleHostResourcesV3>) -> OpaquePointer?) -> (handle: OpaquePointer?, error: (any Error)?) {
             let bridge = ResourceBridge(self)
             let base = PeleHostResources(context: Unmanaged.passUnretained(bridge).toOpaque(),
                 width: textWidth == nil ? nil : resourceWidth,
@@ -31,8 +38,7 @@ extension Pele {
                 now: nowMillis == nil ? nil : resourceClock)
             var callbacks = PeleHostResourcesV3(base: base, calendar: calendarFields == nil ? nil : resourceCalendar, calendar_instant: calendarInstant == nil ? nil : resourceCalendar, date_parser: parseDate == nil ? nil : resourceCalendar, utc_offset: resourceUtcOffset)
             let result = withExtendedLifetime(bridge) { withUnsafePointer(to: &callbacks, invoke) }
-            if let error = bridge.error { pele_result_free(result); throw error }
-            return result
+            return (result, bridge.error)
         }
     }
 }

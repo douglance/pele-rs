@@ -258,6 +258,49 @@ impl MutableDocument {
             Err(error) => pele::compat::error_envelope(&error),
         }
     }
+    /// Schedules/mutates native state and publishes its post-render graph even
+    /// when rendering throws. Revision stays decimal text across JavaScript.
+    pub fn render_operation_with_resources(
+        &mut self,
+        revision: &str,
+        options_json: &str,
+        width: Option<js_sys::Function>,
+        icons: Option<js_sys::Function>,
+    ) -> String {
+        let run = || -> Result<_, pele::compat::PeleError> {
+            let revision = revision.parse::<u64>().map_err(|_| {
+                pele::compat::PeleError::new(
+                    "Invalid public model revision",
+                    pele::compat::ErrorCode::Semantic,
+                )
+            })?;
+            let options = pele::compat::render_options(options_json)?;
+            self.inner
+                .render_operation(revision, &options, &mut BrowserResources { width, icons })
+        };
+        match run() {
+            Ok(outcome) => {
+                #[derive(serde::Serialize)]
+                struct Outcome<'a> {
+                    revision: String,
+                    graph: &'a pele::compat::public::ModelGraph,
+                    result: Result<
+                        pele::compat::RenderResultTransport<'a>,
+                        &'a pele::compat::public::PublicError,
+                    >,
+                }
+                public_result(&Outcome {
+                    revision: outcome.revision.to_string(),
+                    graph: &outcome.graph,
+                    result: outcome
+                        .result
+                        .as_ref()
+                        .map(pele::compat::render_result_transport),
+                })
+            }
+            Err(error) => pele::compat::error_envelope(&error),
+        }
+    }
     pub fn render_with_resources(
         &mut self,
         options_json: &str,

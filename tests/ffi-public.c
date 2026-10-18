@@ -33,6 +33,7 @@ int main(void) {
     failure(pele_public_schema_v4(NULL), 1, "null document");
     failure(pele_public_invoke_v4(NULL, 0, NULL, 64 * 1024 * 1024 + 1, NULL), 2, "budget");
     failure(pele_public_render_v4(NULL, NULL, 0, NULL), 1, "null document");
+    failure(pele_public_render_operation_v4(NULL, 0, NULL, 0, NULL), 1, "null document");
     failure(pele_public_apply_v4(NULL, 0, NULL, 64 * 1024 * 1024 + 1), 2, "budget");
     const char *unavailable = "gitGraph\ncommit";
     failure(pele_public_parse_v4((const uint8_t *)unavailable, strlen(unavailable), NULL, 0, &document), 1, "codec"); assert(document == NULL);
@@ -67,6 +68,18 @@ int main(void) {
     assert(!memcmp(pele_result_data(result), pele_result_data(expected), pele_result_len(result)));
     pele_result_free(result); pele_result_free(expected);
     result = pele_public_snapshot_v4(document); ok(result); metadata = text(result); assert(strstr(metadata, "\"revision\":\"1\"")); free(metadata); pele_result_free(result);
+    result = pele_public_render_operation_v4(document, 1, NULL, 0, NULL); ok(result);
+    metadata = text(result); assert(strstr(metadata, "\"revision\":2")); assert(strstr(metadata, "\"Ok\":{")); assert(strstr(metadata, "\"graph\":{")); free(metadata); pele_result_free(result);
+    failure(pele_public_render_operation_v4(document, 1, NULL, 0, NULL), 1, "Stale public model revision");
+    const char *limited = "{\"outputLimit\":1}";
+    result = pele_public_render_operation_v4(document, 2, (const uint8_t *)limited, strlen(limited), NULL); ok(result);
+    metadata = text(result); assert(strstr(metadata, "\"revision\":3")); assert(strstr(metadata, "\"Err\":{")); assert(strstr(metadata, "\"code\":\"limit\"")); free(metadata); pele_result_free(result);
+    result = pele_public_render_operation_v4(document, 3, NULL, 0, &host); ok(result);
+    metadata = text(result); assert(strstr(metadata, "\"revision\":4")); assert(strstr(metadata, "Host text measurer failed")); free(metadata); pele_result_free(result);
+    context.fail = 0;
+    result = pele_public_render_operation_v4(document, 4, NULL, 0, &host); ok(result);
+    metadata = text(result); assert(strstr(metadata, "\"revision\":5")); assert(strstr(metadata, "\"Ok\":{")); free(metadata); pele_result_free(result);
+    result = pele_public_snapshot_v4(document); ok(result); metadata = text(result); assert(strstr(metadata, "\"revision\":\"5\"")); free(metadata); pele_result_free(result);
     pele_public_document_free_v4(document); pele_public_document_free_v4(NULL);
     for (int i = 0; i < 200; i++) {
         document = NULL; result = pele_public_parse_v4((const uint8_t *)"info", 4, NULL, 0, &document); ok(result); pele_result_free(result);

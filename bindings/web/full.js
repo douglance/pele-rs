@@ -8,7 +8,9 @@ function result(json) {
   const envelope = JSON.parse(json);
   if (envelope.version !== 2) throw new Error('Unsupported compatibility contract');
   if (!envelope.ok) throw fromNativeError(envelope.error);
-  const value=envelope.result;
+  return renderedValue(envelope.result);
+}
+function renderedValue(value) {
   if(value&&typeof value.svg==='string'&&value.$numbers) {
     const bits=new DataView(new ArrayBuffer(8));
     for(const [key,hex] of Object.entries(value.$numbers)) {
@@ -19,6 +21,10 @@ function result(json) {
   }
   return value;
 }
+function renderError(error) {
+  return error instanceof RangeError?fromNativeError({name:'PeleError',message:'Diagram is nested too deeply.',code:'limit',type:null,line:0,column:0,snippet:''}):error;
+}
+
 function operationError(error, bridge) {
   if (error.kind === 'pele') return fromNativeError(error.value);
   if (error.kind === 'peleUtf16') {
@@ -126,25 +132,33 @@ export async function loadRenderer(moduleOrPath) {
       } catch (error) { document.free(); if (typeof error === 'string') return result(error); throw error; }
     },
     render(input, options = {}) {
-      const measurer = options.measurer ?? defaultMeasurer(options.fontFamily);
-      let callbackError, callbackFailed = false;
-      const width = (text, size, style) => { try { return measurer.width(text, size, style); } catch (e) { callbackFailed = true; callbackError = e; throw e; } };
-      const icons = options.icons && (name => { try { return options.icons(name); } catch (e) { callbackFailed = true; callbackError = e; throw e; } });
-      let json;
-      if (typeof input === 'string') json = render_with_resources(input, JSON.stringify(options), width, icons);
-      else {
-        const document = documents.get(input);
-        if (!document) throw new TypeError('render() takes diagram text or a model that parse() returned.');
-        if (document.bridge) document.revision = result(document.handle.apply(document.revision, JSON.stringify(document.bridge.snapshot().graph)));
-        json = document.handle.render_with_resources(JSON.stringify(options), width, icons);
-      }
-      if (callbackFailed) {
-        // Pele's public render guard turns every RangeError into this limit;
-        // other thrown values retain their original host identity.
-        if (callbackError instanceof RangeError) throw fromNativeError({name:'PeleError',message:'Diagram is nested too deeply.',code:'limit',type:null,line:0,column:0,snippet:''});
-        throw callbackError;
-      }
-      return result(json);
+      try {
+        const measurer = options.measurer ?? defaultMeasurer(options.fontFamily);
+        let callbackError, callbackFailed = false;
+        const width = (text, size, style) => { try { return measurer.width(text, size, style); } catch (e) { callbackFailed = true; callbackError = e; throw e; } };
+        const icons = options.icons && (name => { try { return options.icons(name); } catch (e) { callbackFailed = true; callbackError = e; throw e; } });
+        let json, operation, bridge;
+        if (typeof input === 'string') json = render_with_resources(input, JSON.stringify(options), width, icons);
+        else {
+          const document = documents.get(input);
+          if (!document) throw new TypeError('render() takes diagram text or a model that parse() returned.');
+          if (document.bridge) {
+            bridge=document.bridge;
+            document.revision = result(document.handle.apply(document.revision, JSON.stringify(bridge.snapshot().graph)));
+            const outcome=result(document.handle.render_operation_with_resources(document.revision,JSON.stringify(options),width,icons));
+            document.revision=outcome.revision;
+            bridge.reconcile(outcome.graph);
+            operation=outcome.result;
+          } else json = document.handle.render_with_resources(JSON.stringify(options), width, icons);
+        }
+        // Publish native partial state before restoring the original host throw.
+        if (callbackFailed) throw callbackError;
+        if(operation) {
+          if(Object.hasOwn(operation,'Err'))throw operationError(operation.Err,bridge);
+          return renderedValue(operation.Ok);
+        }
+        return result(json);
+      } catch(error) { throw renderError(error); }
     },
     query(model, operation, argumentsValue = null) {
       const document = documents.get(model);

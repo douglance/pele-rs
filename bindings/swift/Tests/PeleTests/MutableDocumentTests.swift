@@ -39,7 +39,8 @@ final class MutableDocumentTests: XCTestCase {
         XCTAssertThrowsError(try document.apply(snapshot.graph, expectedRevision: 0)) {
             XCTAssertEqual(($0 as? CompatibilityError)?.message, "Stale public model revision")
         }
-        XCTAssertEqual(document.revision, 1)
+        XCTAssertEqual(document.revision, saved.revision)
+        XCTAssertEqual(saved.revision, 2)
         XCTAssertEqual(try document.render().svg, first.svg)
         var limited = Pele.Engine.Options(); limited.outputLimit = 1
         XCTAssertThrowsError(try document.render(options: limited)) { XCTAssertEqual(($0 as? CompatibilityError)?.code, "limit") }
@@ -108,11 +109,39 @@ final class MutableDocumentTests: XCTestCase {
         XCTAssertNotNil(NSImage(data: Data(native.svg.utf8)), "Actual macOS SVG image decoder")
         var edited = try document.snapshot().graph
         let raw = try edited.intern(Pele.JSString(codeUnits: [0xD800]))
-        try edited.setField("title", value: .string(raw)); try document.apply(edited, expectedRevision: 1)
+        try edited.setField("title", value: .string(raw)); try document.apply(edited, expectedRevision: document.revision)
         XCTAssertThrowsError(try document.render()) { XCTAssertEqual(($0 as? CompatibilityError)?.message, "UTF-16 Info text rendering is not implemented") }
         edited = try document.snapshot().graph; try setText(&edited, "title", "Recovered")
-        try document.apply(edited, expectedRevision: 2)
+        try document.apply(edited, expectedRevision: document.revision)
         XCTAssertTrue(try document.render().svg.contains("Recovered"))
+    }
+    func testStatefulRenderOutcomesPublishRevisionsAcrossFailureAndRecovery() throws {
+        let document = try Pele.Engine().parseMutable("info title Retained state")
+        defer { try? document.close() }
+        let first = try document.renderOperation()
+        XCTAssertEqual(first.revision, 1)
+        guard case .rendered(let initial) = first.result else { return XCTFail("Initial render") }
+        XCTAssertEqual(initial.type, "info")
+        XCTAssertEqual(try text(first.graph, first.graph.field("title")), "Retained state")
+        var limited = Pele.Engine.Options(); limited.outputLimit = 1
+        let failed = try document.renderOperation(options: limited)
+        XCTAssertEqual(failed.revision, 2)
+        guard case .thrown(.pele(let error)) = failed.result else { return XCTFail("Output limit outcome") }
+        XCTAssertEqual(error.code, "limit")
+        let sentinel = MutableHostFailure()
+        var resources = Pele.HostResources(); resources.textWidth = { _ in throw sentinel }
+        XCTAssertThrowsError(try document.renderOperation(resources: resources)) {
+            XCTAssertTrue(($0 as? MutableHostFailure) === sentinel)
+        }
+        XCTAssertEqual(document.revision, 3)
+        XCTAssertEqual(try document.snapshot().revision, 3)
+        var graph = try document.snapshot().graph
+        try setText(&graph, "title", "Recovered state")
+        try document.apply(graph, expectedRevision: document.revision)
+        let recovered = try document.renderOperation()
+        XCTAssertEqual(recovered.revision, 5)
+        guard case .rendered(let result) = recovered.result else { return XCTFail("Recovered render") }
+        XCTAssertTrue(result.svg.contains("Recovered state"))
     }
     func testUnavailableCodecsAndRepeatedCreateCloseAreExplicit() throws {
         XCTAssertThrowsError(try Pele.Engine().parseMutable("gitGraph\ncommit")) {

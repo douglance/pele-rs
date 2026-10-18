@@ -70,4 +70,23 @@ extension Pele {
         public let graph: PublicGraph
         public let result: PublicOperationResult
     }
+    public enum PublicRenderResult: Decodable, Sendable {
+        case rendered(FullRenderedDiagram)
+        case thrown(PublicOperationError)
+        private enum Keys: String, CodingKey { case Ok, Err }
+        public init(from decoder: any Decoder) throws {
+            let fields = try decoder.container(keyedBy: Keys.self)
+            if fields.contains(.Ok) { self = .rendered(try fields.decode(FullRenderedDiagram.self, forKey: .Ok)) }
+            else { self = .thrown(try fields.decode(PublicOperationError.self, forKey: .Err)) }
+        }
+    }
+    public struct PublicRenderOutcome: Decodable, Sendable {
+        public let revision: UInt64
+        public let graph: PublicGraph
+        public let result: PublicRenderResult
+    }
+    public struct PublicOperationFailure: Error {
+        public let value: PublicOperationError
+    }
+
 }

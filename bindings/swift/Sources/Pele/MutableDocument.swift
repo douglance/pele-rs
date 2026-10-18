@@ -63,21 +63,37 @@ extension Pele {
             let bytes = try JSONEncoder().encode(Call(method: method, receiver: receiver, arguments: arguments))
             guard bytes.count <= 64 * 1024 * 1024 else { throw PeleError(code: "limit", message: "Public method exceeds 64 MiB JSON budget") }
             return try withHandle { handle in
-                let result = try resources.withNativeResources { host in bytes.withUnsafeBytes { input in
+                let response = resources.withCapturedNativeResources { host in bytes.withUnsafeBytes { input in
                     pele_public_invoke_v4(handle, revision, input.bindMemory(to: UInt8.self).baseAddress, input.count, host)
                 }}
-                let outcome = try Pele.compatibilityResult(result, as: PublicInvocationOutcome.self)
-                revision = outcome.revision
-                return outcome
+                do {
+                    let outcome = try Pele.compatibilityResult(response.handle, as: PublicInvocationOutcome.self)
+                    revision = outcome.revision
+                    if let error = response.error { throw error }
+                    return outcome
+                } catch { if let original = response.error { throw original }; throw error }
+            }
+        }
+        /// Stateful native rendering publishes graph/revision even on operation error.
+        public func renderOperation(options: Engine.Options = .init(), resources: HostResources = .init()) throws -> PublicRenderOutcome {
+            let settings = try JSONEncoder().encode(options)
+            return try withHandle { handle in
+                let response = resources.withCapturedNativeResources { host in settings.withUnsafeBytes { bytes in
+                    pele_public_render_operation_v4(handle, revision, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, host)
+                }}
+                do {
+                    let outcome = try Pele.compatibilityResult(response.handle, as: PublicRenderOutcome.self)
+                    revision = outcome.revision
+                    if let error = response.error { throw error }
+                    return outcome
+                } catch { if let original = response.error { throw original }; throw error }
             }
         }
         public func render(options: Engine.Options = .init(), resources: HostResources = .init()) throws -> FullRenderedDiagram {
-            let settings = try JSONEncoder().encode(options)
-            return try withHandle { handle in
-                let result = try resources.withNativeResources { host in settings.withUnsafeBytes { bytes in
-                    pele_public_render_v4(handle, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, host)
-                }}
-                return try Pele.compatibilityResult(result, as: FullRenderedDiagram.self)
+            switch try renderOperation(options: options, resources: resources).result {
+            case .rendered(let rendered): return rendered
+            case .thrown(.pele(let error)): throw error
+            case .thrown(let error): throw PublicOperationFailure(value: error)
             }
         }
     }

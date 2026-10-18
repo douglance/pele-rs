@@ -71,7 +71,10 @@ try document.close()
 `schema()` describes native method IDs. `invoke(method:receiver:arguments:)`
 returns graph, revision and either a returned atom or a typed operation error.
 Inspect the returned graph even after an operation error: preceding edits remain.
-Graph strings use `Pele.JSString`; conversion to Swift String is explicitly fallible
+`renderOperation()` returns the post-render graph, revision and rendered value or
+typed operation error. The `render()` convenience also advances the revision on
+dispatched success or failure. Callback exceptions preserve their original Swift
+identity after the revision is published. Graph strings use `Pele.JSString`; conversion to Swift String is explicitly fallible
 for isolated surrogate code units. Native host errors retain Swift error identity.
 
 C owns the same documents through additive `pele_public_*_v4` operations in
