@@ -15,8 +15,8 @@ pub struct IshikawaModel {
     pub title: Option<String>,
     pub root: Option<usize>,
     pub nodes: Vec<IshikawaNode>,
-    stack: Vec<(f64, usize)>,
-    base_level: Option<f64>,
+    pub(super) stack: Vec<(f64, usize)>,
+    pub(super) base_level: Option<f64>,
 }
 impl IshikawaModel {
     pub(super) fn new(title: Option<&str>) -> Self {

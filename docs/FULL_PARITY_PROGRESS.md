@@ -516,3 +516,32 @@ in Chrome, Firefox and WebKit. Explicit class-field declarations preserve native
 field ordering and WebKit's enumerable line/column descriptors. The strict
 TypeScript 4.9.5 consumer passes. This does not close model constructors or the
 remaining native Error-value arena seam.
+
+
+## AgentFlow and Ishikawa mutable native checkpoints
+
+AgentFlow and Ishikawa bring native mutable coverage to nineteen families. The
+frozen batch passes nineteen release-profile integration tests across four
+targets, including all 14,990 AgentFlow and 20,586 Ishikawa historical outcomes.
+AgentFlow also verifies all 5,373 historical semantic-model results and 114 raw
+graph cases/194 operations/226 complete SVG hashes. Its original parsed drawing
+graph remains cached: root label/graph edits can stay visually stale, while
+detached original style-array edits remain live. Four astral metadata projections
+now work through the public identity graph without changing typed convenience
+serialization. Retained registration, native pixels and bounded expansion recover.
+
+AgentFlow exposes all thirty-four actual method descriptors and thirty-three
+native implementations. Its private `shapeError()` returns a genuine Error
+instance upstream; that one returned-value operation remains explicitly
+unavailable until the Error arena seam lands. Builder shape failures already
+throw real Pele errors. Arbitrary overrides/coercion, options.log callbacks,
+active lone-surrogate SVG, some numeric provenance and render TypeError transport
+remain recorded runtime gaps.
+
+Ishikawa exposes the real addNode method, stack/baseLevel bookkeeping and aliased
+tree. Sixteen pinned wide/narrow mutation SVGs, deep flat round trips, partial
+stack failures and native resource/pixel recovery pass. Caller-added accessibility
+extras are retained but ignored, matching the actual upstream renderer. No
+renderer changes are needed. Active missing/sparse/lone-surrogate node text and
+cyclic/over-budget trees retain explicit boundaries. Foreign mutable coverage
+remains the separately verified sixteen-family checkpoint.

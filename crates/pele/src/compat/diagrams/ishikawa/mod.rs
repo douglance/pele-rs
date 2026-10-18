@@ -31,3 +31,6 @@ impl DiagramModule for Ishikawa {
         render::render(m, o, r)
     }
 }
+
+mod public_model;
+pub use public_model::IshikawaPublicState;

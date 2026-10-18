@@ -97,6 +97,8 @@ pub struct AgentSubgraph {
 #[derive(Clone, Debug, Serialize)]
 #[serde(rename_all = "camelCase")]
 pub struct AgentflowModel {
+    #[serde(skip)]
+    pub public_origin: super::public_model::AgentflowPublicOrigin,
     #[serde(rename = "type")]
     pub diagram_type: DiagramType,
     #[serde(skip_serializing_if = "Option::is_none")]
@@ -190,6 +192,23 @@ impl AgentDb {
         Self {
             model: AgentflowModel {
                 diagram_type: DiagramType::Agentflow,
+                public_origin: super::public_model::AgentflowPublicOrigin {
+                    max_edges: context.max_edges,
+                    inherit_dir: context
+                        .config
+                        .get("flowchart")
+                        .and_then(Value::as_object)
+                        .and_then(|o| o.get("inheritDir"))
+                        == Some(&Value::Bool(true)),
+                    direction: context.config.get("direction").and_then(|v| {
+                        if let Value::String(s) = v {
+                            Some(s.clone())
+                        } else {
+                            None
+                        }
+                    }),
+                    ..Default::default()
+                },
                 direction: None,
                 connectors: vec![],
                 mappings: vec![],
@@ -273,12 +292,28 @@ impl AgentDb {
         let fields = doc.as_ref().and_then(Value::as_object).cloned();
         if let Some(&i) = self.subgraphs.get(id) {
             if let Some(doc) = &doc {
+                super::public_model::AgentflowPublicOrigin::metadata(
+                    &mut self.model.public_origin.raw_group_metadata,
+                    i,
+                    &self.model.subgraphs[i].metadata,
+                    doc,
+                );
                 merge(&mut self.model.subgraphs[i].metadata, doc);
                 return Ok(());
             }
         }
         if let Some(&i) = self.connectors.get(id) {
             if let Some(doc) = &doc {
+                super::public_model::AgentflowPublicOrigin::key(
+                    &mut self.model.public_origin.nodes[i],
+                    "metadata",
+                );
+                super::public_model::AgentflowPublicOrigin::metadata(
+                    &mut self.model.public_origin.raw_node_metadata,
+                    i,
+                    &self.model.nodes[i].1.metadata,
+                    doc,
+                );
                 merge(&mut self.model.nodes[i].1.metadata, doc);
                 return Ok(());
             }
@@ -289,17 +324,31 @@ impl AgentDb {
         if let Some(&i) = self.edge_by_id.get(id) {
             if let Some(fields) = &fields {
                 let e = &mut self.model.edges[i];
+                let keys = &mut self.model.public_origin.edges[i];
                 if let Some(v) = fields.get("animate") {
+                    super::public_model::AgentflowPublicOrigin::key(keys, "animate");
                     e.animate = Some(v.clone())
                 }
                 if let Some(v) = fields.get("animation") {
+                    super::public_model::AgentflowPublicOrigin::key(keys, "animation");
                     e.animation = Some(v.clone())
                 }
                 if let Some(v) = fields.get("curve") {
+                    super::public_model::AgentflowPublicOrigin::key(keys, "interpolate");
                     e.interpolate = Some(v.clone())
                 }
             }
             if let Some(doc) = &doc {
+                super::public_model::AgentflowPublicOrigin::key(
+                    &mut self.model.public_origin.edges[i],
+                    "metadata",
+                );
+                super::public_model::AgentflowPublicOrigin::metadata(
+                    &mut self.model.public_origin.raw_edge_metadata,
+                    i,
+                    &self.model.edges[i].metadata,
+                    doc,
+                );
                 merge(&mut self.model.edges[i].metadata, doc);
             }
             return Ok(());
@@ -309,6 +358,10 @@ impl AgentDb {
         } else {
             let i = self.model.nodes.len();
             self.nodes.insert(id.into(), i);
+            self.model
+                .public_origin
+                .nodes
+                .push(vec!["id", "labelType", "styles", "classes"]);
             self.model.nodes.push((
                 id.into(),
                 AgentNode {
@@ -328,6 +381,21 @@ impl AgentDb {
             ));
             i
         };
+        let keys = &mut self.model.public_origin.nodes[i];
+        let key =
+            |keys: &mut Vec<_>, name| super::public_model::AgentflowPublicOrigin::key(keys, name);
+        if text.is_some() || self.model.nodes[i].1.text.is_none() {
+            key(keys, "text")
+        }
+        if shape.is_some() {
+            key(keys, "type")
+        }
+        if self.model.nodes[i].1.props.is_none() {
+            key(keys, "props")
+        }
+        if doc.is_some() {
+            key(keys, "metadata")
+        }
         let v = &mut self.model.nodes[i].1;
         if let Some(text) = text {
             v.label_type = text.kind;
@@ -349,6 +417,12 @@ impl AgentDb {
             }
         }
         if let Some(doc) = &doc {
+            super::public_model::AgentflowPublicOrigin::metadata(
+                &mut self.model.public_origin.raw_node_metadata,
+                i,
+                &v.metadata,
+                doc,
+            );
             merge(&mut v.metadata, doc)
         } else {
             return Ok(());
@@ -381,6 +455,7 @@ impl AgentDb {
                     self.model.line_offset,
                 ));
             }
+            key(keys, "type");
             self.model.nodes[i].1.shape = Some(shape);
         }
         if let Some(label) = fields.get("label").filter(|v| v.truthy()) {
@@ -439,6 +514,24 @@ impl AgentDb {
                         ErrorCode::Limit,
                     ));
                 }
+                let mut keys = vec![
+                    "start",
+                    "end",
+                    "type",
+                    "text",
+                    "labelType",
+                    "classes",
+                    "isUserDefinedId",
+                    "interpolate",
+                    "stroke",
+                    "length",
+                ];
+                if edge.edge_semantic.is_some() {
+                    keys.push("edgeSemantic")
+                }
+                keys.push("id");
+                self.model.public_origin.edges.push(keys);
+                self.model.public_origin.edge_styles.push(None);
                 self.model.edges.push(edge);
                 self.pair_count.insert(pair, existing + 1);
                 self.edge_by_id.entry(id).or_insert(len);
@@ -502,6 +595,14 @@ impl AgentDb {
         };
         for id in ids.split(',') {
             if let Some(&i) = self.nodes.get(id) {
+                super::public_model::AgentflowPublicOrigin::key(
+                    &mut self.model.public_origin.nodes[i],
+                    "link",
+                );
+                super::public_model::AgentflowPublicOrigin::key(
+                    &mut self.model.public_origin.nodes[i],
+                    "linkTarget",
+                );
                 self.model.nodes[i].1.link = url.clone();
                 self.model.nodes[i].1.link_target = target.clone()
             }
@@ -547,11 +648,14 @@ impl AgentDb {
         mut styles: Vec<String>,
         interpolate: Option<&str>,
     ) -> Result<(), PeleError> {
+        let style_group = self.model.public_origin.next_style;
+        self.model.public_origin.next_style += 1;
         for pos in positions {
             if pos == "default" {
                 if let Some(interpolate) = interpolate {
                     self.model.default_interpolate = Some(Value::String(interpolate.into()))
                 } else {
+                    self.model.public_origin.default_style = Some(style_group);
                     self.model.default_edge_style = Some(styles.clone())
                 }
                 continue;
@@ -564,6 +668,11 @@ impl AgentDb {
                 if !styles.is_empty() && !styles.iter().any(|s| s.starts_with("fill")) {
                     styles.push("fill:none".into())
                 }
+                super::public_model::AgentflowPublicOrigin::key(
+                    &mut self.model.public_origin.edges[i],
+                    "style",
+                );
+                self.model.public_origin.edge_styles[i] = Some(style_group);
                 e.style = Some(styles.clone())
             }
         }
@@ -625,10 +734,15 @@ impl AgentDb {
         }
         let id = name.unwrap_or_else(|| format!("subGraph{}", self.sub_count));
         self.sub_count += 1;
+        self.model.public_origin.sub_count = self.sub_count;
         nodes.retain(|node| {
             node != &id && !self.global_nodes.contains(node) && !self.members.contains(node)
         });
         self.members.extend(nodes.iter().cloned());
+        self.model
+            .public_origin
+            .members
+            .extend(nodes.iter().cloned());
         if let Some(&i) = self.subgraphs.get(&id) {
             self.model.subgraphs[i].nodes.extend(nodes);
             if !trim(title_text).is_empty() {
@@ -1057,7 +1171,12 @@ fn trailing_commas(body: &str) -> String {
     out.join("\n")
 }
 impl AgentDb {
-    fn metadata(&self, id: &str, source: &str, loc: Option<Loc>) -> Result<Value, PeleError> {
+    pub(super) fn metadata(
+        &self,
+        id: &str,
+        source: &str,
+        loc: Option<Loc>,
+    ) -> Result<Value, PeleError> {
         let multiline = source.contains('\n');
         let text = if multiline {
             format!("{source}\n")
@@ -1118,11 +1237,18 @@ impl AgentDb {
                 if id.is_empty() {
                     continue;
                 }
+                if !self.global_nodes.contains(id) {
+                    self.model.public_origin.global_nodes.push(id.into());
+                }
                 self.global_nodes.insert(id.into());
                 release |= self.members.remove(id);
             }
         }
         if release {
+            self.model
+                .public_origin
+                .members
+                .retain(|id| !self.global_nodes.contains(id));
             for s in &mut self.model.subgraphs {
                 s.nodes.retain(|id| !self.global_nodes.contains(id));
             }
@@ -1156,9 +1282,26 @@ impl AgentDb {
                 is_connector: Some(true),
             };
             if let Some(&old) = self.nodes.get(id) {
+                self.model.public_origin.raw_node_metadata.remove(&old);
+                self.model.public_origin.nodes[old] = vec![
+                    "id",
+                    "labelType",
+                    "styles",
+                    "classes",
+                    "isConnector",
+                    "text",
+                ];
                 self.model.nodes[old].1 = v;
                 self.connectors.insert(id.into(), old);
             } else {
+                self.model.public_origin.nodes.push(vec![
+                    "id",
+                    "labelType",
+                    "styles",
+                    "classes",
+                    "isConnector",
+                    "text",
+                ]);
                 self.model.nodes.push((id.into(), v));
                 self.nodes.insert(id.into(), i);
                 self.connectors.insert(id.into(), i);
@@ -1194,6 +1337,7 @@ impl AgentDb {
         let i = self.mapping(id.into(), "vertex", self.position(Some(loc)));
         if bare {
             self.bare_mappings.insert(i);
+            self.model.public_origin.bare_mappings.push(i);
         }
     }
     pub fn extend_mapping(&mut self, id: &str, loc: Loc) {
@@ -1206,6 +1350,10 @@ impl AgentDb {
                 continue;
             }
             if self.bare_mappings.remove(&i) {
+                self.model
+                    .public_origin
+                    .bare_mappings
+                    .retain(|index| *index != i);
                 m.statement_type = "attachment".into();
             }
             let p = &mut m.position;
@@ -1268,6 +1416,11 @@ impl AgentDb {
             .or(edge)
             .and_then(|id| self.first_mapping.get(id))
             .map(|i| self.model.mappings[*i].position.clone());
+        self.model.public_origin.diagnostic_mappings.push(
+            node.or(edge)
+                .and_then(|id| self.first_mapping.get(id))
+                .copied(),
+        );
         self.model.diagnostics.push(Diagnostic {
             id,
             severity: severity.into(),
