@@ -1,4 +1,5 @@
 pub mod architecture;
+pub mod block;
 pub mod c4;
 pub mod class_diagram;
 mod common;
@@ -14,6 +15,8 @@ pub mod packet;
 pub mod pie;
 pub mod quadrant_chart;
 pub mod radar;
+pub mod railroad;
+pub mod requirement;
 pub mod sankey;
 pub mod sequence;
 pub mod state;

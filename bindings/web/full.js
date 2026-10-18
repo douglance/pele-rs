@@ -38,6 +38,8 @@ export async function loadRenderer(moduleOrPath) {
         if (projection.type === 'sankey') for(const link of model.links) {
           link.source=model.nodes[link.source.index];link.target=model.nodes[link.target.index];
         }
+        if (projection.type === 'requirement') for(const key of ['requirements','elements','classes'])model[key]=new Map(model[key]);
+        if (projection.type === 'block') for(const key of ['classes','byId'])model[key]=new Map(model[key]);
         if (projection.type === 'treemap') model.classes = new Map(model.classes);
         if (projection.type === 'c4') {
           const pending = [model];

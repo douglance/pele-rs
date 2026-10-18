@@ -6,7 +6,7 @@ release or new GIF has been published from this branch.
 
 ## Implemented renderers
 
-`Engine::with_builtins()` currently registers twenty-one actual Rust diagram modules.
+`Engine::with_builtins()` currently registers twenty-four actual Rust diagram modules.
 `Engine::empty()` and typed `DiagramModule<Model>` remain extension interfaces.
 Registration never certifies a global parity flag; all public API gates remain open.
 
@@ -33,9 +33,12 @@ Registration never certifies a global parity flag; all public API gates remain o
 | treemap | 15,370 | 9,946 | 5,424 |
 | c4 | 18,603 | 6,278 | 12,325 |
 | info | 8,053 | 1,491 | 6,562 |
-| Total | 289,355 | 111,436 | 177,919 |
+| requirement | 10,358 | 3,714 | 6,644 |
+| block | 12,294 | 4,584 | 7,710 |
+| railroad | 12,288 | 4,424 | 7,864 |
+| Total | 324,295 | 124,158 | 200,137 |
 
-There are 116,148 complete model comparisons. Parsed models are retained when a
+There are 128,922 complete model comparisons. Parsed models are retained when a
 subsequent render fails. Six class stress cases explicitly exceed the JSON
 projection depth/size budget; their typed models and exact source renders/errors
 remain covered. These transport exceptions do not earn full public API parity.
@@ -110,6 +113,9 @@ only to raster evidence, while exported diagrams retain SVG transparency.
 
 | Diagram | Native pixels | Additional text proof |
 | --- | --- | --- |
+| requirement | 228 x 414; 7,895 painted | Tables, markers and 604 title pixels |
+| block | 170 x 64; 1,390 painted | Grid nodes and routed arrow |
+| railroad | 154 x 116; 1,271 painted | Alternatives, tracks and labels |
 | treemap | 656 x 416; 242,303 painted | Hierarchy and 520 title pixels |
 | c4 | 548 x 168; 4,989 painted | Elements, relation and 437 title pixels |
 | info | 127 x 72; 1,106 painted | Pinned version and 419 title pixels |
@@ -195,6 +201,20 @@ Foundation's Any projection exposed false numeric comparison failures and stripp
 a leading U+FEFF in a model string; direct decoding verifies the public binary64
 values and exact Unicode strings. No fixture cases were removed.
 
+## Requirement, Block and Railroad checkpoint
+
+Eight additional release Rust integration tests pass. All 34,940 new public
+scenarios pass Swift/C source and owned-document paths; all seven Swift test
+methods pass. Twelve checks pass across Chrome, Firefox and WebKit, including
+complete corpora and actual SVG decoder pixels. AppKit also paints all three.
+The native smoke sample uses Requirement's supported frontmatter title syntax.
+
+Block's three and Railroad's thirty-three explicit deep JSON projections remain
+bounded; their concrete models and exact source renders stay covered. Railroad
+implements IR, EBNF, ABNF and PEG as one family. Its cached unclosed-comment
+scanner avoids repeatedly searching the same suffix. No projection exclusion
+counts as completed mutable/lossless public API parity.
+
 ## Calendar and deep models
 
 Gantt uses the translated V8 date parser for native fallback strings, attributed
@@ -222,7 +242,7 @@ architecture is [LLD_PUBLIC_MODELS.md](LLD_PUBLIC_MODELS.md).
 
 ## Remaining acceptance work
 
-- Twelve family renderers, remaining shared behavior and the complete
+- Nine family renderers, remaining shared behavior and the complete
   registration/lazy/mount/zoom/public model interface remain required.
 - JavaScript model projections currently do not apply mutations back into the
   retained Rust document. Prototype methods/private enumerable state also need

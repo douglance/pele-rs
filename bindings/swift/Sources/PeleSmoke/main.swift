@@ -62,6 +62,9 @@ try piePNG.write(to: output.appendingPathComponent("swift-pie.png"))
 print("Swift owned pie + AppKit: \(pieWidth)x\(pieHeight), \(colored) colored pixels")
 
 for (type, source) in [
+    ("requirement", "---\ntitle: Shared requirements\n---\nrequirementDiagram\nrequirement core {\n id: 1\n text: Shared renderer\n risk: high\n verifymethod: test\n}\nelement app {\n type: service\n}\napp - satisfies -> core"),
+    ("block", "block-beta\ncolumns 2\napp[\"Swift\"] core[\"Rust\"]\napp --> core"),
+    ("railroad", "railroad-abnf-beta\nrule = \"test\" / \"more\" ;"),
     ("treemap", "treemap-beta\n\"Category A\"\n  \"Swift\": 10\n  \"Web\": 20\n\"Category B\"\n  \"Rust\": 30"),
     ("c4", "C4Context\ntitle Shared system\nPerson(user, \"User\", \"Author\")\nSystem(core, \"Rust\", \"Renderer\")\nRel(user, core, \"Uses\")"),
     ("info", "info\ntitle Shared engine"),
@@ -108,7 +111,7 @@ for (type, source) in [
         }
     }}
     guard painted > 100, let png = bitmap.representation(using: .png, properties: [:]) else { fatalError("No meaningful native \(type) pixels") }
-    guard ["flowchart", "kanban", "mindmap", "class", "er", "sankey", "treemap"].contains(type) || titleInk > 20 else { fatalError("AppKit dropped positioned title in \(type)") }
+    guard ["flowchart", "kanban", "mindmap", "class", "er", "sankey", "treemap", "block", "railroad"].contains(type) || titleInk > 20 else { fatalError("AppKit dropped positioned title in \(type)") }
     try png.write(to: output.appendingPathComponent("swift-\(type).png"))
     print("Swift owned \(type) + AppKit: \(width)x\(height), \(painted) painted pixels, \(titleInk) title pixels")
 }

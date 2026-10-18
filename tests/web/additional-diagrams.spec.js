@@ -1,6 +1,6 @@
 import {test,expect} from '@playwright/test';
 
-for(const family of ['packet','radar','quadrant','timeline','journey','flowchart','kanban','mindmap','class','er','xychart','state','gantt','sequence','git-graph','architecture','sankey','treemap','c4','info']) {
+for(const family of ['packet','radar','quadrant','timeline','journey','flowchart','kanban','mindmap','class','er','xychart','state','gantt','sequence','git-graph','architecture','sankey','treemap','c4','info','requirement','block','railroad']) {
   test(`${family} pinned corpus through WASM source and owned model APIs`, async({page})=>{
     test.setTimeout(120_000);
     await page.goto('/examples/web/');
@@ -73,6 +73,9 @@ test('new families paint resolved SVG through real browser decoders',async({page
   const report=await page.evaluate(async()=>{
     const {loadRenderer}=await import('/dist/package-web/package/full.js'),engine=await loadRenderer(),proof=[];
     for(const [type,source] of [
+      ['requirement','requirementDiagram\nrequirement core {\n id: 1\n text: Shared renderer\n risk: high\n verifymethod: test\n}\nelement app {\n type: service\n}\napp - satisfies -> core'],
+      ['block','block-beta\ncolumns 2\napp["Swift"] core["Rust"]\napp --> core'],
+      ['railroad','railroad-abnf-beta\nrule = "test" / "more" ;'],
       ['treemap','treemap-beta\n"Category A"\n  "Swift": 10\n  "Web": 20\n"Category B"\n  "Rust": 30'],
       ['c4','C4Context\ntitle Shared system\nPerson(user, "User", "Author")\nSystem(core, "Rust", "Renderer")\nRel(user, core, "Uses")'],
       ['info','info\ntitle Shared engine'],
