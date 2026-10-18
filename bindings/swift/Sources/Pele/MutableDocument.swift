@@ -5,6 +5,18 @@ private struct PublicDocumentMetadata: Decodable {
     let type: String
     let revision: String
 }
+private func ownedPublicDocument(_ result: OpaquePointer?, document: OpaquePointer?) throws -> Pele.MutableDocument {
+    do {
+        let metadata = try Pele.compatibilityResult(result, as: PublicDocumentMetadata.self)
+        guard let handle = document, let revision = UInt64(metadata.revision), String(revision) == metadata.revision else {
+            throw PeleError(code: "internal", message: "Invalid mutable document metadata")
+        }
+        return Pele.MutableDocument(handle: handle, type: metadata.type, revision: revision)
+    } catch {
+        if let document { pele_public_document_free_v4(document) }
+        throw error
+    }
+}
 private struct AppliedRevision: Decodable { let revision: String }
 extension Pele {
     /// Owned mutable Rust model. Confine to one owner/actor; this class is not Sendable.
@@ -112,15 +124,20 @@ extension Pele.Engine {
             pele_public_parse_v4(input.bindMemory(to: UInt8.self).baseAddress, input.count,
                                  output.bindMemory(to: UInt8.self).baseAddress, output.count, &document)
         }}
-        do {
-            let metadata = try Pele.compatibilityResult(result, as: PublicDocumentMetadata.self)
-            guard let handle = document, let revision = UInt64(metadata.revision), String(revision) == metadata.revision else {
-                throw PeleError(code: "internal", message: "Invalid mutable document metadata")
-            }
-            return Pele.MutableDocument(handle: handle, type: metadata.type, revision: revision)
-        } catch {
-            if let document { pele_public_document_free_v4(document) }
-            throw error
-        }
+        return try ownedPublicDocument(result, document: document)
+    }
+    /// Exact number-valued source threshold; overrides only options.limit.
+    /// Config and integer maxEdges retain their existing contract. This accepts
+    /// well-formed Swift strings; malformed UTF-16 source remains a separate gap.
+    public func parseMutable(_ source: String, sourceLimit: Pele.SourceLimit, options: ParseOptions = .init()) throws -> Pele.MutableDocument {
+        let source = Data(source.utf8), settings = try JSONEncoder().encode(options)
+        let limit = sourceLimit.nativeValue
+        var document: OpaquePointer?
+        let result = source.withUnsafeBytes { input in settings.withUnsafeBytes { output in
+            pele_public_parse_source_limit_v6(input.bindMemory(to: UInt8.self).baseAddress, input.count,
+                                             output.bindMemory(to: UInt8.self).baseAddress, output.count,
+                                             limit.kind, limit.bits, &document)
+        }}
+        return try ownedPublicDocument(result, document: document)
     }
 }

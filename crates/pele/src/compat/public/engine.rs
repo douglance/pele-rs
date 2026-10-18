@@ -5,7 +5,7 @@ use super::{
 use crate::compat::{
     DiagramId, DiagramModule, Engine, ErrorCode, ModuleDescriptor, Object, ParseContext,
     ParseOptions, PeleError, RenderOptions, RenderResources, RenderResult, RenderSettings,
-    Rendered,
+    Rendered, SourceLimit,
 };
 use std::{any::Any, sync::Arc};
 /// Typed codec opt-in. Parsing, geometry and rendering remain in the native module.
@@ -253,6 +253,19 @@ impl PublicEngine {
     pub fn parse(&self, source: &str, options: &ParseOptions) -> Result<PublicDocument, PeleError> {
         self.create_document(self.engine.parse(source, options)?)
     }
+    /// Parse through the retained native codec with an exact number-valued
+    /// source limit. Only the legacy source limit is overridden.
+    pub fn parse_with_source_limit(
+        &self,
+        source: &str,
+        options: &ParseOptions,
+        limit: SourceLimit,
+    ) -> Result<PublicDocument, PeleError> {
+        self.create_document(
+            self.engine
+                .parse_with_source_limit(source, options, limit)?,
+        )
+    }
     /// Select an extension language without changing the built-in source detector.
     pub fn parse_as(
         &self,
@@ -261,6 +274,20 @@ impl PublicEngine {
         options: &ParseOptions,
     ) -> Result<PublicDocument, PeleError> {
         self.create_document(self.engine.parse_as(id, source, options)?)
+    }
+    /// Select an extension while keeping the public byte budget and exact
+    /// source comparison, without changing the extension's ParseContext shape.
+    pub fn parse_as_with_source_limit(
+        &self,
+        id: &DiagramId,
+        source: &str,
+        options: &ParseOptions,
+        limit: SourceLimit,
+    ) -> Result<PublicDocument, PeleError> {
+        self.create_document(
+            self.engine
+                .parse_as_with_source_limit(id, source, options, limit)?,
+        )
     }
     fn create_document(
         &self,

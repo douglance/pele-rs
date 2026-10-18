@@ -16,6 +16,8 @@ pub mod public;
 pub use engine::{Engine, ParsedDocument};
 pub use module::*;
 pub mod source;
+mod source_limit;
+pub use source_limit::{SourceLimit, MAX_PUBLIC_SOURCE_BYTES};
 mod value;
 pub use error::{ErrorCode, PeleError};
 use serde::{Deserialize, Serialize};

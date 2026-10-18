@@ -913,3 +913,37 @@ records shared-host load and Gantt's retained Date history. Source, executable
 and SDK hashes match before/after. A controlled OS process check verifies the
 build/test guard rejects an active owned process; provisional samples from an
 earlier process-name parser are excluded. See `scripts/perf/results/2026-10-18-swift-api.md`.
+
+## Exact numeric source limits through native and Swift
+
+The additive `SourceLimit` primitive now preserves undefined/default, null,
+fractional and nonfinite thresholds in the Rust inspection/parse interfaces and
+the C v6/Swift mutable-document parse path. Comparison uses the original UTF-16
+source length before preprocessing or detection. Legacy integer APIs retain their
+contract. Config, edge limits, extension dispatch, handle ownership and binary
+graph operations retain their shared implementations. An independent 16 MiB
+source-byte ceiling remains active even for NaN or positive infinity.
+
+The pinned 207-case oracle contains 54 complete model/SVG successes and 153
+complete error outcomes. Nineteen focused Rust release integration tests pass,
+including extension registration, legacy behavior, exact error formatting,
+UTF-16 ordering and native byte boundaries. Strict C source-limit, mutable and
+legacy integrations pass. Sixteen Swift release integration tests pass, covering
+the complete new matrix plus existing document and preparation behavior.
+
+Fresh universal artifacts also pass separate arm64 and Intel Rosetta checks:
+three source-limit integration tests (all 207 cases), the actual C v6 integration,
+and independent immutable/mutable consumers across all 33 families on each
+architecture. The new universal archive SHA-256 is
+`b9bbb51696fb744ac017c848f71a1e25d2395efb89571f008f4dccf2ae6f5455`.
+These runs use macOS 26.6 and declare minimum macOS 14.0; physical Intel/macOS 14
+runtime verification remains separate. A fresh artifact-free Swift consumer
+downloads the unchanged checksum-pinned v0.1 archive and builds/runs its legacy
+flowchart API, with modern source-limit files excluded as intended.
+
+This closes only exact number-valued source limits for well-formed input.
+Numeric edge/output limits, malformed UTF-16 source/output, arbitrary coercions,
+constructors, callback dispatch and other full-runtime/release gates remain open.
+See [source-limit contract](SOURCE_LIMITS.md). The earlier full corpus and
+performance results retain their recorded revisions and artifact fingerprints;
+this additive slice uses the focused verification above.

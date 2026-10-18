@@ -5,7 +5,7 @@ use pele::compat::{
     public::{ModelGraph, PublicDocument, PublicEngine},
     ErrorCode, PeleError,
 };
-use serde::Serialize;
+use serde::{Deserialize, Serialize};
 use std::{
     io::Write,
     panic::{catch_unwind, AssertUnwindSafe},
@@ -18,6 +18,29 @@ pub struct PelePublicDocument {
 }
 fn invalid(message: &str) -> PeleError {
     PeleError::new(message, ErrorCode::Semantic)
+}
+fn source_limit_options(json: &str) -> Result<pele::compat::ParseOptions, PeleError> {
+    // The explicit source-limit argument is the sole authority in v6. Consume
+    // the unused legacy field without applying its integer decoder; flattening
+    // retains the existing decoder for every other option and future additions.
+    #[derive(Deserialize)]
+    struct Options {
+        #[serde(rename = "limit", default)]
+        _legacy_limit: Option<serde::de::IgnoredAny>,
+        #[serde(flatten)]
+        options: pele::compat::ParseOptions,
+    }
+    if json.trim().is_empty() {
+        return Ok(Default::default());
+    }
+    serde_json::from_str::<Options>(json)
+        .map(|value| value.options)
+        .map_err(|error| {
+            PeleError::new(
+                format!("Invalid parse options: {error}"),
+                ErrorCode::Semantic,
+            )
+        })
 }
 unsafe fn document<'a>(
     handle: *const PelePublicDocument,
@@ -110,6 +133,62 @@ pub unsafe extern "C" fn pele_public_parse_v4(
             }
             error
         })?;
+        let result = success(
+            serde_json::json!({"type":document.diagram_type(),"revision":document.revision().to_string()}),
+        )?;
+        *out = Box::into_raw(Box::new(PelePublicDocument {
+            document: Mutex::new(document),
+        }));
+        Ok(result)
+    })
+}
+/// Parse with the original JavaScript source-limit comparison, independently of
+/// the legacy integer options.limit. Other options and v4 ownership are retained.
+/// # Safety
+/// Inputs must satisfy parse_v4's pointer/length and writable output requirements.
+/// Source is well-formed UTF-8; numeric bits are transported without JSON coercion.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_parse_source_limit_v6(
+    source: *const u8,
+    source_len: usize,
+    options: *const u8,
+    options_len: usize,
+    limit_kind: u32,
+    limit_bits: u64,
+    out_document: *mut *mut PelePublicDocument,
+) -> *mut PeleResult {
+    compatibility_call(|| {
+        let out = unsafe { out_document.as_mut() }
+            .ok_or_else(|| invalid("Native public transport: null document output"))?;
+        *out = std::ptr::null_mut();
+        let source = unsafe {
+            compatibility_input(source, source_len, pele::compat::MAX_PUBLIC_SOURCE_BYTES)
+        }?;
+        let options = unsafe { compatibility_input(options, options_len, 1024 * 1024) }?;
+        let limit = match limit_kind {
+            0 => pele::compat::SourceLimit::Undefined,
+            1 => pele::compat::SourceLimit::Null,
+            2 => pele::compat::SourceLimit::Number(f64::from_bits(limit_bits)),
+            _ => {
+                return Err(invalid(
+                    "Native public transport: unknown source-limit kind",
+                ))
+            }
+        };
+        let options = source_limit_options(options)?;
+        let registry = PublicEngine::with_builtins();
+        let document = registry
+            .parse_with_source_limit(source, &options, limit)
+            .map_err(|mut error| {
+                if error.code == ErrorCode::UnsupportedDiagram {
+                    if let Some(kind) = &error.diagram_type {
+                        error.message = format!(
+                            "Mutable public model codec for diagram type \"{kind}\" is unavailable."
+                        );
+                    }
+                }
+                error
+            })?;
         let result = success(
             serde_json::json!({"type":document.diagram_type(),"revision":document.revision().to_string()}),
         )?;

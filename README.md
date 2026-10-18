@@ -48,6 +48,8 @@ its matching legacy API stays available without a local build. See
 remaining work. All 33 source-built families now support native Rust and Swift mutable owned models;
 twenty-three also expose browser mutable models. See
 [mutable model APIs](docs/MUTABLE_MODELS.md) for methods, ownership and remaining boundaries. Detection alone does not imply parsing/rendering support.
+The additive native/Swift [source-limit API](docs/SOURCE_LIMITS.md) preserves
+undefined, null and exact IEEE number comparisons before source preparation.
 Current browser measurements show no speedup over Pele JS; see the scoped
 [performance baseline](docs/PERFORMANCE.md). GPU acceleration is not implemented.
 

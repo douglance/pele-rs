@@ -1,6 +1,6 @@
 use super::{
     module::*, source, Capability, DiagramId, DiagramType, ErrorCode, Inspection, Object,
-    PeleError, PrepareOptions, Value, DIAGRAM_TYPES,
+    PeleError, PrepareOptions, SourceLimit, Value, DIAGRAM_TYPES,
 };
 use serde::Serialize;
 use std::{any::Any, collections::HashMap, sync::Arc};
@@ -254,8 +254,23 @@ impl Engine {
                 ErrorCode::Limit,
             ));
         }
+        self.inspect_prechecked(source, &options.config)
+    }
+    /// Prepare well-formed source with an exact number-valued source limit.
+    /// `limit` overrides only `options.limit`; configuration is retained. The
+    /// independent public byte budget remains active for every argument value.
+    pub fn inspect_with_source_limit(
+        &self,
+        source: &str,
+        options: &PrepareOptions,
+        limit: SourceLimit,
+    ) -> Result<Inspection, PeleError> {
+        limit.check(source)?;
+        self.inspect_prechecked(source, &options.config)
+    }
+    fn inspect_prechecked(&self, source: &str, extra: &Object) -> Result<Inspection, PeleError> {
         let mut prepared = source::preprocess(source)?;
-        let mut config = options.config.clone();
+        let mut config = extra.clone();
         for (k, v) in prepared.config.entries() {
             config.insert(k.into(), v.clone())
         }
@@ -271,13 +286,32 @@ impl Engine {
     }
     pub fn parse(&self, source: &str, options: &ParseOptions) -> Result<ParsedDocument, PeleError> {
         let inspection = self.inspect(source, &options.preparation)?;
+        self.parse_detected(inspection, options.max_edges)
+    }
+    /// Parse once with exact source-limit semantics and the existing typed
+    /// configuration/edge limit. No preparation is repeated through the legacy
+    /// usize source check; all other module inputs remain unchanged.
+    pub fn parse_with_source_limit(
+        &self,
+        source: &str,
+        options: &ParseOptions,
+        limit: SourceLimit,
+    ) -> Result<ParsedDocument, PeleError> {
+        let inspection = self.inspect_with_source_limit(source, &options.preparation, limit)?;
+        self.parse_detected(inspection, options.max_edges)
+    }
+    fn parse_detected(
+        &self,
+        inspection: Inspection,
+        max_edges: usize,
+    ) -> Result<ParsedDocument, PeleError> {
         let kind = inspection.diagram_type.ok_or_else(|| {
             PeleError::new(
                 "No diagram type detected for the given text.",
                 ErrorCode::UnsupportedDiagram,
             )
         })?;
-        self.parse_prepared(inspection, &kind.into(), options.max_edges)
+        self.parse_prepared(inspection, &kind.into(), max_edges)
     }
     /// Explicit selection lets consumers add new languages without editing the built-in detector.
     pub fn parse_as(
@@ -288,6 +322,22 @@ impl Engine {
     ) -> Result<ParsedDocument, PeleError> {
         self.parse_prepared(
             self.inspect(source, &options.preparation)?,
+            id,
+            options.max_edges,
+        )
+    }
+    /// Explicit module selection with an exact source limit. The selected
+    /// registration, configuration and integer edge limit retain their normal
+    /// ownership and behavior.
+    pub fn parse_as_with_source_limit(
+        &self,
+        id: &DiagramId,
+        source: &str,
+        options: &ParseOptions,
+        limit: SourceLimit,
+    ) -> Result<ParsedDocument, PeleError> {
+        self.parse_prepared(
+            self.inspect_with_source_limit(source, &options.preparation, limit)?,
             id,
             options.max_edges,
         )

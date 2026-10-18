@@ -76,6 +76,15 @@ PeleResult *pele_render_document_with_resources_v3(const PeleResult *, const uin
  * operations on one handle return an error; never free during an active call. */
 typedef struct PelePublicDocument PelePublicDocument;
 PeleResult *pele_public_parse_v4(const uint8_t *, size_t, const uint8_t *, size_t, PelePublicDocument **out_document);
+/* Additive exact source-limit lane for well-formed UTF-8 source. limit_kind:
+ * 0 undefined (default 50,000 UTF-16 units), 1 null, 2 IEEE-754 number bits.
+ * Overrides only options.limit; config/maxEdges retain their existing contract.
+ * NaN/infinity never disable the independent 16 MiB source-byte budget.
+ * Ownership/error rules match parse_v4; unknown kinds fail without a handle. */
+PeleResult *pele_public_parse_source_limit_v6(const uint8_t *, size_t,
+                                           const uint8_t *, size_t,
+                                           uint32_t limit_kind, uint64_t limit_bits,
+                                           PelePublicDocument **out_document);
 PeleResult *pele_public_snapshot_v4(const PelePublicDocument *);
 /* Native schema and method operations. invoke returns an operation outcome with
  * graph/revision/result even when the method throws, subject to output budgets.

@@ -119,6 +119,11 @@ whose graph fits the output budget can carry complete post-call state.
 
 ## Remaining compatibility boundary
 
+The additive Rust/C/Swift [source-limit API](SOURCE_LIMITS.md) now handles
+undefined, null, fractions, NaN and infinities using the original UTF-16 source
+length. Its independent native byte budget stays active. Edge/output limits and
+general options coercion retain their existing boundary.
+
 This checkpoint does not certify complete Pele public API parity. Active
 lone-surrogate source/text rendering, numeric options outside the current JSON
 lane, constructors, exotic getter/proxy/coercion behavior, arbitrary overridden
