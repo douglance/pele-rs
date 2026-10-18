@@ -19,6 +19,28 @@ inspired by [Pele](https://github.com/obsidianmd/pele); not an official
 Obsidian/Pele/Mermaid release or full Mermaid replacement. Layout is independently
 implemented. No upstream pixel-equivalence or speedup claims.
 
+## Full Pele compatibility work
+
+The complete Pele library is the target: all 33 diagram families, public APIs,
+shared layout/text/theme behavior and Swift/web adapters. The required
+[architecture](docs/FULL_PARITY_LLD.md) and [parity inventory](docs/PELE_PARITY.md)
+account for all 287 pinned upstream source files. **Full parity is not released.**
+
+The development compatibility interface adds typed `DiagramModule` and
+`RenderResources` seams, an owned `ParsedDocument`, source preparation and truthful
+capability discovery. Its separate v2 contract preserves the released v1 renderer.
+Open extension IDs and `parse_as` allow additional languages without editing the
+built-in detector. New modules retain their concrete model types; parsed documents keep the
+handler/config that created them, including after registry replacement. No built-in
+full-compatibility diagram renderer is registered yet.
+
+Source preparation is checked against pinned upstream examples and generated cases.
+Build native/WASM artifacts from source to use the development Swift `Pele.inspect`
+and web `@unlocalhosted/pele-rs/core` APIs. The released Swift binary remains v0.1;
+its matching legacy API stays available without a local build. See
+[development verification](docs/FULL_PARITY_PROGRESS.md) for current evidence and
+remaining work. Detection alone does not imply parsing/rendering support.
+
 ## Install
 
 ### Rust

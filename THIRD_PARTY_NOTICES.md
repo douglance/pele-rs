@@ -3,6 +3,9 @@
 - **Pele**: Copyright (c) 2026 kepano. Complete upstream MIT license is retained
   verbatim in [third_party/PELE-LICENSE](third_party/PELE-LICENSE), including its
   additional Lucide ISC notice. No Lucide icon is used in this implementation.
+- **Mermaid documentation fixtures**: Copyright (c) 2014 - 2022 Knut Sveidqvist.
+  MIT, retained in [third_party/MERMAID-LICENSE](third_party/MERMAID-LICENSE).
+  Pinned source provenance lives in `fixtures/pele/source.json`.
 - **Noto Sans Regular**: Copyright 2018 The Noto Project Authors. Unmodified font
   is bundled in [crates/pele/assets/fonts](crates/pele/assets/fonts/README.md), with
   the full [SIL OFL 1.1](crates/pele/assets/fonts/OFL.txt). Font is not relicensed MIT.

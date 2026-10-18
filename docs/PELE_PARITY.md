@@ -1,6 +1,6 @@
 # Pinned Pele parity inventory
 
-Target: [obsidianmd/pele 458322a5b8abb1ae57ddf127c32017ab9fb14a92](https://github.com/obsidianmd/pele/tree/458322a5b8abb1ae57ddf127c32017ab9fb14a92), package 1.6.0. Baseline: pele-rs `6803707`, inspected 2026-10-18. This inventory defines required work; it does not report newly executed conformance tests.
+Target: [obsidianmd/pele 458322a5b8abb1ae57ddf127c32017ab9fb14a92](https://github.com/obsidianmd/pele/tree/458322a5b8abb1ae57ddf127c32017ab9fb14a92), package 1.6.0. Baseline: pele-rs `6803707`, inspected 2026-10-18. This baseline inventory defines required work. Subsequent bounded implementation evidence lives in [FULL_PARITY_PROGRESS.md](FULL_PARITY_PROGRESS.md); baseline markers below are not current completion claims.
 
 `P` means existing partial implementation; `—` means absent from the full compatibility interface. Columns are syntax / semantic model / rendering / host. A `P` is not a passing full-parity gate. All rows are mandatory; no first-slice exclusion remains an exemption. Evidence must later record exact fixture IDs, counts, failures, skips and platforms against a source commit. See [FULL_PARITY_LLD.md](FULL_PARITY_LLD.md) for interfaces and acceptance rules.
 

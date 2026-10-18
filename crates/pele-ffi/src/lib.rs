@@ -89,3 +89,67 @@ pub unsafe extern "C" fn pele_result_free(result: *mut PeleResult) {
         drop(unsafe { Box::from_raw(result) });
     }
 }
+
+/// Full-interface source preparation. JSON envelope version 2; no diagram rendering implied.
+/// # Safety
+/// Non-null pointers must name their declared readable byte lengths for this call.
+#[no_mangle]
+pub unsafe extern "C" fn pele_inspect(
+    source: *const u8,
+    source_len: usize,
+    options: *const u8,
+    options_len: usize,
+) -> *mut PeleResult {
+    fn failure(message: &str, limit: bool) -> PeleResult {
+        let error = pele::compat::PeleError::new(
+            message,
+            if limit {
+                pele::compat::ErrorCode::Limit
+            } else {
+                pele::compat::ErrorCode::Semantic
+            },
+        );
+        PeleResult {
+            status: if limit { 2 } else { 1 },
+            data: pele::compat::error_envelope(&error).into_bytes(),
+        }
+    }
+    let result = catch_unwind(AssertUnwindSafe(|| {
+        if source_len > 16 * 1024 * 1024 || options_len > 1024 * 1024 {
+            return failure(
+                "Native transport: declared input exceeds the 16 MiB source / 1 MiB options budget",
+                true,
+            );
+        }
+        if (source.is_null() && source_len != 0) || (options.is_null() && options_len != 0) {
+            return failure("Native transport: null input with nonzero length", false);
+        }
+        let s = if source_len == 0 {
+            &[]
+        } else {
+            unsafe { slice::from_raw_parts(source, source_len) }
+        };
+        let o = if options_len == 0 {
+            &[]
+        } else {
+            unsafe { slice::from_raw_parts(options, options_len) }
+        };
+        let (Ok(s), Ok(o)) = (std::str::from_utf8(s), std::str::from_utf8(o)) else {
+            return failure("Native transport: input must be UTF-8", false);
+        };
+        let (status, data) = pele::compat::inspect_envelope(s, o);
+        PeleResult {
+            status,
+            data: data.into_bytes(),
+        }
+    }))
+    .unwrap_or_else(|_| failure("Native transport: unexpected engine failure", false));
+    Box::into_raw(Box::new(result))
+}
+#[no_mangle]
+pub extern "C" fn pele_capabilities() -> *mut PeleResult {
+    Box::into_raw(Box::new(PeleResult {
+        status: 0,
+        data: pele::compat::capabilities_json().into_bytes(),
+    }))
+}

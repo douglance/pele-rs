@@ -28,43 +28,68 @@ Current text is embedded Noto Sans outlined glyphs, with unsupported-glyph/RTL r
 Keep one deep Rust engine with two real seams: diagram modules vary by family, and host resources vary by platform. Avoid exposing lexer tokens, rank passes or SVG-writing helpers as user interface. Core orchestration owns limits, preprocessing, registry selection, parsed-model provenance, render context, output validation and errors.
 
 ```rust
-pub enum DiagramType { /* all 33 exact upstream names via serde renames */ }
-pub enum DiagramModel {
-    Flowchart(flowchart::Model), Sequence(sequence::Model),
-    // One typed variant per registered built-in family; all 33 are required.
-    // Swimlane has its own variant wrapping FlowchartModel, despite upstream model.type quirk.
-    Extension { type_name: String, value: serde_json::Value },
+pub enum DiagramType { /* 33 pinned built-in discriminator names */ }
+pub enum DiagramId { Builtin(DiagramType), Extension(String) }
+pub trait DiagramModule: Send + Sync + 'static {
+    type Model: Serialize + Send + Sync + 'static;
+    fn descriptor(&self) -> ModuleDescriptor;
+    fn parse(&self, context: ParseContext<'_>) -> Result<Self::Model, PeleError>;
+    fn render(&self, model: &Self::Model, config: &Object,
+              settings: &RenderSettings, resources: &mut dyn RenderResources)
+        -> Result<Rendered, PeleError>;
 }
-pub struct ParsedDocument { /* private model, config, handler, type, source map */ }
-pub struct Engine { /* ordered registry and capability policy */ }
-
-impl Engine {
-    pub fn empty() -> Self;
-    pub fn full() -> Self;
-    pub fn register(&mut self, module: Arc<dyn DiagramModule>);
-    pub fn registered(&self, kind: DiagramType) -> bool;
-    pub fn detect_type(&self, source: &str) -> Result<Option<DiagramType>, PeleError>;
-    pub fn supports(&self, source: &str) -> bool;
-    pub fn parse(&self, source: &str, options: &ParseOptions)
-        -> Result<ParsedDocument, PeleError>;
-    pub fn render(&self, input: RenderInput<'_>, options: &RenderOptions,
-                  resources: &mut dyn RenderResources)
-        -> Result<RenderResult, PeleError>;
-}
+pub struct ParsedDocument { /* private registration, concrete model, effective config */ }
+pub struct Engine { /* ordered immutable registration snapshots */ }
 ```
 
-`DiagramModule` owns a family descriptor (`type`, config section override, `keep_comments`), parsing and rendering; its public interface is the Rust counterpart of upstream `Diagram<Model>`. Use typed family implementations plus enum dispatch for built-ins. Custom registration must remain possible through a documented extension adapter; arbitrary custom models use an extension variant, not untyped maps for all built-ins. A module returns a validated scene/result, not arbitrary executable content. Browser custom callbacks, if supported for upstream interface compatibility, are explicitly trusted host extensions and cannot implement any built-in family in lieu of Rust.
+Concrete implemented interfaces live in `compat/module.rs`, `compat/engine.rs` and
+`compat/id.rs`. `Engine::empty` starts with no handlers. `register<D: DiagramModule>`
+accepts a module with its own concrete model; type erasure stays private, and
+`ParsedDocument::model<T>` exposes a read-only typed view. Built-in family models
+remain complete concrete Rust types, not generic JSON graphs. A public closed
+33-variant model sum is not required at this seam; it would block new custom kinds.
 
-Registration replaces the handler for its type, like upstream's Map.set. A `ParsedDocument` owns an `Arc` to the exact handler that parsed it, its effective config, and immutable typed model. Re-registering a type must not change how an existing document renders. Parse-stage options are ignored when rendering an existing document, matching upstream. Do not publicly accept arbitrary deserialized JSON as a parsed document; expose a read-only model view/serialization and keep provenance private. A later explicit import-model operation must validate fully and is outside the pinned public interface.
+`DiagramId` separates pinned detector names from open extension IDs. New languages
+register under `DiagramId::Extension` and use `parse_as(id, source, options)`; this
+explicit seam avoids editing detector ordering or changing the wire discriminator.
+Ordinary `parse`/`detect_type` retain pinned built-in precedence. A convenience full
+entry will register every completed built-in; it is not present while none qualify.
 
-The full entry registers all completed built-in modules; the minimal/core entry starts empty. During implementation, capability reports must distinguish `known` (detector exists), `registered` (handler installed), and earned parity levels. Never register a placeholder that parses or draws nothing merely to make `supports` true. At completion, all 33 full-entry handlers are registered. `supports` answers whether detection succeeds and a handler exists, not whether every input parses; it returns false if preprocessing throws. Detection order and regex matching behavior are ported literally, including prefix matches and case differences between detection and parsing.
+`ModuleDescriptor` owns its ID, optional config section and `keep_comments` flag.
+The engine reads it once at registration and keeps that immutable snapshot with the
+handler. Re-registering an ID affects future parses; an existing document retains
+its exact registration, model and effective config, even if the provider's mutable
+state would now return different metadata. A trusted provider can still mutate its
+own behavior; extensions are executable Rust, not sandboxed source.
+
+The public call's `RenderOptions` combines `ParseOptions` and `RenderSettings`.
+The module receives only render settings and the document's retained config, so
+parse-stage overrides cannot accidentally become a second config authority.
+`render_source` parses then renders; `render_document` skips parsing. Arbitrary
+JSON cannot fabricate a document. Ordered model projection uses the compatibility
+value tree and direct serialization, preserving nested JS enumeration order.
+
+A per-render engine resource session decodes authored icon names, caches positive
+and negative lookups, and captures one lazy clock value (or explicit `now`). Those
+semantics do not have to be reimplemented in each diagram. The host supplies text
+measurement and trusted icon markup; source cannot promote itself to trusted
+markup. Registry extensions are trusted code and own their SVG output. Built-in
+renderers must still produce the validated scene/result described below; the
+retained scene and complete native/browser resource adapters are pending layers.
+
+Capabilities distinguish pinned `known` types, installed `registered` handlers and
+earned parity levels. Extension IDs appear as registered but outside the pinned
+known catalogue. Replacement must never inherit certification from a prior handler.
+The empty core advertises zero complete built-in handlers. At completion the full
+entry must register all 33. `supports` checks detected registration and catches
+preprocessing errors, rather than claiming source grammar validation.
 
 ## 4. Module map and translation discipline
 
 Keep the three-crate workspace. Add `crates/pele/src/compat/` for the new interface while leaving legacy symbols forwarding to their current implementation until a separately tested migration is chosen:
 
 ```text
-compat/mod.rs, engine.rs, registry.rs, model.rs, options.rs, error.rs
+compat/mod.rs, engine.rs, module.rs, id.rs, value.rs, error.rs
 compat/source/{mod.rs,preprocess.rs,yaml.rs,entities.rs,detect.rs,locations.rs}
 compat/diagrams/<upstream-directory>/{mod.rs,lexer.rs,parser.rs,model.rs,...}
 compat/layout/{layered.rs,compound.rs,lanes.rs}

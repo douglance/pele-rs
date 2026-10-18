@@ -17,6 +17,7 @@ cp dist/wasm/* bindings/web/pkg/
 cp LICENSE bindings/web/LICENSE
 cp NOTICE bindings/web/NOTICE
 cp third_party/PELE-LICENSE bindings/web/PELE-LICENSE
+cp third_party/MERMAID-LICENSE bindings/web/MERMAID-LICENSE
 cp crates/pele/assets/fonts/OFL.txt bindings/web/FONT-OFL.txt
 mkdir -p dist/release dist/package-web
 npm pack ./bindings/web --pack-destination dist/release --silent

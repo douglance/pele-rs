@@ -4,8 +4,36 @@
   "description": "Independent Rust Mermaid flowcharts through WebAssembly",
   "type": "module",
   "license": "MIT",
-  "repository": { "type": "git", "url": "https://github.com/vijayksingh/pele-rs.git", "directory": "bindings/web" },
-  "exports": { ".": { "types": "./index.d.ts", "import": "./index.js" }, "./pele.wasm": "./pkg/pele_bg.wasm" },
-  "files": ["index.js", "index.d.ts", "pkg/", "LICENSE", "NOTICE", "PELE-LICENSE", "FONT-OFL.txt", "README.md"],
-  "publishConfig": { "access": "public" }
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vijayksingh/pele-rs.git",
+    "directory": "bindings/web"
+  },
+  "exports": {
+    ".": {
+      "types": "./index.d.ts",
+      "import": "./index.js"
+    },
+    "./pele.wasm": "./pkg/pele_bg.wasm",
+    "./core": {
+      "types": "./core.d.ts",
+      "import": "./core.js"
+    }
+  },
+  "files": [
+    "index.js",
+    "index.d.ts",
+    "pkg/",
+    "LICENSE",
+    "NOTICE",
+    "PELE-LICENSE",
+    "FONT-OFL.txt",
+    "README.md",
+    "core.js",
+    "core.d.ts",
+    "MERMAID-LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  }
 }

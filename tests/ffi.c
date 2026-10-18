@@ -26,6 +26,20 @@ int main(void) {
     assert(pele_result_status(result) == 1); pele_result_free(result);
     result = pele_render(NULL, 262145, NULL, 0);
     assert(pele_result_status(result) == 2); pele_result_free(result);
+    result = pele_inspect((const uint8_t *)"pie", 3, NULL, 0);
+    assert(pele_result_status(result) == 0);
+    char inspection[1024]; size_t length = pele_result_len(result);
+    assert(length < sizeof inspection); memcpy(inspection, pele_result_data(result), length); inspection[length] = 0;
+    assert(strstr(inspection, "encodedText") != NULL);
+    pele_result_free(result);
+    result = pele_inspect(NULL, 16777217, NULL, 0);
+    assert(pele_result_status(result) == 2); pele_result_free(result);
+    result = pele_inspect(NULL, 1, NULL, 0);
+    assert(pele_result_status(result) == 1); pele_result_free(result);
+    result = pele_inspect(invalid, 1, NULL, 0);
+    assert(pele_result_status(result) == 1); pele_result_free(result);
+    result = pele_capabilities();
+    assert(pele_result_status(result) == 0); pele_result_free(result);
     puts("C ABI ownership/error integration passed (400 success/error lifetimes)");
     return 0;
 }

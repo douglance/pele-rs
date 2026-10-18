@@ -23,5 +23,6 @@ if [[ "$(uname -s)" == Darwin ]]; then
       -headers "$repo_dir/include" -output "$artifact"
     cp LICENSE "$artifact/LICENSE"
     cp third_party/PELE-LICENSE "$artifact/PELE-LICENSE"
+    cp third_party/MERMAID-LICENSE "$artifact/MERMAID-LICENSE"
     cp crates/pele/assets/fonts/OFL.txt "$artifact/FONT-OFL.txt"
 fi
