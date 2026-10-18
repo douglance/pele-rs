@@ -21,6 +21,8 @@ pub const UPSTREAM_REVISION: &str = "458322a5b8abb1ae57ddf127c32017ab9fb14a92";
 pub const DEFAULT_LIMIT: usize = 50_000;
 pub const DEFAULT_OUTPUT_LIMIT: usize = 4_000_000;
 pub const DEFAULT_MAX_EDGES: usize = 5_000;
+/// A model's shared data can expand during JSON projection. Bound transport allocation.
+pub const MAX_MODEL_JSON_BYTES: usize = 16 * 1024 * 1024;
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(default, rename_all = "camelCase", deny_unknown_fields)]
 pub struct PrepareOptions {

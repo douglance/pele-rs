@@ -17,6 +17,23 @@ trait ErasedModule: Send + Sync {
     fn model_view(&self, model: &Model) -> Result<Value, PeleError>;
 }
 struct Module<D>(D);
+struct ModelWriter {
+    bytes: Vec<u8>,
+    exceeded: bool,
+}
+impl std::io::Write for ModelWriter {
+    fn write(&mut self, bytes: &[u8]) -> std::io::Result<usize> {
+        if bytes.len() > super::MAX_MODEL_JSON_BYTES - self.bytes.len() {
+            self.exceeded = true;
+            return Err(std::io::Error::other("model projection limit"));
+        }
+        self.bytes.extend_from_slice(bytes);
+        Ok(bytes.len())
+    }
+    fn flush(&mut self) -> std::io::Result<()> {
+        Ok(())
+    }
+}
 impl<D: DiagramModule> ErasedModule for Module<D> {
     fn parse(&self, context: ParseContext<'_>) -> Result<Model, PeleError> {
         Ok(Box::new(self.0.parse(context)?))
@@ -36,12 +53,30 @@ impl<D: DiagramModule> ErasedModule for Module<D> {
         )
     }
     fn model_view(&self, model: &Model) -> Result<Value, PeleError> {
-        let json = serde_json::to_string(
-            model
-                .downcast_ref::<D::Model>()
-                .expect("private module/model pairing"),
-        );
-        json.and_then(|s| super::value::parse_json(&s))
+        let model = model
+            .downcast_ref::<D::Model>()
+            .expect("private module/model pairing");
+        self.0.validate_model_projection(model)?;
+        let mut writer = ModelWriter {
+            bytes: Vec::new(),
+            exceeded: false,
+        };
+        let result = serde_json::to_writer(&mut writer, model);
+        if writer.exceeded {
+            return Err(PeleError::new(
+                format!(
+                    "Parsed model JSON exceeds {} bytes",
+                    super::MAX_MODEL_JSON_BYTES
+                ),
+                ErrorCode::Limit,
+            ));
+        }
+        result
+            .and_then(|_| {
+                super::value::parse_json(
+                    std::str::from_utf8(&writer.bytes).expect("JSON serializer emits UTF-8"),
+                )
+            })
             .map_err(|e| {
                 PeleError::new(
                     format!("Module model cannot be serialized: {e}"),
@@ -68,7 +103,15 @@ impl ParsedDocument {
         self.model.downcast_ref()
     }
     pub fn model_view(&self) -> Result<Value, PeleError> {
-        self.registration.module.model_view(&self.model)
+        self.registration
+            .module
+            .model_view(&self.model)
+            .map_err(|mut error| {
+                if error.diagram_type.is_none() {
+                    error.diagram_type = Some(self.diagram_type().as_str().to_owned())
+                }
+                error
+            })
     }
     pub fn config(&self) -> &Object {
         &self.config
@@ -84,6 +127,11 @@ impl Engine {
     pub fn with_builtins() -> Self {
         let mut engine = Self::empty();
         engine.register(super::diagrams::pie::Pie);
+        engine.register(super::diagrams::quadrant_chart::QuadrantChart);
+        engine.register(super::diagrams::packet::Packet);
+        engine.register(super::diagrams::radar::Radar);
+        engine.register(super::diagrams::timeline::Timeline);
+        engine.register(super::diagrams::journey::Journey);
         engine
     }
     pub fn empty() -> Self {

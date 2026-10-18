@@ -251,5 +251,41 @@ pub(crate) fn resolved_svg(svg: &str, theme: &NativeTheme) -> Result<String, Pel
         cursor = range.end;
     }
     out.push_str(&svg[cursor..]);
-    Ok(out)
+    Ok(positioned_text(&out))
+}
+
+// AppKit's SVG decoder drops a text element whose coordinates exist only on its
+// first tspan. Repeating that first position on the parent preserves SVG layout.
+fn positioned_text(svg: &str) -> String {
+    let ranges = tags(svg);
+    let mut out = String::new();
+    let mut cursor = 0;
+    for pair in ranges.windows(2) {
+        let (range, child) = (&pair[0], &pair[1]);
+        let tag = &svg[range.clone()];
+        let span = &svg[child.clone()];
+        if !tag.starts_with("<text ") || !span.starts_with("<tspan ") || range.end != child.start {
+            continue;
+        }
+        let attrs = attributes(tag);
+        let mut position = String::new();
+        for attr in attributes(span) {
+            if matches!(attr.name, "x" | "y") && !attrs.iter().any(|a| a.name == attr.name) {
+                // Preserve the original quote and entity encoding.
+                position.push_str(&format!(
+                    " {}={}",
+                    attr.name,
+                    &span[attr.from - 1..attr.to + 1]
+                ));
+            }
+        }
+        if !position.is_empty() {
+            out.push_str(&svg[cursor..range.end - 1]);
+            out.push_str(&position);
+            out.push('>');
+            cursor = range.end;
+        }
+    }
+    out.push_str(&svg[cursor..]);
+    out
 }

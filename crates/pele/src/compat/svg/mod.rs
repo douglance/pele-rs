@@ -67,8 +67,32 @@ fn span_style(style: u8) -> String {
     )
 }
 pub(crate) fn label_svg(label: &Label, cx: f64, cy: f64, attrs: &str) -> String {
+    label_svg_inner(label, cx, cy, attrs, &mut |_| Ok(String::new()))
+        .expect("empty icon writer cannot fail")
+}
+pub(crate) fn label_svg_with_resources(
+    label: &Label,
+    cx: f64,
+    cy: f64,
+    attrs: &str,
+    resources: &mut dyn crate::compat::RenderResources,
+) -> Result<String, PeleError> {
+    label_svg_inner(label, cx, cy, attrs, &mut |name| {
+        Ok(resources
+            .icon(name)?
+            .map(|svg| svg.markup().to_string())
+            .unwrap_or_default())
+    })
+}
+fn label_svg_inner(
+    label: &Label,
+    cx: f64,
+    cy: f64,
+    attrs: &str,
+    icons: &mut dyn FnMut(&str) -> Result<String, PeleError>,
+) -> Result<String, PeleError> {
     if label.lines.is_empty() {
-        return String::new();
+        return Ok(String::new());
     }
     let shift = label.size * 0.35;
     let mut y = cy - label.height / 2. + label.line_height / 2. + shift;
@@ -77,12 +101,12 @@ pub(crate) fn label_svg(label: &Label, cx: f64, cy: f64, attrs: &str) -> String 
         && label.lines[0][0].icon.is_none()
         && label.lines[0][0].style == 0
     {
-        return format!(
+        return Ok(format!(
             "<text{attrs} x=\"{}\" y=\"{}\" text-anchor=\"middle\">{}</text>",
             num(cx),
             num(y),
             esc(&label.lines[0][0].text)
-        );
+        ));
     }
     let mut shared = 3;
     let mut any = false;
@@ -102,7 +126,7 @@ pub(crate) fn label_svg(label: &Label, cx: f64, cy: f64, attrs: &str) -> String 
     if shared & 1 != 0 && !attrs.contains(" font-weight=\"") {
         attrs.push_str(" font-weight=\"var(--_w)\"")
     }
-    if shared & 2 != 0 {
+    if shared & 2 != 0 && !attrs.contains(" font-style=\"") {
         attrs.push_str(" font-style=\"italic\"")
     }
     let mut body = String::new();
@@ -112,9 +136,9 @@ pub(crate) fn label_svg(label: &Label, cx: f64, cy: f64, attrs: &str) -> String 
             let mut x = cx - label.widths[i] / 2.;
             for span in line {
                 if let Some(icon) = &span.icon {
-                    // The upstream pie renderer invokes labelSvg without an icon writer: retain its empty icon box.
                     let side = label.size * 1.1;
-                    extra.push_str(&format!("<svg class=\"pele-icon\" data-icon=\"{}\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\"></svg>",esc(&decode_entities(icon).unwrap_or_else(|_|icon.clone())),num(x),num(y-shift-side/2.),num(side),num(side)));
+                    let inner = icons(icon)?;
+                    extra.push_str(&format!("<svg class=\"pele-icon\" data-icon=\"{}\" x=\"{}\" y=\"{}\" width=\"{}\" height=\"{}\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\" stroke-linecap=\"round\" stroke-linejoin=\"round\">{inner}</svg>",esc(&decode_entities(icon).unwrap_or_else(|_|icon.clone())),num(x),num(y-shift-side/2.),num(side),num(side)));
                 } else if !span.text.is_empty() {
                     body.push_str(&format!(
                         "<tspan x=\"{}\" y=\"{}\" text-anchor=\"start\"{}>{}</tspan>",
@@ -149,7 +173,9 @@ pub(crate) fn label_svg(label: &Label, cx: f64, cy: f64, attrs: &str) -> String 
         }
         y += label.line_height;
     }
-    format!("<text{attrs} text-anchor=\"middle\" xml:space=\"preserve\">{body}</text>{extra}")
+    Ok(format!(
+        "<text{attrs} text-anchor=\"middle\" xml:space=\"preserve\">{body}</text>{extra}"
+    ))
 }
 fn family<'a>(list: Option<&'a str>, generic: &'a str) -> &'a str {
     static FAMILY: OnceLock<Regex> = OnceLock::new();
@@ -160,6 +186,32 @@ fn family<'a>(list: Option<&'a str>, generic: &'a str) -> &'a str {
     });
     list.filter(|v| !v.is_empty() && re.is_match(v))
         .unwrap_or(generic)
+}
+// Match Pele root.ts: put the default radius first so an authored radius wins.
+fn rounded(content: &str) -> std::borrow::Cow<'_, str> {
+    use std::borrow::Cow;
+    const ROUNDED: &str = " rx=\"var(--pele-radius,4px)\"";
+    if !content.contains(ROUNDED) {
+        return Cow::Borrowed(content);
+    }
+    static RECT: OnceLock<Regex> = OnceLock::new();
+    let re = RECT.get_or_init(|| Regex::new(r"<rect\b[^>]*>").unwrap());
+    Cow::Owned(
+        re.replace_all(content, |captures: &regex::Captures<'_>| {
+            let tag = &captures[0];
+            let Some(at) = tag.find(ROUNDED) else {
+                return tag.to_string();
+            };
+            let rest = format!("{}{}", &tag[..at], &tag[at + ROUNDED.len()..]);
+            if let Some(style) = rest.find(" style=\"") {
+                format!("{}rx:var(--_r);{}", &rest[..style + 8], &rest[style + 8..])
+            } else {
+                let end = rest.len() - if rest.ends_with("/>") { 2 } else { 1 };
+                format!("{} style=\"rx:var(--_r)\"{}", &rest[..end], &rest[end..])
+            }
+        })
+        .into_owned(),
+    )
 }
 pub(crate) fn document(
     kind: &str,
@@ -193,7 +245,12 @@ pub(crate) fn document(
     } else {
         "max-width:100%;height:auto;"
     };
-    let mut weights = String::new();
+    let content = rounded(content);
+    let mut weights = if content.contains("var(--_r)") {
+        ";--_r:var(--pele-radius,4px)".to_string()
+    } else {
+        String::new()
+    };
     for (alias, name) in [("--_tw", "title"), ("--_hw", "heading"), ("--_w", "bold")] {
         if content.contains(&format!("var({alias})")) {
             weights.push_str(&format!(";{alias}:var(--pele-{name}-weight,bold)"))

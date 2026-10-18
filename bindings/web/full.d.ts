@@ -10,12 +10,27 @@ export interface RenderOptions extends ParseOptions {
   links?: boolean; images?: boolean; linkRel?: string; now?: number;
 }
 export interface PieModel { type: 'pie'; title?: string; accTitle?: string; accDescr?: string; showData: boolean; sections: ReadonlyMap<string, number> }
+export interface AccessibleModel { title?: string; accTitle?: string; accDescr?: string }
+export interface PacketBlock { start: number; end: number; bits: number; label: string }
+export interface PacketModel extends AccessibleModel { type: 'packet'; bitsPerRow: number; rows: PacketBlock[][] }
+export interface RadarAxis { name: string; label: string }
+export interface RadarCurve { name: string; label: string; entries: number[] }
+export interface RadarModel extends AccessibleModel { type: 'radar'; axes: RadarAxis[]; curves: RadarCurve[]; options: { showLegend: boolean; ticks: number; max: number | null; min: number; graticule: 'circle' | 'polygon' } }
+export interface QuadrantText { text: string; type: string }
+export interface PointStyle { radius?: number; color?: string; strokeColor?: string; strokeWidth?: string }
+export interface QuadrantPoint extends PointStyle { x: number; y: number; text: QuadrantText; className: string }
+export interface QuadrantModel extends AccessibleModel { type: 'quadrantChart'; quadrants: [QuadrantText | null, QuadrantText | null, QuadrantText | null, QuadrantText | null]; xAxisLeft?: QuadrantText; xAxisRight?: QuadrantText; yAxisBottom?: QuadrantText; yAxisTop?: QuadrantText; points: QuadrantPoint[]; classes: ReadonlyMap<string, PointStyle> }
+export interface TimelinePeriod { text: string; events: string[]; section: string; sectionIndex: number }
+export interface TimelineModel extends AccessibleModel { type: 'timeline'; direction: string; sections: string[]; periods: TimelinePeriod[]; currentSection: string }
+export interface JourneyTask { task: string; score: number; people: string[]; section: string }
+export interface JourneyModel extends AccessibleModel { type: 'journey'; sections: string[]; tasks: JourneyTask[]; currentSection: string }
+export type DiagramModel = PieModel | PacketModel | RadarModel | QuadrantModel | TimelineModel | JourneyModel;
 export interface Rendered { type: DiagramId; svg: string; width: number; height: number; links: { id: string; href: string; internal: boolean }[] }
 export interface Renderer {
   capabilities(): Capability[];
-  parse(source: string, options?: ParseOptions): PieModel;
-  render(input: string | PieModel, options?: RenderOptions): Rendered;
-  dispose(model: PieModel): void;
+  parse(source: string, options?: ParseOptions): DiagramModel;
+  render(input: string | DiagramModel, options?: RenderOptions): Rendered;
+  dispose(model: DiagramModel): void;
 }
 export function loadRenderer(moduleOrPath?: string | URL | Response | BufferSource | WebAssembly.Module): Promise<Renderer>;
 

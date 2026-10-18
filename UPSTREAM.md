@@ -47,6 +47,14 @@ origin and SHA-256 are in `crates/pele/assets/fonts/README.md`.
 | `compat/{value,error}.rs` | `src/{preprocess,errors}.ts`, `src/util/chars.ts` | Ordered JS-compatible config values, scalar formatting and UTF-16 diagnostics |
 | `compat/{engine,module}.rs` | `src/core.ts`, `src/types.ts` | Typed Rust module/resource interfaces and parse provenance; full built-ins pending |
 | `compat/diagrams/pie/` | `src/diagrams/pie/{parser,model,render}.ts`, `src/diagrams/common/{tokens,fit-width}.ts` | Pie parser, ordered model, sectors/donut layout, legends, width fitting and exact SVG translation |
+| `compat/diagrams/packet/` | `src/diagrams/packet/{parser,model,render}.ts`, common literal-label/fit-text/fit-width | Packet rows, splitting, narrow reflow, labels and bit numbering; shared Rust label strings avoid repeated allocation |
+| `compat/diagrams/quadrant_chart/` | `src/diagrams/quadrant/{index,lexer,parser,db,render,tokens}.ts` | Typed ordered styles/points, axes, quadrants, labels, point layout and responsive sizing |
+| `compat/diagrams/radar/` | `src/diagrams/radar/{parser,model,render,index}.ts` | Axes/curves/options, reference entries, radial geometry, legends and width fitting |
+| `compat/diagrams/timeline/` | `src/diagrams/timeline/{index,db,lexer,parser,render}.ts` | Periods/events/sections, colors, horizontal/vertical layout and narrow adaptation |
+| `compat/diagrams/journey/` | `src/diagrams/journey/{index,db,lexer,parser,render}.ts` | Tasks/actors/scores, ordered sections, faces and horizontal/vertical layout |
+| `compat/diagrams/common.rs` | `src/diagrams/common/tokens.ts` | Hidden YAML greedy-optional-body behavior shared by pie, packet and radar |
+| `compat/diagrams/flowchart/` | `src/diagrams/flowchart/{lexer,parser,db,types,shapes}.ts` | Full source/model checkpoint; actual renderer remains in progress |
+| `compat/source/url.rs` | `src/util/url.ts` | Sanitization and scheme gates; WHATWG HTTP normalization uses Rust url crate |
 | `compat/text/` | `src/text/{label,measurer,metrics}.ts` | Rich labels, wrapping, style spans and deterministic Arial fallback metrics |
 | `compat/svg/` | `src/svg/{builder,root,theme}.ts` | Escaping, labels, SVG root and theme tokens; native palette resolution is a Rust extension |
 | `bindings/web/resources.js` | `src/text/measurer.ts` | Browser-only Canvas measurement/cache adapter; fallback advances execute in Rust |
@@ -57,12 +65,17 @@ checkout using Node's development-only TypeScript transformation. Its 34 source
 corpora include 761 examples across every family and agentflow reference cases.
 Mermaid fixture licensing is retained in `third_party/MERMAID-LICENSE`.
 
-`fixtures/pele/pie.json` and `scripts/parity/extract-pie.mjs` pin 11 source-file
-hashes and 3,670 public parse/render scenarios: 1,175 complete SVG results and 2,495
-errors. The oracle JavaScript is a development dependency only. Pie has identical
-model/error/SVG checks in Rust, Swift/C and three real browser engines. This does
+The six family fixtures and extractors pin source-file hashes and 58,154 public
+parse/render scenarios. Large SVGs use exact SHA256 comparisons; complete models
+remain present. A separate packet stress case checks shared labels and a 10,000-row
+typed model without materializing 400 MB of JSON. The oracle JavaScript is a
+development dependency only. Models/errors/SVG are checked through Rust, Swift/C
+and three real browser engines. This does
 not certify all public API behavior: JavaScript model mutations are not yet applied
 to retained Rust documents, and lazy registration/mount/zoom remain pending.
+Shared label model projections have an explicit 16 MiB JSON transport cap, while
+typed Rust models and direct source rendering retain shared data. Native export
+also repeats initial tspan coordinates on parent text for AppKit's SVG decoder.
 
 The full-parity inventory remains the acceptance gate. Passing preparation cases
 is not complete grammar/model/render compatibility. In particular, Rust/Swift UTF-8

@@ -147,6 +147,11 @@ pub trait RenderResources {
 /// Modules are trusted Rust code; registering one grants responsibility for its emitted SVG.
 pub trait DiagramModule: Send + Sync + 'static {
     type Model: Serialize + Send + Sync + 'static;
+    /// Guard recursive/shared model expansion before JSON introspection. This does
+    /// not reject the typed model or prevent rendering without that projection.
+    fn validate_model_projection(&self, _model: &Self::Model) -> Result<(), PeleError> {
+        Ok(())
+    }
     fn descriptor(&self) -> ModuleDescriptor;
     fn parse(&self, context: ParseContext<'_>) -> Result<Self::Model, PeleError>;
     fn render(

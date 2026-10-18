@@ -94,6 +94,15 @@ fn native_export_resolves_palette_without_changing_authored_text() {
         .svg
         .contains("data-id=\"style='var(--_fg)'\""));
     let xml = roxmltree::Document::parse(&diagram.rendered.svg).unwrap();
+    for text in xml.descendants().filter(|n| n.has_tag_name("text")) {
+        if let Some(span) = text
+            .first_element_child()
+            .filter(|n| n.has_tag_name("tspan"))
+        {
+            assert_eq!(text.attribute("x"), span.attribute("x"));
+            assert_eq!(text.attribute("y"), span.attribute("y"));
+        }
+    }
     for node in xml.descendants().filter(|n| n.is_element()) {
         for attr in node.attributes() {
             if matches!(

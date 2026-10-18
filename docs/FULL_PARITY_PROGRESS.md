@@ -1,103 +1,115 @@
 # Full-library port: development evidence
 
-The acceptance target remains every row of `PELE_PARITY.md`. The public v0.1.0
-release remains the documented legacy flowchart subset. No full-library release
-or new GIF has been published from this work.
+Acceptance remains every row of `PELE_PARITY.md`: all 33 families and public APIs.
+The public v0.1.0 release remains the legacy flowchart subset. No full-library
+release or new GIF has been published from this branch.
 
-## Current layer
+## Implemented renderers
 
-- Astra's LLD and source inventory: commit `67204fc`. All 33 families and all 287
-  pinned upstream TypeScript modules are accounted for.
-- Independent `compat` namespace and version-2 source-preparation contract;
-  legacy Rust/C/Swift/WASM render interfaces keep version 1.
-- Typed `DiagramModule<Model>` and per-render `RenderResources` interfaces;
-  immutable documents retain handler, concrete model and resolved config.
-  Consumer-module integration checks replacement, retained lifetime, model view,
-  source comments/line offsets, host measurement, output limits and parse-once use.
-  Open extension IDs with `parse_as` avoid changes to the built-in detector. Registration
-  metadata is immutable; handlers receive render-only settings and retained config.
-  Engine-owned resource sessions decode/cache icons and capture time per render.
-  1,536 additional public consumer-link scenarios check named/numeric entities,
-  malformed placeholders, decoded link IDs and upstream error behavior.
-- Ordered configuration keeps JS numeric values (including NaN/Infinity
-  internally), unsafe-key filtering, integer-key enumeration and JSON scalar
-  formatting. Frontmatter/directives use document deep merge and host shallow
-  precedence. Compatibility locations/source limits use UTF-16 units.
-- Detector knows all 33 families. `Engine::with_builtins()` registers pie;
-  `Engine::empty()` remains available for consumer modules. No global family/API
-  parity gates are certified merely from registration.
-- Pie parser, ordered model, real sector/donut geometry, labels, accessibility,
-  legends and width fitting are translated from pinned source. Shared rich-label,
-  fallback metrics and SVG primitives support the actual pie renderer.
-- C/Swift and WASM own immutable parsed documents. Per-call text/icon callbacks
-  remain host resources; the Rust engine retains parsing/configuration authority.
-  Optional native palette resolution enables native SVG decoders without CSS vars.
+`Engine::with_builtins()` currently registers six actual Rust diagram modules.
+`Engine::empty()` and typed `DiagramModule<Model>` remain extension interfaces.
+Registration never certifies a global parity flag; all public API gates remain open.
 
-## Verification corpus
+| Family | Public scenarios | Model/SVG results | Errors |
+| --- | ---: | ---: | ---: |
+| pie | 3,678 | 1,179 | 2,499 |
+| quadrantChart | 10,614 | 1,586 | 9,028 |
+| packet | 12,774 | 2,924 | 9,850 |
+| radar | 8,431 | 1,791 | 6,640 |
+| timeline | 11,932 | 8,017 | 3,915 |
+| journey | 10,725 | 3,244 | 7,481 |
+| Total | 58,154 | 18,741 | 39,413 |
 
-`fixtures/pele/source.json`: 5,345 public preparation scenarios. Includes all 761
-examples in 34 pinned upstream corpus files, upstream YAML metadata cases,
-frontmatter/directives/comments, detector ordering/case/boundaries, Unicode,
-malformed input and fixed-seed mutations. No source fixture is skipped.
+These fixtures run through Rust, Swift/C and real browser WASM. Models and errors
+compare completely. SVG compares byte-for-byte, or by SHA256 of every UTF-8 byte
+for large outputs. Extractors pin the upstream revision and source-file hashes.
 
-Consolidated `scripts/verify.sh` passed on 2026-10-18 after the interface audit
-fixes. Host: macOS 26.6 arm64, Rust 1.98.1, Swift 6.4, Node 25.9.0.
+The actual parsers/models/layouts/renderers are translated, including narrow
+adaptation, configuration, accessibility and host resources. There is no upstream
+JavaScript renderer in distributed Rust/native/WASM code. JavaScript is a
+build/test oracle and browser font/resource adapter only.
 
-- Twelve Rust integration tests: legacy renderer checks, 5,345 source-preparation
-  scenarios, 1,536 consumer-link entity scenarios, downstream module lifecycle,
-  open IDs, metadata snapshot, ordered projection, per-render resources and limits.
-- Packaged Rust crate verifies; independent Cargo consumer executes successfully.
-- C executable passes ownership/NULL/UTF-8/budget checks and compatibility inspection.
-- Both Swift integration tests pass, including every final preparation fixture.
-- Current Swift/C + AppKit SVG proof: 416 x 789 image, 6,846 painted pixels.
-- Independent root SwiftPM consumer runs; 10 legacy Rust/Swift/Pele comparisons pass.
-- Six browser integration tests pass using the extracted npm tarball: legacy WASM
-  rendering and all 5,345 preparation cases in Chrome, Firefox and WebKit.
-- Rust formatting and Git whitespace checks pass. Browser workers remain serialized.
+Full flowchart parser checkpoint: `76efca9`, 4,796 model/error scenarios, separately
+from the legacy renderer. Actual shared layered/compound, shape/edge and full
+flowchart rendering are in progress. The checkpoint alone adds no flowchart
+handler to built-ins; see `FLOWCHART_PORT.md` for declared-model/private-cache scope.
 
-Source-preparation scenarios run through Rust, C/Swift and real browser WASM; the
-extension module/resource/link scenarios currently run through the Rust interface.
-No new CI run, Intel execution or full-parity release is asserted for this branch.
+## Shared interfaces and behavior
 
-## Pie verification (2026-10-18)
+- Astra LLD/source inventory: `67204fc`; 33 families and 287 source files accounted for.
+- Compatibility core: `e86bfc5`; legacy Rust/C/Swift/WASM interfaces remain v1.
+  Pie/owned host adapters: `82a2791`; development model/render results are v2.
+- Modules retain typed models and resolved configuration. Documents retain exact
+  registration/metadata even after replacement. Open IDs and `parse_as` support
+  consumer languages without changing the pinned built-in detector.
+- Engine-owned resource sessions cache decoded icons and capture one clock value
+  per render. Text/icon callbacks stay per-call; wrappers do not own grammar/layout.
+- Ordered JS-compatible values, preprocessing, YAML and entities remain shared.
+  Source locations and ordinary source/output limits use UTF-16 units.
+- Shared hidden-YAML token matching now preserves the greedy optional-body branch
+  found by packet differential tests; pie and radar use the same implementation.
+- Typed packet rows share label strings. JSON projection stops while serializing
+  above 16 MiB, before allocating a pathological 400 MB model projection. Rust
+  typed models remain accessible, and source/document rendering remains usable.
+- Native export resolves CSS theme tokens, moves rounded rectangle radii into
+  style declarations, and repeats first-tspan coordinates on parent text. AppKit
+  otherwise drops such text despite a valid SVG accepted by browsers.
 
-`fixtures/pele/pie.json`: 3,670 scenarios generated from the clean pinned upstream
-revision with source hashes. Includes documentation/spec sources, 1,175 rendered
-results and 2,495 errors, rich labels, configuration/legend placement, donuts,
-width fitting, metadata, host icons/measurement, hostile inputs and mutations.
+## Verified delivery lanes (2026-10-18)
 
-- Both Rust pie integration tests pass: every model/error/complete SVG plus native
-  palette export and real rasterization. Fourteen Rust integration tests pass
-  across pie, legacy, preparation and extension feature slices.
-- Swift/C runs every pie fixture through owned documents and host callbacks.
-  C ownership checks pass for 400 legacy and 200 parsed pie document lifetimes.
-- Nine pie browser tests pass from the extracted npm package: complete corpus,
-  native SVG pixels and upstream browser Canvas/font/callback comparisons in
-  Chrome, Firefox and WebKit, with one worker.
-- Swift AppKit decodes and paints the current pie SVG: 358 x 296, 44,733 colored
-  pixels. Legacy AppKit proof remains 416 x 789, 6,846 painted pixels.
-- The packaged Rust crate and separate downstream Cargo consumer pass. Formatting
-  and Git whitespace checks pass. These checks do not publish a release.
+Host: macOS 26.6 arm64 / Apple M1 Pro, Rust 1.98.1, Swift 6.4, Node 25.9.
+
+- Public Rust integration coverage passes across legacy, preparation, extension,
+  all six families and the flowchart parser checkpoint. No unit tests added.
+- Source preparation: all 5,345 scenarios, including 761 examples from 34 upstream
+  corpora; extension links: 1,536 entity/link scenarios.
+- All four Swift integration tests pass. The additional-diagram test exercises
+  every packet/radar/quadrant/timeline/journey fixture through owned documents,
+  callbacks and source rendering; pie and preparation have their own full corpora.
+- Thirty-three browser integration tests pass with one worker in Chrome, Firefox
+  and WebKit, using the extracted npm tarball. Includes exact corpus comparisons,
+  actual SVG pixels, browser Canvas/font behavior and callback error propagation.
+- C executable passes NULL/UTF-8/limits/ownership checks: 400 legacy lifetimes plus
+  200 owned pie document lifetimes.
+- Rust crate packaging and independent downstream Cargo consumer pass.
+- Formatting/whitespace checks pass for completed slices. In-progress flow layout
+  helpers are not certified until their real public diagram path is verified.
+
+AppKit decodes and paints current native exports. White proof backgrounds belong
+only to raster evidence, while exported diagrams retain SVG transparency.
+
+| Diagram | Native pixels | Additional text proof |
+| --- | --- | --- |
+| legacy flowchart | 416 x 789; 6,846 painted | Legacy outlined font path |
+| pie | 358 x 296; 44,733 colored | Native compatibility export |
+| packet | 1035 x 98; 6,053 painted | 456 title pixels |
+| radar | 470 x 419; 35,281 painted | 159 title pixels |
+| timeline | 408 x 266; 49,449 painted | 295 title pixels |
+| journey | 340 x 327; 4,719 painted | 413 title pixels |
+| quadrantChart | 500 x 500; 8,718 painted | 373 title pixels |
+
+Packet has one additional stress scenario: 40,000-character label shared across
+10,000 rows. Rust verifies every typed row and exact rendered SVG hash. Foreign
+hosts verify a bounded projection error and successful exact source-render hash.
+The 400 MB JSON projection is deliberately not built.
 
 ## Remaining acceptance work
 
-The other 32 family parsers/models/renderers, remaining shared layout/text/shape/
-theme behavior and DOM mount/zoom/lazy APIs remain required. Shared preparation
-is not the grammar for 33 diagrams. User authorized three parallel module ports:
-quadrantChart, packet and radar, with separate file ownership and parent integration.
-Full flowchart and its shared layout consumers remain required.
+- Twenty-seven family renderers, remaining shared behavior and the complete
+  registration/lazy/mount/zoom/public model interface remain required.
+- JavaScript model projections currently do not apply mutations back into the
+  retained Rust document. Prototype methods/private enumerable state also need
+  explicit compatibility decisions; full host parity is not claimed.
+- Lone UTF-16 surrogate transport remains unresolved. Radar records two and
+  quadrant three unrepresentable mutations explicitly; they are not passing cases.
+  Init-JSON's explicit 64-level work cap, extreme radix rounding and non-finite/
+  negative numeric host budgets also require broader conformance.
+- The 16 MiB JSON projection cap is an explicit transport extension. Large typed
+  models/source rendering work without that expanded projection.
+- No new CI run, Intel execution, GPU acceleration or full-parity release is asserted.
+  Initial four-family Chrome timings show slower current WASM public calls than
+  Pele JS; see `PERFORMANCE.md`. Rust/GPU choices are not speedup evidence.
 
-JavaScript models currently project retained immutable Rust documents: mutating
-the projection does not update rendered content. Full public API parity requires
-an explicit solution. Non-finite/negative numeric budgets across host transports
-also require further conformance before release. Current finite-budget corpus
-evidence does not close those gaps.
-
-Known preparation gaps remain explicit: lone UTF-16 surrogates across UTF-8
-transports/unpaired YAML escapes, the explicit 64-level init-JSON work cap, and extreme
-radix rounding need further conformance. The present fixture evidence is bounded;
-it is not a claim of exhaustive source-language parity.
-
-Development Swift inspection APIs require `scripts/build-native.sh`; root SwiftPM
-with the old downloaded v0.1 binary excludes those new symbols. WASM inspection
-requires `scripts/build-wasm.sh`. No new release asset is substituted under v0.1.
+Development Swift APIs require source-built native artifacts. Root SwiftPM using
+old v0.1 downloaded binaries excludes newer symbols. WASM needs a source build.
+No replacement binary is substituted under the old release tag.

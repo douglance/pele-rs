@@ -202,44 +202,9 @@ fn tokenize(src: &str) -> Result<Vec<Token>, PeleError> {
             p = start;
             continue;
         }
-        if tail.starts_with("---") {
-            let open = blank(src, p + 3);
-            let open_end = if src[open..].starts_with("\r\n") {
-                Some(open + 2)
-            } else if src[open..].starts_with('\n') {
-                Some(open + 1)
-            } else {
-                None
-            };
-            if let Some(body) = open_end {
-                let mut at = body;
-                let mut end = None;
-                loop {
-                    if src[at..].starts_with("---") {
-                        let after = at + 3;
-                        end = if src[after..].starts_with("\r\n") {
-                            Some(after + 2)
-                        } else if src[after..].starts_with('\n') {
-                            Some(after + 1)
-                        } else if src[after..].chars().next().is_none_or(space) {
-                            Some(after)
-                        } else {
-                            None
-                        };
-                        if end.is_some() {
-                            break;
-                        }
-                    }
-                    let Some(next) = src[at..].find('\n').map(|i| at + i + 1) else {
-                        break;
-                    };
-                    at = next;
-                }
-                if let Some(end) = end {
-                    p = end;
-                    continue;
-                }
-            }
+        if let Some(end) = super::super::common::hidden_yaml_end(src, p) {
+            p = end;
+            continue;
         }
         if tail.starts_with("%%{") {
             if let Some(end) = tail[3..].find("}%%").map(|i| p + 3 + i + 3) {

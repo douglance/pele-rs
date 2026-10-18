@@ -6,7 +6,8 @@ Reference revision: 458322a5b8abb1ae57ddf127c32017ab9fb14a92
 Copyright (c) 2026 kepano. MIT; see third_party/PELE-LICENSE.
 The legacy flowchart engine is independently written. The new compatibility
 source layer translates Pele preprocessing, detection, YAML and entity handling.
-Compatibility pie, rich labels, fallback text metrics and SVG primitives translate
+Compatibility pie, quadrant, packet, radar, timeline, journey, flowchart parsing,
+rich labels, fallback text metrics, URL handling and SVG primitives translate
 the pinned upstream implementation; upstream MIT attribution applies to these ports.
 Full parser, model and rendering parity remains under implementation.
 
