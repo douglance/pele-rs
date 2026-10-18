@@ -2,6 +2,8 @@
 //! Public codecs are opt-in; an unimplemented codec never silently ignores edits.
 mod engine;
 mod graph;
+mod host_function;
+pub use host_function::{ActiveModel, HostFunction};
 mod schema;
 pub use engine::{PublicDiagramModule, PublicDocument, PublicEngine};
 pub use graph::{Atom, ErrorObjectKind, GraphWriter, JsString, ModelGraph, Node, Property};

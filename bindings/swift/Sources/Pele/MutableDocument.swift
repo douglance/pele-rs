@@ -25,6 +25,7 @@ extension Pele {
     public final class MutableDocument {
         private var handle: OpaquePointer?
         private var active = false
+        var hostFunctions: [UInt32: HostFunctionBox] = [:]
         public let type: String
         public private(set) var revision: UInt64
         fileprivate init(handle: OpaquePointer, type: String, revision: UInt64) {
@@ -33,9 +34,13 @@ extension Pele {
         deinit { if let handle { pele_public_document_free_v4(handle) } }
         public func close() throws {
             guard !active else { throw PeleError(code: "semantic", message: "Mutable document is already in use") }
-            if let handle { pele_public_document_free_v4(handle); self.handle = nil }
+            if let handle {
+                active = true; self.handle = nil
+                defer { active = false }
+                pele_public_document_free_v4(handle); hostFunctions.removeAll()
+            }
         }
-        private func withHandle<T>(_ operation: (OpaquePointer) throws -> T) throws -> T {
+        func withHandle<T>(_ operation: (OpaquePointer) throws -> T) throws -> T {
             guard let handle else { throw PeleError(code: "semantic", message: "Mutable document is closed") }
             guard !active else { throw PeleError(code: "semantic", message: "Mutable document is already in use") }
             active = true; defer { active = false }
@@ -103,18 +108,22 @@ extension Pele {
             let settings = try RenderNumberEncoding(options, outputLimit: outputLimit)
             let presentation = try presentationBudget?.packet()
             return try withHandle { handle in
-                let response = resources.withCapturedNativeResources { host in settings.withPacket { packet in settings.optionsJSON.withUnsafeBytes { bytes in
+                let response = resources.withCapturedNativeResources { host, takeError in
+                    withHostFunctionResources(takeError) {
+                        return settings.withPacket { packet in settings.optionsJSON.withUnsafeBytes { bytes in
                     if var value = presentation {
                         return withUnsafePointer(to: &value) { presentation in
                             pele_public_render_presentation_v11(handle, revision, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, packet, settings.outputKind, settings.outputBits, presentation, host)
                         }
                     }
                     return pele_public_render_operation_with_numbers_v9(handle, revision, bytes.bindMemory(to: UInt8.self).baseAddress, bytes.count, packet, settings.outputKind, settings.outputBits, host)
-                }}}
+                }}}}
+                defer { clearHostFunctionErrors() }
                 do {
                     let exchange = try Pele.binaryResult(response.handle)
                     let outcome = PublicRenderOutcome(revision: exchange.revision, graph: exchange.graph, result: try JSONDecoder().decode(PublicRenderResult.self, from: exchange.metadata))
                     revision = outcome.revision
+                    if let original = originalHostFunctionError(outcome.result) { throw original }
                     if let error = response.error { throw error }
                     return outcome
                 } catch { if let original = response.error { throw original }; throw error }

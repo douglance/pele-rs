@@ -150,7 +150,7 @@ pub unsafe extern "C" fn pele_public_render_presentation_v11(
         let (options, limit) = unsafe { render_numbers::options(bytes, len, numbers, kind, bits) }?;
         let mut document = unsafe { public::document(handle) }?;
         let (outcome, presentation) = unsafe {
-            calendar::with_resources(resources, |host| {
+            super::host_functions::with_resources(handle, resources, |host| {
                 let mut capture = PresentationCapture::new(host, budget);
                 let outcome = document.render_operation_bounded(
                     expected_revision,

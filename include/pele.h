@@ -299,6 +299,36 @@ PeleResult *pele_public_render_presentation_v11(PelePublicDocument *, uint64_t,
     const uint8_t *, size_t, const PeleRenderNumbersV9 *, uint32_t, uint64_t,
     const PelePresentationOptionsV11 *, const PeleHostResourcesV3 *);
 
+/* Owner-thread host methods for mutable built-in models. Binding retains context
+ * once until document close (maximum 1024). IDs are never reused and only resolve
+ * on their owner document. Callback/table must not unwind across C. */
+typedef struct PeleActiveModelV12 PeleActiveModelV12;
+typedef struct PeleHostFunctionReplyV12 {
+    uint32_t status, exception; /* 0 Atom JSON, 1 PublicError JSON, 2 exception token */
+    PeleForeignBytesV10 payload; /* copied then released exactly once */
+} PeleHostFunctionReplyV12;
+typedef struct PeleHostFunctionV12 {
+    uint32_t version, struct_size; /* 12, sizeof(PeleHostFunctionV12) */
+    void *context;
+    void (*retain)(void *);
+    void (*release)(void *);
+    void (*invoke)(void *, PeleActiveModelV12 *, const uint8_t *, size_t, PeleHostFunctionReplyV12 *);
+    uint64_t reserved[2];
+} PeleHostFunctionV12;
+PeleResult *pele_public_bind_host_function_v12(PelePublicDocument *, const PeleHostFunctionV12 *, uint32_t *);
+PeleResult *pele_public_render_operation_with_functions_v12(PelePublicDocument *, uint64_t,
+    const uint8_t *, size_t, const PeleRenderNumbersV9 *, uint32_t, uint64_t, const PeleHostResourcesV3 *);
+/* Active view only valid synchronously inside its callback. Never retain pointer.
+ * Access JSON <=1MiB; one million operations per call plus existing arena budgets.
+ * Operations: root, read/set {receiver,key[,value]}, intern {units:[u16]},
+ * string/dateMillis {value}, object, array, date {value:NumberAtom},
+ * push {receiver,value}, invokeBuiltin {call:{method,receiver,arguments}}.
+ * Result envelope contains Result<{kind:atom|string,value},PublicError>.
+ * Structural array mutation uses push; direct length assignment is unsupported.
+ * Same-view reentry during invokeBuiltin fails; public document is busy throughout.
+ */
+PeleResult *pele_active_model_access_v12(PeleActiveModelV12 *, const uint8_t *, size_t);
+
 uint32_t pele_result_status(const PeleResult *result);
 const uint8_t *pele_result_data(const PeleResult *result);
 size_t pele_result_len(const PeleResult *result);

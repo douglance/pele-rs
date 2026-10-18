@@ -15,6 +15,13 @@ const GRAPH_JSON_BUDGET: usize = 64 * 1024 * 1024;
 /// Opaque owner. Operations serialize; callers must not free while an operation is active.
 pub struct PelePublicDocument {
     document: Mutex<PublicDocument>,
+    pub(super) host_functions: std::cell::RefCell<super::host_functions::Bindings>,
+}
+pub(super) fn owned_document(document: PublicDocument) -> *mut PelePublicDocument {
+    Box::into_raw(Box::new(PelePublicDocument {
+        document: Mutex::new(document),
+        host_functions: Default::default(),
+    }))
 }
 pub(super) fn invalid(message: &str) -> PeleError {
     PeleError::new(message, ErrorCode::Semantic)
@@ -248,9 +255,7 @@ pub unsafe extern "C" fn pele_public_parse_v4(
         let result = success(
             serde_json::json!({"type":document.diagram_type(),"revision":document.revision().to_string()}),
         )?;
-        *out = Box::into_raw(Box::new(PelePublicDocument {
-            document: Mutex::new(document),
-        }));
+        *out = owned_document(document);
         Ok(result)
     })
 }
@@ -304,9 +309,7 @@ pub unsafe extern "C" fn pele_public_parse_source_limit_v6(
         let result = success(
             serde_json::json!({"type":document.diagram_type(),"revision":document.revision().to_string()}),
         )?;
-        *out = Box::into_raw(Box::new(PelePublicDocument {
-            document: Mutex::new(document),
-        }));
+        *out = owned_document(document);
         Ok(result)
     })
 }
@@ -348,9 +351,7 @@ pub(super) fn publish_document(
     let result = success(
         serde_json::json!({"type":document.diagram_type(),"revision":document.revision().to_string()}),
     )?;
-    *out = Box::into_raw(Box::new(PelePublicDocument {
-        document: Mutex::new(document),
-    }));
+    *out = owned_document(document);
     Ok(result)
 }
 /// Independently select exact source/edge thresholds or legacy integer options.
@@ -694,7 +695,9 @@ pub unsafe extern "C" fn pele_public_render_operation_output_limit_v6(
     })
 }
 
-fn render_outcome(outcome: &pele::compat::public::RenderOutcome) -> Result<PeleResult, PeleError> {
+pub(super) fn render_outcome(
+    outcome: &pele::compat::public::RenderOutcome,
+) -> Result<PeleResult, PeleError> {
     binary_metadata(
         outcome.revision,
         &outcome.graph,
@@ -741,7 +744,7 @@ pub unsafe extern "C" fn pele_public_render_operation_with_numbers_v9(
             unsafe { super::render_numbers::options(bytes, len, numbers, kind, bits) }?;
         let mut document = unsafe { document(handle) }?;
         let outcome = unsafe {
-            calendar::with_resources(resources, |host| {
+            super::host_functions::with_resources(handle, resources, |host| {
                 document.render_operation_bounded(expected_revision, &options, limit, host)
             })
         }?;

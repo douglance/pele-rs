@@ -128,6 +128,13 @@ impl<'a> PresentationCapture<'a> {
     }
 }
 impl RenderResources for PresentationCapture<'_> {
+    fn host_function(
+        &mut self,
+        reference: u32,
+    ) -> Result<std::rc::Rc<dyn super::public::HostFunction>, super::public::PublicError> {
+        self.host.host_function(reference)
+    }
+
     fn presentation_budget(&self) -> Option<PresentationBudget> {
         self.budget
     }

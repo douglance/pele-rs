@@ -14,10 +14,10 @@ use super::{
 };
 use crate::compat::{
     public::{
-        Atom, FieldKind, FieldSchema, JavaScriptErrorKind, JsString, MemberKind, MemberSchema,
-        MethodCall, MethodId, MethodSchema, ModelGraph, ModelSchema, Node, Property, PrototypeId,
-        PrototypeParent, PrototypeSchema, PublicDiagramModule, PublicError, RecordId, RecordKind,
-        RecordSchema,
+        ActiveModel, Atom, FieldKind, FieldSchema, JavaScriptErrorKind, JsString, MemberKind,
+        MemberSchema, MethodCall, MethodId, MethodSchema, ModelGraph, ModelSchema, Node, Property,
+        PrototypeId, PrototypeParent, PrototypeSchema, PublicDiagramModule, PublicError, RecordId,
+        RecordKind, RecordSchema,
     },
     ErrorCode,
 };
@@ -2336,7 +2336,126 @@ impl Arena<'_> {
         Ok(Atom::Undefined)
     }
 }
-fn imported(c: &mut Context<'_>, tasks: Atom) -> Result<GanttModel, PublicError> {
+impl ActiveModel for Arena<'_> {
+    fn root(&self) -> Atom {
+        self.c.g.root.clone()
+    }
+    fn validate(&self, value: &Atom) -> Result<(), PublicError> {
+        self.c.g.validate_atom(value)?;
+        if let Atom::BuiltinFunction(id) = value {
+            if SCHEMA.method(MethodId(*id)).is_none() {
+                return Err(invalid("Unknown public builtin function").into());
+            }
+        }
+        Ok(())
+    }
+    fn read(&mut self, receiver: &Atom, key: &str) -> Result<Atom, PublicError> {
+        self.validate(receiver)?;
+        if key.len() > 1024 * 1024 {
+            return Err(limit().into());
+        }
+        self.c.tick(key.len())?;
+        self.c.read(receiver, key)
+    }
+    fn set(&mut self, receiver: &Atom, key: &str, value: Atom) -> Result<(), PublicError> {
+        self.validate(receiver)?;
+        self.validate(&value)?;
+        if key.len() > 1024 * 1024 {
+            return Err(limit().into());
+        }
+        // Array structural edits use push; writing existing elements preserves
+        // the current length and descriptors. Arbitrary length assignment is
+        // intentionally not a partial implementation of ArraySetLength.
+        if let Atom::Ref(id) = receiver {
+            if let Node::Array { length, .. } = self.c.g.nodes[*id as usize] {
+                if key == "length"
+                    || key
+                        .parse::<u32>()
+                        .ok()
+                        .is_some_and(|n| n.to_string() == key && n >= length)
+                {
+                    return Err(invalid("Use active array push for structural array edits").into());
+                }
+            }
+        }
+        self.c.tick(key.len())?;
+        self.c.set(receiver, key, value)
+    }
+    fn intern(&mut self, value: JsString) -> Result<Atom, PublicError> {
+        self.c.tick(value.0.len())?;
+        self.c.intern(value)
+    }
+    fn string(&mut self, value: &Atom) -> Result<JsString, PublicError> {
+        self.validate(value)?;
+        self.c.tick(1)?;
+        match value {
+            Atom::String(id) => {
+                self.c.tick(self.c.g.strings[*id as usize].0.len())?;
+                Ok(self.c.g.strings[*id as usize].clone())
+            }
+            _ => Err(type_error("Active model value is not a string")),
+        }
+    }
+    fn object(&mut self) -> Result<Atom, PublicError> {
+        self.c.node(Node::Object { properties: vec![] })
+    }
+    fn array(&mut self) -> Result<Atom, PublicError> {
+        self.c.array(vec![])
+    }
+    fn date(&mut self, milliseconds: f64) -> Result<Atom, PublicError> {
+        let milliseconds = if milliseconds.is_finite() && milliseconds.abs() <= 8.64e15 {
+            milliseconds.trunc() + 0.0
+        } else {
+            f64::NAN
+        };
+        self.c.node(Node::Date {
+            milliseconds,
+            properties: vec![],
+        })
+    }
+    fn date_millis(&mut self, value: &Atom) -> Result<f64, PublicError> {
+        self.validate(value)?;
+        self.c.tick(1)?;
+        match value {
+            Atom::Ref(id) => match self.c.g.nodes[*id as usize] {
+                Node::Date { milliseconds, .. } => Ok(milliseconds),
+                _ => Err(type_error("Active model value is not a Date")),
+            },
+            _ => Err(type_error("Active model value is not a Date")),
+        }
+    }
+    fn push(&mut self, array: &Atom, value: Atom) -> Result<(), PublicError> {
+        self.validate(array)?;
+        self.validate(&value)?;
+        self.c.push(array, value, "array.push")
+    }
+    fn invoke_builtin(
+        &mut self,
+        call: MethodCall,
+        host: &mut dyn RenderResources,
+    ) -> Result<Atom, PublicError> {
+        self.c.tick(call.arguments.len())?;
+        self.validate(&call.receiver)?;
+        for argument in &call.arguments {
+            self.validate(argument)?;
+        }
+        // Captured methods use the same arena/indexes and restore the active
+        // receiver even when scheduling fails after partially changing state.
+        let receiver = std::mem::replace(&mut self.receiver, call.receiver);
+        let direct_entry = self.direct_entry;
+        let result = self.call(call.method.0, &call.arguments, host);
+        self.receiver = receiver;
+        self.direct_entry = direct_entry;
+        result
+    }
+}
+fn imported(
+    c: &mut Context<'_>,
+    tasks: Atom,
+    compact: bool,
+    top_axis: bool,
+    render_now: f64,
+) -> Result<GanttModel, PublicError> {
     let root = c.g.root.clone();
     let mut m = GanttModel::new(None, String::new());
     let mut bytes = 0usize;
@@ -2375,8 +2494,7 @@ fn imported(c: &mut Context<'_>, tasks: Atom) -> Result<GanttModel, PublicError>
     m.date_format = field(c, &root, "dateFormat", &mut bytes)?;
     m.axis_format = field(c, &root, "axisFormat", &mut bytes)?;
     m.today_marker = field(c, &root, "todayMarker", &mut bytes)?;
-    let mode = c.read(&root, "displayMode")?;
-    m.display_mode = if matches!(mode,Atom::String(id)if c.g.strings[id as usize].is("compact")) {
+    m.display_mode = if compact {
         "compact".into()
     } else {
         String::new()
@@ -2399,8 +2517,7 @@ fn imported(c: &mut Context<'_>, tasks: Atom) -> Result<GanttModel, PublicError>
     }
     let inclusive = c.read(&root, "inclusiveEndDates")?;
     m.inclusive_end_dates = truth(c.g, &inclusive);
-    let top = c.read(&root, "topAxis")?;
-    m.top_axis = truth(c.g, &top);
+    m.top_axis = top_axis;
     let links = c.read(&root, "links")?;
     let Atom::Ref(id) = links else {
         return Err(invalid("Gantt links must be a Map").into());
@@ -2519,11 +2636,16 @@ fn imported(c: &mut Context<'_>, tasks: Atom) -> Result<GanttModel, PublicError>
         .collect();
     let dated = c.read(&root, "datedTokens")?;
     let dated = truth(c.g, &dated);
-    let now = c.read(&root, "now")?;
-    let now = c.numeric(&now)?;
     let work = c.read(&root, "work")?;
     let work = c.numeric(&work)?;
-    m.import_public_cache(now, work, cache.remove(0), cache.remove(0), days, dated);
+    m.import_public_cache(
+        render_now,
+        work,
+        cache.remove(0),
+        cache.remove(0),
+        days,
+        dated,
+    );
     Ok(m)
 }
 impl PublicDiagramModule for Gantt {
@@ -2586,26 +2708,34 @@ impl PublicDiagramModule for Gantt {
             receiver: root,
             direct_entry: None,
         };
+        let now = match options.now.filter(|value| value.is_finite()) {
+            Some(value) => value,
+            None => host.now_millis().map_err(PublicError::from)?,
+        };
+        // Pinned render captures both fields before calling the live override.
+        let mode = arena.get("displayMode")?;
+        let compact =
+            matches!(mode, Atom::String(id) if arena.c.g.strings[id as usize].is("compact"));
+        let top = arena.get("topAxis")?;
+        let top_axis = truth(arena.c.g, &top);
         let implementation = arena.get("getTasks")?;
-        let method = match implementation {
+        let arguments = [Atom::Number(now)];
+        let tasks = match implementation {
             Atom::Undefined => {
                 arena.native_method("getTasks")?;
-                19
+                arena.call(19, &arguments, host)?
             }
-            Atom::BuiltinFunction(id) => id,
-            Atom::HostReference(_) => {
-                return Err(
-                    invalid("Gantt render getTasks override requires callback dispatch").into(),
-                )
+            Atom::BuiltinFunction(id) => arena.call(id, &arguments, host)?,
+            Atom::HostReference(reference) => {
+                let function = host.host_function(reference)?;
+                let receiver = arena.receiver.clone();
+                let result = function.call(&mut arena, receiver, &arguments, host)?;
+                arena.validate(&result)?;
+                result
             }
             _ => return Err(type_error("db.getTasks is not a function")),
         };
-        let now = options.now.map_or(Atom::Undefined, Atom::Number);
-        let tasks = arena.call(method, &[now], host)?;
-        // Scheduling writes are already in the authoritative arena before the
-        // first geometry/measurement callback. Reentrant host mutation needs a
-        // live synchronization interface beyond this native borrow boundary.
-        let mut model = imported(&mut arena.c, tasks)?;
+        let mut model = imported(&mut arena.c, tasks, compact, top_axis, now)?;
         let result = super::render::render_scheduled(&mut model, config, options, host)
             .map_err(PublicError::from);
         arena.set("work", Atom::Number(model.work))?;

@@ -708,6 +708,13 @@ struct RenderSession<'a> {
     clock: Option<Result<f64, PeleError>>,
 }
 impl RenderResources for RenderSession<'_> {
+    fn host_function(
+        &mut self,
+        reference: u32,
+    ) -> Result<std::rc::Rc<dyn super::public::HostFunction>, super::public::PublicError> {
+        self.host.host_function(reference)
+    }
+
     fn presentation_budget(&self) -> Option<super::PresentationBudget> {
         self.presentation_budget
     }

@@ -481,3 +481,49 @@ must reuse a retained value arena rather than bolting JSON copies onto each prov
 Likewise Rust String/Swift String source and SVG paths do not preserve lone UTF-16.
 Neither gap is solved by opaque model ownership. This document makes no full-native
 or full-public-API parity claim.
+
+
+## Implemented native host-method slice (C12)
+
+`HostFunction` is an owner-thread, retained callable; `ActiveModel` borrows the
+current arena. `RenderResources::host_function` resolves an `Rc<dyn HostFunction>`
+before invoking it with the same render session, avoiding mutable self-aliasing.
+Default hosts reject unbound references. Gantt captures the render clock,
+displayMode and topAxis before calling the override; its returned array drives
+layout. Captured native methods update the same indexed arena and restore their
+receiver on success or failure. Callback edits and original scheduling mutations
+publish with the ordinary advanced revision even when a callback, output policy
+or later renderer fails.
+
+Swift consumers bind `Pele.HostFunction` through `MutableDocument.bindHostFunction`,
+set the returned Atom on `getTasks`, and apply the graph using its revision. The
+callable's `call` property remains live. `Pele.ActiveModel` exposes field access,
+UTF-16 strings, object/array/Date creation, append, and explicit captured native
+method invocation. Retained view objects reject accesses after the callback.
+Original Swift errors survive both callback and resource failure; consuming a
+caught resource error allows recovery within that same callback. Graph-backed
+render, exact output rendering, and presentation rendering share the owner bindings.
+
+C12 adds a size/version checked table and bind/render/access functions without
+changing prior ABI structs. Context is retained once until document close, with
+1024 registrations per document. Only monotonic identity allocation is global;
+no callable or pointer is stored globally. IDs never repeat, so an ID copied to
+another document cannot resolve accidentally. The active view has one synchronous
+lease; nested view access while a captured method owns it is rejected. Captured
+native dispatch never recursively calls an own host override. Requests and reply
+payloads are limited to 1 MiB, a callback has at most one million view operations,
+and native arena limits/work accounting remain active. Existing scalar fields and
+array elements can be edited; structural array growth uses append. Arbitrary
+ArraySetLength, property deletion, Map/Set mutation, replaced nested scheduler
+methods, and later measurer-driven graph edits remain outside this first slice.
+No whole graph is exported/imported at the callback boundary.
+
+Acceptance: four Rust integration features include three pinned Pele 1.6.0
+vectors comparing complete drawings and callback order (wrapped original,
+alternate returned array, pre-call field capture). Seven existing Gantt public
+features, including the historical corpus, remain green. Actual C12 and four
+Swift public-consumer features cover aliases, original delegation, live closure
+replacement, partial errors/recovery, output ordering, owner separation/release,
+reentry, expired leases, and UTF-16/Date values. These are isolated ARM64 proofs;
+Root SDK integration, x86_64 and ordinary browser callback hydration are separate
+release gates.

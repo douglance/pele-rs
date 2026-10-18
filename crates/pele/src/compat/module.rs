@@ -133,6 +133,18 @@ impl TrustedSvg {
 }
 /// Per-render host resources. No global resolver, filesystem, network or clock in the core.
 pub trait RenderResources {
+    /// Resolve an owner-retained callable before borrowing the active arena.
+    fn host_function(
+        &mut self,
+        _reference: u32,
+    ) -> Result<std::rc::Rc<dyn super::public::HostFunction>, super::public::PublicError> {
+        Err(PeleError::new(
+            "Unbound host function reference",
+            super::ErrorCode::Semantic,
+        )
+        .into())
+    }
+
     /// Opt-in presentation capture. Ordinary hosts return None and allocate no frames.
     fn presentation_budget(&self) -> Option<super::PresentationBudget> {
         None
