@@ -530,10 +530,9 @@ detached original style-array edits remain live. Four astral metadata projection
 now work through the public identity graph without changing typed convenience
 serialization. Retained registration, native pixels and bounded expansion recover.
 
-AgentFlow exposes all thirty-four actual method descriptors and thirty-three
-native implementations. Its private `shapeError()` returns a genuine Error
-instance upstream; that one returned-value operation remains explicitly
-unavailable until the Error arena seam lands. Builder shape failures already
+AgentFlow exposes all thirty-four actual method descriptors. The later returned
+Error checkpoint below completes its previously unavailable `shapeError()` native
+implementation using a branded identity-arena node. Builder shape failures already
 throw real Pele errors. Arbitrary overrides/coercion, options.log callbacks,
 active lone-surrogate SVG, some numeric provenance and render TypeError transport
 remain recorded runtime gaps.
@@ -773,3 +772,27 @@ These checkpoints do not certify full runtime parity. Constructors, custom
 callbacks/coercions, several active sparse/nonnumeric fields and lone-surrogate
 SVG output remain explicit shared or family-specific boundaries. Native source
 codecs and foreign Swift/web exposure are counted separately.
+
+
+## Twenty-nine Swift mutable families and returned Errors
+
+The C registry and Swift wrapper now expose the twenty-nine completed native
+codecs. Strict C integration and seventeen Swift feature slices pass: twelve
+existing slices plus five new slices covering the six added families, all eight
+Error brands, returned AgentFlow PeleErrors, Gantt Date scheduling/identity and
+post-scheduling Swift callback failure/recovery. Swift renders decode through
+AppKit and match the source lane; extensions retain cycles, raw UTF-16 and NaN
+payloads. All 34 native AgentFlow methods are implemented.
+
+The additive binary arena Error tag keeps own fields/descriptors and stable
+references separate from thrown operation errors. Generated host stack/location
+diagnostics remain runtime-local. Native release proof includes four AgentFlow,
+four original AgentFlow, three binary and two returned-Error tests. Existing
+exhaustive integration canonicalizers now retain Error brand metadata.
+
+Full mutable Swift corpus verification is a separate pending gate. Set
+`PELE_VERIFY_MUTABLE=1` when running the pinned AdditionalDiagramTests corpus;
+`PELE_FAMILIES` optionally selects families. This checks independent source versus
+mutable drawings, graph edits/cycles/UTF-16, exact error fields and ownership.
+Five pre-existing native graph-export budget differences are source-hash pinned.
+Full constructor/callback/active UTF-16 parity and release readiness remain open.

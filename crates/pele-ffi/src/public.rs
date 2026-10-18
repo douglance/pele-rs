@@ -3,8 +3,9 @@
 use super::{calendar, compatibility_call, compatibility_input, PeleHostResourcesV3, PeleResult};
 use pele::compat::{
     diagrams::{
-        agentflow::AgentFlow, class_diagram::Class, event_modeling::EventModeling,
-        git_graph::GitGraph, ishikawa::Ishikawa, state::State, tree_view::TreeView,
+        agentflow::AgentFlow, c4::C4, class_diagram::Class, event_modeling::EventModeling,
+        gantt::Gantt, git_graph::GitGraph, ishikawa::Ishikawa, requirement::RequirementDiagram,
+        sequence::Sequence, state::State, tree_view::TreeView, usecase::Usecase, venn::Venn,
     },
     diagrams::{
         architecture::Architecture, er::Er, flowchart::Flowchart, info::Info, journey::Journey,
@@ -133,6 +134,12 @@ pub unsafe extern "C" fn pele_public_parse_v4(
         registry.register(Ishikawa);
         registry.register(State);
         registry.register(TreeView);
+        registry.register(Venn);
+        registry.register(Sequence);
+        registry.register(Gantt);
+        registry.register(C4);
+        registry.register(RequirementDiagram);
+        registry.register(Usecase);
 
         let document = registry.parse(source, &options).map_err(|mut error| {
             if error.code == ErrorCode::UnsupportedDiagram {

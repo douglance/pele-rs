@@ -40,6 +40,7 @@ extension Pele.PublicGraph {
         try w.count(nodes.count)
         for n in nodes {
             switch n {
+            case .error(let kind, _): try w.integer(UInt8(6)); try w.integer(UInt8(Pele.ErrorObjectKind.allCases.firstIndex(of: kind)!))
             case .object: try w.integer(UInt8(0))
             case .instance(let id, _): try w.integer(UInt8(1)); try w.integer(id)
             case .array(let count, _): try w.integer(UInt8(2)); try w.integer(count)
@@ -103,6 +104,10 @@ private struct BinaryReader {
     mutating func node() throws -> Pele.PublicGraph.Node {
         var n: Pele.PublicGraph.Node
         switch try integer(UInt8.self) {
+        case 6:
+            let tag = Int(try integer(UInt8.self))
+            guard Pele.ErrorObjectKind.allCases.indices.contains(tag) else { throw invalidBinary() }
+            n = .error(errorType: Pele.ErrorObjectKind.allCases[tag], properties: [])
         case 0: n = .object(properties: [])
         case 1: n = .instance(prototype: try integer(UInt32.self), properties: [])
         case 2: n = .array(length: try integer(UInt32.self), properties: [])

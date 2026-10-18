@@ -182,11 +182,7 @@ final class MutableDocumentTests: XCTestCase {
         XCTAssertTrue(try document.render().height.isNaN)
     }
 
-    func testUnavailableCodecsAndRepeatedCreateCloseAreExplicit() throws {
-        XCTAssertThrowsError(try Pele.Engine().parseMutable("sequenceDiagram\nAlice->>Bob:Hello")) {
-            XCTAssertEqual(($0 as? CompatibilityError)?.type, "sequence")
-            XCTAssertTrue(($0 as? CompatibilityError)?.message.contains("codec") == true)
-        }
+    func testRepeatedCreateCloseKeepsIndependentOwners() throws {
         for _ in 0..<100 {
             let document = try Pele.Engine().parseMutable("pie\n\"Owned\":1")
             XCTAssertEqual(try document.render().type, "pie")

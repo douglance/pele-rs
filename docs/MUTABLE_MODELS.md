@@ -1,13 +1,14 @@
 # Development mutable model interfaces
 
-The source-built development branch has all 33 diagram renderers. Twenty-three
-families expose mutable public models through Rust, Swift/C and browser WASM:
-Pie, Info, Sankey, Packet, Radar, Quadrant, Treemap, Journey, XYChart, Kanban,
-Mindmap, Timeline, Flowchart, Swimlane, ER, Architecture, GitGraph, AgentFlow,
-Ishikawa, Class, EventModeling, TreeView and State. Venn, Sequence and Gantt also have native Rust
-codecs, bringing native coverage to twenty-six; their foreign checkpoint is pending.
-Methods are available where inventoried. AgentFlow has thirty-four actual
-descriptors with one explicitly unavailable Error-valued return operation.
+The source-built development branch has all 33 diagram renderers. Twenty-nine
+families expose mutable public models through Rust and Swift/C. Twenty-three
+also expose browser WASM models: Pie, Info, Sankey, Packet, Radar, Quadrant,
+Treemap, Journey, XYChart, Kanban, Mindmap, Timeline, Flowchart, Swimlane, ER,
+Architecture, GitGraph, AgentFlow, Ishikawa, Class, EventModeling, TreeView and
+State. The six additional native/Swift families are Venn, Sequence, Gantt, C4,
+Requirement and Usecase; their browser checkpoint remains pending.
+Methods are available where inventoried. All thirty-four AgentFlow method
+descriptors now have native implementations, including returned Error values.
 The published v0.1.0 binary remains the earlier flowchart subset.
 
 ## Browser
@@ -66,6 +67,11 @@ try document.apply(snapshot.graph, expectedRevision: snapshot.revision)
 let result = try document.render()
 try document.close()
 ```
+
+`schema()` describes native method IDs. Returned Errors use
+`PublicGraph.Node.error(errorType:properties:)`, keeping eight runtime brands,
+raw UTF-16 fields, descriptor flags and graph reference identity. They are values,
+separate from thrown operation failures.
 
 `schema()` describes native method IDs. `invoke(method:receiver:arguments:)`
 returns graph, revision and either a returned atom or a typed operation error.

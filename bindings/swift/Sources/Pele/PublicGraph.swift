@@ -1,6 +1,7 @@
 import Foundation
 
 extension Pele {
+    public enum ErrorObjectKind: String, Codable, Sendable, CaseIterable { case error, pele, type, range, syntax, reference, eval, uri }
     /// Exact JavaScript string value. Conversion to Swift String is explicitly fallible.
     public struct JSString: Codable, Sendable, Equatable, Hashable {
         public var codeUnits: [UInt16]
@@ -76,6 +77,7 @@ extension Pele {
             }
         }
         public enum Node: Codable, Sendable {
+            case error(errorType: ErrorObjectKind, properties: [Property])
             case instance(prototype: UInt32, properties: [Property])
             case object(properties: [Property])
             case array(length: UInt32, properties: [Property])
@@ -84,9 +86,10 @@ extension Pele {
             case date(milliseconds: Double, properties: [Property])
             public var properties: [Property] {
                 get { switch self {
-                case .instance(_, let p), .object(let p), .array(_, let p), .map(_, let p), .set(_, let p), .date(_, let p): return p
+                case .error(_, let p), .instance(_, let p), .object(let p), .array(_, let p), .map(_, let p), .set(_, let p), .date(_, let p): return p
                 } }
                 set { switch self {
+                case .error(let type, _): self = .error(errorType: type, properties: newValue)
                 case .instance(let id, _): self = .instance(prototype: id, properties: newValue)
                 case .object: self = .object(properties: newValue)
                 case .array(let n, _): self = .array(length: n, properties: newValue)
@@ -95,11 +98,12 @@ extension Pele {
                 case .date(let ms, _): self = .date(milliseconds: ms, properties: newValue)
                 } }
             }
-            private enum Keys: String, CodingKey { case kind, properties, length, entries, values, milliseconds, prototype }
+            private enum Keys: String, CodingKey { case kind, properties, length, entries, values, milliseconds, prototype, errorType }
             public init(from decoder: any Decoder) throws {
                 let fields = try decoder.container(keyedBy: Keys.self)
                 let properties = try fields.decode([Property].self, forKey: .properties)
                 switch try fields.decode(String.self, forKey: .kind) {
+                case "error": self = .error(errorType: try fields.decode(ErrorObjectKind.self, forKey: .errorType), properties: properties)
                 case "instance": self = .instance(prototype: try fields.decode(UInt32.self, forKey: .prototype), properties: properties)
                 case "object": self = .object(properties: properties)
                 case "array": self = .array(length: try fields.decode(UInt32.self, forKey: .length), properties: properties)
@@ -113,6 +117,7 @@ extension Pele {
                 var fields = encoder.container(keyedBy: Keys.self)
                 try fields.encode(properties, forKey: .properties)
                 switch self {
+                case .error(let type, _): try fields.encode("error", forKey: .kind); try fields.encode(type, forKey: .errorType)
                 case .instance(let id, _): try fields.encode("instance", forKey: .kind); try fields.encode(id, forKey: .prototype)
                 case .object: try fields.encode("object", forKey: .kind)
                 case .array(let n, _): try fields.encode("array", forKey: .kind); try fields.encode(n, forKey: .length)
