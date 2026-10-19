@@ -84,13 +84,15 @@ extension Pele {
             let bytes = try JSONEncoder().encode(Call(method: method, receiver: receiver, arguments: arguments))
             guard bytes.count <= 64 * 1024 * 1024 else { throw PeleError(code: "limit", message: "Public method exceeds 64 MiB JSON budget") }
             return try withHandle { handle in
-                let response = resources.withCapturedNativeResources { host in bytes.withUnsafeBytes { input in
-                    pele_public_invoke_binary_v5(handle, revision, input.bindMemory(to: UInt8.self).baseAddress, input.count, host)
-                }}
+                let response = resources.withCapturedNativeResources { host, takeError in withHostFunctionResources(takeError) { bytes.withUnsafeBytes { input in
+                    pele_public_invoke_with_functions_v12(handle, revision, input.bindMemory(to: UInt8.self).baseAddress, input.count, host)
+                }}}
+                defer { clearHostFunctionErrors() }
                 do {
                     let exchange = try Pele.binaryResult(response.handle)
                     let outcome = PublicInvocationOutcome(revision: exchange.revision, graph: exchange.graph, result: try JSONDecoder().decode(PublicOperationResult.self, from: exchange.metadata))
                     revision = outcome.revision
+                    if case .thrown(.hostException(let token)) = outcome.result, let original = hostFunctions[token]?.error { throw original }
                     if let error = response.error { throw error }
                     return outcome
                 } catch { if let original = response.error { throw original }; throw error }

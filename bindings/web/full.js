@@ -136,7 +136,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
             if (entry.disposed) throw new TypeError('Public model document is disposed');
             const input = bridge.snapshot([receiver, ...argumentsValue]);
             entry.revision = result(mutable.apply_binary(encodeGraphBinary(entry.revision,input.graph)));
-            const outcome = binaryResult(()=>mutable.invoke_binary(entry.revision, JSON.stringify({method, receiver: input.values[0], arguments: input.values.slice(1)})));
+            const outcome = binaryResult(()=>mutable.invoke_binary_with_functions(entry.revision, JSON.stringify({method, receiver: input.values[0], arguments: input.values.slice(1)}),modelHostFunctions(bridge,operationError)));
             entry.revision = outcome.revision;
             bridge.reconcile(outcome.graph);
             if (Object.hasOwn(outcome.result, 'Err')) throw operationError(outcome.result.Err, bridge);

@@ -1,7 +1,8 @@
 // Ordinary caller closures stay JavaScript. Only changed records cross the
 // borrowed Rust arena; scheduling, geometry and rendering remain native.
 export function modelHostFunctions(bridge, operationError, takeResourceError = () => null) {
-  return (reference, receiverJSON, argumentsJSON, invokeNative) => {
+  return (reference, receiverJSON, argumentsJSON, invokeNative, initialJSON) => {
+    if(initialJSON)bridge.reconcileDelta(JSON.parse(initialJSON));
     const previous=bridge.activeInvoke;let invokingNative=false;
     bridge.activeInvoke=(method,receiver,argumentsValue)=>{
       if(invokingNative)throw new TypeError("Active model is already in use");
@@ -21,7 +22,7 @@ export function modelHostFunctions(bridge, operationError, takeResourceError = (
     let value, error, failed=false;
     try {
       const callable=bridge.hostValues[reference];
-      if(typeof callable!=='function')throw new TypeError('db.getTasks is not a function');
+      if(typeof callable!=='function')throw new TypeError('Host reference is not callable');
       value=Reflect.apply(callable,bridge.value(JSON.parse(receiverJSON)),JSON.parse(argumentsJSON).map(atom=>bridge.value(atom)));
     } catch(thrown) { failed=true;error=thrown; }
     finally {bridge.activeInvoke=previous;}

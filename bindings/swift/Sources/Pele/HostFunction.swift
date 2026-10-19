@@ -14,10 +14,11 @@ extension Pele {
         private var handle: OpaquePointer?
         private var active = false
         private var takeResourceError: (() -> (any Error)?)?
-        fileprivate init(_ handle: OpaquePointer, takeResourceError: @escaping () -> (any Error)?) {
-            self.handle = handle; self.takeResourceError = takeResourceError
+        private var resolveHostError: ((UInt32) -> (any Error)?)?
+        fileprivate init(_ handle: OpaquePointer, takeResourceError: @escaping () -> (any Error)?, resolveHostError: @escaping (UInt32) -> (any Error)?) {
+            self.handle = handle; self.takeResourceError = takeResourceError; self.resolveHostError = resolveHostError
         }
-        fileprivate func finish() { handle = nil; takeResourceError = nil }
+        fileprivate func finish() { handle = nil; takeResourceError = nil; resolveHostError = nil }
         private func access(_ request: AccessRequest) throws -> ActiveValue {
             guard let handle else { throw PeleError(code: "semantic", message: "Active model callback has finished") }
             guard !active else { throw PeleError(code: "semantic", message: "Active model view is already in use") }
@@ -30,6 +31,9 @@ extension Pele {
                 let outcome = try Pele.compatibilityResult(result, as: AccessOutcome.self)
                 switch outcome {
                 case .value(let value): return value
+                case .error(.hostException(let token)):
+                    if let original = resolveHostError?(token) { throw original }
+                    throw PublicOperationFailure(value: .hostException(token))
                 case .error(.pele(let error)): throw error
                 case .error(let error): throw PublicOperationFailure(value: error)
                 }
@@ -73,8 +77,11 @@ extension Pele.MutableDocument {
     // publication, then clear them once the outer operation has consumed them.
     func withHostFunctionResources<T>(_ takeError: () -> (any Error)?, _ body: () -> T) -> T {
         withoutActuallyEscaping(takeError) { errors in
-            for box in hostFunctions.values { box.error = nil; box.takeResourceError = errors }
-            defer { for box in hostFunctions.values { box.takeResourceError = nil } }
+            for box in hostFunctions.values {
+                box.error = nil; box.takeResourceError = errors
+                box.resolveHostError = { [weak self] token in self?.hostFunctions[token]?.error }
+            }
+            defer { for box in hostFunctions.values { box.takeResourceError = nil; box.resolveHostError = nil } }
             return body()
         }
     }
@@ -137,6 +144,7 @@ final class HostFunctionBox {
     var reference: UInt32 = 0
     var error: (any Error)?
     var takeResourceError: (() -> (any Error)?)?
+    var resolveHostError: ((UInt32) -> (any Error)?)?
     init(_ function: Pele.HostFunction) { self.function = function }
 }
 private func hostFunctionRetain(_ p: UnsafeMutableRawPointer?) { if let p { _ = Unmanaged<HostFunctionBox>.fromOpaque(p).retain() } }
@@ -145,7 +153,7 @@ private func hostFunctionBytesRelease(_ p: UnsafeMutableRawPointer?) { if let p 
 private func hostFunctionInvoke(_ context: UnsafeMutableRawPointer?, _ view: OpaquePointer?, _ bytes: UnsafePointer<UInt8>?, _ count: Int, _ reply: UnsafeMutablePointer<PeleHostFunctionReplyV12>?) {
     guard let context, let view, let reply else { return }
     let box = Unmanaged<HostFunctionBox>.fromOpaque(context).takeUnretainedValue()
-    let model = Pele.ActiveModel(view, takeResourceError: { box.takeResourceError?() })
+    let model = Pele.ActiveModel(view, takeResourceError: { box.takeResourceError?() }, resolveHostError: { box.resolveHostError?($0) })
     defer { model.finish() }
     do {
         struct Call: Decodable { let receiver: Pele.PublicGraph.Atom; let arguments: [Pele.PublicGraph.Atom] }
