@@ -32,10 +32,24 @@ use std::collections::{BTreeMap, HashMap};
 const RADIUS: &str = "var(--pele-radius,4px)";
 const LINE: &str = "var(--_l)";
 #[derive(Clone)]
-struct Line {
-    text: String,
-    width: f64,
-    classifier: String,
+pub(super) struct Line {
+    pub(super) text: String,
+    pub(super) width: f64,
+    pub(super) classifier: String,
+}
+/// Mutable public models supply rows at the upstream callsite. Geometry stays here.
+pub(super) trait LiveMembers {
+    fn begin_draw(&mut self) -> Result<ClassModel, PeleError>;
+    fn class(&mut self, index: usize) -> Result<ClassNode, PeleError>;
+    fn definition(&mut self, name: &str) -> Result<Vec<String>, PeleError>;
+    fn lines(
+        &mut self,
+        index: usize,
+        field: &str,
+        size: f64,
+        options: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<Vec<Line>, PeleError>;
 }
 struct View {
     node: GraphNode,
@@ -133,6 +147,32 @@ impl StyleCache {
         }
         resolve_style(&kept.into_iter().map(|(_, s)| s).collect::<Vec<_>>())
     }
+    fn resolve_live(
+        &mut self,
+        cls: &ClassNode,
+        live: &mut dyn LiveMembers,
+    ) -> Result<ResolvedStyle, PeleError> {
+        let mut kept = if let Some(base) = self.from_defs.get(&cls.css_classes) {
+            base.clone()
+        } else {
+            let mut kept = vec![];
+            for name in cls.css_classes.split(' ') {
+                for declaration in live.definition(name)? {
+                    for part in declaration.split(',') {
+                        self.keep(&mut kept, part);
+                    }
+                }
+            }
+            self.from_defs.insert(cls.css_classes.clone(), kept.clone());
+            kept
+        };
+        for declaration in &cls.styles {
+            self.keep(&mut kept, declaration);
+        }
+        Ok(resolve_style(
+            &kept.into_iter().map(|(_, s)| s).collect::<Vec<_>>(),
+        ))
+    }
 }
 
 // Budget the same compacted cascade that geometry consumes. Raw definitions can
@@ -170,6 +210,8 @@ fn class_view(
     cache: &mut StyleCache,
     node: GraphNode,
     cls: &ClassNode,
+    index: usize,
+    live: &mut Option<&mut dyn LiveMembers>,
     size: f64,
     tiny: f64,
     tiny_h: f64,
@@ -177,7 +219,18 @@ fn class_view(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<View, PeleError> {
-    let style = cache.resolve(db, cls);
+    let current;
+    let cls = if let Some(live) = live.as_deref_mut() {
+        current = live.class(index)?;
+        &current
+    } else {
+        cls
+    };
+    let style = if let Some(live) = live.as_deref_mut() {
+        cache.resolve_live(cls, live)?
+    } else {
+        cache.resolve(db, cls)
+    };
     let font_size = style.font_size.unwrap_or(size);
     let member_size = round(font_size * 0.875);
     let line_height = round(member_size * 1.5);
@@ -210,16 +263,22 @@ fn class_view(
             ))
         })
         .collect::<Result<Vec<_>, PeleError>>()?;
-    let attributes = cls
-        .members
-        .iter()
-        .map(|m| member_line(m, member_size, o, r))
-        .collect::<Result<Vec<_>, _>>()?;
-    let methods = cls
-        .methods
-        .iter()
-        .map(|m| member_line(m, member_size, o, r))
-        .collect::<Result<Vec<_>, _>>()?;
+    let attributes = if let Some(live) = live.as_deref_mut() {
+        live.lines(index, "members", member_size, o, r)?
+    } else {
+        cls.members
+            .iter()
+            .map(|m| member_line(m, member_size, o, r))
+            .collect::<Result<Vec<_>, _>>()?
+    };
+    let methods = if let Some(live) = live.as_deref_mut() {
+        live.lines(index, "methods", member_size, o, r)?
+    } else {
+        cls.methods
+            .iter()
+            .map(|m| member_line(m, member_size, o, r))
+            .collect::<Result<Vec<_>, _>>()?
+    };
     let mut inner = label.width;
     for a in &annotations {
         inner = inner.js_max(measure(r, o, a, tiny, 0)?)
@@ -261,7 +320,7 @@ pub fn render(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    render_impl(db, c, o, r, Preflight::LegacyInteger)
+    render_impl(db, c, o, r, Preflight::LegacyInteger, None)
 }
 pub(super) fn render_exact(
     db: &ClassModel,
@@ -269,7 +328,28 @@ pub(super) fn render_exact(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
 ) -> Result<Rendered, PeleError> {
-    render_impl(db, c, o, r, Preflight::ExactPostRender)
+    render_impl(db, c, o, r, Preflight::ExactPostRender, None)
+}
+pub(super) fn render_live(
+    db: &ClassModel,
+    c: &Object,
+    o: &RenderSettings,
+    r: &mut dyn RenderResources,
+    exact: bool,
+    live: &mut dyn LiveMembers,
+) -> Result<Rendered, PeleError> {
+    render_impl(
+        db,
+        c,
+        o,
+        r,
+        if exact {
+            Preflight::ExactPostRender
+        } else {
+            Preflight::LegacyInteger
+        },
+        Some(live),
+    )
 }
 #[derive(Clone, Copy)]
 enum Preflight {
@@ -282,6 +362,7 @@ fn render_impl(
     o: &RenderSettings,
     r: &mut dyn RenderResources,
     preflight: Preflight,
+    mut live: Option<&mut dyn LiveMembers>,
 ) -> Result<Rendered, PeleError> {
     // Every drawn object emits its authored id. Refuse a proven output overflow
     // before allocating the compound geometry or the entire oversized SVG.
@@ -343,11 +424,11 @@ fn render_impl(
         }
     }
     let mut fitted = |turned| -> Result<Rendered, PeleError> {
-        let loose = draw(db, c, o, r, turned, false)?;
+        let loose = draw(db, c, o, r, turned, false, &mut live)?;
         if o.max_width.is_none_or(|a| !(a > 0.) || loose.width <= a) {
             return Ok(loose);
         }
-        let tight = draw(db, c, o, r, turned, true)?;
+        let tight = draw(db, c, o, r, turned, true, &mut live)?;
         Ok(if tight.width < loose.width {
             tight
         } else {
@@ -378,7 +459,15 @@ fn draw(
     r: &mut dyn RenderResources,
     turned: bool,
     tight: bool,
+    live: &mut Option<&mut dyn LiveMembers>,
 ) -> Result<Rendered, PeleError> {
+    let current;
+    let db = if let Some(live) = live.as_deref_mut() {
+        current = live.begin_draw()?;
+        &current
+    } else {
+        db
+    };
     let empty = Object::default();
     let conf = c.get("class").and_then(Value::as_object).unwrap_or(&empty);
     let graph = build(
@@ -456,6 +545,8 @@ fn draw(
                 &mut cache,
                 node,
                 &db.classes[at].1,
+                at,
+                live,
                 size,
                 tiny,
                 tiny_h,

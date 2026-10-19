@@ -2356,7 +2356,7 @@ impl Arena<'_> {
 impl ActiveModel for Arena<'_> {
     fn begin_sync(&mut self) -> Result<(), PublicError> {
         if self.c.sync.is_some() {
-            return Err(invalid("Active model synchronization already started").into());
+            return Ok(());
         }
         self.c.sync = Some(SyncJournal {
             strings: self.c.g.strings.len(),

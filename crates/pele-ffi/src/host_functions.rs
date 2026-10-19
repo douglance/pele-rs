@@ -391,3 +391,28 @@ pub unsafe extern "C" fn pele_active_model_access_v12(
         public::success(result)
     })
 }
+
+/// Invoke a captured builtin with the document's retained caller functions.
+/// # Safety
+/// Same synchronous owner-thread pointer requirements as the v12 render call.
+#[no_mangle]
+pub unsafe extern "C" fn pele_public_invoke_with_functions_v12(
+    handle: *mut PelePublicDocument,
+    revision: u64,
+    bytes: *const u8,
+    len: usize,
+    resources: *const PeleHostResourcesV3,
+) -> *mut PeleResult {
+    public::bounded_call(|| {
+        let json = unsafe { super::compatibility_input(bytes, len, 64 * 1024 * 1024) }?;
+        let call = serde_json::from_str(json)
+            .map_err(|_| public::invalid("Invalid public model method call"))?;
+        let mut document = unsafe { public::document(handle) }?;
+        let outcome = unsafe {
+            with_resources(handle, resources, |host| {
+                document.invoke(revision, call, host)
+            })
+        }?;
+        public::binary_metadata(outcome.revision, &outcome.graph, &outcome.result)
+    })
+}

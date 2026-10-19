@@ -46,6 +46,7 @@ impl HostFunction for Function {
         resources: &mut dyn RenderResources,
     ) -> Result<Atom, PublicError> {
         model.begin_sync()?;
+        let initial = json(&model.take_delta()?)?;
         let receiver = json(&receiver)?;
         let arguments = json(&arguments)?;
         let result = {
@@ -78,12 +79,13 @@ impl HostFunction for Function {
             let closure = ScopedClosure::<dyn FnMut(String) -> Result<String, JsValue>>::borrow_mut(
                 &mut invoke,
             );
-            self.dispatcher.call4(
+            self.dispatcher.call5(
                 &JsValue::UNDEFINED,
                 &JsValue::from(self.reference),
                 &JsValue::from_str(&receiver),
                 &JsValue::from_str(&arguments),
                 closure.as_ref(),
+                &JsValue::from_str(&initial),
             )
         }
         .map_err(super::callback_error)?;
@@ -152,6 +154,46 @@ impl RenderResources for Resources<'_> {
 }
 #[wasm_bindgen]
 impl MutableDocument {
+    /// Public captured method calls share the same owner-bound callable arena.
+    pub fn invoke_binary_with_functions(
+        &mut self,
+        revision: &str,
+        call_json: &str,
+        dispatcher: js_sys::Function,
+    ) -> Result<Vec<u8>, JsValue> {
+        let run = || -> Result<Vec<u8>, PeleError> {
+            if call_json.len() > MAX_BYTES {
+                return Err(invalid(
+                    "Public method JSON exceeds 64 MiB transport budget",
+                ));
+            }
+            let revision = revision
+                .parse::<u64>()
+                .map_err(|_| invalid("Invalid public model revision"))?;
+            let call = serde_json::from_str(call_json)
+                .map_err(|_| invalid("Invalid public model method call"))?;
+            let mut host = BrowserResources {
+                width: None,
+                icons: None,
+            };
+            let outcome = self.inner.invoke(
+                revision,
+                call,
+                &mut Resources {
+                    host: &mut host,
+                    dispatcher,
+                },
+            )?;
+            let metadata = render_numbers::encode(&outcome.result)?;
+            pele::compat::public::encode_binary_exchange(
+                outcome.revision,
+                &outcome.graph,
+                &metadata,
+                pele::compat::public::DEFAULT_BINARY_BUDGET,
+            )
+        };
+        run().map_err(|error| JsValue::from_str(&render_numbers::failure(&error)))
+    }
     #[allow(clippy::too_many_arguments)]
     pub fn render_numbers_operation_binary_with_functions(
         &mut self,

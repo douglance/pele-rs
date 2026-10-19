@@ -316,6 +316,9 @@ typedef struct PeleHostFunctionV12 {
     uint64_t reserved[2];
 } PeleHostFunctionV12;
 PeleResult *pele_public_bind_host_function_v12(PelePublicDocument *, const PeleHostFunctionV12 *, uint32_t *);
+/* Captured builtin invocation with the document's v12 function bindings.
+ * Returns the same binary graph/result envelope as invoke_binary_v5. */
+PeleResult *pele_public_invoke_with_functions_v12(PelePublicDocument *document, uint64_t expected_revision, const uint8_t *call, size_t call_len, const PeleHostResourcesV3 *resources);
 PeleResult *pele_public_render_operation_with_functions_v12(PelePublicDocument *, uint64_t,
     const uint8_t *, size_t, const PeleRenderNumbersV9 *, uint32_t, uint64_t, const PeleHostResourcesV3 *);
 /* Active view only valid synchronously inside its callback. Never retain pointer.

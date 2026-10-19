@@ -8,14 +8,14 @@ use super::model::RelationType;
 use super::*;
 use crate::compat::{
     public::{
-        Atom, FieldKind, FieldSchema, GraphWriter, JavaScriptErrorKind, JsString, MemberKind,
-        MemberSchema, MethodCall, MethodId, MethodSchema, ModelGraph, ModelSchema, Node, Property,
-        PrototypeId, PrototypeParent, PrototypeSchema, PublicDiagramModule, PublicError, RecordId,
-        RecordKind, RecordSchema,
+        ActiveModel, Atom, FieldKind, FieldSchema, GraphWriter, JavaScriptErrorKind, JsString,
+        MemberKind, MemberSchema, MethodCall, MethodId, MethodSchema, ModelDelta, ModelGraph,
+        ModelSchema, Node, Property, PrototypeId, PrototypeParent, PrototypeSchema,
+        PublicDiagramModule, PublicError, RecordId, RecordKind, RecordSchema,
     },
     ErrorCode,
 };
-use std::collections::{HashMap, HashSet};
+use std::collections::{BTreeSet, HashMap, HashSet};
 const PROTO: PrototypeId = PrototypeId(1);
 const MEMBER: PrototypeId = PrototypeId(2);
 const fn field_schema(
@@ -323,6 +323,13 @@ struct Context<'a> {
     work: usize,
     refs: usize,
     units: usize,
+    sync: Option<SyncJournal>,
+    depth: usize,
+}
+struct SyncJournal {
+    strings: usize,
+    nodes: usize,
+    dirty: BTreeSet<u32>,
 }
 enum Iter {
     Array(u32, u32),
@@ -357,6 +364,13 @@ impl<'a> Context<'a> {
             work: 0,
             refs,
             units,
+            sync: None,
+            depth: 0,
+        }
+    }
+    fn dirty(&mut self, id: u32) {
+        if let Some(sync) = &mut self.sync {
+            sync.dirty.insert(id);
         }
     }
     fn tick(&mut self, n: usize) -> Result<(), PublicError> {
@@ -487,6 +501,7 @@ impl<'a> Context<'a> {
                 message: JsString(units),
             });
         };
+        self.dirty(*id);
         self.tick(self.g.nodes[*id as usize].properties().len())?;
         let at = self.g.nodes[*id as usize]
             .properties()
@@ -523,6 +538,7 @@ impl<'a> Context<'a> {
         )?;
         let id = self.g.nodes.len() as u32;
         self.g.nodes.push(n);
+        self.dirty(id);
         Ok(Atom::Ref(id))
     }
     fn record(&mut self, fields: Vec<(&str, Atom)>) -> Result<Atom, PublicError> {
@@ -592,6 +608,7 @@ impl<'a> Context<'a> {
     }
     fn map_set(&mut self, a: &Atom, k: Atom, v: Atom, expr: &str) -> Result<(), PublicError> {
         let id = self.native(a, "set", expr, 0)?;
+        self.dirty(id);
         self.map_index(id)?;
         let key = self.key(&k);
         let at = self.maps[&id].get(&key).copied();
@@ -631,6 +648,7 @@ impl<'a> Context<'a> {
     }
     fn set_add(&mut self, a: &Atom, k: Atom) -> Result<(), PublicError> {
         let id = self.native(a, "add", "tagged.add", 2)?;
+        self.dirty(id);
         self.set_index(id)?;
         let key = self.key(&k);
         if !self.sets[&id].contains(&key) {
@@ -913,6 +931,9 @@ impl Import<'_> {
     }
 }
 fn imported(g: &ModelGraph) -> Result<ClassModel, PeleError> {
+    imported_mode(g, false)
+}
+fn imported_mode(g: &ModelGraph, live: bool) -> Result<ClassModel, PeleError> {
     let mut i = Import {
         g,
         bytes: 0,
@@ -932,16 +953,22 @@ fn imported(g: &ModelGraph) -> Result<ClassModel, PeleError> {
         ids.insert(id.clone());
         let css_classes = i.field(&a, "cssClasses")?;
         used.extend(css_classes.split(' ').map(str::to_owned));
-        let methods = i
-            .array(required(g, &a, "methods")?)?
-            .iter()
-            .map(|a| i.member(a))
-            .collect::<Result<_, _>>()?;
-        let members = i
-            .array(required(g, &a, "members")?)?
-            .iter()
-            .map(|a| i.member(a))
-            .collect::<Result<_, _>>()?;
+        let methods = if live {
+            vec![]
+        } else {
+            i.array(required(g, &a, "methods")?)?
+                .iter()
+                .map(|a| i.member(a))
+                .collect::<Result<_, _>>()?
+        };
+        let members = if live {
+            vec![]
+        } else {
+            i.array(required(g, &a, "members")?)?
+                .iter()
+                .map(|a| i.member(a))
+                .collect::<Result<_, _>>()?
+        };
         let callback = match a {
             Atom::Ref(id) => own(g, id, "haveCallback").map(|a| truth(g, a)),
             _ => None,
@@ -1493,9 +1520,11 @@ impl PublicDiagramModule for Class {
         s: &mut ClassPublicState,
         c: MethodCall,
         _: &Object,
-        _: &mut dyn RenderResources,
+        host: &mut dyn RenderResources,
     ) -> Result<Atom, PublicError> {
-        let result = Context::new(&mut s.graph).invoke(c);
+        let mut context = Context::new(&mut s.graph);
+        context.begin_sync()?;
+        let result = context.invoke_live(c, host);
         s.model = imported(&s.graph);
         result
     }
@@ -1506,7 +1535,22 @@ impl PublicDiagramModule for Class {
         o: &RenderSettings,
         h: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError> {
-        self.render(s.model.as_ref().map_err(Clone::clone)?, c, o, h)
+        self.render_public_operation(s, c, o, h)
+            .map_err(legacy_error)
+    }
+    fn render_public_operation(
+        &self,
+        s: &mut ClassPublicState,
+        c: &Object,
+        o: &RenderSettings,
+        h: &mut dyn RenderResources,
+    ) -> Result<Rendered, PublicError> {
+        if needs_live(&s.graph) {
+            render_live_state(s, c, o, h, false)
+        } else {
+            self.render(s.model.as_ref().map_err(Clone::clone)?, c, o, h)
+                .map_err(Into::into)
+        }
     }
     fn render_public_raw_operation(
         &self,
@@ -1515,6 +1559,9 @@ impl PublicDiagramModule for Class {
         o: &RenderSettings,
         h: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
+        if needs_live(&s.graph) {
+            return render_live_state(s, c, o, h, true);
+        }
         self.render_raw(s.model.as_ref().map_err(Clone::clone)?, c, o, h)
             .map_err(Into::into)
     }
@@ -1526,6 +1573,9 @@ impl PublicDiagramModule for Class {
         h: &mut dyn RenderResources,
         limit: OutputLimit,
     ) -> Result<Rendered, PublicError> {
+        if needs_live(&s.graph) {
+            return render_live_state(s, c, o, h, true);
+        }
         self.render_with_output_limit(s.model.as_ref().map_err(Clone::clone)?, c, o, h, limit)
             .map_err(Into::into)
     }
@@ -1598,6 +1648,7 @@ impl Context<'_> {
         self.intern(JsString(trimmed(&units).to_vec()))
     }
     fn delete(&mut self, id: u32, key: &str) -> Result<(), PublicError> {
+        self.dirty(id);
         self.tick(self.g.nodes[id as usize].properties().len())?;
         let at = self.g.nodes[id as usize]
             .properties()
@@ -1614,6 +1665,7 @@ impl Context<'_> {
         Ok(())
     }
     fn length(&mut self, id: u32, length: u32) -> Result<(), PublicError> {
+        self.dirty(id);
         if let Some(p) = self.g.nodes[id as usize]
             .properties()
             .iter()
@@ -2140,7 +2192,7 @@ impl Context<'_> {
         }
         Ok(out.into_iter().flatten().collect())
     }
-    fn display(&mut self, r: &Atom) -> Result<Atom, PublicError> {
+    fn display_text(&mut self, r: &Atom) -> Result<Atom, PublicError> {
         let visibility = self.read(r, "visibility")?;
         let id = self.read(r, "id")?;
         let generic = self.generic(&id)?;
@@ -2159,7 +2211,10 @@ impl Context<'_> {
                 display.extend(self.generic(&return_type)?);
             }
         }
-        let display = self.intern(JsString(trimmed(&display).to_vec()))?;
+        self.intern(JsString(trimmed(&display).to_vec()))
+    }
+    fn display(&mut self, r: &Atom) -> Result<Atom, PublicError> {
+        let display = self.display_text(r)?;
         let css = self.helper(r, "parseClassifier", 27, vec![])?;
         self.record(vec![("displayText", display), ("cssStyle", css)])
     }
@@ -2508,5 +2563,554 @@ fn decode_link(link: &str) -> Result<String, PublicError> {
             }
             Err(error.into())
         }
+    }
+}
+
+impl ActiveModel for Context<'_> {
+    fn begin_sync(&mut self) -> Result<(), PublicError> {
+        if self.sync.is_some() {
+            return Ok(());
+        }
+        self.sync = Some(SyncJournal {
+            strings: self.g.strings.len(),
+            nodes: self.g.nodes.len(),
+            dirty: BTreeSet::new(),
+        });
+        Ok(())
+    }
+    fn apply_delta(&mut self, delta: ModelDelta) -> Result<(), PublicError> {
+        let c = &mut *self;
+        let sync = c
+            .sync
+            .as_ref()
+            .ok_or_else(|| invalid("Active model synchronization has not started"))?;
+        if !sync.dirty.is_empty()
+            || sync.strings != c.g.strings.len()
+            || sync.nodes != c.g.nodes.len()
+        {
+            return Err(invalid("Drain native edits before applying host edits").into());
+        }
+        let old_strings = c.g.strings.len();
+        let old_nodes = c.g.nodes.len();
+        if delta.strings_start as usize != old_strings || delta.nodes_start as usize != old_nodes {
+            return Err(invalid("Stale active model delta").into());
+        }
+        let units = delta
+            .strings
+            .iter()
+            .try_fold(c.units, |n, s| n.checked_add(s.0.len()))
+            .ok_or_else(limit)?;
+        if old_strings.saturating_add(delta.strings.len()) > 1_000_000
+            || units > 16_000_000
+            || delta.nodes.len() > 1_000_000
+        {
+            return Err(limit().into());
+        }
+        let mut ids = HashSet::new();
+        let mut final_nodes = old_nodes;
+        for (id, node) in &delta.nodes {
+            if !ids.insert(*id) {
+                return Err(invalid("Duplicate active model node").into());
+            }
+            if *id as usize >= old_nodes {
+                if *id as usize != final_nodes {
+                    return Err(invalid("Non-contiguous active model nodes").into());
+                }
+                final_nodes += 1;
+            } else {
+                let old = &c.g.nodes[*id as usize];
+                if std::mem::discriminant(old) != std::mem::discriminant(node) {
+                    return Err(invalid("Active model object identity changed kind").into());
+                }
+                if let (Node::Instance { prototype: a, .. }, Node::Instance { prototype: b, .. }) =
+                    (old, node)
+                {
+                    if a != b {
+                        return Err(invalid("Active model object prototype changed").into());
+                    }
+                }
+            }
+        }
+        if final_nodes > 1_000_000 {
+            return Err(limit().into());
+        }
+        let delta_work = delta.nodes.iter().fold(0usize, |n, (_, node)| {
+            n.saturating_add(node.properties().len())
+                .saturating_add(match node {
+                    Node::Map { entries, .. } => entries.len().saturating_mul(2),
+                    Node::Set { values, .. } => values.len(),
+                    _ => 0,
+                })
+        });
+        c.tick(
+            c.refs
+                .saturating_add(units)
+                .saturating_add(final_nodes)
+                .saturating_add(delta_work),
+        )?;
+        // Swap only changed records. Invalid deltas roll back without copying
+        // the rest of the arena or invalidating its existing native indexes.
+        c.g.strings.extend(delta.strings);
+        let mut previous = Vec::new();
+        for (id, node) in delta.nodes {
+            if (id as usize) < old_nodes {
+                previous.push((id, std::mem::replace(&mut c.g.nodes[id as usize], node)));
+            } else {
+                c.g.nodes.push(node);
+            }
+        }
+        if let Err(error) = c.g.validate_schema(&SCHEMA) {
+            for (id, node) in previous {
+                c.g.nodes[id as usize] = node;
+            }
+            c.g.nodes.truncate(old_nodes);
+            c.g.strings.truncate(old_strings);
+            return Err(error.into());
+        }
+        fn refs(n: &Node) -> usize {
+            n.properties().len()
+                + match n {
+                    Node::Map { entries, .. } => entries.len() * 2,
+                    Node::Set { values, .. } => values.len(),
+                    _ => 0,
+                }
+        }
+        for (id, old) in previous {
+            c.refs = c.refs - refs(&old) + refs(&c.g.nodes[id as usize]);
+        }
+        for node in &c.g.nodes[old_nodes..] {
+            c.refs += refs(node);
+        }
+        for id in ids {
+            c.maps.remove(&id);
+            c.sets.remove(&id);
+        }
+        for (id, string) in c.g.strings.iter().enumerate().skip(old_strings) {
+            c.canonical
+                .push(*c.strings.entry(string.clone()).or_insert(id as u32));
+        }
+        c.units = units;
+        let sync = c.sync.as_mut().unwrap();
+        sync.strings = c.g.strings.len();
+        sync.nodes = c.g.nodes.len();
+        Ok(())
+    }
+    fn take_delta(&mut self) -> Result<ModelDelta, PublicError> {
+        let c = &mut *self;
+        let sync = c
+            .sync
+            .as_ref()
+            .ok_or_else(|| invalid("Active model synchronization has not started"))?;
+        let work = sync
+            .dirty
+            .iter()
+            .fold(0usize, |n, id| {
+                let node = &c.g.nodes[*id as usize];
+                n.saturating_add(node.properties().len() + 1)
+                    .saturating_add(match node {
+                        Node::Map { entries, .. } => entries.len() * 2,
+                        Node::Set { values, .. } => values.len(),
+                        _ => 0,
+                    })
+            })
+            .saturating_add(c.g.strings[sync.strings..].iter().map(|s| s.0.len()).sum());
+        c.tick(work)?;
+        let sync = c.sync.as_mut().unwrap();
+        let delta = ModelDelta {
+            strings_start: sync.strings as u32,
+            strings: c.g.strings[sync.strings..].to_vec(),
+            nodes_start: sync.nodes as u32,
+            nodes: std::mem::take(&mut sync.dirty)
+                .into_iter()
+                .map(|id| (id, c.g.nodes[id as usize].clone()))
+                .collect(),
+        };
+        sync.strings = c.g.strings.len();
+        sync.nodes = c.g.nodes.len();
+        Ok(delta)
+    }
+
+    fn root(&self) -> Atom {
+        self.g.root.clone()
+    }
+    fn validate(&self, value: &Atom) -> Result<(), PublicError> {
+        self.g.validate_atom(value)?;
+        if let Atom::BuiltinFunction(id) = value {
+            if SCHEMA.method(MethodId(*id)).is_none() {
+                return Err(invalid("Unknown public builtin function").into());
+            }
+        }
+        Ok(())
+    }
+    fn read(&mut self, receiver: &Atom, key: &str) -> Result<Atom, PublicError> {
+        self.validate(receiver)?;
+        if key.len() > 1024 * 1024 {
+            return Err(limit().into());
+        }
+        self.tick(key.len())?;
+        self.read(receiver, key)
+    }
+    fn set(&mut self, receiver: &Atom, key: &str, value: Atom) -> Result<(), PublicError> {
+        self.validate(receiver)?;
+        self.validate(&value)?;
+        if key.len() > 1024 * 1024 {
+            return Err(limit().into());
+        }
+        // Array structural edits use push; writing existing elements preserves
+        // the current length and descriptors. Arbitrary length assignment is
+        // intentionally not a partial implementation of ArraySetLength.
+        if let Atom::Ref(id) = receiver {
+            if let Node::Array { length, .. } = self.g.nodes[*id as usize] {
+                if key == "length"
+                    || key
+                        .parse::<u32>()
+                        .ok()
+                        .is_some_and(|n| n.to_string() == key && n >= length)
+                {
+                    return Err(invalid("Use active array push for structural array edits").into());
+                }
+            }
+        }
+        self.tick(key.len())?;
+        self.set(receiver, key, value)
+    }
+    fn intern(&mut self, value: JsString) -> Result<Atom, PublicError> {
+        self.tick(value.0.len())?;
+        self.intern(value)
+    }
+    fn string(&mut self, value: &Atom) -> Result<JsString, PublicError> {
+        self.validate(value)?;
+        self.tick(1)?;
+        match value {
+            Atom::String(id) => {
+                self.tick(self.g.strings[*id as usize].0.len())?;
+                Ok(self.g.strings[*id as usize].clone())
+            }
+            _ => Err(type_error("Active model value is not a string")),
+        }
+    }
+    fn object(&mut self) -> Result<Atom, PublicError> {
+        self.node(Node::Object { properties: vec![] })
+    }
+    fn array(&mut self) -> Result<Atom, PublicError> {
+        self.array(vec![])
+    }
+    fn date(&mut self, milliseconds: f64) -> Result<Atom, PublicError> {
+        let milliseconds = if milliseconds.is_finite() && milliseconds.abs() <= 8.64e15 {
+            milliseconds.trunc() + 0.0
+        } else {
+            f64::NAN
+        };
+        self.node(Node::Date {
+            milliseconds,
+            properties: vec![],
+        })
+    }
+    fn date_millis(&mut self, value: &Atom) -> Result<f64, PublicError> {
+        self.validate(value)?;
+        self.tick(1)?;
+        match value {
+            Atom::Ref(id) => match self.g.nodes[*id as usize] {
+                Node::Date { milliseconds, .. } => Ok(milliseconds),
+                _ => Err(type_error("Active model value is not a Date")),
+            },
+            _ => Err(type_error("Active model value is not a Date")),
+        }
+    }
+    fn push(&mut self, array: &Atom, value: Atom) -> Result<(), PublicError> {
+        self.validate(array)?;
+        self.validate(&value)?;
+        self.push(array, value, "array.push")
+    }
+    fn invoke_builtin(
+        &mut self,
+        call: MethodCall,
+        host: &mut dyn RenderResources,
+    ) -> Result<Atom, PublicError> {
+        self.tick(call.arguments.len())?;
+        self.validate(&call.receiver)?;
+        for value in &call.arguments {
+            self.validate(value)?;
+        }
+        self.invoke_live(call, host)
+    }
+}
+impl Context<'_> {
+    fn invoke_live(
+        &mut self,
+        call: MethodCall,
+        host: &mut dyn RenderResources,
+    ) -> Result<Atom, PublicError> {
+        if self.depth >= 64 {
+            return Err(limit().into());
+        }
+        self.depth += 1;
+        let result = if call.method.0 == 26 {
+            (|| {
+                self.tick(1)?;
+                let display = self.display_text(&call.receiver)?;
+                let css = self.call_member(&call.receiver, "parseClassifier", 27, host)?;
+                self.record(vec![("displayText", display), ("cssStyle", css)])
+            })()
+        } else {
+            self.invoke(call)
+        };
+        self.depth -= 1;
+        result
+    }
+    fn call_member(
+        &mut self,
+        receiver: &Atom,
+        name: &str,
+        method: u32,
+        host: &mut dyn RenderResources,
+    ) -> Result<Atom, PublicError> {
+        self.tick(1)?;
+        if self.depth >= 64 {
+            return Err(limit().into());
+        }
+        let value = self.read(receiver, name)?;
+        let native = matches!(receiver, Atom::Ref(id) if matches!(self.g.nodes[*id as usize], Node::Instance { prototype: MEMBER, .. }) && own(self.g,*id,name).is_none());
+        match value {
+            Atom::HostReference(reference) => {
+                let callable = host.host_function(reference)?;
+                self.depth += 1;
+                let result = callable.call(self, receiver.clone(), &[], host);
+                self.depth -= 1;
+                if let Ok(value) = &result {
+                    self.validate(value)?;
+                }
+                result
+            }
+            Atom::BuiltinFunction(id) => self.invoke_live(
+                MethodCall {
+                    method: MethodId(id),
+                    receiver: receiver.clone(),
+                    arguments: vec![],
+                },
+                host,
+            ),
+            _ if native => self.invoke_live(
+                MethodCall {
+                    method: MethodId(method),
+                    receiver: receiver.clone(),
+                    arguments: vec![],
+                },
+                host,
+            ),
+            _ => Err(type_error(if method == 26 {
+                "member.getDisplayDetails is not a function"
+            } else {
+                "this.parseClassifier is not a function"
+            })),
+        }
+    }
+}
+
+// Only public rows with replaced methods use the live adapter. The immutable
+// typed model and ordinary parsed public models keep their existing fast path.
+fn needs_live(graph: &ModelGraph) -> bool {
+    graph.nodes.iter().any(|node| {
+        node.properties().iter().any(|property| {
+            let key = &graph.strings[property.key as usize];
+            (key.is("getDisplayDetails") && !matches!(property.value, Atom::BuiltinFunction(26)))
+                || (key.is("parseClassifier")
+                    && !matches!(property.value, Atom::BuiltinFunction(27)))
+        })
+    })
+}
+struct Live<'a> {
+    context: Context<'a>,
+    classes: Vec<Atom>,
+    error: Option<PublicError>,
+}
+impl Live<'_> {
+    fn result<T>(&mut self, value: Result<T, PublicError>) -> Result<T, PeleError> {
+        value.map_err(|error| {
+            let legacy = match &error {
+                PublicError::Pele(error) => error.clone(),
+                _ => invalid("Class callback failed"),
+            };
+            self.error = Some(error);
+            legacy
+        })
+    }
+    fn class_value(&self, index: usize) -> Result<Atom, PublicError> {
+        self.classes
+            .get(index)
+            .cloned()
+            .ok_or_else(|| invalid("Class identity is unavailable").into())
+    }
+}
+impl super::render::LiveMembers for Live<'_> {
+    fn begin_draw(&mut self) -> Result<ClassModel, PeleError> {
+        let model = imported_mode(self.context.g, true)?;
+        let mut import = Import {
+            g: self.context.g,
+            bytes: 0,
+            work: 0,
+        };
+        self.classes = import
+            .map(required(import.g, &import.g.root, "classes")?)?
+            .into_iter()
+            .map(|(_, value)| value)
+            .collect();
+        Ok(model)
+    }
+    fn class(&mut self, index: usize) -> Result<ClassNode, PeleError> {
+        let value = self.class_value(index);
+        let a = self.result(value)?;
+        let g = &*self.context.g;
+        let mut i = Import {
+            g,
+            bytes: 0,
+            work: 0,
+        };
+        Ok(ClassNode {
+            id: i.field(&a, "id")?,
+            generic: i.field(&a, "type")?,
+            label: i.field(&a, "label")?,
+            css_classes: i.field(&a, "cssClasses")?,
+            methods: vec![],
+            members: vec![],
+            annotations: i.texts(required(g, &a, "annotations")?)?,
+            styles: i.texts(required(g, &a, "styles")?)?,
+            parent: i.optional(&a, "parent")?,
+            link: i.optional(&a, "link")?,
+            link_target: i.optional(&a, "linkTarget")?,
+            have_callback: match a {
+                Atom::Ref(id) => own(g, id, "haveCallback").map(|v| truth(g, v)),
+                _ => None,
+            },
+            tooltip: i.optional(&a, "tooltip")?,
+        })
+    }
+    fn definition(&mut self, name: &str) -> Result<Vec<String>, PeleError> {
+        let result = (|| {
+            let root = self.context.g.root.clone();
+            let map = self.context.read(&root, "styleClasses")?;
+            let key = self.context.text(name)?;
+            let value = self
+                .context
+                .map_get(&map, &key, false, "db.styleClasses.get")?;
+            if !truth(self.context.g, &value) {
+                return Ok(vec![]);
+            }
+            let styles = self.context.read(&value, "styles")?;
+            let mut import = Import {
+                g: self.context.g,
+                bytes: 0,
+                work: 0,
+            };
+            Ok(import.texts(&styles)?)
+        })();
+        self.result(result)
+    }
+    fn lines(
+        &mut self,
+        index: usize,
+        field: &str,
+        size: f64,
+        options: &RenderSettings,
+        host: &mut dyn RenderResources,
+    ) -> Result<Vec<super::render::Line>, PeleError> {
+        let result = (|| {
+            let class = self.class_value(index)?;
+            let array = self.context.read(&class, field)?;
+            let id = self
+                .context
+                .native(&array, "map", &format!("cls.{field}.map"), 1)?;
+            let Node::Array { length, .. } = self.context.g.nodes[id as usize] else {
+                unreachable!()
+            };
+            if length > 1_000_000 {
+                return Err(limit().into());
+            }
+            let mut lines = Vec::new();
+            for index in 0..length {
+                self.context.tick(1)?;
+                let Some(member) = self.context.own(id, &index.to_string())? else {
+                    continue;
+                };
+                let display = self
+                    .context
+                    .call_member(&member, "getDisplayDetails", 26, host)?;
+                let text = self.context.read(&display, "displayText")?;
+                let text = match text {
+                    Atom::String(id) => self.context.g.strings[id as usize]
+                        .well_formed()
+                        .ok_or_else(|| invalid("Class display text must be valid UTF-16"))?,
+                    Atom::Undefined => {
+                        return Err(type_error(
+                            "Cannot read properties of undefined (reading 'includes')",
+                        ))
+                    }
+                    Atom::Null => {
+                        return Err(type_error(
+                            "Cannot read properties of null (reading 'includes')",
+                        ))
+                    }
+                    _ => return Err(type_error("text.includes is not a function")),
+                };
+                let text = crate::compat::source::decode_entities(&text)?
+                    .trim_matches(crate::compat::source::space)
+                    .to_owned();
+                let classifier = self.context.read(&member, "classifier")?;
+                let italic = matches!(classifier, Atom::String(id) if self.context.g.strings[id as usize].is("*"));
+                let width = crate::compat::text::measure(
+                    host,
+                    options,
+                    &text,
+                    size,
+                    if italic { 2 } else { 0 },
+                )?;
+                let classifier = self.context.read(&member, "classifier")?;
+                let classifier = match classifier {
+                    Atom::String(id) if self.context.g.strings[id as usize].is("*") => "*",
+                    Atom::String(id) if self.context.g.strings[id as usize].is("$") => "$",
+                    _ => "",
+                }
+                .to_owned();
+                lines.push(super::render::Line {
+                    text,
+                    width,
+                    classifier,
+                });
+            }
+            Ok(lines)
+        })();
+        self.result(result)
+    }
+}
+fn render_live_state(
+    state: &mut ClassPublicState,
+    config: &Object,
+    options: &RenderSettings,
+    host: &mut dyn RenderResources,
+    exact: bool,
+) -> Result<Rendered, PublicError> {
+    let model = imported_mode(&state.graph, true)?;
+    let mut context = Context::new(&mut state.graph);
+    context.begin_sync()?;
+    let mut live = Live {
+        context,
+        classes: vec![],
+        error: None,
+    };
+    let result = super::render::render_live(&model, config, options, host, exact, &mut live);
+    let error = live.error.take();
+    drop(live);
+    state.model = imported(&state.graph);
+    match error {
+        Some(error) => Err(error),
+        None => result.map_err(Into::into),
+    }
+}
+fn legacy_error(error: PublicError) -> PeleError {
+    match error {
+        PublicError::Pele(error) => error,
+        other => invalid(&format!(
+            "Class public operation requires structured exception transport: {other:?}"
+        )),
     }
 }
