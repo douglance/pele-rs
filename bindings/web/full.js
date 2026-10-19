@@ -42,6 +42,11 @@ function binaryResult(call) {
   try {const exchange=decodeGraphBinary(call());return {revision:exchange.revision,graph:exchange.graph,result:exchange.metadata};}
   catch(error){if(typeof error==='string')return result(error);throw error;}
 }
+// Only these pinned renderers pass the mono family into defaultMeasurer.
+function builtinMeasurer(options,type) {
+  return defaultMeasurer(options.fontFamily,
+    type==='eventmodeling'||type==='railroad'?options.fontFamilyMono:undefined);
+}
 function renderedValue(value) {
   if(value&&typeof value.svg==='string'&&value.$numbers) {
     const bits=new DataView(new ArrayBuffer(8));
@@ -184,7 +189,7 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
       return nativeModelCall(entry,()=>{
       let callbackFailed=false,callbackError;
       const capture=run=>{try{return run();}catch(error){callbackFailed=true;callbackError=error;throw error;}};
-      const measurer=options.measurer??defaultMeasurer(options.fontFamily);
+      const measurer=options.measurer??builtinMeasurer(options,type);
       const width=(text,size,style)=>capture(()=>measurer.width(text,size,style));
       const icons=options.icons&&(name=>capture(()=>options.icons(name)));
       const clock=()=>capture(()=>Date.now());
@@ -304,8 +309,19 @@ export function createRenderer(nativeRegistry, canonicalProviders = []) {
             return foreignRender(foreign,input,options);
           }
         }
-        const measurer = options.measurer ?? defaultMeasurer(options.fontFamily);
-        const width = (text, size, style) => { try { return measurer.width(text, size, style); } catch (e) { callbackFailed = true; callbackError = e; throw e; } };
+        let measurer = options.measurer;
+        const width = (text, size, style) => { try {
+          if(measurer==null) {
+            // Source/options/grammar errors have already been decided by Rust
+            // before its first measurement. Inspect only now, never ahead of
+            // parsing; retained models use their actual registration identity.
+            const type=options.fontFamilyMono===undefined?undefined:typeof input==='string'
+              ?nativeRegistry&&nativeValue(()=>nativeRegistry.detect_type(input))
+              :documents.get(input)?.rawType;
+            measurer=builtinMeasurer(options,type);
+          }
+          return measurer.width(text,size,style);
+        } catch (e) { callbackFailed = true; callbackError = e; throw e; } };
         const icons = options.icons && (name => { try { return options.icons(name); } catch (e) { callbackFailed = true; callbackError = e; throw e; } });
         const clock = () => { try { return Date.now(); } catch (e) { callbackFailed = true; callbackError = e; throw e; } };
         const numeric = renderNumericOptions(typeof input === 'string' ? options : {...options, limit: undefined, maxEdges: undefined, config: undefined});
