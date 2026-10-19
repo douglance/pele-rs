@@ -22,7 +22,7 @@ assert(['127.0.0.1', 'localhost', '[::1]'].includes(url.hostname), 'Use the loca
 assert.equal(url.pathname, '/examples/web/full.html');
 const hash = bytes => createHash('sha256').update(bytes).digest('hex');
 const manifest = JSON.parse(await readFile(join(root, 'dist/package-web/package/package.json'), 'utf8'));
-assert.equal(manifest.version, '0.2.0', 'Record the verified 0.2 package.');
+assert.equal(manifest.version, '0.3.0', 'Record the verified 0.3 package.');
 const archive = join(root, 'dist/release', `unlocalhosted-pele-rs-${manifest.version}.tgz`);
 const output = join(root, 'docs/images/full-demo.gif');
 if (recording) {
