@@ -1,0 +1,27 @@
+{
+  "succeeded": true,
+  "nativeProductionSourcesExact": 301,
+  "nativeRuntimeAndHeadersExact": {
+    "CPele/macos-arm64_x86_64/Headers/pele.h": true,
+    "CPele/macos-arm64_x86_64/libpele_ffi.a": true
+  },
+  "metadataChangesAfterTiming": [
+    "local-only SwiftPM manifest selection",
+    "updated attribution NOTICE text",
+    "documentation"
+  ],
+  "timingNote": "Final default web timings include the initializer fix and exactly match all8 package runtime files. Native production sources, archives and headers match the Swift timing record; later SDK-selection/notice changes are metadata only.",
+  "webRuntimeFileCount": 8,
+  "webInitializerFixCommit": "6097858",
+  "focusedBrowserIntegrationChecksPassed": 60,
+  "webFinalPackageRuntimeFilesExact": {
+    "full.js": true,
+    "index.js": true,
+    "initialize.js": true,
+    "graph.js": true,
+    "graph-binary.js": true,
+    "resources.js": true,
+    "pkg/pele.js": true,
+    "pkg/pele_bg.wasm": true
+  }
+}

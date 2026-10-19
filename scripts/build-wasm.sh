@@ -5,9 +5,12 @@ if [[ "$(wasm-bindgen --version)" != 'wasm-bindgen 0.2.128' ]]; then
     echo 'Install matching CLI: cargo install wasm-bindgen-cli --version 0.2.128 --locked' >&2
     exit 1
 fi
+# Explicit opt-in experiment; the smaller default remains measured and reproducible.
+pele_wasm_opt_level="${PELE_WASM_OPT_LEVEL:-s}"
+case "$pele_wasm_opt_level" in s|3) ;; *) echo 'PELE_WASM_OPT_LEVEL must be s or 3' >&2; exit 2 ;; esac
 # rust-lld on macOS needs the LLVM library shipped in the toolchain's lib/.
 DYLD_FALLBACK_LIBRARY_PATH="$rust_bin/../lib:${DYLD_FALLBACK_LIBRARY_PATH:-/usr/local/lib:/usr/lib}" \
-CARGO_PROFILE_RELEASE_PANIC=abort CARGO_PROFILE_RELEASE_OPT_LEVEL=s \
+CARGO_PROFILE_RELEASE_PANIC=abort CARGO_PROFILE_RELEASE_OPT_LEVEL="$pele_wasm_opt_level" \
   cargo build --locked --release -p pele-wasm --target wasm32-unknown-unknown
 mkdir -p dist/wasm dist/evidence
 # Test oracle only, never included in the distributed WASM package.
