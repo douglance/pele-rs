@@ -15,7 +15,6 @@ mod registry;
 pub use registry::*;
 mod calendar;
 pub use calendar::PeleHostResourcesV3;
-use pele::Error;
 use std::{
     panic::{catch_unwind, AssertUnwindSafe},
     slice,
@@ -26,62 +25,11 @@ pub struct PeleResult {
     data: Vec<u8>,
     document: Option<pele::compat::ParsedDocument>,
 }
-fn error(code: &str, message: &str) -> PeleResult {
-    let e = Error {
-        code: code.into(),
-        message: message.into(),
-        span: None,
-    };
-    PeleResult {
-        status: e.status(),
-        data: pele::error_envelope(&e).into_bytes(),
-        document: None,
-    }
-}
 #[no_mangle]
 pub extern "C" fn pele_abi_version() -> u32 {
-    1
+    2
 }
 
-/// # Safety
-/// Each non-null pointer must name `len` readable bytes for this call.
-#[no_mangle]
-pub unsafe extern "C" fn pele_render(
-    source: *const u8,
-    source_len: usize,
-    options: *const u8,
-    options_len: usize,
-) -> *mut PeleResult {
-    let result = catch_unwind(AssertUnwindSafe(|| {
-        if source_len > pele::MAX_SOURCE || options_len > pele::MAX_OPTIONS {
-            return error("input_limit", "Declared input length exceeds limit");
-        }
-        if (source.is_null() && source_len != 0) || (options.is_null() && options_len != 0) {
-            return error("invalid_utf8", "Null input with nonzero length");
-        }
-        let s = if source_len == 0 {
-            &[]
-        } else {
-            unsafe { slice::from_raw_parts(source, source_len) }
-        };
-        let o = if options_len == 0 {
-            &[]
-        } else {
-            unsafe { slice::from_raw_parts(options, options_len) }
-        };
-        let (Ok(s), Ok(o)) = (std::str::from_utf8(s), std::str::from_utf8(o)) else {
-            return error("invalid_utf8", "Input must be UTF-8");
-        };
-        let (status, data) = pele::render_envelope(s, o);
-        PeleResult {
-            status,
-            data: data.into_bytes(),
-            document: None,
-        }
-    }))
-    .unwrap_or_else(|_| error("internal", "Unexpected engine failure"));
-    Box::into_raw(Box::new(result))
-}
 /// # Safety
 /// Non-null result must be a live handle returned by a Pele operation.
 #[no_mangle]

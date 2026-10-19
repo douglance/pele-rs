@@ -1,10 +1,11 @@
+import initialize from './initialize.js';
 import {modelHostFunctions} from "./host-functions.js";
 import {builtinDiagramType,builtinDiagramOrigin,ownRawModel,withBuiltinIcons,builtinInlineIcons} from './builtin-entries.js';
 import {parseLimitOptions, parseLimitValues} from './parse-limits.js';
 export {loadRegistry} from './registry.js';
 import {mountWith} from './mount.js';
 export {enableZoom} from './zoom.js';
-import initialize, { parse_v2, render_numbers_with_resources, builtin_capabilities, NativeRegistry, foreign_decode_entities } from './pkg/pele.js';
+import { parse_v2, render_numbers_with_resources, builtin_capabilities, NativeRegistry, foreign_decode_entities } from './pkg/pele.js';
 import {renderNumericOptions} from './render-numbers.js';
 import {encodeGraphBinary,decodeGraphBinary} from './graph-binary.js';
 import {fromNativeError} from './errors.js';

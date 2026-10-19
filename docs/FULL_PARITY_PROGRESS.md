@@ -1,3 +1,23 @@
+# 0.3 source checkpoint — 2026-10-19
+
+The v1-only renderer, wrappers and playground are removed. The package root now
+exports the full library. Source checkouts require a matching local Swift SDK;
+they no longer silently select an older downloaded binary.
+
+Current checks: workspace/all-target Rust compilation, packaged Rust consumer
+(all 33 mutable families and 15 typed families), 28 strict C executions on ARM
+and actual Intel/Rosetta, all-33-family Swift consumers on both architectures,
+ARM AppKit pixel smoke, 60 focused browser checks across all three engines, including shared initialization
+and failed-load recovery, TypeScript,
+and 109 exact-WASM consumer checks. Production diagram logic remains unchanged.
+
+Performance evidence is separate: 21 workloads, 126 rows per independent-VM web
+condition and 168 actual Swift rows. The no-slower-than-JS target is not met;
+[results](benchmarks/2026-10-19-vm/README.md) are published without a speedup claim.
+0.3 remains a source candidate; historical release evidence follows.
+
+---
+
 # 0.2 verification checkpoint — 2026-10-19
 
 All 33 native Rust diagram renderers, mutable codecs, prepared/raw entries and

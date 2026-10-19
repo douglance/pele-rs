@@ -2,7 +2,7 @@ import Foundation
 import CryptoKit
 import Pele
 
-private let stages = ["parseMutable", "snapshot", "apply", "render", "lifetime"]
+private let stages = ["parse", "render-source", "render-retained", "parseMutable", "snapshot", "apply", "render", "lifetime"]
 private func invalid(_ message: String) -> PeleError { PeleError(code: "benchmark", message: message) }
 private struct Workload: Decodable {
     let id: String
@@ -102,7 +102,9 @@ private final class Prepared {
             throw invalid("Owned graph lost raw UTF16 or reference identity")
         }
         let rerendered = try document.render(options: options, resources: resources)
-        return Verification(caseID: workload.id, outputs: [Output(initial), Output(applied), Output(rerendered)], arenaNodes: saved.nodes.count, arenaStrings: saved.strings.count)
+        return Verification(caseID: workload.id, outputs: [Output(initial), Output(applied), Output(rerendered),
+            Output(try engine.render(workload.source, options: options, resources: resources)),
+            Output(try engine.render(engine.parse(workload.source, options: parseOptions), options: options, resources: resources))], arenaNodes: saved.nodes.count, arenaStrings: saved.strings.count)
     }
     private func consume(_ result: FullRenderedDiagram) -> UInt64 {
         UInt64(result.svg.utf8.count) &+ result.width.bitPattern &+ result.height.bitPattern
@@ -123,6 +125,8 @@ private final class Prepared {
     func exercise(stage: String, count: Int, timing: Bool) throws -> Measurement {
         guard stages.contains(stage), count > 0, count <= maximumBatch else { throw invalid("Invalid stage or batch count") }
         guard !timing || ProcessInfo.processInfo.environment["PELE_PERF_ALLOW_TIMING"] == "1" else { throw invalid("Timing requires coordinated --quiet-run") }
+        let immutable = stage == "render-retained" ? try engine.parse(workload.source, options: parseOptions) : nil
+        if let immutable { _ = try engine.render(immutable, options: options, resources: resources) }
         let retained = ["snapshot", "apply", "render"].contains(stage) ? try warmDocument() : nil
         defer { try? retained?.close() }
         let baseline = stage == "apply" ? try retained!.snapshot().graph : nil
@@ -132,6 +136,11 @@ private final class Prepared {
         for _ in 0..<count {
             let contribution: UInt64 = try autoreleasepool {
                 switch stage {
+                case "parse":
+                    let document = try engine.parse(workload.source, options: parseOptions)
+                    return UInt64(document.type.utf8.count)
+                case "render-source": return consume(try engine.render(workload.source, options: options, resources: resources))
+                case "render-retained": return consume(try engine.render(immutable!, options: options, resources: resources))
                 case "parseMutable": return try parseOnce()
                 case "snapshot":
                     let snapshot = try retained!.snapshot()

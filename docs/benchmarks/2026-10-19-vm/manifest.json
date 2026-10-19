@@ -1,0 +1,47 @@
+{
+  "delivery-correspondence.json": {
+    "sha256": "14b2dd481171d3e0afbbbceaee5f761a1b276e75f5c8511f49aa7e7ccaf99dbd",
+    "bytes": 964
+  },
+  "final-schema-o3.json": {
+    "sha256": "510350d7a0a11f23caf483e19c510582f635fc425fb14628524d225abcc138d3",
+    "bytes": 159285
+  },
+  "final-schema-size.json": {
+    "sha256": "617e14e9ca1929685a4d444e8942caa8cf30413664a8977be25463fea4af3493",
+    "bytes": 158630
+  },
+  "final-size.json": {
+    "sha256": "ed83ff3528e88d9377c99f074fec02cfc9c803bfeb6b86dc77da7e6a5fa06955",
+    "bytes": 158791
+  },
+  "pre-init-default.json": {
+    "sha256": "a792909e405007ea995f93259e9aa86c6328e3cc3699980ee112dfeb9700c8e3",
+    "bytes": 158834
+  },
+  "swift-macos.json": {
+    "sha256": "535b24d605e9a45b8d0456a1f7613f9d934cf5d8430db75c12280c50f03d3935",
+    "bytes": 807767
+  },
+  "conditions": {
+    "coreSourceCommit": "21c57eb",
+    "defaultBuild": "opt-level=s, LTO, panic=abort; no schema-cache patch",
+    "browser": "Chromium 156.0.8078.4",
+    "host": "independent Linux x86_64 VM, AMD EPYC-Genoa,8vCPU,16GiB",
+    "webSameResourceSourceHashesAsSwift": true,
+    "finalWarmupMinimumMs": 100,
+    "trialsPerWebRow": 9,
+    "trialsPerSwiftRow": 7,
+    "vmRowsPerBuild": 126,
+    "swiftRows": 168,
+    "defaultRawWasmBytes": 7684713,
+    "speedRawWasmBytes": 10999641,
+    "experimentalChangesShipped": false,
+    "performanceParityTargetMet": false,
+    "webInitializerFixCommit": "6097858",
+    "finalDefaultRows": 126,
+    "experimentBaseline": "pre-init-default.json",
+    "finalDefaultHarnessSHA256": "05945f5273727ae9b1dec62ac4ddd5ac7000b8c1e06435d07ce5948d5fedae85",
+    "experimentHarnessSHA256": "1ab49ae277863c097fbe4070c2a9364ddf8febad44c0f2cbf518fe291606bd40"
+  }
+}

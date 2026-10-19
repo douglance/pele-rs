@@ -2,34 +2,116 @@
 <html lang="en">
 <head>
   <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-  <title>pele-rs · Flowchart playground</title>
+  <title>pele-rs · Full-library playground</title>
   <link rel="stylesheet" href="style.css">
-  <script type="module" src="main.js"></script>
+  <style>
+    #preview { --pele-bg: #ffffff; --pele-fg: #1f1f1f; --pele-muted: #6e6e6e; --pele-line: #1f1f1f; --pele-surface: #f3f3f3; --pele-surface-alt: #e6e6e6; --pele-border: #8a8a8a; --pele-accent: #5b7bd5; background: var(--pele-bg); }
+    #preview[data-dark="true"] { --pele-bg: #191b20; --pele-fg: #eceef5; --pele-muted: #aeb6c9; --pele-line: #c4ccdf; --pele-surface: #272b33; --pele-surface-alt: #353b47; --pele-border: #8f98ad; --pele-accent: #91a9ef; }
+  </style>
 </head>
 <body>
   <header><a href="https://github.com/vijayksingh/pele-rs">pele-rs</a><span>Rust engine · Browser WASM · Swift native</span></header>
   <main>
     <section class="editor" aria-labelledby="editor-title">
-      <p class="eyebrow">FLOWCHARTS / V0.1.0</p>
-      <h1 id="editor-title">One graph. Same engine.</h1>
-      <p>Mermaid source becomes deterministic geometry and font outlines. No installed fonts or JavaScript diagram renderer.</p>
+      <h1 id="editor-title">One engine. Many diagrams.</h1>
+      <p id="family-count">Discovering diagram families…</p>
+      <p>Edit source or change an owned model. Every drawing runs the packed Rust WASM library.</p>
       <form id="form">
         <label for="example">Example</label>
-        <select id="example">
-          <option value="branch">Decision + feedback</option><option value="links">Link styles</option>
-          <option value="cycles">Cycles + parallel links</option><option value="quoted">Quoted labels</option>
-          <option value="diamond">Bottom to top</option><option value="long">Long edge + disconnected</option>
+        <select id="example" disabled>
+          <option value="flowchart">Flowchart · capture and review</option>
+          <option value="class">Class · shared engine</option>
+          <option value="sequence">Sequence · one render request</option>
+          <option value="pie">Pie · editable model</option>
+          <option value="railroad">Railroad · diagram grammar</option>
         </select>
-        <label for="source">Mermaid source</label>
-        <textarea id="source" spellcheck="false" rows="14"></textarea>
-        <div class="controls"><button id="render" disabled>Render flowchart</button><label class="theme-label"><input id="dark" type="checkbox"> Dark diagram</label></div>
+        <label for="source">Diagram source</label>
+        <textarea id="source" spellcheck="false" rows="10" aria-describedby="status"></textarea>
+        <div class="controls"><button id="render" disabled>Render diagram</button><label class="theme-label"><input id="dark" type="checkbox"> Dark diagram</label></div>
+        <div class="controls"><button id="mutate" type="button" disabled>Add Rust slice</button></div>
       </form>
       <p id="status" role="status" aria-live="polite">Loading Rust WASM…</p>
       <p id="error" role="alert" hidden></p>
-      <details><summary>Supported syntax</summary><p>TB/TD, BT, LR, RL. Rectangles, rounded rectangles, diamonds, circles, stadiums. Solid, dashed, thick links; pipe labels; chains, cycles and self-loops.</p><p>Subgraphs, styling directives, rich text and uncovered scripts return explicit errors. Labels stay plain text.</p></details>
     </section>
-    <section class="drawing" aria-label="Rendered flowchart"><div id="preview"></div></section>
+    <section class="drawing" aria-label="Rendered diagram"><div id="preview" data-dark="false"></div></section>
   </main>
-  <footer>Independent Rust adaptation inspired by Pele. MIT engine · OFL Noto Sans · No full Mermaid compatibility claim.</footer>
+  <footer>Independent Rust adaptation of Pele 1.6.0 · MIT engine · Example data is illustrative.</footer>
+  <script type="module">
+    const examples = {
+      flowchart: 'flowchart LR\n  A[Capture] --> B{Keep?}\n  B -->|Yes| C[Review]\n  C --> D[Store]\n  B -->|No| E[Discard]\n  C -.->|Revise| A',
+      class: 'classDiagram\n  class Engine {\n    +parse(source) Document\n    +render(model) SVG\n  }\n  class Document {\n    +model\n    +close()\n  }\n  Engine --> Document : owns',
+      sequence: 'sequenceDiagram\n  participant App\n  participant Rust\n  App->>Rust: Parse source\n  Rust-->>App: Owned model\n  App->>Rust: Render model\n  Rust-->>App: SVG',
+      pie: 'pie\n  title Shared engine\n  "Swift": 3\n  "Web": 4',
+      railroad: 'railroad-abnf-beta\n  diagram = "flowchart" / "class" / "sequence" / "pie" ;',
+    };
+    const source = document.querySelector('#source');
+    const preview = document.querySelector('#preview');
+    const status = document.querySelector('#status');
+    const error = document.querySelector('#error');
+    const renderButton = document.querySelector('#render');
+    const mutateButton = document.querySelector('#mutate');
+    const example = document.querySelector('#example');
+    let renderer, model, modelSource = '', renders = 0;
+
+    function syncMutation() {
+      mutateButton.disabled = !model || model.type !== 'pie' || source.value !== modelSource || !error.hidden;
+      mutateButton.textContent = model?.type === 'pie' && model.sections.has('Rust') ? 'Grow Rust slice' : 'Add Rust slice';
+    }
+    function publish(drawing, edited = false) {
+      // Only the SVG returned by this Rust renderer is inserted as HTML.
+      preview.innerHTML = drawing.svg;
+      preview.dataset.family = drawing.type;
+      preview.dataset.render = String(++renders);
+      error.hidden = true;
+      error.textContent = '';
+      status.textContent = `${drawing.type} · ${Math.round(drawing.width)} × ${Math.round(drawing.height)}${edited ? ' · Rust slice changed in owned model' : ' · Rust WASM'}`;
+      syncMutation();
+    }
+    function fail(failure) {
+      error.textContent = `${failure.code ?? failure.name ?? 'Error'}: ${failure.message ?? String(failure)}`;
+      error.hidden = false;
+      status.textContent = model ? 'Source rejected. Last successful drawing retained; edit and render again.' : 'No drawing yet. Edit source and render again.';
+      syncMutation();
+    }
+    function draw() {
+      if (!renderer) return;
+      let candidate;
+      try {
+        candidate = renderer.parse(source.value);
+        const drawing = renderer.render(candidate, {idPrefix: 'full-demo'});
+        if (model) renderer.dispose(model);
+        model = candidate;
+        candidate = undefined;
+        modelSource = source.value;
+        publish(drawing);
+      } catch (failure) { fail(failure); }
+      finally { if (candidate) renderer.dispose(candidate); }
+    }
+    document.querySelector('#form').addEventListener('submit', event => { event.preventDefault(); draw(); });
+    example.addEventListener('change', () => { source.value = examples[example.value]; draw(); });
+    source.addEventListener('input', syncMutation);
+    document.querySelector('#dark').addEventListener('change', event => { preview.dataset.dark = String(event.target.checked); });
+    mutateButton.addEventListener('click', () => {
+      if (mutateButton.disabled) return;
+      try {
+        model.sections.set('Rust', (model.sections.get('Rust') ?? 0) + 5);
+        publish(renderer.render(model, {idPrefix: 'full-demo'}), true);
+      } catch (failure) { fail(failure); }
+    });
+    window.addEventListener('pagehide', () => { if (model) renderer.dispose(model); renderer?.close(); }, {once: true});
+    try {
+      const {loadRenderer} = await import('/dist/package-web/package/full.js');
+      renderer = await loadRenderer();
+      const families = renderer.capabilities().filter(family => family.registered);
+      document.querySelector('#family-count').textContent = `${families.length} registered diagram families · five examples below`;
+      example.disabled = false;
+      renderButton.disabled = false;
+      source.value = examples.flowchart;
+      draw();
+    } catch (failure) {
+      fail(failure);
+      status.textContent = 'Build the current package with scripts/build-wasm.sh, then serve this repository.';
+    }
+  </script>
 </body>
 </html>

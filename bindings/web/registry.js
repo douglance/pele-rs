@@ -1,5 +1,6 @@
+import initialize from './initialize.js';
 // Owned built-in selection. Registration and parsing remain in Rust.
-import initialize, {NativeRegistry} from './pkg/pele.js';
+import {NativeRegistry} from './pkg/pele.js';
 import {createRenderer} from './full.js';
 export {PeleError, PeleError as PeleCompatibilityError} from './errors.js';
 

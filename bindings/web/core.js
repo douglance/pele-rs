@@ -1,5 +1,6 @@
+import initialize from './initialize.js';
 export {loadRegistry} from './registry.js';
-import initialize, { inspect as rawInspect, capabilities as rawCapabilities } from './pkg/pele.js';
+import { inspect as rawInspect, capabilities as rawCapabilities } from './pkg/pele.js';
 import {PeleError, fromNativeError} from './errors.js';
 export {PeleError, PeleError as PeleCompatibilityError};
 function result(json) {

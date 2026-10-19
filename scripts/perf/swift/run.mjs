@@ -14,7 +14,7 @@ const {cases,revision,now}=await import(pathToFileURL(join(root,'scripts/perf/ca
 const bundle=join(root,'node_modules/pele/dist/pele.js'),oracleSha256=sha(await readFile(bundle));
 assert.equal(oracleSha256,'d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d','Pinned development oracle differs');
 const upstream=await import(pathToFileURL(bundle));Date.now=()=>now;
-const knownStages=['parseMutable','snapshot','apply','render','lifetime'];
+const knownStages=['parse','render-source','render-retained','parseMutable','snapshot','apply','render','lifetime'];
 const stages=arg('--stages',knownStages.join(',')).split(',');assert(stages.length&&stages.every(s=>knownStages.includes(s))&&new Set(stages).size===stages.length,'Invalid stages');
 const ids=arg('--cases','').split(',').filter(Boolean),filter=arg('--filter','');
 const selected=cases().filter(c=>(!ids.length||ids.includes(c.id))&&(!filter||c.id.includes(filter)));
@@ -46,7 +46,7 @@ try{
   const expected=summary(upstream.render(workload.source,{...workload.options,...resources()}));
   const prepared=await swift.send({op:'prepare',workload});for(const output of prepared.outputs)check(output,expected,workload.id+' prepared');
   report.cases.push({...workload,sourceSha256:sha(Buffer.from(workload.source)),sourceBytes:Buffer.byteLength(workload.source),output:expected,prepared});
-  // All five executable API paths run once even in correctness-only mode.
+  // All selected executable API paths run once even in correctness-only mode.
   for(const stage of stages){
    const exercised=await swift.send({op:'exercise',caseID:workload.id,stage,count:1});check(exercised.output,expected,workload.id+' '+stage+' correctness');
    if(!timed){report.rows.push({case:workload.id,stage,correctness:exercised});continue}

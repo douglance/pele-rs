@@ -6,17 +6,17 @@
 
 **Pele-compatible diagrams, one independent Rust engine for Swift and the web.**
 
-**0.2.0 implements all 33 diagram families** from
+**The engine implements all 33 diagram families** from
 [Pele 1.6.0](https://github.com/obsidianmd/pele). Rust owns parsing, models,
 layout and SVG generation. Thin C/Swift and WebAssembly adapters expose the same
 engine, with host font, icon, clock, calendar and presentation resources.
 The project has no Kamui dependency and runs no JavaScript diagram engine in its
 native or WASM distribution.
 
-The Rust, universal macOS and packed-browser verification covers all 33 families.
-Use the [v0.2.0 GitHub release](https://github.com/vijayksingh/pele-rs/releases/tag/v0.2.0)
-for source, Swift XCFramework, web tarball, checksums and verification records.
-Packages are distributed through GitHub, not crates.io or the npm registry.
+Current development source targets **0.3.0**. Build from source below. The former
+v1-only engine and wrappers are removed. A new release remains on hold while the
+web performance target is unmet. Packages are distributed through GitHub, not
+crates.io or the npm registry.
 
 ![Packed Rust WASM demo: five diagram families, mutable pie, error recovery and dark palette](docs/images/full-demo.gif)
 
@@ -42,16 +42,16 @@ themselves establish complete API or release acceptance. The
 [provenance](UPSTREAM.md) records its relationship to upstream. This is an
 independent project, not an official Obsidian, Pele or Mermaid release.
 
-## Install 0.2.0
+## Install
 
 ### Rust
 
 The Cargo package is named `pele-rs`; the dependency below aliases it as `pele`.
-Use the pinned Git tag:
+Use the source checkout for the current API:
 
 ```toml
 [dependencies]
-pele = { package = "pele-rs", git = "https://github.com/vijayksingh/pele-rs.git", tag = "v0.2.0" }
+pele = { package = "pele-rs", path = "/absolute/path/to/pele-rs/crates/pele" }
 ```
 
 ```rust
@@ -77,12 +77,12 @@ methods and direct model construction.
 
 ### Swift
 
-macOS 14+, Swift 6+. The Swift package uses a checksum-pinned universal
-arm64/x86_64 XCFramework. In the application's `Package.swift`:
+macOS 14+, Swift 6+. Run `scripts/build-native.sh --universal` before resolving
+the local package. In the application's `Package.swift`:
 
 ```swift
 // dependencies:
-.package(url: "https://github.com/vijayksingh/pele-rs.git", exact: "0.2.0")
+.package(path: "/absolute/path/to/pele-rs")
 // Target dependencies:
 .product(name: "Pele", package: "pele-rs")
 ```
@@ -107,10 +107,11 @@ included.
 
 ### Web
 
-Install the GitHub release tarball:
+Build the current package:
 
 ```sh
-npm install https://github.com/vijayksingh/pele-rs/releases/download/v0.2.0/unlocalhosted-pele-rs-0.2.0.tgz
+scripts/build-wasm.sh
+npm install /absolute/path/to/pele-rs/dist/release/unlocalhosted-pele-rs-0.3.0.tgz
 ```
 
 ```js
@@ -169,13 +170,47 @@ See [source limits](docs/SOURCE_LIMITS.md), [parse limits](docs/PARSE_LIMITS.md)
 [intrinsic diagnostics](docs/WEB_VM_DIAGNOSTICS.md) and
 [extreme corpus boundaries](docs/WEB_LEGACY_CORPUS.md).
 
-Host font metrics can affect drawing dimensions. The compatibility renderer's
-host-font SVG and the legacy renderer's embedded-font outlined SVG have distinct
-contracts. Do not treat legacy geometry/limits as the full-library API.
+Host font metrics can affect drawing dimensions. Rust renders SVG using resources
+provided by the host. Source, retained-model and mutable-model APIs use this same engine.
 
-There is no claimed speedup over Pele JavaScript. Existing measurements are
-scoped historical baselines; GPU acceleration is not implemented. See
-[performance evidence](docs/PERFORMANCE.md).
+## Performance
+
+**The current WASM build does not meet the goal of matching Pele JS.** Independent
+VM measurements across 21 workloads show warm source rendering takes
+1.92–5.25× the Pele JS time. No speedup or GPU acceleration is claimed.
+
+Linux VM: AMD EPYC-Genoa, 8 vCPUs, 16 GiB, Chromium 156.0.8078.4.
+Same browser, inputs and cached Canvas metrics; nine alternating trials after
+at least 100 ms warmup per API. Complete SVG and dimensions match before/after.
+Large workloads use 200 units, except Sankey (199 links) and Railroad (60 rules).
+
+| Large workload | Pele JS | Rust/WASM | WASM / JS |
+| --- | ---: | ---: | ---: |
+| Flowchart | 1.387 ms | 3.025 ms | 2.18× |
+| Sequence | 0.512 ms | 1.344 ms | 2.62× |
+| ER | 2.900 ms | 8.050 ms | 2.78× |
+| Pie | 0.281 ms | 0.769 ms | 2.73× |
+| Sankey | 0.869 ms | 1.987 ms | 2.29× |
+| Gantt | 0.719 ms | 2.975 ms | 4.14× |
+| Railroad | 0.756 ms | 2.325 ms | 3.07× |
+
+Swift runs here on Apple M1 Pro because the Linux VM lacks the macOS/AppKit SDK.
+Seven-trial medium-workload medians (48 units; Railroad 15 rules):
+
+| Medium workload | Source render | Retained render | Mutable render |
+| --- | ---: | ---: | ---: |
+| Flowchart | 0.597 ms | 0.493 ms | 0.621 ms |
+| Sequence | 0.275 ms | 0.235 ms | 0.290 ms |
+| ER | 1.624 ms | 1.411 ms | 1.580 ms |
+| Pie | 0.306 ms | 0.290 ms | 0.309 ms |
+| Sankey | 0.399 ms | 0.372 ms | 0.420 ms |
+| Gantt | 0.450 ms | 0.383 ms | 1.130 ms |
+| Railroad | 0.469 ms | 0.442 ms | 0.501 ms |
+
+The Swift and VM figures cannot be compared across machines. Timings include
+public API/ownership costs, and exclude startup, downloads and SVG painting.
+Larger compiler and schema-cache experiments showed no reliable overall win and
+remain out of the default. See [methodology, all stages and raw results](docs/benchmarks/2026-10-19-vm/README.md).
 
 ## Build and verification
 
@@ -193,14 +228,12 @@ scripts/build-wasm.sh
 npm run test:types
 ```
 
-Acceptance covers 380 Rust integration tests, 176 Swift features and 28 strict C
-executions across arm64 and actual x86_64/Rosetta, all-33-family native pixel and
-consumer checks on both architectures, and 31 active AppKit interaction features.
-The packed browser matrix covers 285 unique checks across Chromium, Firefox and
-WebKit. Its initial run passed 284; macOS low-power sleep interrupted one WebKit
-Class check, which passed separately on unchanged source/package with unchanged
-assertions and timeout. This was not one uninterrupted 285-check run. See
-[verification evidence](docs/FULL_PARITY_PROGRESS.md).
+The current cleanup passes all-target Rust compilation, packaged Rust consumers
+for all 33 mutable families, 28 strict C executions across ARM/Intel, all-33-family
+Swift consumers on both architectures, native painted-pixel checks, and the
+canonical web package and 60 focused browser checks through Chromium/Firefox/WebKit. An independent exact-WASM
+consumer checks all 33 complete SVG baselines and live host features. The broader
+pinned corpus history is retained in [verification evidence](docs/FULL_PARITY_PROGRESS.md).
 
 `scripts/verify.sh` runs Rust integration corpora, packaged consumers, strict C
 ownership checks, Swift integration features, AppKit checks and packed-WASM
@@ -214,17 +247,10 @@ It does not publish. Distribution checks and compatibility boundaries are
 recorded in [release acceptance](docs/RELEASE_0_2.md).
 Tests are integration/end-to-end, not unit tests.
 
-## Legacy v0.1.0
-
-The earlier [v0.1.0 release](https://github.com/vijayksingh/pele-rs/releases/tag/v0.1.0)
-remains the original [flowchart subset](docs/LLD.md), with `pele::render`,
-Swift `Pele.render` and web `loadPele`. Its binaries do not expose the new
-all-family interfaces. The legacy APIs remain separate from `compat` / `full`.
-
 ## License and attribution
 
 Engine: [MIT](LICENSE). Upstream Pele: [NOTICE](NOTICE) and
-[upstream MIT license](third_party/PELE-LICENSE). Bundled unmodified Noto Sans:
+[upstream MIT license](third_party/PELE-LICENSE). Unmodified Noto Sans test font:
 [SIL OFL 1.1](crates/pele/assets/fonts/OFL.txt), with pinned
 [origin/hash](crates/pele/assets/fonts/README.md).
 [Third-party notices](THIRD_PARTY_NOTICES.md) cover the remaining derived code

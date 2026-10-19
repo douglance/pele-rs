@@ -74,10 +74,6 @@ fn discovery_and_contract_do_not_overclaim_parity() {
     assert_eq!(error.line, 1);
     assert_eq!(error.column, 3);
     assert_eq!(error.snippet, "🙂 broken\n--^");
-    assert!(
-        pele::render("graph TD\nA --> B", &Default::default()).is_ok(),
-        "legacy interface remains usable"
-    );
 }
 
 #[test]
