@@ -75,7 +75,8 @@
     "diagrams/",
     "builtin-entries.js",
     "all-diagram-entries.js",
-    "host-functions.js"
+    "host-functions.js",
+    "initialize.js"
   ],
   "publishConfig": {
     "access": "public"

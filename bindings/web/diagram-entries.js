@@ -1,6 +1,7 @@
+import initialize from './initialize.js';
 // Low-level built-in host facade. Prepared parsing, models and drawing stay Rust.
 import {markBuiltinDiagram,rawModelOwner} from './builtin-entries.js';
-import initialize, {NativeRegistry} from './pkg/pele.js';
+import {NativeRegistry} from './pkg/pele.js';
 import {createRenderer} from './full.js';
 let pending, renderer;
 /** Explicit asynchronous WASM readiness; entry objects remain synchronous after it. */
