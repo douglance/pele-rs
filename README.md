@@ -6,18 +6,23 @@
 
 **Pele-compatible diagrams, one independent Rust engine for Swift and the web.**
 
-The current **0.2.0 source candidate implements all 33 diagram families** from
+**0.2.0 implements all 33 diagram families** from
 [Pele 1.6.0](https://github.com/obsidianmd/pele). Rust owns parsing, models,
 layout and SVG generation. Thin C/Swift and WebAssembly adapters expose the same
 engine, with host font, icon, clock, calendar and presentation resources.
 The project has no Kamui dependency and runs no JavaScript diagram engine in its
 native or WASM distribution.
 
-**0.2.0 is not released.** Full API acceptance and final package verification are
-still in progress. The latest published **v0.1.0 is the original flowchart subset**;
-its downloaded binaries do not expose the new interfaces shown below. See the
-[0.2 candidate checklist](docs/RELEASE_0_2.md) and
-[current verification checkpoint](docs/FULL_PARITY_PROGRESS.md).
+The Rust, universal macOS and packed-browser verification covers all 33 families.
+Use the [v0.2.0 GitHub release](https://github.com/vijayksingh/pele-rs/releases/tag/v0.2.0)
+for source, Swift XCFramework, web tarball, checksums and verification records.
+Packages are distributed through GitHub, not crates.io or the npm registry.
+
+![Packed Rust WASM demo: five diagram families, mutable pie, error recovery and dark palette](docs/images/full-demo.gif)
+
+Recorded from the actual packed-library playground with
+[asserted interactions](scripts/record-full-demo.mjs). The
+[playground](examples/web/full.html) uses the same WASM engine as the package.
 
 ## Diagram families
 
@@ -37,23 +42,16 @@ themselves establish complete API or release acceptance. The
 [provenance](UPSTREAM.md) records its relationship to upstream. This is an
 independent project, not an official Obsidian, Pele or Mermaid release.
 
-## Use the current source candidate
-
-Check out the development branch for the all-family interfaces:
-
-```sh
-git clone --branch codex/full-pele-parity https://github.com/vijayksingh/pele-rs.git
-cd pele-rs
-```
+## Install 0.2.0
 
 ### Rust
 
-Use a local path dependency while the candidate is under verification. The Cargo
-package is named `pele-rs`; the import below uses the dependency alias `pele`.
+The Cargo package is named `pele-rs`; the dependency below aliases it as `pele`.
+Use the pinned Git tag:
 
 ```toml
 [dependencies]
-pele = { package = "pele-rs", path = "/absolute/path/to/pele-rs/crates/pele" }
+pele = { package = "pele-rs", git = "https://github.com/vijayksingh/pele-rs.git", tag = "v0.2.0" }
 ```
 
 ```rust
@@ -79,19 +77,12 @@ methods and direct model construction.
 
 ### Swift
 
-macOS 14+, Swift 6+ and Xcode command-line tools are required. Build the matching
-native SDK before resolving the local Swift package:
-
-```sh
-scripts/build-native.sh                 # Host architecture
-# Or: scripts/build-native.sh --universal
-```
-
-In the application's `Package.swift`, use a local package dependency:
+macOS 14+, Swift 6+. The Swift package uses a checksum-pinned universal
+arm64/x86_64 XCFramework. In the application's `Package.swift`:
 
 ```swift
 // dependencies:
-.package(path: "/absolute/path/to/pele-rs")
+.package(url: "https://github.com/vijayksingh/pele-rs.git", exact: "0.2.0")
 // Target dependencies:
 .product(name: "Pele", package: "pele-rs")
 ```
@@ -105,26 +96,21 @@ let drawing = try engine.render(document)
 // drawing.svg, drawing.width, drawing.height, drawing.links
 ```
 
-The local XCFramework selects the source-built APIs. Without it, the current
-root manifest falls back to the older published v0.1 binary and legacy API.
 Use `parseMutable` for editable owned models, or `parsePrepared` /
 `createPrepared` for low-level per-family models. The AppKit layer supplies
 `DiagramView`, mount/update/destroy, zoom, link/accessibility controls and
-explicitly approved native image resources. Its final combined GUI verification
-is still pending. See [native entries](docs/NATIVE_DIAGRAM_ENTRIES.md),
+explicitly approved native image resources. See
+[native entries](docs/NATIVE_DIAGRAM_ENTRIES.md),
 [mutable models](docs/MUTABLE_MODELS.md) and
-[Swift build details](bindings/swift/README.md).
+[Swift build details](bindings/swift/README.md). No iOS or Windows binaries are
+included.
 
 ### Web
 
-Build and pack the current source rather than installing the published v0.1
-artifact:
+Install the GitHub release tarball:
 
 ```sh
-npm ci --ignore-scripts
-scripts/build-wasm.sh
-# Install this actual output in your application's directory:
-npm install /absolute/path/to/pele-rs/dist/release/unlocalhosted-pele-rs-0.2.0.tgz
+npm install https://github.com/vijayksingh/pele-rs/releases/download/v0.2.0/unlocalhosted-pele-rs-0.2.0.tgz
 ```
 
 ```js
@@ -207,6 +193,15 @@ scripts/build-wasm.sh
 npm run test:types
 ```
 
+Acceptance covers 380 Rust integration tests, 176 Swift features and 28 strict C
+executions across arm64 and actual x86_64/Rosetta, all-33-family native pixel and
+consumer checks on both architectures, and 31 active AppKit interaction features.
+The packed browser matrix covers 285 unique checks across Chromium, Firefox and
+WebKit. Its initial run passed 284; macOS low-power sleep interrupted one WebKit
+Class check, which passed separately on unchanged source/package with unchanged
+assertions and timeout. This was not one uninterrupted 285-check run. See
+[verification evidence](docs/FULL_PARITY_PROGRESS.md).
+
 `scripts/verify.sh` runs Rust integration corpora, packaged consumers, strict C
 ownership checks, Swift integration features, AppKit checks and packed-WASM
 browser tests. Browser tests use one worker across Chromium, Firefox and WebKit;
@@ -215,35 +210,16 @@ macOS desktop and count assertions only after the QA app becomes active.
 
 `scripts/package-release.sh` creates universal macOS/WASM artifacts, verifies the
 crate, computes SHA-256 checksums and updates the Swift distribution manifest.
-It does not publish. Final universal execution, packed-browser regression,
-package consumption and a new demo remain [release gates](docs/RELEASE_0_2.md).
+It does not publish. Distribution checks and compatibility boundaries are
+recorded in [release acceptance](docs/RELEASE_0_2.md).
 Tests are integration/end-to-end, not unit tests.
 
-## Published v0.1.0
+## Legacy v0.1.0
 
-The existing [v0.1.0 release](https://github.com/vijayksingh/pele-rs/releases/tag/v0.1.0)
-is usable today for its [documented flowchart subset](docs/LLD.md).
-It provides `pele::render`, Swift `Pele.render` and web `loadPele` with outlined
-SVG and structured flowchart geometry. It does not contain the all-family APIs.
-Rust and web packages are GitHub artifacts, not registry publications.
-
-```toml
-pele = { package = "pele-rs", git = "https://github.com/vijayksingh/pele-rs.git", tag = "v0.1.0" }
-```
-
-```swift
-.package(url: "https://github.com/vijayksingh/pele-rs.git", exact: "0.1.0")
-```
-
-```sh
-npm install https://github.com/vijayksingh/pele-rs/releases/download/v0.1.0/unlocalhosted-pele-rs-0.1.0.tgz
-```
-
-![Legacy v0.1 WASM playground: editing, cycles, errors, recovery and dark theme](docs/images/demo.gif)
-
-This GIF records the legacy playground, not 0.2 verification. Its
-[recording script](scripts/record-demo.mjs) remains available; the new release
-requires a recording from its verified artifacts.
+The earlier [v0.1.0 release](https://github.com/vijayksingh/pele-rs/releases/tag/v0.1.0)
+remains the original [flowchart subset](docs/LLD.md), with `pele::render`,
+Swift `Pele.render` and web `loadPele`. Its binaries do not expose the new
+all-family interfaces. The legacy APIs remain separate from `compat` / `full`.
 
 ## License and attribution
 
@@ -252,4 +228,7 @@ Engine: [MIT](LICENSE). Upstream Pele: [NOTICE](NOTICE) and
 [SIL OFL 1.1](crates/pele/assets/fonts/OFL.txt), with pinned
 [origin/hash](crates/pele/assets/fonts/README.md).
 [Third-party notices](THIRD_PARTY_NOTICES.md) cover the remaining derived code
-and fixtures. System fonts are not redistributed.
+and fixtures. The distributed artifacts also retain
+[Rust dependency notices](crates/pele/assets/RUST-DEPENDENCY-LICENSES.txt) and
+[Rust standard-library/runtime notices](crates/pele/assets/RUST-STDLIB-LICENSES.txt).
+System fonts are not redistributed.

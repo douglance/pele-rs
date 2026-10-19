@@ -1,120 +1,101 @@
-# 0.2 source candidate and release gates
+# 0.2 release acceptance
 
-Status at source revision `fa07860`: Cargo and web manifests identify **0.2.0**,
-but there is no published 0.2 tag, package or GitHub release. The published
-v0.1.0 remains the legacy flowchart subset. This document describes implemented
-source and outstanding acceptance, not a release announcement.
+0.2 ports all 33 Pele 1.6.0 diagram families and the inventoried native/web
+interfaces through the independent Rust engine. Runtime implementation is frozen
+at `0c0c5a4` / `fa07860`; later commits cover verification, packaging, notices,
+demo and documentation. Publication remains gated on final distribution checks.
+This document does not claim the GitHub tag or downloads already exist.
 
-The target is the entire Pele 1.6.0 library at upstream revision
-`458322a5b8abb1ae57ddf127c32017ab9fb14a92`: all 33 families and the inventoried
-public APIs. The [parity inventory](PELE_PARITY.md) is the acceptance scope;
-[the progress log](FULL_PARITY_PROGRESS.md) records revision-specific evidence.
+Oracle: upstream revision `458322a5b8abb1ae57ddf127c32017ab9fb14a92`.
+The [parity inventory](PELE_PARITY.md) defines scope; the
+[verification checkpoint](FULL_PARITY_PROGRESS.md) retains evidence and history.
 
-## Implemented source
+## Delivered interfaces
 
-- All 33 Rust parsers/renderers and mutable family codecs, shared source
-  preparation, layout/text/theme processing and SVG output.
+- All 33 Rust parsers/renderers and mutable model codecs; shared source
+  preparation, layout, text/theme processing and SVG output.
 - Typed immutable documents, editable owned graphs, schema-described methods,
-  retained registration/config, extension IDs and independent registries.
-- Low-level prepared parsers/renderers and explicit caller-graph constructors
-  for all 33 families, without reconstructing source or injecting DB prototypes.
-- C/Swift and WASM adapters for retained documents, model exchange, callbacks,
-  precise render numbers and source/edge/output policies.
-- Host-function binding, original-method delegation, partial mutation/error
-  publication and scoped callback lifetimes. Gantt callback features have
-  focused native, Swift and browser evidence. ClassMember live replacements
-  and captured nested original calls are implemented with focused evidence.
-- Browser mount/update/destroy and zoom, selective/lazy registries and custom
-  providers. Built-ins share one WASM artifact.
-- Native AppKit mount/update/destroy, zoom, presentation, link/accessibility
-  controls, and owned font/approved raster resource adapters.
-- Versioned 0.2 build/packaging scripts and a source-built downstream Swift
-  consumer that exercises all 33 families and newer C13/C14 interfaces.
+  retained handlers/config, extension IDs and independent registries.
+- All 33 low-level prepared parsers/renderers and explicit caller-graph
+  constructors, without reconstructing source or injecting DB prototypes.
+- C/Swift and WASM adapters, precise render numbers and source/edge/output
+  policies, host resources and scoped host-function binding.
+- Gantt and ClassMember callable replacements, captured original delegation,
+  nested calls, partial mutation/error publication and recovery.
+- Browser mount/update/destroy, zoom, selective/lazy registries and custom
+  providers; all built-ins share one WASM artifact.
+- Native AppKit mount/update/destroy, zoom, link/accessibility controls and
+  bounded native fonts/explicitly approved raster resources.
+- Universal macOS arm64/x86_64 packaging and retained Rust dependency,
+  generated-glue and standard-library/runtime notices (`415a04a`).
 
-Adapters keep platform services outside the Rust diagram engine. No Kamui
-runtime, JavaScript diagram engine, network image loader or GPU renderer is
-required by the engine.
+## Completed runtime verification
 
-## Evidence completed before the final freeze
+| Lane | Verified result |
+| --- | --- |
+| Rust | 380 tests across all 88 integration targets; zero failures/ignored |
+| Native C | 14 strict integrations per architecture; 28 actual executions |
+| Swift CLI | 88 features per architecture; 176 actual executions |
+| Native rendering | All 33 families render and paint pixels on arm64 and x86_64/Rosetta |
+| SwiftPM consumers | Independent local consumers pass on both architectures |
+| AppKit | 31/31 features in the active signed QA app, zero failures |
+| Packed browser | 285 unique passing checks: 95 Chromium, 95 Firefox, 95 WebKit |
+| TypeScript | Independent consumer resolves exact extracted archive declarations |
 
-These are independent feature slices, not one passing final release matrix:
+The Rust corpus at `0c0c5a4` used release opt-level 3, LTO off, codegen16, two
+jobs/test threads. Distribution artifacts use the normal release profile.
+Native evidence preserves 502 source/SDK inputs unchanged. Intel SwiftPM test
+discovery failed under Rosetta; all 25 non-GUI classes then executed through the
+actual x86_64 XCTest runner, without product changes or repeating C coverage.
 
-- The final consolidated Core run at `0c0c5a4` passes all 88 integration targets
-  and 380 tests with zero failures or ignored tests, superseding the earlier
-  failed complete run below. Source hashes match before and after execution.
+The browser result is **not one uninterrupted 285-check run**. The initial run
+passed 284 with zero skips/flaky retries. macOS entered low-power sleep for
+17,654 seconds (4h54m14s) during WebKit's Class corpus. That same check then passed
+in 21,758 ms against unchanged source/archive, with unchanged assertions and
+120,000 ms timeout. Original results and OS sleep evidence remain preserved;
+all 285 distinct checks have passing evidence. The packed tree, archive entries,
+three WASM copies and 33 attached diagnostic ledgers were verified exact.
 
-- The final Class slice passed 17 Rust features, seven Swift features, strict C
-  Class/Gantt integration and 30 browser checks across all three engines.
-  Commits `0c0c5a4` and `fa07860` contain the implementation and feature tests.
+The final GUI harness confirmation after `95d33ae` passes all four suites:
+Mount 10, Zoom 9, Presentation 7, NativeResource 5. Run `run-scu8m8og` records
+active PID 88918 and 31 executed features with zero failures. Earlier
+inactive, zero-assertion attempts are retained as failed attempts, not passes.
+Synthetic magnification and AX controls do not establish physical-trackpad or
+spoken VoiceOver behavior.
 
-- The consolidated Rust run executed all 87 integration targets: 376 tests
-  passed and one C4 legacy error-boundary assertion failed. That defect is fixed;
-  the 14-test C4/construction batch and restored-builtin raw recovery check pass.
-  The original failure remains recorded in the progress log.
-- A matching isolated ARM64 SDK passed 16 Swift prepared/construction,
-  host-function and presentation integration features. They include 99 raw
-  entry vectors and 67 caller-built model vectors across every family. Four
-  later AgentFlow diagnostic vectors require the final matching run.
-- Packed browser feature batches passed 105 distinct callback checks and 111
-  checks after caller-built model coverage, across Chromium, Firefox and WebKit.
-  A subsequent mono-font correction passed six targeted browser checks.
-- Source-built downstream Swift consumption passed against an isolated ARM64
-  release archive. Manifest checks distinguish local/new 0.2 APIs from legacy
-  remote 0.1 behavior. This is not published-artifact consumption proof.
-- Earlier active AppKit execution passed 26 interaction features. The expanded
-  31-feature GUI suite has not completed: recent QA attempts remained inactive
-  and executed no assertions. Those attempts are not passes.
+## Final distribution/publication gates
 
-Exact source/artifact hashes and logs are recorded in
-[FULL_PARITY_PROGRESS.md](FULL_PARITY_PROGRESS.md) and the linked feature docs.
-Older green matrices do not establish a later source revision's release status.
+- [x] Complete native/web Class callable slice and final Rust corpus.
+- [x] Build matching universal SDK and execute native C/Swift, pixel and consumer lanes.
+- [x] Execute all 31 AppKit features in an active signed application.
+- [x] Complete the packed three-browser/TypeScript matrix with the preserved sleep account.
+- [x] Retain production dependency and Rust runtime notices in distribution packaging.
+- [x] Verify exact universal ZIP consumers on arm64 and x86_64/Rosetta.
+- [x] Verify final web tarball: 104 entries, only NOTICE differs from browser acceptance;
+  TypeScript plus 109 exact-final-WASM checks pass.
+- [ ] Complete final crate/checksum and published remote distribution checks.
+- [x] Record the full-library demo: 114 actual browser frames, 19 seconds, from the verified packed artifact.
+- [ ] Publish the v0.2.0 tag/release, then verify actual downloads/checksums and remote consumers.
 
-## Pending release acceptance
+Runtime acceptance and published-artifact consumption are separate proof.
+`scripts/package-release.sh` builds local artifacts; it does not publish.
+Repacking notices/docs changes archive hashes and must preserve accepted
+executable bytes; final consumers use the actual final distribution.
 
-- [x] Complete ClassMember `getDisplayDetails` / `parseClassifier` live-callable
-  behavior, including captured originals, nested calls, partial errors and
-  native/Swift/packed-browser coverage.
-- [x] Freeze final Core source and pass the combined Rust integration corpus: 88
-  targets, 380 tests, zero failures/ignored at `0c0c5a4`. Formatting, immutable
-  diff checks and unchanged source hashes also pass. The optimized validation
-  profile uses LTO off/codegen16; distribution uses its normal release profile.
-- [ ] Build one matching universal macOS arm64/x86_64 XCFramework, recording
-  source, archive and header hashes.
-- [ ] Execute strict C integrations and Swift CLI features on arm64 and actual
-  x86_64/Rosetta, then run smoke and separate SwiftPM consumer checks.
-- [ ] Execute all 31 native GUI features in an active, signed QA application;
-  retain actual assertion and presentation evidence.
-- [ ] Build the final WASM artifact and npm archive; execute the complete packed
-  Chromium/Firefox/WebKit suite and TypeScript consumer checks against those
-  exact bytes, with zero unexplained skips or failures.
-- [ ] Verify crate packaging and standalone consumers, universal ZIP/checksums,
-  and the generated versioned Swift manifest. Check downstream consumption
-  again from the exact distribution artifacts.
-- [ ] Record a current demo from the verified package and update README, release
-  notes and PR evidence with final revision, artifacts and remaining boundaries.
-- [ ] Publish the GitHub tag/release only after those gates pass; verify the
-  published downloads, checksums and remote Swift/package consumers.
+## Compatibility boundaries
 
-`scripts/package-release.sh` produces local artifacts and does not publish.
-Running it while browser or Swift tests read their staging directories would
-invalidate the evidence; packaging and verification must use stable artifacts.
+Native graph/source/layout/image/output work budgets remain enforced. Source and
+config use bounded UTF-8/JSON; mutable graph transport preserves UTF-16 code units
+and IEEE number bits. Arbitrary JavaScript VM behavior, custom property
+interpreters and every undeclared helper override are outside this contract.
+Caller-authored models preserve upstream missing-helper errors at their actual
+operation boundary. Corpus coverage does not imply unrestricted JavaScript or
+Mermaid compatibility.
 
-## Compatibility boundaries carried into review
-
-The compatibility target does not remove independent native graph, source,
-layout, image or output work budgets. Source/config transport uses bounded
-UTF-8/JSON; graph transport preserves UTF-16 code units and IEEE number bits.
-Arbitrary JavaScript VM behavior, custom property interpreters and all
-undeclared helper overrides are not provided. Explicit missing-helper failures
-of ordinary caller-authored models are preserved at the relevant operation.
-
-See [caller-authored model behavior](DECLARED_MODEL_CONSTRUCTION.md),
+See [construction](DECLARED_MODEL_CONSTRUCTION.md),
 [VM diagnostics](WEB_VM_DIAGNOSTICS.md),
 [extreme corpus boundaries](WEB_LEGACY_CORPUS.md),
 [source limits](SOURCE_LIMITS.md), [parse limits](PARSE_LIMITS.md) and
-[output limits](OUTPUT_LIMITS.md). Do not describe finite corpus coverage as
-unrestricted JavaScript or Mermaid compatibility.
-
-No performance improvement over Pele JavaScript is claimed. GPU acceleration is
-not implemented; [existing benchmark evidence](PERFORMANCE.md) remains scoped
-to its recorded revisions and workloads.
+[output limits](OUTPUT_LIMITS.md). No speedup over Pele JavaScript is claimed;
+GPU acceleration is not implemented. [Performance evidence](PERFORMANCE.md)
+remains scoped to its recorded revisions/workloads.

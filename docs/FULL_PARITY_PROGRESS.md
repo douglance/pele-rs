@@ -1,42 +1,64 @@
-# Current checkpoint — 2026-10-19, source candidate 0.2.0
+# 0.2 verification checkpoint — 2026-10-19
 
-All 33 diagram families have native Rust renderers and mutable model codecs.
-The source candidate now exposes all 33 prepared/raw entries in web and Swift,
-explicit caller-graph constructors, native host-function bindings, native link
-interaction, and bounded native font/raster resources. This is not a published
-full-parity release.
+All 33 native Rust diagram renderers, mutable codecs, prepared/raw entries and
+caller-graph constructors are implemented. Swift and packed WASM expose the
+inventoried interfaces, including native resources, interaction/accessibility,
+Gantt live callbacks and ClassMember nested original-method delegation.
+Runtime implementation is frozen at `0c0c5a4` / `fa07860`. Final distribution and
+publication checks remain separate; see [0.2 acceptance](RELEASE_0_2.md).
 
-Latest completed slices:
+## Completed acceptance
 
-- Web live callbacks: 105 distinct browser/project checks passed across all three
-  engines; no failures/skips. Caller-built models extend that layer to 111 checks.
-- Swift prepared/construction layer: 16 integration features passed against a
-  matching isolated ARM SDK, including 99 raw-entry vectors and 67 caller-built
-  model vectors across every family. Four additional pinned AgentFlow diagnostic
-  cases were subsequently added to both Rust and Swift coverage.
-- Default mono-font adapter correction: six targeted browser checks passed.
-- Source-built external Swift consumer now checks all 33 families and C13/C14
-  APIs; explicit remote 0.2 enables those checks while legacy 0.1 stays compatible.
-- Class live methods and nested captured originals are committed in `0c0c5a4`
-  and `fa07860`. The focused slice passed 17 Rust checks, seven Swift features,
-  strict linked C Class/Gantt integration and 30 browser checks.
-- The final consolidated Rust corpus at `0c0c5a4` passed all 88 integration
-  targets: 380 tests, zero failures, zero ignored, zero missing. Formatting and
-  immutable commit diff checks passed. Source hashes matched before/after.
-  Validation used release opt-level 3, LTO off, codegen-units 16, jobs 2 and two
-  test threads. The packaged SDK uses its separate normal release build.
-  The previous 87-target run's C4 failure remains historical evidence below;
-  both repaired C4 and new Class coverage pass in this complete final run.
+- **Rust:** all 88 integration targets pass, 380 tests, zero failures/ignored.
+  Source hashes remained unchanged. Validation used release opt-level 3, LTO off,
+  codegen16, two jobs and two test threads; distribution uses its normal release profile.
+- **Native:** a matching universal arm64/x86_64 SDK passes 28 strict C executions
+  (14 per architecture), 176 Swift features (88 per architecture), all-33-family
+  painted-pixel smoke checks and independent SwiftPM consumers on both targets.
+  The 502 recorded source/SDK inputs are unchanged. The original Intel SwiftPM
+  discovery failure is preserved; all 25 non-GUI classes passed through actual
+  Rosetta/x86_64 XCTest without product changes or repeated C checks.
+- **AppKit:** final harness run `run-scu8m8og` after `95d33ae` passed 31/31 in the
+  active signed QA app, PID 88918: Mount 10, Zoom 9, Presentation 7, NativeResource 5;
+  zero failures. Earlier active run `run-9m9jrn6g` also passed 31. Inactive attempts
+  executed no assertions and remain recorded as unsuccessful attempts.
+- **Web:** all 285 unique checks have passing evidence, 95 per Chromium, Firefox
+  and WebKit, with one worker and no relaxed assertions/timeouts. Initial run:
+  284 passed, one WebKit Class check interrupted by OS low-power sleep. The host
+  slept 17,654 seconds (4h54m14s); that unchanged Class check passed separately in
+  21,758 ms with its original 120,000 ms timeout. This was not a single uninterrupted
+  285-pass run. Original raw results and sleep evidence are retained. There are
+  zero skipped/flaky/retried cases; the separate confirmation is explicit.
+- **Package identity:** the browser run verifies exact archive entries/extracted
+  tree, three identical WASM copies, unchanged source tests and 33 diagnostic
+  ledger attachments. Independent TypeScript consumer checks pass. License
+  commit `415a04a` adds dependency/glue/stdlib notices; final archive hashes change
+  while accepted runtime bytes must remain unchanged.
 
-Remaining release gates: final combined native universal SDK, C/Swift and packed
-browser matrix; actual native GUI31 execution; matching published package/checksum
-consumption, current demo and release docs.
-The final GUI attempts stayed inactive and executed no assertions, so they are
-not counted as passes. Fresh universal native and packed WASM builds now include the Class changes;
-older SDK files are not counted as matching release proof. No 0.2 tag or GitHub release exists yet.
+Native gate record: `dist/evidence/native-02-final/result-final.json`.
+GUI record: `dist/evidence/native-ui/run-scu8m8og/result.json`.
+Browser gate record: `/tmp/pele-final-web-ae1b146/gate-proof.json`, preserving the
+initial 284-plus-confirmation account, source/package identity and ledger hashes.
+These local records are evidence locations, not published download claims.
 
-Earlier entries below are historical snapshots; their artifacts and counts do
-not establish the current release's status.
+Final web delivery: all 104 packed entries match the browser-tested archive
+except expanded license notices. Independent TypeScript and 109 exact-final-WASM
+checks pass, including all 33 pinned SVG baselines, Class/Gantt callbacks and
+caller-built models. Both architectures pass consumers from the exact final
+universal ZIP. The demo records 114 real browser frames (19 seconds) from the
+final web archive.
+
+Remaining delivery work: final crate/source and published remote-consumer checks,
+plus GitHub tag/release publication. No registry publication,
+unrestricted VM parity, GPU acceleration or speedup is claimed. Existing
+[VM](WEB_VM_DIAGNOSTICS.md), [native work](WEB_LEGACY_CORPUS.md),
+[construction](DECLARED_MODEL_CONSTRUCTION.md) and limit boundaries remain.
+
+## Historical development record
+
+The snapshots below record earlier revisions and superseded failures/unfinished
+slices. Their old counts and pending-work statements do not override the current
+checkpoint above. The repaired C4 failure is retained instead of erased.
 
 ---
 
