@@ -4,193 +4,199 @@
 [![Release](https://img.shields.io/github/v/release/vijayksingh/pele-rs)](https://github.com/vijayksingh/pele-rs/releases/latest)
 [![MIT](https://img.shields.io/badge/engine-MIT-blue)](LICENSE)
 
-**Mermaid flowcharts, one Rust engine. Native Swift and browser WebAssembly.**
+**Pele-compatible diagrams, one independent Rust engine for Swift and the web.**
 
-Parse source, lay out graphs, route edges, and produce portable SVG plus structured
-geometry. One embedded font shapes labels on every target. No installed fonts,
-web view, runtime JavaScript diagram renderer, or Kamui dependency.
+The current **0.2.0 source candidate implements all 33 diagram families** from
+[Pele 1.6.0](https://github.com/obsidianmd/pele). Rust owns parsing, models,
+layout and SVG generation. Thin C/Swift and WebAssembly adapters expose the same
+engine, with host font, icon, clock, calendar and presentation resources.
+The project has no Kamui dependency and runs no JavaScript diagram engine in its
+native or WASM distribution.
 
-![Actual WASM playground: editing, cycles, errors, recovery and dark theme](docs/images/demo.gif)
+**0.2.0 is not released.** Full API acceptance and final package verification are
+still in progress. The latest published **v0.1.0 is the original flowchart subset**;
+its downloaded binaries do not expose the new interfaces shown below. See the
+[0.2 candidate checklist](docs/RELEASE_0_2.md) and
+[current verification checkpoint](docs/FULL_PARITY_PROGRESS.md).
 
-Recorded from the real playground after verification; [reproduction script](scripts/record-demo.mjs).
+## Diagram families
 
-**v0.1.0 covers a documented flowchart subset.** Independent Rust adaptation
-inspired by [Pele](https://github.com/obsidianmd/pele); not an official
-Obsidian/Pele/Mermaid release or full Mermaid replacement. Layout is independently
-implemented. No upstream pixel-equivalence or speedup claims.
+All 33 have Rust parsers/renderers and mutable model codecs:
 
-## Full Pele compatibility work
+| | Families |
+| --- | --- |
+| Graphs and structure | Flowchart, Swimlane, Class, ER, State, Architecture, Block, Mindmap, TreeView |
+| Time and workflow | Sequence, Gantt, Timeline, Journey, Kanban, GitGraph, AgentFlow, EventModeling |
+| Charts and data | Pie, QuadrantChart, Packet, Radar, XYChart, Sankey, Treemap, Venn |
+| Systems and explanation | C4, Requirement, Railroad, Cynefin, Wardley, Usecase, Ishikawa, Info |
 
-The complete Pele library is the target: all 33 diagram families, public APIs,
-shared layout/text/theme behavior and Swift/web adapters. The required
-[architecture](docs/FULL_PARITY_LLD.md) and [parity inventory](docs/PELE_PARITY.md)
-account for all 287 pinned upstream source files. **Full parity is not released.**
+Compatibility is pinned to upstream revision
+`458322a5b8abb1ae57ddf127c32017ab9fb14a92`. Implemented families do not by
+themselves establish complete API or release acceptance. The
+[parity inventory](docs/PELE_PARITY.md) tracks the complete library, and
+[provenance](UPSTREAM.md) records its relationship to upstream. This is an
+independent project, not an official Obsidian, Pele or Mermaid release.
 
-The development compatibility interface adds typed `DiagramModule` and
-`RenderResources` seams, an owned `ParsedDocument`, source preparation and truthful
-capability discovery. Its separate v2 contract preserves the released v1 renderer.
-Open extension IDs and `parse_as` allow additional languages without editing the
-built-in detector. New modules retain their concrete model types; parsed documents keep the
-handler/config that created them, including after registry replacement. Thirty-three
-compatibility renderers are implemented: **flowchart, pie, quadrantChart, packet,
-radar, timeline, journey, kanban, mindmap, class, ER, XYChart, state, Gantt, sequence, GitGraph, Architecture, Sankey, Treemap, C4, Info, Requirement, Block, Railroad, Cynefin, TreeView, AgentFlow, Wardley, EventModeling, Usecase, Venn, Ishikawa and Swimlane**. Their 437,833 model/SVG/error
-scenarios pass through Rust, Swift/C and browser WASM, including one explicit native
-Venn work-ceiling case rather than an upstream render/error comparison. Full public
-API parity and final release verification remain open.
+## Use the current source candidate
 
-Source preparation is checked against pinned upstream examples and generated cases.
-Build native/WASM artifacts from source to use the development Swift `Pele.inspect`
-and web `@unlocalhosted/pele-rs/core` APIs. The development `Pele.Engine` and web
-`@unlocalhosted/pele-rs/full` APIs add owned parsed documents, host measurement/icon
-callbacks, and native SVG palette resolution. The released Swift binary remains v0.1;
-its matching legacy API stays available without a local build. See
-[development verification](docs/FULL_PARITY_PROGRESS.md) for current evidence and
-remaining work. All 33 source-built families now support native Rust, Swift and browser mutable owned models. See
-[mutable model APIs](docs/MUTABLE_MODELS.md) for methods, ownership and remaining boundaries. Detection alone does not imply parsing/rendering support.
-The additive native/Swift [source-limit API](docs/SOURCE_LIMITS.md) preserves
-undefined, null and exact IEEE number comparisons before source preparation.
-The [output-limit API](docs/OUTPUT_LIMITS.md) preserves nullish defaults and
-checks the finished SVG after callbacks, publishing mutable state on errors.
-The composable [parse-limit API](docs/PARSE_LIMITS.md) independently overrides
-source and edge thresholds, preserving fractional edge accounting and mutable
-graph options while keeping native byte and generation budgets active.
-Source-built Swift also exposes an [owned selective registry](docs/MUTABLE_MODELS.md#owned-native-registry)
-with independent registration, discovery and document lifetimes.
-Current browser measurements show no speedup over Pele JS; see the scoped
-[performance baseline](docs/PERFORMANCE.md). GPU acceleration is not implemented.
+Check out the development branch for the all-family interfaces:
 
-## Install
+```sh
+git clone --branch codex/full-pele-parity https://github.com/vijayksingh/pele-rs.git
+cd pele-rs
+```
 
 ### Rust
 
-Tagged Git dependency; not published to crates.io yet:
+Use a local path dependency while the candidate is under verification. The Cargo
+package is named `pele-rs`; the import below uses the dependency alias `pele`.
 
 ```toml
 [dependencies]
-pele = { package = "pele-rs", git = "https://github.com/vijayksingh/pele-rs.git", tag = "v0.1.0" }
+pele = { package = "pele-rs", path = "/absolute/path/to/pele-rs/crates/pele" }
 ```
 
 ```rust
-let diagram = pele::render(
-    "flowchart LR; A[Capture] --> B{Keep?} --> C([Store])",
-    &pele::RenderOptions::default(),
-)?;
-// diagram.svg, diagram.width, diagram.height, diagram.geometry
+use pele::compat::{Engine, RenderOptions, text::MetricsResources};
+
+fn main() -> Result<(), Box<dyn std::error::Error>> {
+    let engine = Engine::with_builtins();
+    let drawing = engine.render_source(
+        "pie\n\"Swift\":2\n\"Web\":3",
+        &RenderOptions::default(),
+        &mut MetricsResources,
+    )?;
+    println!("{}", drawing.rendered.svg);
+    Ok(())
+}
 ```
+
+`MetricsResources` supplies Rust's fallback measurement. Hosts can implement
+`RenderResources` for their actual fonts and resources. Use `Engine::parse` and
+`render_document` to retain a parsed document. The separate
+`compat::public::PublicEngine` exposes owned mutable graphs, schema-described
+methods and direct model construction.
 
 ### Swift
 
-macOS 14+, Swift 6+. Root package downloads a checksum-pinned **universal
-arm64 + x86_64 XCFramework** from the release:
+macOS 14+, Swift 6+ and Xcode command-line tools are required. Build the matching
+native SDK before resolving the local Swift package:
+
+```sh
+scripts/build-native.sh                 # Host architecture
+# Or: scripts/build-native.sh --universal
+```
+
+In the application's `Package.swift`, use a local package dependency:
 
 ```swift
-// Package.swift dependencies:
-.package(url: "https://github.com/vijayksingh/pele-rs.git", from: "0.1.0")
+// dependencies:
+.package(path: "/absolute/path/to/pele-rs")
 // Target dependencies:
 .product(name: "Pele", package: "pele-rs")
 ```
 
 ```swift
 import Pele
-let diagram = try Pele.render("flowchart LR; A[Hello] --> B{Ready?}")
-// AppKit can display this engine's outlined SVG:
-// NSImage(data: Data(diagram.svg.utf8))
+
+let engine = Pele.Engine()
+let document = try engine.parse("pie\n\"Swift\":2\n\"Web\":3")
+let drawing = try engine.render(document)
+// drawing.svg, drawing.width, drawing.height, drawing.links
 ```
 
-[Swift build details](bindings/swift/README.md). No iOS or Windows binaries included.
+The local XCFramework selects the source-built APIs. Without it, the current
+root manifest falls back to the older published v0.1 binary and legacy API.
+Use `parseMutable` for editable owned models, or `parsePrepared` /
+`createPrepared` for low-level per-family models. The AppKit layer supplies
+`DiagramView`, mount/update/destroy, zoom, link/accessibility controls and
+explicitly approved native image resources. Its final combined GUI verification
+is still pending. See [native entries](docs/NATIVE_DIAGRAM_ENTRIES.md),
+[mutable models](docs/MUTABLE_MODELS.md) and
+[Swift build details](bindings/swift/README.md).
 
 ### Web
 
-GitHub release tarball; not published to npm registry yet:
+Build and pack the current source rather than installing the published v0.1
+artifact:
 
 ```sh
-npm install https://github.com/vijayksingh/pele-rs/releases/download/v0.1.0/unlocalhosted-pele-rs-0.1.0.tgz
+npm ci --ignore-scripts
+scripts/build-wasm.sh
+# Install this actual output in your application's directory:
+npm install /absolute/path/to/pele-rs/dist/release/unlocalhosted-pele-rs-0.2.0.tgz
 ```
 
 ```js
-import { loadPele, PeleError } from '@unlocalhosted/pele-rs';
-const pele = await loadPele();
-const diagram = pele.render('flowchart LR; A[Hello] --> B[World]');
-document.querySelector('#diagram').innerHTML = diagram.svg;
+import {loadRenderer} from '@unlocalhosted/pele-rs/full';
+
+const renderer = await loadRenderer();
+const model = renderer.parse('pie\n"Swift":2\n"Web":3');
+model.sections.set('Rust', 5);
+const drawing = renderer.render(model);
+document.querySelector('#diagram').innerHTML = drawing.svg;
+renderer.dispose(model);
 ```
 
-Serve over HTTP. Bundlers that relocate WASM can pass its emitted URL to
-`loadPele(wasmURL)`; package exports `@unlocalhosted/pele-rs/pele.wasm`.
-Rendering is synchronous after initialization. [Web package details](bindings/web/README.md).
+Serve over HTTP. Initialization is asynchronous; parse/render are synchronous
+afterward. `loadRenderer(wasmURL)` accepts a relocated WASM URL. The package also
+exports `./core`, independent `./registry`, `./lazy`, and all 33 `./diagrams/*`
+entries. Low-level entries accept parsed or caller-authored models after
+`loadDiagramEntries()`. The built-ins share one WASM binary; lazy family selection
+does not download separate native modules. See
+[web interfaces](bindings/web/README.md),
+[registry contracts](bindings/web/REGISTRY.md) and
+[caller-authored models](docs/DECLARED_MODEL_CONSTRUCTION.md).
 
-All artifacts and SHA-256 checksums: [v0.1.0 release](https://github.com/vijayksingh/pele-rs/releases/tag/v0.1.0).
+## Extending the engine
 
-## Supported flowcharts
+`DiagramModule<Model>` keeps new languages behind a typed parser/render interface;
+`Engine::empty()`, open diagram IDs and explicit `parse_as` support independent
+registries. A document retains the handler and config that created it, even after
+registry replacement. `RenderResources` keeps fonts, icons, time and platform
+services outside diagram logic.
 
-```mermaid
-flowchart TD
-    Start([Receive request]) --> Check{Valid input?}
-    Check -->|Yes| Save[Save document]
-    Check -->|No| Reject(Show error)
-    Save --> Done((Done))
-    Reject --> Start
-```
+The mutable interface adds `PublicDiagramModule` and owned model graphs. New
+providers opt into their own graph codecs and constructors; unsupported
+construction fails explicitly. Graph exchange preserves aliases, cycles, UTF-16
+code units and IEEE number bits without making Swift or JavaScript implement the
+diagram renderer. See the [architecture](docs/FULL_PARITY_LLD.md),
+[public model design](docs/LLD_PUBLIC_MODELS.md) and
+[construction contract](docs/DECLARED_MODEL_CONSTRUCTION.md).
 
-- Headers `flowchart` / `graph`; TB, TD, BT, LR, RL directions.
-- Shapes `[rectangle]`, `(rounded)`, `{diamond}`, `((circle))`, `([stadium])`.
-- Links `-->`, `---`, `-.->`, `-.-`, `==>`; pipe labels and chains.
-- Forks, joins, skip edges, cycles, self-loops, parallel links, disconnected nodes.
-- Plain labels, double quotes for delimiters, `\"`, `\\`, `\n` escapes,
-  multiline labels, covered left-to-right Unicode and combining marks.
-- ASCII IDs `[A-Za-z_][A-Za-z0-9_]*`; newline/semicolon separators, `%%` comments,
-  CRLF. Last explicit declaration wins; references preserve existing labels/shapes.
+## Compatibility and limits
 
-**Unsupported syntax returns structured errors.** Subgraphs, full Mermaid ID
-syntax, extended/rich shapes, `&` fan-out, classes/styles, frontmatter/directives,
-HTML/Markdown formatting, callbacks, external links/images, other diagram families,
-font fallback and bidi are deferred. HTML-looking labels remain literal data.
-Uncovered glyphs and RTL text fail explicitly.
+The port compares source preparation, complete models, method mutations, SVG,
+errors and ordered callbacks with the pinned Pele oracle through public
+integration and browser tests. Test counts and artifact identities belong to
+specific revisions; [the progress log](docs/FULL_PARITY_PROGRESS.md) separates
+completed slices from final acceptance.
 
-## Interface
+Native transport and work budgets remain enforced independently of Pele's
+source, edge and output options. Source/config use bounded UTF-8/JSON domains;
+mutable graph strings use lossless UTF-16 transport. Arbitrary JavaScript VM
+behavior, custom getters/prototype interpreters and every undeclared helper
+replacement are outside the current contract. A declared plain model can expose
+an upstream missing-helper error; the constructor does not invent parser state.
+See [source limits](docs/SOURCE_LIMITS.md), [parse limits](docs/PARSE_LIMITS.md),
+[output limits](docs/OUTPUT_LIMITS.md),
+[intrinsic diagnostics](docs/WEB_VM_DIAGNOSTICS.md) and
+[extreme corpus boundaries](docs/WEB_LEGACY_CORPUS.md).
 
-Rust: `parse`, `layout`, `render_svg`, convenience `render`. Foreign adapters share
-one versioned JSON render operation. Graph/layout internals remain private.
+Host font metrics can affect drawing dimensions. The compatibility renderer's
+host-font SVG and the legacy renderer's embedded-font outlined SVG have distinct
+contracts. Do not treat legacy geometry/limits as the full-library API.
 
-Results include SVG and `geometry.version = 1`: ordered node IDs, labels, shapes,
-bounds; ordered edge endpoints, styles, polylines and label bounds. Coordinates use
-top-left origin, x right, y down, quantized to 0.001 units. Virtual nodes do not leak.
+There is no claimed speedup over Pele JavaScript. Existing measurements are
+scoped historical baselines; GPU acceleration is not implemented. See
+[performance evidence](docs/PERFORMANCE.md).
 
-Options accept concrete `#RRGGBB` theme colors, font sizes, spacing, padding,
-radius, stroke width and accessible title. Unknown fields/invalid ranges fail.
-Use Rust/JS `font_size`, Swift `fontSize`. No arbitrary CSS or host font callbacks.
+## Build and verification
 
-Errors carry stable `code`, `message`, optional UTF-8 byte `span` and one-based
-line/Unicode-scalar column. Rust returns `Result`; Swift/JS throw `PeleError`.
-Normal input errors do not poison the engine; WASM traps require reloading its
-page/worker.
-
-Outlined text is portable but not selectable. Escaped titles, labels and geometry
-retain text for accessible consumers; playground source is editable and exposed.
-Geometry enables future interaction, not automatic editable app-native nodes.
-
-## Limits
-
-| Resource | Ceiling |
-| --- | --- |
-| Source / options | 256 KiB / 16 KiB UTF-8 |
-| Nodes / edges | 256 / 1,024 |
-| Identifier / label | 128 / 4,096 bytes |
-| Lines per label / glyphs per diagram | 64 / 65,536 |
-| Virtual route vertices | 8,192 |
-| Canvas side | 100,000 units |
-| SVG / JSON result | 8 MiB / 16 MiB |
-
-Not every graph below graph ceilings fits routing/canvas budgets: `layout_limit`
-reports failure to reserve valid space. PNG example caps allocation at 16M pixels.
-
-## Build and verify
-
-Needs rustup (pinned Rust **1.98.1**), matching wasm-bindgen CLI **0.2.128**, Node
-20+, npm. Native builds require macOS/Xcode and Swift 6+.
+Tooling: pinned Rust **1.98.1**, matching wasm-bindgen CLI **0.2.128**, Node 20+
+and npm. Swift requires macOS/Xcode and Swift 6+.
 
 ```sh
-git clone https://github.com/vijayksingh/pele-rs.git
-cd pele-rs
 rustup toolchain install 1.98.1 --profile minimal --component rustfmt
 rustup target add --toolchain 1.98.1 wasm32-unknown-unknown
 cargo install wasm-bindgen-cli --version 0.2.128 --locked
@@ -198,35 +204,52 @@ npm ci --ignore-scripts
 npx playwright install chromium firefox webkit
 scripts/build-native.sh
 scripts/build-wasm.sh
-npm run serve
-# http://127.0.0.1:5191/examples/web/
+npm run test:types
 ```
 
-`scripts/verify.sh` runs Rust integration, packaged Rust consumer, real C lifetime
-checks, Swift corpus, AppKit pixels, separate SwiftPM consumer, Pele semantic
-comparison and packed-WASM browser tests. Local Chromium uses installed Google
-Chrome; CI uses Playwright Chromium. Firefox/WebKit use pinned binaries. One worker.
+`scripts/verify.sh` runs Rust integration corpora, packaged consumers, strict C
+ownership checks, Swift integration features, AppKit checks and packed-WASM
+browser tests. Browser tests use one worker across Chromium, Firefox and WebKit;
+local Chromium uses installed Google Chrome. Native UI checks require an active
+macOS desktop and count assertions only after the QA app becomes active.
 
-[Verification report](docs/VERIFICATION.md): ten rendered fixture SVG/geometry
-results match exactly across Rust, Swift/C and three browser engines; twelve
-rejections match error envelopes. Further checks cover varied workflows, all
-directions, high fan-in, limits, independent XML/raster consumers and determinism.
-All tests cross public interfaces; no unit tests.
+`scripts/package-release.sh` creates universal macOS/WASM artifacts, verifies the
+crate, computes SHA-256 checksums and updates the Swift distribution manifest.
+It does not publish. Final universal execution, packed-browser regression,
+package consumption and a new demo remain [release gates](docs/RELEASE_0_2.md).
+Tests are integration/end-to-end, not unit tests.
 
-`scripts/package-release.sh` builds universal native/WASM artifacts, verifies the
-crate, computes checksums and updates Swift's distribution manifest; it does not
-publish. After verification, `npm run demo` against the served playground recreates
-the GIF (ffmpeg required).
+## Published v0.1.0
 
-## Architecture and attribution
+The existing [v0.1.0 release](https://github.com/vijayksingh/pele-rs/releases/tag/v0.1.0)
+is usable today for its [documented flowchart subset](docs/LLD.md).
+It provides `pele::render`, Swift `Pele.render` and web `loadPele` with outlined
+SVG and structured flowchart geometry. It does not contain the all-family APIs.
+Rust and web packages are GitHub artifacts, not registry publications.
 
-[Astra's LLD](docs/LLD.md) defines parser, bounded layered layout, cycle return
-lanes, shaping, ownership and verification. [UPSTREAM.md](UPSTREAM.md) maps our
-implementation to Pele revision `458322a5b8abb1ae57ddf127c32017ab9fb14a92` and
-records compatibility differences.
+```toml
+pele = { package = "pele-rs", git = "https://github.com/vijayksingh/pele-rs.git", tag = "v0.1.0" }
+```
 
-Engine: [MIT](LICENSE). Pele attribution: [NOTICE](NOTICE),
-[upstream license](third_party/PELE-LICENSE). Bundled unmodified Noto Sans remains
+```swift
+.package(url: "https://github.com/vijayksingh/pele-rs.git", exact: "0.1.0")
+```
+
+```sh
+npm install https://github.com/vijayksingh/pele-rs/releases/download/v0.1.0/unlocalhosted-pele-rs-0.1.0.tgz
+```
+
+![Legacy v0.1 WASM playground: editing, cycles, errors, recovery and dark theme](docs/images/demo.gif)
+
+This GIF records the legacy playground, not 0.2 verification. Its
+[recording script](scripts/record-demo.mjs) remains available; the new release
+requires a recording from its verified artifacts.
+
+## License and attribution
+
+Engine: [MIT](LICENSE). Upstream Pele: [NOTICE](NOTICE) and
+[upstream MIT license](third_party/PELE-LICENSE). Bundled unmodified Noto Sans:
 [SIL OFL 1.1](crates/pele/assets/fonts/OFL.txt), with pinned
 [origin/hash](crates/pele/assets/fonts/README.md).
-[Third-party notices](THIRD_PARTY_NOTICES.md). No system font redistributed.
+[Third-party notices](THIRD_PARTY_NOTICES.md) cover the remaining derived code
+and fixtures. System fonts are not redistributed.
