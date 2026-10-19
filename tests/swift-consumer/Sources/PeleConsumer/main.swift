@@ -91,5 +91,52 @@ for (type, source) in [
     do { _ = try mutable.snapshot(); fatalError("Closed document accepted") } catch { }
 
 }
-print("Independent source-built SwiftPM consumer passed: all 33 immutable and mutable families")
+print("Independent current-API SwiftPM consumer passed: all 33 immutable and mutable families")
+// C13: construct a real model graph without parsing, retaining aliases/cycles.
+let preparedSchema = try engine.preparedSchema(for: "pie")
+precondition(!preparedSchema.id.isEmpty && preparedSchema.version > 0)
+var callerGraph = Pele.PublicGraph(root: .ref(0), strings: [], nodes: [
+    .object(properties: []), .map(entries: [], properties: [])
+])
+let pieType = try callerGraph.intern("pie")
+try callerGraph.setField("type", value: .string(pieType))
+for name in ["title", "accTitle", "accDescr"] { try callerGraph.setField(name, value: .undefined) }
+try callerGraph.setField("showData", value: .bool(false))
+try callerGraph.setField("sections", value: .ref(1))
+try callerGraph.setField("consumerAlias", value: .ref(1))
+try callerGraph.setField("consumerCycle", value: .ref(0))
+let one = try callerGraph.intern("One"), two = try callerGraph.intern("Two")
+callerGraph.nodes[1] = .map(entries: [
+    .init(key: .string(one), value: .number(1)), .init(key: .string(two), value: .number(2))
+], properties: [])
+let constructed = try engine.createPrepared("pie", graph: callerGraph)
+let prepared = try engine.parsePrepared("pie", source: "pie\n\"One\":1\n\"Two\":2\n")
+let constructedSVG = try constructed.render().svg
+let preparedSVG = try prepared.render().svg
+precondition(constructedSVG == preparedSVG)
+let constructedGraph = try constructed.snapshot().graph
+if case .ref(let alias) = try constructedGraph.field("consumerAlias"),
+   case .ref(let cycle) = try constructedGraph.field("consumerCycle") {
+    precondition(alias == 1 && cycle == 0 && constructed.revision == 1)
+} else { fatalError("Caller-owned graph lost alias or cycle") }
+try constructed.close(); try prepared.close()
+
+// C14: installed-font measurement and strict image approval, without a window.
+@MainActor func checkStrictNativeResources() throws {
+    let owner = Pele.NativeResources()
+    let source = "flowchart LR\nA[Native fonts] --> B[Approved resources]"
+    let first = try engine.renderNative(source, nativeResources: owner)
+    precondition(first.type == "flowchart" && first.width > 0 && first.height > 0)
+    precondition(first.svg.contains("Native fonts"))
+    do {
+        _ = try engine.renderNative("flowchart LR\nA@{img: \"https://example.test/picture.png\",label: \"Picture\",w:80,h:60}", nativeResources: owner)
+        fatalError("Strict native renderer accepted an unapproved image")
+    } catch let error as PeleError {
+        precondition(error.code == "resource" && error.message == "Native image requires explicit host approval")
+    }
+    let recovered = try engine.renderNative(source, nativeResources: owner)
+    precondition(recovered.svg == first.svg)
+}
+try checkStrictNativeResources()
+print("Independent SwiftPM consumer passed: C13 caller-owned graph + C14 strict resources/recovery")
 #endif
