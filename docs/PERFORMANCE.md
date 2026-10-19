@@ -2,7 +2,8 @@
 
 Rust and WebGPU are implementation choices, not speedup evidence. The compatibility
 port currently prioritizes matching pinned models, errors and SVG. No performance
-claim applies to the released legacy flowchart subset or the unimplemented families.
+claim applies to the legacy flowchart subset or the current 0.2 release. The
+measurements below identify their own historical revisions and workloads.
 
 ## First browser measurement
 

@@ -4,8 +4,10 @@ All 33 native Rust diagram renderers, mutable codecs, prepared/raw entries and
 caller-graph constructors are implemented. Swift and packed WASM expose the
 inventoried interfaces, including native resources, interaction/accessibility,
 Gantt live callbacks and ClassMember nested original-method delegation.
-Runtime implementation is frozen at `0c0c5a4` / `fa07860`. Final distribution and
-publication checks remain separate; see [0.2 acceptance](RELEASE_0_2.md).
+Runtime implementation is frozen at `0c0c5a4` / `fa07860`.
+[v0.2.0 is published](https://github.com/vijayksingh/pele-rs/releases/tag/v0.2.0)
+at `7a8b958`, with completed distribution/remote-consumer checks; see
+[0.2 acceptance](RELEASE_0_2.md).
 
 ## Completed acceptance
 
@@ -48,8 +50,13 @@ caller-built models. Both architectures pass consumers from the exact final
 universal ZIP. The demo records 114 real browser frames (19 seconds) from the
 final web archive.
 
-Remaining delivery work: final crate/source and published remote-consumer checks,
-plus GitHub tag/release publication. No registry publication,
+Publication verification passes: all public downloads/checksums, fresh Rust Git-tag
+consumer, actual npm tarball installation with 109 checks, and artifact-free
+SwiftPM consumers on both architectures. The public SDK/header match accepted
+bytes and the README GIF matches its recording. The release attaches
+`published-consumers.json`, `verification.json`, checksums and curated evidence.
+The separate full remote CI rerun remains in progress at this checkpoint; local
+acceptance and actual CI Swift 6 GUI recovery are complete. No registry publication,
 unrestricted VM parity, GPU acceleration or speedup is claimed. Existing
 [VM](WEB_VM_DIAGNOSTICS.md), [native work](WEB_LEGACY_CORPUS.md),
 [construction](DECLARED_MODEL_CONSTRUCTION.md) and limit boundaries remain.

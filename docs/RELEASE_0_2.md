@@ -3,8 +3,12 @@
 0.2 ports all 33 Pele 1.6.0 diagram families and the inventoried native/web
 interfaces through the independent Rust engine. Runtime implementation is frozen
 at `0c0c5a4` / `fa07860`; later commits cover verification, packaging, notices,
-demo and documentation. Publication remains gated on final distribution checks.
-This document does not claim the GitHub tag or downloads already exist.
+demo and documentation. [v0.2.0 is published](https://github.com/vijayksingh/pele-rs/releases/tag/v0.2.0)
+at merge commit `7a8b958`; its source tree equals packaged commit `973c01f`.
+Anonymous downloads/checksums and fresh public Rust, Swift and web consumers pass.
+The separate [full remote CI rerun](https://github.com/vijayksingh/pele-rs/actions/runs/39208743694)
+was still running when publication verification completed. Local complete matrices
+and the actual CI Swift 6 bundle recovery pass; remote green is not inferred.
 
 Oracle: upstream revision `458322a5b8abb1ae57ddf127c32017ab9fb14a92`.
 The [parity inventory](PELE_PARITY.md) defines scope; the
@@ -73,9 +77,16 @@ spoken VoiceOver behavior.
 - [x] Verify exact universal ZIP consumers on arm64 and x86_64/Rosetta.
 - [x] Verify final web tarball: 104 entries, only NOTICE differs from browser acceptance;
   TypeScript plus 109 exact-final-WASM checks pass.
-- [ ] Complete final crate/checksum and published remote distribution checks.
+- [x] Verify the final packaged crate, all public downloads/checksums and remote consumers.
 - [x] Record the full-library demo: 114 actual browser frames, 19 seconds, from the verified packed artifact.
-- [ ] Publish the v0.2.0 tag/release, then verify actual downloads/checksums and remote consumers.
+- [x] Publish v0.2.0 and execute independent consumers from the actual public release.
+
+The release includes `verification.json`, `published-consumers.json`,
+`SHA256SUMS` and a curated verification ZIP. SwiftPM downloads the checksum-pinned
+universal SDK without a local fallback; both architectures pass all 33 families
+and C13/C14. npm installs the public tarball and passes 109 exact-WASM checks.
+Cargo builds a fresh consumer from the public tag and passes legacy, 15 immutable
+and all 33 mutable family checks. The public README GIF matches the recording hash.
 
 Runtime acceptance and published-artifact consumption are separate proof.
 `scripts/package-release.sh` builds local artifacts; it does not publish.
