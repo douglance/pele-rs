@@ -1,5 +1,0 @@
-graph TB
-    A[Queue] --> B[Worker] --> C[Result] --> A
-    B -->|retry| B
-    A -->|priority| B
-    Lone[Disconnected]

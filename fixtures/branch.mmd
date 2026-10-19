@@ -1,6 +1,0 @@
-flowchart TD
-    Start([Receive request]) --> Check{Valid input?}
-    Check -->|Yes| Save[Save document]
-    Check -->|No| Reject(Show error)
-    Save --> Done((Done))
-    Reject --> Start

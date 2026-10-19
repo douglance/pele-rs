@@ -6,7 +6,7 @@
 
 **Pele-compatible diagrams, one independent Rust engine for Swift and the web.**
 
-**0.2.0 implements all 33 diagram families** from
+**The engine implements all 33 diagram families** from
 [Pele 1.6.0](https://github.com/obsidianmd/pele). Rust owns parsing, models,
 layout and SVG generation. Thin C/Swift and WebAssembly adapters expose the same
 engine, with host font, icon, clock, calendar and presentation resources.
@@ -15,7 +15,8 @@ native or WASM distribution.
 
 The Rust, universal macOS and packed-browser verification covers all 33 families.
 Use the [v0.2.0 GitHub release](https://github.com/vijayksingh/pele-rs/releases/tag/v0.2.0)
-for source, Swift XCFramework, web tarball, checksums and verification records.
+for the previous all-family build and verification records. Current development
+removes the v1-only APIs for 0.3.0; use source builds until the new release is published.
 Packages are distributed through GitHub, not crates.io or the npm registry.
 
 ![Packed Rust WASM demo: five diagram families, mutable pie, error recovery and dark palette](docs/images/full-demo.gif)
@@ -42,16 +43,16 @@ themselves establish complete API or release acceptance. The
 [provenance](UPSTREAM.md) records its relationship to upstream. This is an
 independent project, not an official Obsidian, Pele or Mermaid release.
 
-## Install 0.2.0
+## Install
 
 ### Rust
 
 The Cargo package is named `pele-rs`; the dependency below aliases it as `pele`.
-Use the pinned Git tag:
+Use the source checkout for the current API:
 
 ```toml
 [dependencies]
-pele = { package = "pele-rs", git = "https://github.com/vijayksingh/pele-rs.git", tag = "v0.2.0" }
+pele = { package = "pele-rs", path = "/absolute/path/to/pele-rs/crates/pele" }
 ```
 
 ```rust
@@ -77,12 +78,12 @@ methods and direct model construction.
 
 ### Swift
 
-macOS 14+, Swift 6+. The Swift package uses a checksum-pinned universal
-arm64/x86_64 XCFramework. In the application's `Package.swift`:
+macOS 14+, Swift 6+. Run `scripts/build-native.sh --universal` before resolving
+the local package. In the application's `Package.swift`:
 
 ```swift
 // dependencies:
-.package(url: "https://github.com/vijayksingh/pele-rs.git", exact: "0.2.0")
+.package(path: "/absolute/path/to/pele-rs")
 // Target dependencies:
 .product(name: "Pele", package: "pele-rs")
 ```
@@ -107,10 +108,11 @@ included.
 
 ### Web
 
-Install the GitHub release tarball:
+Build the current package:
 
 ```sh
-npm install https://github.com/vijayksingh/pele-rs/releases/download/v0.2.0/unlocalhosted-pele-rs-0.2.0.tgz
+scripts/build-wasm.sh
+npm install /absolute/path/to/pele-rs/dist/release/unlocalhosted-pele-rs-0.3.0.tgz
 ```
 
 ```js
@@ -169,9 +171,8 @@ See [source limits](docs/SOURCE_LIMITS.md), [parse limits](docs/PARSE_LIMITS.md)
 [intrinsic diagnostics](docs/WEB_VM_DIAGNOSTICS.md) and
 [extreme corpus boundaries](docs/WEB_LEGACY_CORPUS.md).
 
-Host font metrics can affect drawing dimensions. The compatibility renderer's
-host-font SVG and the legacy renderer's embedded-font outlined SVG have distinct
-contracts. Do not treat legacy geometry/limits as the full-library API.
+Host font metrics can affect drawing dimensions. Rust renders SVG using resources
+provided by the host. Source, retained-model and mutable-model APIs use this same engine.
 
 There is no claimed speedup over Pele JavaScript. Existing measurements are
 scoped historical baselines; GPU acceleration is not implemented. See
@@ -193,7 +194,7 @@ scripts/build-wasm.sh
 npm run test:types
 ```
 
-Acceptance covers 380 Rust integration tests, 176 Swift features and 28 strict C
+The 0.2 baseline acceptance covered 380 Rust integration tests, 176 Swift features and 28 strict C
 executions across arm64 and actual x86_64/Rosetta, all-33-family native pixel and
 consumer checks on both architectures, and 31 active AppKit interaction features.
 The packed browser matrix covers 285 unique checks across Chromium, Firefox and
@@ -213,13 +214,6 @@ crate, computes SHA-256 checksums and updates the Swift distribution manifest.
 It does not publish. Distribution checks and compatibility boundaries are
 recorded in [release acceptance](docs/RELEASE_0_2.md).
 Tests are integration/end-to-end, not unit tests.
-
-## Legacy v0.1.0
-
-The earlier [v0.1.0 release](https://github.com/vijayksingh/pele-rs/releases/tag/v0.1.0)
-remains the original [flowchart subset](docs/LLD.md), with `pele::render`,
-Swift `Pele.render` and web `loadPele`. Its binaries do not expose the new
-all-family interfaces. The legacy APIs remain separate from `compat` / `full`.
 
 ## License and attribution
 

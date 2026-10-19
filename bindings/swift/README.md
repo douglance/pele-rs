@@ -1,14 +1,12 @@
 # Swift
 
-The 0.2 Swift package exposes all 33 Pele-compatible diagram families through the
+The Swift package exposes all 33 Pele-compatible diagram families through the
 Rust engine. macOS 14+, Swift 6+. The repository root is the consumer package;
-its checksum-pinned XCFramework contains arm64 and x86_64 native slices. The
-commands below target the v0.2.0 release; publication state is tracked in
-[release acceptance](../../docs/RELEASE_0_2.md).
+its checksum-pinned XCFramework contains arm64 and x86_64 native slices. Build the current native SDK before resolving a local dependency.
 
 ```swift
 // In your application's Package.swift:
-.package(url: "https://github.com/vijayksingh/pele-rs.git", exact: "0.2.0")
+.package(path: "/absolute/path/to/pele-rs")
 // Target dependency:
 .product(name: "Pele", package: "pele-rs")
 ```
@@ -96,12 +94,6 @@ all-33-family pixel/consumer checks on each, and 31 active AppKit features. See
 [verification evidence](../../docs/FULL_PARITY_PROGRESS.md) for exact scope,
 Rosetta discovery recovery and artifact boundaries.
 
-## Legacy API
-
-`Pele.render` remains the original v0.1 flowchart-subset API, returning outlined
-SVG and structured flowchart geometry with its bundled Noto Sans font. Its text
-contract differs from the full compatibility renderer and native installed-font
-adapter. The v0.1 downloaded SDK does not expose the 0.2 interfaces above.
-No Kamui dependency, web view or JavaScript diagram renderer is required. No iOS
-or Windows binary is included. Native transport/work budgets and documented
-compatibility boundaries remain active.
+No Kamui dependency, web view or JavaScript diagram renderer is required.
+No iOS or Windows binary is included. Native transport/work budgets and
+documented compatibility boundaries remain active.

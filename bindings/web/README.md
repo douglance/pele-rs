@@ -1,50 +1,32 @@
 # @unlocalhosted/pele-rs
 
-Published v0.1.0 covers the documented flowchart subset. Development source builds
-also provide all 33 compatibility diagram families. Build from repository root with
-`scripts/build-wasm.sh`, then `npm pack ./bindings/web`. Available as a GitHub release artifact; not published to npm registry.
+One independent Rust/WASM engine for all 33 Pele-compatible diagram families.
+Build from the repository root with `scripts/build-wasm.sh`, then install the
+resulting GitHub-distribution tarball. Not published to the npm registry.
 
 ```js
-import { loadPele, PeleError } from '@unlocalhosted/pele-rs';
-const pele = await loadPele();
-const diagram = pele.render('flowchart LR; A[Hello] --> B[World]');
-document.querySelector('#diagram').innerHTML = diagram.svg;
-```
-
-Serve over HTTP. Bundlers that relocate WASM can pass its URL or bytes to
-`loadPele(wasmURL)`. Rendering is synchronous after initialization. Malformed
-input throws `PeleError` with `code` and optional UTF-8 `span`; a WASM trap requires
-reloading the page/worker. See the repository README for supported syntax and limits.
-
-Geometry and outlined SVG use the same Rust engine as Swift. No browser fonts,
-external URLs or runtime npm dependencies. The engine is MIT; bundled Noto Sans
-is SIL OFL 1.1. See included notices. Independent project, not official Pele.
-
-## Development full-library interface
-
-Source builds also provide `@unlocalhosted/pele-rs/full`. All 33 renderers have
-pinned Rust/Swift/browser corpus verification. All 33 families expose mutable
-models and inventoried native methods, including shared Flowchart/Swimlane
-prototypes and Kanban/Mindmap helper identity. Remaining API compatibility is still under development. This does
-not change the earlier published v0.1.0 release.
-
-```js
-import {loadRenderer} from '@unlocalhosted/pele-rs/full';
+import {loadRenderer} from '@unlocalhosted/pele-rs';
 const renderer = await loadRenderer();
 const model = renderer.parse('pie\n"Swift":2\n"Web":3');
 model.sections.set('Rust', 5);
-const diagram = renderer.render(model);
+const drawing = renderer.render(model);
+document.querySelector('#diagram').innerHTML = drawing.svg;
 renderer.dispose(model);
 ```
 
-The full interface uses browser font/resource adapters with Rust processing.
-See the repository's `docs/MUTABLE_MODELS.md` for ownership, method/error behavior
-and the explicit remaining compatibility boundaries.
+Serve over HTTP. `loadRenderer(wasmURL)` supports relocated WASM assets. Parsing
+and rendering are synchronous after initialization. The root and `./full` entries
+expose the same full interface; `./core`, `./registry`, `./lazy` and all 33
+`./diagrams/*` entries expose source preparation, independent registries and
+per-family parsers/renderers. Built-ins share one WASM binary.
 
-`renderer.mount(element, source, options)` supplies the retained browser lifecycle;
-`enableZoom(element, options)` adds native DOM input and controls. The `./registry`
-entry creates an independent empty registry, and `./lazy` adds asynchronous family
-selection, rendering and mounting. Native built-ins are linked into one WASM
-artifact; lazy selection does not download smaller binaries. See [registry
-contracts](REGISTRY.md) for ordinary `register(...Diagram)` extensions, ownership,
-finite Config transport and the remaining low-level built-in entry gap.
+`renderer.render(source, options)` avoids exporting an editable model when only
+SVG is required. `parse` supplies mutable owned models; dispose them when done.
+`renderer.mount` and `enableZoom` supply browser lifecycle and interaction.
+Host font metrics, icons and time remain outside the Rust diagram engine.
+See [registry contracts](REGISTRY.md) and the repository's mutable-model,
+caller-authored construction, resource, transport and work-budget documentation.
+
+Independent project, not an official Obsidian/Pele/Mermaid release. MIT engine;
+all upstream, dependency and runtime notices are included. No GPU acceleration
+or general performance speedup is implied by using Rust or WASM.

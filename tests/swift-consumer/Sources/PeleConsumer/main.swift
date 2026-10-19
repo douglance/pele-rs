@@ -1,12 +1,5 @@
 import Foundation
 import Pele
-let diagram = try Pele.render("flowchart LR; A[Consumer] --> B{Linked?} --> C([Yes])")
-precondition(diagram.geometry.nodes.count == 3)
-precondition(diagram.geometry.edges.count == 2)
-precondition(diagram.svg.contains("<path"))
-print("Independent SwiftPM consumer passed: \(diagram.width) × \(diagram.height)")
-
-#if PELE_SOURCE_CORE
 let engine = Pele.Engine()
 for (type, source) in [
     ("pie", "pie\n\"One\":1"),
@@ -139,4 +132,3 @@ try constructed.close(); try prepared.close()
 }
 try checkStrictNativeResources()
 print("Independent SwiftPM consumer passed: C13 caller-owned graph + C14 strict resources/recovery")
-#endif

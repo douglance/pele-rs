@@ -1,6 +1,0 @@
-flowchart LR
-    A[Source] -->|solid| B(Transform)
-    B -.->|retry| A
-    B ==>|thick| C([Publish])
-    A --- D{Inspect}
-    D -.- C
