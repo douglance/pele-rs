@@ -1,0 +1,9 @@
+{
+  "README.md": "5e3d77bba8ce00627763fef7ab5bed0e4bc02becc998a23b4f1e18ccb9259e1a",
+  "baseline-overlay.patch": "5075e27395e3676684fb45d42fcf017d78c8b1a2ba222a9e26e62438a19acbb1",
+  "compare-property.mjs": "e41bf7062aeda84944f3434645063429121e0fd0253385af11baab29bf9e4c27",
+  "evidence.json": "1f1acd06a946d7eee8702aaaa199355b0dce1070ff944b1492c2b0a815e9ea07",
+  "harness.patch": "4338def03229dffe1426763ae90f598c7851aa92e47929094c4d2194951aa4c4",
+  "reproduce.sh": "7f63006399a4f9647e2a0783cd302e71ccf41c9d2b1105fa3952c0c2bb63cb0d",
+  "runtime.patch": "0a11dd29f97cce2ab0d4d5bf44656e5764b698ceda42f7bc3073d2559d4705cd"
+}

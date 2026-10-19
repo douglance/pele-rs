@@ -1,0 +1,85 @@
+   Compiling smallvec v1.16.3
+   Compiling simd-adler32 v0.3.10
+   Compiling log v0.4.34
+   Compiling adler2 v2.0.1
+   Compiling arrayvec v0.7.8
+   Compiling bytemuck_derive v1.12.1
+   Compiling crc32fast v1.5.2
+   Compiling slotmap v1.1.1
+   Compiling float-cmp v0.9.0
+   Compiling once_cell v1.21.4
+   Compiling icu_normalizer v2.3.0
+   Compiling polycool v0.4.0
+   Compiling miniz_oxide v0.9.1
+   Compiling strict-num v0.1.1
+   Compiling arrayref v0.3.9
+   Compiling kurbo v0.13.1
+   Compiling fdeflate v0.3.7
+   Compiling flate2 v1.1.10
+   Compiling bytemuck v1.25.2
+   Compiling idna_adapter v1.2.2
+   Compiling miniz_oxide v0.8.9
+   Compiling tinyvec v1.13.3
+   Compiling siphasher v1.0.4
+   Compiling idna v1.1.0
+   Compiling simplecss v0.2.2
+   Compiling roxmltree v0.21.1
+   Compiling unicode-vo v0.1.0
+   Compiling font-types v0.12.7
+   Compiling tiny-skia-path v0.12.0
+   Compiling fontdb v0.24.0
+   Compiling read-fonts v0.41.0
+   Compiling svgtypes v0.16.1
+   Compiling png v0.18.1
+   Compiling imagesize v0.15.0
+   Compiling data-url v0.3.2
+   Compiling xmlwriter v0.1.0
+   Compiling unicode-bidi v0.3.18
+   Compiling pico-args v0.5.0
+   Compiling base64 v0.23.1
+   Compiling rustybuzz v0.20.1
+   Compiling url v2.5.8
+   Compiling tiny-skia v0.12.0
+   Compiling rgb v0.8.53
+   Compiling pele-rs v0.1.0 (/private/tmp/pele-gantt-key-cache.TPaZGH/crates/pele)
+   Compiling skrifa v0.44.0
+   Compiling harfrust v0.12.0
+   Compiling usvg v0.48.1
+   Compiling resvg v0.48.1
+warning: stripping debug info with `rust-objcopy` failed: signal: 6 (SIGABRT)
+  |
+  = note: dyld[30472]: Library not loaded: @rpath/libLLVM.dylib
+            Referenced from: <AC0D75A8-23BF-301F-B7CE-3E5CC0C1BC06> /Users/vijaysingh/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/rust-objcopy
+            Reason: tried: '/Users/vijaysingh/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/../lib/libLLVM.dylib' (no such file), '/Users/vijaysingh/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/../lib/libLLVM.dylib' (no such file), '/tmp/pele-gantt-key-cache.TPaZGH/scripts/perf/native/target/release/deps/libLLVM.dylib' (no such file), '/Users/vijaysingh/lib/libLLVM.dylib' (no such file), '/usr/local/lib/libLLVM.dylib' (no such file), '/usr/lib/libLLVM.dylib' (no such file, not in dyld cache)
+
+
+warning: `pele-rs` (test "gantt_compat") generated 1 warning
+warning: stripping debug info with `rust-objcopy` failed: signal: 6 (SIGABRT)
+  |
+  = note: dyld[30575]: Library not loaded: @rpath/libLLVM.dylib
+            Referenced from: <AC0D75A8-23BF-301F-B7CE-3E5CC0C1BC06> /Users/vijaysingh/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/rust-objcopy
+            Reason: tried: '/Users/vijaysingh/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/../lib/libLLVM.dylib' (no such file), '/Users/vijaysingh/.rustup/toolchains/1.98.1-aarch64-apple-darwin/lib/rustlib/aarch64-apple-darwin/bin/../lib/libLLVM.dylib' (no such file), '/tmp/pele-gantt-key-cache.TPaZGH/scripts/perf/native/target/release/deps/libLLVM.dylib' (no such file), '/Users/vijaysingh/lib/libLLVM.dylib' (no such file), '/usr/local/lib/libLLVM.dylib' (no such file), '/usr/lib/libLLVM.dylib' (no such file, not in dyld cache)
+
+
+warning: `pele-rs` (test "public_gantt") generated 1 warning
+    Finished `release` profile [optimized] target(s) in 3m 32s
+     Running tests/gantt_compat.rs (/tmp/pele-gantt-key-cache.TPaZGH/scripts/perf/native/target/release/deps/gantt_compat-c790746c5f22466a)
+
+running 2 tests
+test gantt_schedules_dependencies_calendar_exclusions_and_renders_native_task_states ... ok
+test all_pinned_gantt_scenarios_match_model_svg_and_errors ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 10.57s
+
+     Running tests/public_gantt.rs (/tmp/pele-gantt-key-cache.TPaZGH/scripts/perf/native/target/release/deps/public_gantt-5314e3807818bdd4)
+
+running 7 tests
+test gantt_schedule_publication_host_output_error_and_recovery ... ok
+test gantt_task_array_detached_lookup_and_date_identity_lifecycle ... ok
+test gantt_source_equivalent_builders_and_unused_cyclic_task_fields ... ok
+test gantt_first_calendar_failure_publishes_partial_dates_without_further_callbacks ... ok
+test gantt_graph_replacement_deep_cycles_utf16_and_borrowed_methods ... ok
+test all_pinned_gantt_native_method_alias_descriptor_and_svg_vectors ... ok
+test public_gantt_complete_historical_model_svg_error_corpus ... ok
+
+test result: ok. 7 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 29.02s

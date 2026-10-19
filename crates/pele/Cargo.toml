@@ -4,7 +4,7 @@ version.workspace = true
 edition.workspace = true
 license.workspace = true
 repository.workspace = true
-description = "Deterministic Mermaid flowcharts for Rust, Swift and WebAssembly"
+description = "Pele-compatible diagram rendering for Rust, Swift and WebAssembly"
 include = ["src/**", "Cargo.toml", "README.md", "assets/**", "LICENSE", "NOTICE"]
 
 [lib]
@@ -14,7 +14,12 @@ name = "pele"
 serde.workspace = true
 serde_json.workspace = true
 rustybuzz = "=0.20.1"
+ryu-js = "=1.0.2"
+regex = "=1.13.1"
+url = "=2.5.8"
 
 [dev-dependencies]
+flate2 = "=1.1.10"
+sha2 = "=0.10.7"
 roxmltree = "0.21"
-resvg = { version = "0.48", default-features = false }
+resvg = { version = "0.48", default-features = false, features = ["text"] }

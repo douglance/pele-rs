@@ -1,0 +1,111 @@
+diff --git a/crates/pele-ffi/src/public.rs b/crates/pele-ffi/src/public.rs
+index 3d35dd7..1a43e5a 100644
+--- a/crates/pele-ffi/src/public.rs
++++ b/crates/pele-ffi/src/public.rs
+@@ -2,17 +2,6 @@
+ //! This bounded UTF-8 source/JSON lane is not the complete lossless source/options ABI.
+ use super::{calendar, compatibility_call, compatibility_input, PeleHostResourcesV3, PeleResult};
+ use pele::compat::{
+-    diagrams::{
+-        agentflow::AgentFlow, c4::C4, class_diagram::Class, event_modeling::EventModeling,
+-        gantt::Gantt, git_graph::GitGraph, ishikawa::Ishikawa, requirement::RequirementDiagram,
+-        sequence::Sequence, state::State, tree_view::TreeView, usecase::Usecase, venn::Venn,
+-    },
+-    diagrams::{
+-        architecture::Architecture, er::Er, flowchart::Flowchart, info::Info, journey::Journey,
+-        kanban::Kanban, mindmap::Mindmap, packet::Packet, pie::Pie, quadrant_chart::QuadrantChart,
+-        radar::Radar, sankey::Sankey, swimlane::Swimlane, timeline::Timeline, treemap::Treemap,
+-        xychart::XyChart,
+-    },
+     public::{ModelGraph, PublicDocument, PublicEngine},
+     ErrorCode, PeleError,
+ };
+@@ -110,37 +99,7 @@ pub unsafe extern "C" fn pele_public_parse_v4(
+         let source = unsafe { compatibility_input(source, source_len, 16 * 1024 * 1024) }?;
+         let options = unsafe { compatibility_input(options, options_len, 1024 * 1024) }?;
+         let options = pele::compat::parse_options(options)?;
+-        let mut registry = PublicEngine::empty();
+-        registry.register(Pie);
+-        registry.register(Info);
+-        registry.register(Sankey);
+-        registry.register(Packet);
+-        registry.register(Radar);
+-        registry.register(QuadrantChart);
+-        registry.register(Treemap);
+-        registry.register(Journey);
+-        registry.register(XyChart);
+-        registry.register(Kanban);
+-        registry.register(Mindmap);
+-        registry.register(Timeline);
+-        registry.register(Flowchart);
+-        registry.register(Swimlane);
+-        registry.register(Er);
+-        registry.register(Architecture);
+-        registry.register(AgentFlow);
+-        registry.register(Class);
+-        registry.register(EventModeling);
+-        registry.register(GitGraph);
+-        registry.register(Ishikawa);
+-        registry.register(State);
+-        registry.register(TreeView);
+-        registry.register(Venn);
+-        registry.register(Sequence);
+-        registry.register(Gantt);
+-        registry.register(C4);
+-        registry.register(RequirementDiagram);
+-        registry.register(Usecase);
+-
++        let registry = PublicEngine::with_builtins();
+         let document = registry.parse(source, &options).map_err(|mut error| {
+             if error.code == ErrorCode::UnsupportedDiagram {
+                 if let Some(kind) = &error.diagram_type {
+diff --git a/crates/pele/src/compat/public/engine.rs b/crates/pele/src/compat/public/engine.rs
+index 31c5456..341d53c 100644
+--- a/crates/pele/src/compat/public/engine.rs
++++ b/crates/pele/src/compat/public/engine.rs
+@@ -181,6 +181,45 @@ pub struct PublicEngine {
+     modules: Vec<Arc<Registration>>,
+ }
+ impl PublicEngine {
++    /// All built-in mutable codecs. Register extensions/replacements through the
++    /// same typed interface; registration alone does not certify runtime parity.
++    pub fn with_builtins() -> Self {
++        let mut engine = Self::empty();
++        engine.register(crate::compat::diagrams::venn::Venn);
++        engine.register(crate::compat::diagrams::ishikawa::Ishikawa);
++        engine.register(crate::compat::diagrams::swimlane::Swimlane);
++        engine.register(crate::compat::diagrams::wardley::Wardley);
++        engine.register(crate::compat::diagrams::event_modeling::EventModeling);
++        engine.register(crate::compat::diagrams::usecase::Usecase);
++        engine.register(crate::compat::diagrams::cynefin::Cynefin);
++        engine.register(crate::compat::diagrams::tree_view::TreeView);
++        engine.register(crate::compat::diagrams::agentflow::AgentFlow);
++        engine.register(crate::compat::diagrams::requirement::RequirementDiagram);
++        engine.register(crate::compat::diagrams::block::Block);
++        engine.register(crate::compat::diagrams::railroad::Railroad);
++        engine.register(crate::compat::diagrams::treemap::Treemap);
++        engine.register(crate::compat::diagrams::c4::C4);
++        engine.register(crate::compat::diagrams::info::Info);
++        engine.register(crate::compat::diagrams::git_graph::GitGraph);
++        engine.register(crate::compat::diagrams::architecture::Architecture);
++        engine.register(crate::compat::diagrams::sankey::Sankey);
++        engine.register(crate::compat::diagrams::state::State);
++        engine.register(crate::compat::diagrams::gantt::Gantt);
++        engine.register(crate::compat::diagrams::sequence::Sequence);
++        engine.register(crate::compat::diagrams::xychart::XyChart);
++        engine.register(crate::compat::diagrams::class_diagram::Class);
++        engine.register(crate::compat::diagrams::er::Er);
++        engine.register(crate::compat::diagrams::flowchart::Flowchart);
++        engine.register(crate::compat::diagrams::kanban::Kanban);
++        engine.register(crate::compat::diagrams::mindmap::Mindmap);
++        engine.register(crate::compat::diagrams::pie::Pie);
++        engine.register(crate::compat::diagrams::quadrant_chart::QuadrantChart);
++        engine.register(crate::compat::diagrams::packet::Packet);
++        engine.register(crate::compat::diagrams::radar::Radar);
++        engine.register(crate::compat::diagrams::timeline::Timeline);
++        engine.register(crate::compat::diagrams::journey::Journey);
++        engine
++    }
+     pub fn empty() -> Self {
+         Self::default()
+     }

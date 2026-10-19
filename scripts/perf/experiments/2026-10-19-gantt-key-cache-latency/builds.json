@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "commit": "42abbfbead6a8fa0c23bd578b6f09b78c747056e",
+  "preparedSha256": "14cab6e04b292e880887ce7648c81c351a6001fd96d417ade57e171daa7960af",
+  "workflowHashes": {
+    "README.md": "d9ab91337eb52a1a661178f10ed7504f1ceca03fdaaf82bb6aa17285c8e19e48",
+    "common.mjs": "56924788c59c7a90c30811f3298cef91f2e525476b6cc81847b5a91aa2f4dd04",
+    "prepare.mjs": "30460c9988ff9b0d6f4deed9eaaeee5dd5141fd5179cc014e33aaf7a31a30b08",
+    "build.mjs": "c8b08fee617f0c1484ea5c61e9fba3fe3d2781c057ee2e912ae8752e4f586b56",
+    "run.mjs": "928f3c5f9c079bb23789cf5ab34b5cae852a2a3c8749b5a331eaf3bf9b4c7393",
+    "report.mjs": "214187810c48f5d87bc17bf1a5e3d0dbe7e38e89748453eb222c64c63048b318",
+    "harness.patch": "9ddfda76a43cdf4957a52d9d78ad3914f15d998f028f9dbfedd603a259c0dfd9"
+  },
+  "builds": {
+    "baseline": {
+      "root": "/tmp/pele-gantt-key-latency-42abbf/baseline",
+      "sourceInputSha256": "a931716f5cb79b6c7d386d9e20adce4a5816b934a88e079eb29573d92f7161cd",
+      "binary": "/tmp/pele-gantt-key-latency-42abbf/baseline/scripts/perf/native/target/release/pele-perf",
+      "binarySha256": "717b9a56605d1997f3dc44b43b189c4adb584259da76c175c97739730921287d"
+    },
+    "candidate": {
+      "root": "/tmp/pele-gantt-key-latency-42abbf/candidate",
+      "sourceInputSha256": "2566807a331c7055838e0902de071042f1e20290130f30f5e36a686a1caf2125",
+      "binary": "/tmp/pele-gantt-key-latency-42abbf/candidate/scripts/perf/native/target/release/pele-perf",
+      "binarySha256": "61f024290925ee8e05ee6fff52b8a39461ba6cda35d009255cf674fd2db89e02"
+    }
+  }
+}

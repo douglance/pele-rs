@@ -1,5 +1,6 @@
 //! Standalone deterministic flowcharts. See docs/LLD.md and README for supported syntax.
 #![forbid(unsafe_code)]
+pub mod compat;
 mod contract;
 mod error;
 mod layout;

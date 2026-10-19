@@ -1,0 +1,183 @@
+diff --git a/scripts/perf/README.md b/scripts/perf/README.md
+index ee783f9..b753602 100644
+--- a/scripts/perf/README.md
++++ b/scripts/perf/README.md
+@@ -53,3 +53,7 @@ Six one-operation warmups plus at least 100 ms of measured work per runtime/stag
+ A candidate optimization needs evidence from matched outputs and relevant feature/corpus regression tests, plus before/after samples on the same host and allocation counts. Registry caching needs thread-safety and state isolation proof. Removing preflight graph snapshots needs equivalent resource validation and failure ordering; simply skipping validation is not an optimization. This harness makes no Rust, WebAssembly, Swift or WebGPU speed claim in advance.
+
+ The [first local baseline](results/2026-10-18-first-native-js.md) records measured costs, output proof, shared-host load, initial warmup limitations, and one bounded optimization proposal.
++
++## Isolated property-cache attribution
++
++`--allocation-only --stages parse-public,parse-public-fresh-registry,property-repeated,property-unique` collects separately instrumented allocation counts without elapsed timing samples. It does not require an idle host and records concurrent load. Record field-name matrices are prepared outside counters. Array index strings and fixed diagnostic long-key construction remain included equally in both versions. The repeated/unique GraphWriter consumer workloads mix raw lone-surrogate UTF-16 strings, existing intern IDs, long keys, repeated fields and more than 64 distinct property names. Preparation records complete source graph hashes plus both consumer graph hashes, intern counts and GraphWriter's inline size. `compare-property.mjs before.json after.json comparison.json` rejects any changed SVG, dimension, graph ID/order, raw string or consumer graph before reporting allocation/peak-memory deltas. These are allocation attribution workloads, not standalone claims about diagram rendering speed.
+diff --git a/scripts/perf/cases.mjs b/scripts/perf/cases.mjs
+index d34b383..fda52a3 100644
+--- a/scripts/perf/cases.mjs
++++ b/scripts/perf/cases.mjs
+@@ -18,4 +18,4 @@ export function cases() {
+   return out;
+ }
+ export const pairedStages = ['parse','parse-fresh-registry','parse-public','parse-public-fresh-registry','render-source','render-retained','render-mutable-core','render-mutable-publish'];
+-export const componentStages = ['registry','public-registry','model-json','graph-snapshot','graph-json-encode','graph-json-roundtrip','graph-binary-encode','graph-binary-decode','graph-apply','result-json'];
++export const componentStages = ['registry','public-registry','model-json','graph-snapshot','graph-json-encode','graph-json-roundtrip','graph-binary-encode','graph-binary-decode','graph-apply','result-json','property-repeated','property-unique'];
+diff --git a/scripts/perf/native/src/workload.rs b/scripts/perf/native/src/workload.rs
+index fe3243e..5a97a81 100644
+--- a/scripts/perf/native/src/workload.rs
++++ b/scripts/perf/native/src/workload.rs
+@@ -16,6 +16,7 @@ struct Case {
+     source: String,
+     options: J,
+     resources: String,
++    units: usize,
+ }
+ struct Host {
+     fixed: bool,
+@@ -45,6 +46,70 @@ struct State {
+     graph: ModelGraph,
+     binary: Vec<u8>,
+     result: RenderResult,
++    repeated_keys: Vec<Vec<String>>,
++    unique_keys: Vec<Vec<String>>,
++}
++// Public graph consumer workloads: keys allocated before timed/counted region.
++fn property_keys(count: usize, unique: bool) -> Vec<Vec<String>> {
++    (0..count)
++        .map(|row| {
++            (0..16)
++                .map(|field| {
++                    if unique {
++                        format!("key_{row}_{field}")
++                    } else {
++                        format!("field_{field}")
++                    }
++                })
++                .collect()
++        })
++        .collect()
++}
++fn property_graph(keys: &[Vec<String>]) -> Result<ModelGraph, String> {
++    let mut w = GraphWriter::default();
++    // Existing raw UTF16 intern IDs interleave with property-key lookups.
++    let seed = w.string(JsString(vec![0xd800]));
++    let shared = w.string("field_0");
++    let mut records = vec![];
++    for row in keys {
++        let properties = row
++            .iter()
++            .map(|key| w.property(key, Atom::String(shared)))
++            .collect();
++        records.push(Atom::Ref(w.node(Node::Object { properties })));
++    }
++    // Raw string insertion after cached property lookup must reuse exact ID.
++    assert_eq!(
++        w.string(JsString("field_0".encode_utf16().collect())),
++        shared
++    );
++    let late = w.string("\u{fffd}");
++    assert_ne!(late, seed);
++    let mut properties = vec![
++        w.property("", Atom::String(seed)),
++        w.property("\u{fffd}", Atom::String(late)),
++    ];
++    // Exercise keys exceeding cache byte/entry bounds, with no scalar coercion.
++    properties.push(w.property(&"é".repeat(40), Atom::String(shared)));
++    properties.push(w.property("field_0", Atom::String(shared)));
++    let values = records;
++    for (index, value) in values.iter().enumerate() {
++        properties.push(w.property(&index.to_string(), value.clone()));
++    }
++    let root = w.node(Node::Array {
++        length: values.len() as u32,
++        properties,
++    });
++    w.finish(Atom::Ref(root)).map_err(error)
++}
++fn property_summaries(repeated: &[Vec<String>], unique: &[Vec<String>]) -> Result<J, String> {
++    let mut result = serde_json::Map::new();
++    for (name, keys) in [("repeated", repeated), ("unique", unique)] {
++        let g = property_graph(keys)?;
++        let bytes = serde_json::to_vec(&g).map_err(error)?;
++        result.insert(name.into(),json!({"sha256":format!("{:x}",Sha256::digest(bytes)),"nodes":g.nodes.len(),"strings":g.strings.len(),"properties":g.nodes.iter().map(|n|n.properties().len()).sum::<usize>()}));
++    }
++    Ok(J::Object(result))
+ }
+ fn error(e: impl std::fmt::Debug) -> String {
+     format!("{e:?}")
+@@ -86,6 +151,8 @@ impl State {
+             graph,
+             binary,
+             result,
++            repeated_keys: property_keys(c.units, false),
++            unique_keys: property_keys(c.units, true),
+         })
+     }
+     fn reset(&mut self, public: &PublicEngine) -> Result<(), String> {
+@@ -109,6 +176,10 @@ impl State {
+             )
+         };
+         Ok(match stage {
++            "property-repeated" => {
++                black_box(property_graph(&self.repeated_keys)?.nodes.len() as u64)
++            }
++            "property-unique" => black_box(property_graph(&self.unique_keys)?.nodes.len() as u64),
+             "registry" => {
+                 let e = Engine::with_builtins();
+                 black_box(&e);
+@@ -226,6 +297,8 @@ fn handle(
+         let state = State::new(case, engine, public)?;
+         let result = json!({"output":summary(&state.result),"graphNodes":state.graph.nodes.len(),"graphStrings":state.graph.strings.len(),
+             "graphUtf16Units":state.graph.strings.iter().map(|s|s.0.len()).sum::<usize>(),
++            "graphWriterBytes":std::mem::size_of::<GraphWriter>(),"graphSha256":format!("{:x}",Sha256::digest(serde_json::to_vec(&state.graph).map_err(error)?)),
++            "propertyGraphs":property_summaries(&state.repeated_keys,&state.unique_keys)?,
+             "graphJsonBytes":serde_json::to_vec(&state.graph).map_err(error)?.len(),"graphBinaryBytes":state.binary.len()});
+         states.insert(id, state);
+         return Ok(result);
+diff --git a/scripts/perf/run.mjs b/scripts/perf/run.mjs
+index fffddb1..f9ca923 100644
+--- a/scripts/perf/run.mjs
++++ b/scripts/perf/run.mjs
+@@ -14,8 +14,8 @@ Date.now=()=>now;
+ const root=resolve(dirname(fileURLToPath(import.meta.url)),'../..');
+ process.chdir(root);
+ const args=process.argv.slice(2),arg=(name,fallback)=>{const i=args.indexOf(name);return i<0?fallback:args[i+1]};
+-const timed=args.includes('--quiet-run'),allocation=args.includes('--allocations');
+-if(allocation&&!timed)throw Error('Allocation collection also requires a coordinated --quiet-run');
++const timed=args.includes('--quiet-run'),allocationOnly=args.includes('--allocation-only'),allocation=args.includes('--allocations')||allocationOnly;
++if(allocation&&!timed&&!allocationOnly)throw Error('Allocation collection also requires a coordinated --quiet-run');
+ const trials=Number(arg('--trials',9)),targetMs=Number(arg('--batch-ms',12)),warmupMs=Number(arg('--warmup-ms',100));
+ assert(trials>=3&&trials<=51&&targetMs>=2&&targetMs<=200&&warmupMs>=0&&warmupMs<=1000);
+ const caseIDs=arg('--cases','').split(',').filter(Boolean);
+@@ -33,7 +33,7 @@ function summary(r){return{type:r.type,widthBits:bits(r.width),heightBits:bits(r
+ function system(){const processList=execFileSync('ps',['-Ao','pid,pcpu,comm'],{encoding:'utf8'}).trim().split('\n').slice(1).map(s=>{const m=s.trim().match(/^(\d+)\s+([\d.]+)\s+(.*)$/);return m?{pid:+m[1],cpuPercent:+m[2],name:m[3].split('/').pop()}:null}).filter(Boolean);return{loadAverage:loadavg(),freeMemory:freemem(),processes:processList.filter(p=>p.cpuPercent>=10||/^(cargo|rustc|swiftc|swift-frontend|xcodebuild|xctest|ld)$/.test(p.name)).sort((a,b)=>b.cpuPercent-a.cpuPercent).slice(0,20)}}
+ function buildGuard(){const s=system();const busy=s.processes.filter(p=>/^(cargo|rustc|swiftc|swift-frontend|xcodebuild|ld)$/.test(p.name));if(busy.length)throw Error('Build process active; defer timed run: '+JSON.stringify(busy));return s}
+ class Native{
+- constructor(path){this.child=spawn(path,[],{env:{...process.env,TZ:'UTC',PELE_PERF_ALLOW_TIMING:timed?'1':'0'},stdio:['pipe','pipe','inherit']});this.pending=[];this.dead=false;createInterface({input:this.child.stdout}).on('line',line=>{const p=this.pending.shift();if(!p)return;clearTimeout(p.timeout);try{const r=JSON.parse(line);r.ok?p.resolve(r.value):p.reject(Error(r.error))}catch(e){p.reject(e)}});this.child.on('error',e=>this.fail(e));this.child.on('exit',(code,signal)=>this.fail(Error(`Native benchmark exited ${code??signal}`)))}
++ constructor(path){this.child=spawn(path,[],{env:{...process.env,TZ:'UTC',PELE_PERF_ALLOW_TIMING:timed||allocationOnly?'1':'0'},stdio:['pipe','pipe','inherit']});this.pending=[];this.dead=false;createInterface({input:this.child.stdout}).on('line',line=>{const p=this.pending.shift();if(!p)return;clearTimeout(p.timeout);try{const r=JSON.parse(line);r.ok?p.resolve(r.value):p.reject(Error(r.error))}catch(e){p.reject(e)}});this.child.on('error',e=>this.fail(e));this.child.on('exit',(code,signal)=>this.fail(Error(`Native benchmark exited ${code??signal}`)))}
+  fail(e){this.dead=true;for(const p of this.pending){clearTimeout(p.timeout);p.reject(e)}this.pending=[]}
+  send(request){if(this.dead)return Promise.reject(Error('Native process closed'));return new Promise((resolve,reject)=>{const timeout=setTimeout(()=>{this.child.kill();reject(Error('Native command exceeded 60s'))},60_000);this.pending.push({resolve,reject,timeout});this.child.stdin.write(JSON.stringify(request)+'\n')})}
+  close(){this.child.stdin.end();this.child.kill()}
+@@ -50,7 +50,7 @@ assert.equal(await buildInputs(),buildManifest.sourceInputSha256,'Native source
+ assert.equal(sha(await readFile(binary)),buildManifest.binaries['pele-perf'],'Native benchmark binary differs from build manifest');
+ if(allocation)assert.equal(sha(await readFile(allocBinary)),buildManifest.binaries['pele-perf-alloc'],'Allocation binary differs from build manifest');
+ async function provenance(){const list=execFileSync('rg',['--files','crates/pele/src'],{encoding:'utf8'}).trim().split('\n').sort();const tree=createHash('sha256');for(const p of list){tree.update(p+'\0');tree.update(await readFile(p))}return{revision:execFileSync('git',['rev-parse','HEAD'],{encoding:'utf8'}).trim(),worktree:execFileSync('git',['status','--porcelain'],{encoding:'utf8'}).trim().split('\n'),rustSourceSha256:tree.digest('hex'),buildManifest,nativeSha256:sha(await readFile(binary)),nativeLockSha256:sha(await readFile('scripts/perf/native/Cargo.lock')),harnessSha256:Object.fromEntries(await Promise.all(['run.mjs','cases.mjs','build.mjs'].map(async p=>[p,sha(await readFile('scripts/perf/'+p))]))),upstream:revision,oracleSha256:sha(await readFile('node_modules/pele/dist/pele.js')),node:process.version,rustc:execFileSync('/bin/bash',['-c','source scripts/env.sh && rustc --version'],{encoding:'utf8'}).trim(),platform:platform(),arch:arch(),cpu:cpus()[0]?.model,logicalCPUs:cpus().length,totalMemory:totalmem()}}
+-const report={schemaVersion:1,mode:timed?'local-timing':'correctness-only',timestamp:new Date().toISOString(),...await provenance(),settings:{trials,targetBatchMs:targetMs,warmupMs,explicitNodeGC:!!global.gc,fixedClock:now,timeZone:'UTC',resource:'fixed UTF16 length × size × (bold?.71:.6)',freshRetainedStatePerBatch:true,warmRenderBeforeBatch:true},scope:{paired:'Same source, public options, fixed measurement/clock and exact SVG+dimension verification. JS raw model render compared with Rust typed retained and mutable publication APIs; publication returns an additional cloned graph.',nativeComponents:'Separate native API components, not matched JS operations or end-to-end Swift costs.',excluded:'Startup, module loading, process setup, NDJSON control pipe, SVG DOM insertion, layout/paint and GPU. JS GC during a batch remains part of observed runtime.',externalLoad:'Host is not assumed globally idle. External xctest may consume one core; unrelated processes are never stopped.'},systemBefore:timed?buildGuard():system(),cases:[],rows:[],allocationRows:[]};
++const report={schemaVersion:1,mode:timed?'local-timing':allocationOnly?'allocation-only':'correctness-only',timestamp:new Date().toISOString(),...await provenance(),settings:{trials,targetBatchMs:targetMs,warmupMs,explicitNodeGC:!!global.gc,fixedClock:now,timeZone:'UTC',resource:'fixed UTF16 length × size × (bold?.71:.6)',freshRetainedStatePerBatch:true,warmRenderBeforeBatch:true},scope:{paired:'Same source, public options, fixed measurement/clock and exact SVG+dimension verification. JS raw model render compared with Rust typed retained and mutable publication APIs; publication returns an additional cloned graph.',nativeComponents:'Separate native API components, not matched JS operations or end-to-end Swift costs.',excluded:'Startup, module loading, process setup, NDJSON control pipe, SVG DOM insertion, layout/paint and GPU. JS GC during a batch remains part of observed runtime.',externalLoad:'Host is not assumed globally idle. External xctest may consume one core; unrelated processes are never stopped.'},systemBefore:timed?buildGuard():system(),cases:[],rows:[],allocationRows:[]};
+ let native,alloc;
+ try{
+  native=new Native(binary);if(allocation)alloc=new Native(allocBinary);
+@@ -60,7 +60,7 @@ try{
+   if(alloc){const p=await alloc.send({op:'prepare',case:c});assert.deepEqual(p.output,expected,c.id+' allocation output')}
+   const verification=await native.send({op:'verify',case:c.id});for(const output of verification.outputs)assert.deepEqual(output,expected,c.id+' retained output');
+   report.cases.push({...c,sourceSha256:sha(Buffer.from(c.source)),sourceBytes:Buffer.byteLength(c.source),output:expected,native:prepared});
+-  if(!timed){console.log('verified '+c.id);continue}
++  if(!timed){if(allocationOnly)for(const stage of stages)report.allocationRows.push({case:c.id,stage,count:1,...await alloc.send({op:'allocations',case:c.id,stage,count:1})});console.log((allocationOnly?'profiled ':'verified ')+c.id);continue}
+   for(const stage of stages){
+    const paired=pairedStages.includes(stage),counts={native:1,js:1};
+    const warmups={native:{operations:0,elapsedNs:0},js:{operations:0,elapsedNs:0}};
+@@ -81,5 +81,5 @@ try{
+  }
+  assert.equal(await buildInputs(),buildManifest.sourceInputSha256,'Native source changed during benchmark');
+  report.systemAfter=system();report.completedAt=new Date().toISOString();
+- const output=arg('--output',timed?'dist/evidence/perf-native-js.json':'dist/evidence/perf-verified.json');await mkdir(dirname(output),{recursive:true});await writeFile(output,JSON.stringify(report,null,2)+'\n');console.log(output);
++ const output=arg('--output',timed?'dist/evidence/perf-native-js.json':allocationOnly?'dist/evidence/perf-allocations.json':'dist/evidence/perf-verified.json');await mkdir(dirname(output),{recursive:true});await writeFile(output,JSON.stringify(report,null,2)+'\n');console.log(output);
+ }finally{native?.close();alloc?.close()}

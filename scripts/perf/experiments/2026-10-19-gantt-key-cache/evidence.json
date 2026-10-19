@@ -1,0 +1,7339 @@
+{
+  "schemaVersion": 1,
+  "status": "isolated allocation attribution only; runtime adoption held; no elapsed timing or speed claim",
+  "baselineCommit": "32e845d4b0e63476dcaba8ebe4dc8730bdc7fdd0",
+  "upstream": "458322a5b8abb1ae57ddf127c32017ab9fb14a92",
+  "oracleSha256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "baselineBuild": {
+    "schemaVersion": 1,
+    "mode": "allocation-build-only",
+    "sourceInputSha256": "e523e2be797bab6d5e25c0bb890c2f6f2c5eb451889d68087da3a5ad7aa23a96",
+    "revision": "32e845d4b0e63476dcaba8ebe4dc8730bdc7fdd0",
+    "binaries": {
+      "pele-perf-alloc": "91adc3a74cd99d42d987eccf6c14526a4e31dda1f5bb878bf8b8a04d305039d9"
+    },
+    "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)"
+  },
+  "candidateBuild": {
+    "schemaVersion": 1,
+    "mode": "allocation-build-only",
+    "sourceInputSha256": "aa405876c28a7b06219b9eb6d7f5d66ffafecc361b4c0b8fbb0a8103c48d92a7",
+    "revision": "32e845d4b0e63476dcaba8ebe4dc8730bdc7fdd0",
+    "binaries": {
+      "pele-perf-alloc": "2bd32b2b69f216e07dbec0ec2e7f5bd888aa8ae50f9e730f284ebd79803fa204"
+    },
+    "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)"
+  },
+  "rawReports": {
+    "baselineSha256": "1371f83ebe8ce461dfcbd5c617910322a2ab2b141a93035a838a985bb90dffc1",
+    "candidateSha256": "09271df7c9ed52470e3ed8e63d43c00b727034df5e8c3c0f94be87005229a2ae"
+  },
+  "verification": {
+    "all21CaseWholeSvgAndGraphFingerprints": true,
+    "caseCount": 21,
+    "allocationRowsPerBuild": 126,
+    "historyRowsPerBuild": 18,
+    "mutationRowsPerBuild": 12,
+    "elapsedRows": 0,
+    "negativeControlsEqual": true
+  },
+  "cases": [
+    {
+      "id": "flowchart/small",
+      "units": 8,
+      "sourceSha256": "647d1649fff45083426d711811675be3bb058a9178bd1c469b5940aeb0bb783b",
+      "output": {
+        "type": "flowchart",
+        "widthBits": "405b800000000000",
+        "heightBits": "4087000000000000",
+        "svgSha256": "9aa81d216d0f8804a49140d117b98e29f93eb16942f5829e426da1fd5000b4de",
+        "svgBytes": 4116
+      },
+      "native": {
+        "graphBinaryBytes": 3452,
+        "graphJsonBytes": 14545,
+        "graphNodes": 57,
+        "graphSha256": "d8fb80050cfb5a6b1fabc7fe91d8672e9d7ce6b824b7e334922430dbb72abf41",
+        "graphStrings": 74,
+        "graphUtf16Units": 448,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "4087000000000000",
+          "svgBytes": 4116,
+          "svgSha256": "9aa81d216d0f8804a49140d117b98e29f93eb16942f5829e426da1fd5000b4de",
+          "type": "flowchart",
+          "widthBits": "405b800000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+            "strings": 28
+          },
+          "unique": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+            "strings": 141
+          }
+        }
+      }
+    },
+    {
+      "id": "sequence/small",
+      "units": 8,
+      "sourceSha256": "761e97cb09258622eb0e4b26b51a78b927bfecc75f05dad9ec97b7a982bc6bc6",
+      "output": {
+        "type": "sequence",
+        "widthBits": "4068200000000000",
+        "heightBits": "407aa00000000000",
+        "svgSha256": "81dfb69796084be2b9dbdd8d80368e2fa969c9c37689f5d2f1f878701768999a",
+        "svgBytes": 4404
+      },
+      "native": {
+        "graphBinaryBytes": 2107,
+        "graphJsonBytes": 8654,
+        "graphNodes": 22,
+        "graphSha256": "d636ba61f06535683fe6995f5b91c09d23565a155fa68a1da7a73a972319a93e",
+        "graphStrings": 50,
+        "graphUtf16Units": 341,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "407aa00000000000",
+          "svgBytes": 4404,
+          "svgSha256": "81dfb69796084be2b9dbdd8d80368e2fa969c9c37689f5d2f1f878701768999a",
+          "type": "sequence",
+          "widthBits": "4068200000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+            "strings": 28
+          },
+          "unique": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+            "strings": 141
+          }
+        }
+      }
+    },
+    {
+      "id": "er/small",
+      "units": 8,
+      "sourceSha256": "5a6e7a2ba89f903cdb22547387e4f04df621bae730a0a6a172bcfa1a0345790d",
+      "output": {
+        "type": "er",
+        "widthBits": "4066600000000000",
+        "heightBits": "4096bc0000000000",
+        "svgSha256": "475a8c17cfb501bbaf7e41062c1cd9166faa8cca151f75a0ad9f93432d0d3984",
+        "svgBytes": 11874
+      },
+      "native": {
+        "graphBinaryBytes": 3640,
+        "graphJsonBytes": 16285,
+        "graphNodes": 77,
+        "graphSha256": "020d5f34dd9c2cae38354ea0f33cc46e620f425af07ea1c4be56af43b3eab481",
+        "graphStrings": 61,
+        "graphUtf16Units": 359,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "4096bc0000000000",
+          "svgBytes": 11874,
+          "svgSha256": "475a8c17cfb501bbaf7e41062c1cd9166faa8cca151f75a0ad9f93432d0d3984",
+          "type": "er",
+          "widthBits": "4066600000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+            "strings": 28
+          },
+          "unique": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+            "strings": 141
+          }
+        }
+      }
+    },
+    {
+      "id": "pie/small",
+      "units": 8,
+      "sourceSha256": "148212294e69607b7cae24468114ec57c3fdd59971156137746d83b1e4272f2b",
+      "output": {
+        "type": "pie",
+        "widthBits": "407a700000000000",
+        "heightBits": "4076000000000000",
+        "svgSha256": "cd8cefb8884714ae9eff91326c65ddb3f579ebfc6fcd587acb28feef7c7d9706",
+        "svgBytes": 4131
+      },
+      "native": {
+        "graphBinaryBytes": 495,
+        "graphJsonBytes": 1490,
+        "graphNodes": 2,
+        "graphSha256": "d38e3303d8a97b9fa8ca73a21c77c755ef24e03ceb11d7238245019e61cb6f23",
+        "graphStrings": 16,
+        "graphUtf16Units": 109,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "4076000000000000",
+          "svgBytes": 4131,
+          "svgSha256": "cd8cefb8884714ae9eff91326c65ddb3f579ebfc6fcd587acb28feef7c7d9706",
+          "type": "pie",
+          "widthBits": "407a700000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+            "strings": 28
+          },
+          "unique": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+            "strings": 141
+          }
+        }
+      }
+    },
+    {
+      "id": "sankey/small",
+      "units": 8,
+      "sourceSha256": "e0bac64249ac2903390cfcffd9822508c74e6cdff134aa0dfff7b6c88c65786e",
+      "output": {
+        "type": "sankey",
+        "widthBits": "4083400000000000",
+        "heightBits": "407a000000000000",
+        "svgSha256": "4c8372081ec9f54f9450ac6f28ceb0cdb744fcecc346d86f18b504a03200c491",
+        "svgBytes": 4589
+      },
+      "native": {
+        "graphBinaryBytes": 1174,
+        "graphJsonBytes": 5076,
+        "graphNodes": 19,
+        "graphSha256": "8f74921e2206b5f8962bcb37f2fbf5bc743ca818f5a7a3ab2a84615c0676839e",
+        "graphStrings": 29,
+        "graphUtf16Units": 95,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "407a000000000000",
+          "svgBytes": 4589,
+          "svgSha256": "4c8372081ec9f54f9450ac6f28ceb0cdb744fcecc346d86f18b504a03200c491",
+          "type": "sankey",
+          "widthBits": "4083400000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+            "strings": 28
+          },
+          "unique": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+            "strings": 141
+          }
+        }
+      }
+    },
+    {
+      "id": "gantt/small",
+      "units": 8,
+      "sourceSha256": "e95d857b2d21277ff82edeab27a83c843a3012c9ab06f2c55b30c0b96c0fd531",
+      "output": {
+        "type": "gantt",
+        "widthBits": "4089000000000000",
+        "heightBits": "4071500000000000",
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "svgBytes": 3407
+      },
+      "native": {
+        "graphBinaryBytes": 4203,
+        "graphJsonBytes": 17538,
+        "graphNodes": 54,
+        "graphSha256": "9fb7022860984ebdc1c14d1ca1f0150d6576f8fca8532b3cf8dfe404cd75e50e",
+        "graphStrings": 100,
+        "graphUtf16Units": 712,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "4071500000000000",
+          "svgBytes": 3407,
+          "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+            "strings": 28
+          },
+          "unique": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+            "strings": 141
+          }
+        }
+      }
+    },
+    {
+      "id": "railroad/small",
+      "units": 3,
+      "sourceSha256": "c81c9badf39b8e955da47fa8a7ed38e4bd3f24876a26eededc54d55a94374816",
+      "output": {
+        "type": "railroad",
+        "widthBits": "4077c00000000000",
+        "heightBits": "407b000000000000",
+        "svgSha256": "96e9d750a58266724dd06599c282c56bec8baf3524e8e07af66b72dabf1b083a",
+        "svgBytes": 6036
+      },
+      "native": {
+        "graphBinaryBytes": 1671,
+        "graphJsonBytes": 7150,
+        "graphNodes": 36,
+        "graphSha256": "2ecb075ba354ffe6e9399a1466baf72e20f7b7498f7c86e8a2195dc937394038",
+        "graphStrings": 33,
+        "graphUtf16Units": 196,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "407b000000000000",
+          "svgBytes": 6036,
+          "svgSha256": "96e9d750a58266724dd06599c282c56bec8baf3524e8e07af66b72dabf1b083a",
+          "type": "railroad",
+          "widthBits": "4077c00000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 4,
+            "properties": 55,
+            "sha256": "3366a045752643d0c3a10496783695f2605a12ad4d88dfd945eb7b1c54547110",
+            "strings": 23
+          },
+          "unique": {
+            "nodes": 4,
+            "properties": 55,
+            "sha256": "5ac6d4f31e16711a87e396123c54345a1abee81a61b0ceb551374db0c186c50e",
+            "strings": 56
+          }
+        }
+      }
+    },
+    {
+      "id": "flowchart/medium",
+      "units": 48,
+      "sourceSha256": "d3ffdd90a8476c76234d30bf49cb41c7faaeb437c67ec4b5d92dd1e75dd2c5ca",
+      "output": {
+        "type": "flowchart",
+        "widthBits": "405e000000000000",
+        "heightBits": "40b1e00000000000",
+        "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+        "svgBytes": 21889
+      },
+      "native": {
+        "graphBinaryBytes": 17098,
+        "graphJsonBytes": 79779,
+        "graphNodes": 297,
+        "graphSha256": "5ba84ab112c45a16c833a8397c817b0b3ed74944375a40041224488cbe7bbd9c",
+        "graphStrings": 274,
+        "graphUtf16Units": 1631,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40b1e00000000000",
+          "svgBytes": 21889,
+          "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+          "type": "flowchart",
+          "widthBits": "405e000000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+            "strings": 68
+          },
+          "unique": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+            "strings": 821
+          }
+        }
+      }
+    },
+    {
+      "id": "sequence/medium",
+      "units": 48,
+      "sourceSha256": "ff4d80b120bdba34c800984585ea064e45cb46ce19ea198c35ab0e7a5064cd1c",
+      "output": {
+        "type": "sequence",
+        "widthBits": "4069400000000000",
+        "heightBits": "409dc80000000000",
+        "svgSha256": "656d674a53bf2a97bb9429486711300be4d97c6694f14dee62a939f80d54444a",
+        "svgBytes": 15759
+      },
+      "native": {
+        "graphBinaryBytes": 7179,
+        "graphJsonBytes": 33848,
+        "graphNodes": 62,
+        "graphSha256": "0991e675be7002702370f76bb218c4357a5f1fa68dd810754839776642b05569",
+        "graphStrings": 130,
+        "graphUtf16Units": 817,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "409dc80000000000",
+          "svgBytes": 15759,
+          "svgSha256": "656d674a53bf2a97bb9429486711300be4d97c6694f14dee62a939f80d54444a",
+          "type": "sequence",
+          "widthBits": "4069400000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+            "strings": 68
+          },
+          "unique": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+            "strings": 821
+          }
+        }
+      }
+    },
+    {
+      "id": "er/medium",
+      "units": 48,
+      "sourceSha256": "51f222a39995ad6774e0fc6094dd5b8902d32febcd97d3a67b282f8c7851b748",
+      "output": {
+        "type": "er",
+        "widthBits": "4066600000000000",
+        "heightBits": "40c1c38000000000",
+        "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+        "svgBytes": 70404
+      },
+      "native": {
+        "graphBinaryBytes": 18382,
+        "graphJsonBytes": 92001,
+        "graphNodes": 437,
+        "graphSha256": "b8ec01a15071df3a58038246a7b5b74adcc34b5aaaf19a465e153858d89156a9",
+        "graphStrings": 181,
+        "graphUtf16Units": 1070,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40c1c38000000000",
+          "svgBytes": 70404,
+          "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+          "type": "er",
+          "widthBits": "4066600000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+            "strings": 68
+          },
+          "unique": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+            "strings": 821
+          }
+        }
+      }
+    },
+    {
+      "id": "pie/medium",
+      "units": 48,
+      "sourceSha256": "71db10120ad41f8031b3d4f5eac266754e1eba7680ac530e2c5a00f3938e8954",
+      "output": {
+        "type": "pie",
+        "widthBits": "407b000000000000",
+        "heightBits": "4094600000000000",
+        "svgSha256": "36f57bc6717ac42cc50f971a0f87d18027d58a863ef0cfc9b6841634a8f0c72a",
+        "svgBytes": 17134
+      },
+      "native": {
+        "graphBinaryBytes": 1851,
+        "graphJsonBytes": 5684,
+        "graphNodes": 2,
+        "graphSha256": "cdb98e84e9c36ddea2f5217874343808379dfc4140150283b34ad0e7b61b3565",
+        "graphStrings": 56,
+        "graphUtf16Units": 427,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "4094600000000000",
+          "svgBytes": 17134,
+          "svgSha256": "36f57bc6717ac42cc50f971a0f87d18027d58a863ef0cfc9b6841634a8f0c72a",
+          "type": "pie",
+          "widthBits": "407b000000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+            "strings": 68
+          },
+          "unique": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+            "strings": 821
+          }
+        }
+      }
+    },
+    {
+      "id": "sankey/medium",
+      "units": 48,
+      "sourceSha256": "6543cd2e087fca2b0c5636630c6b73381f1298dea196e4379c6056f33a1ebd7c",
+      "output": {
+        "type": "sankey",
+        "widthBits": "4083400000000000",
+        "heightBits": "407a000000000000",
+        "svgSha256": "f6a9ac0c183550e62c53181252222401f56b9be509a32a947f7bba1bbf5b4928",
+        "svgBytes": 24853
+      },
+      "native": {
+        "graphBinaryBytes": 5806,
+        "graphJsonBytes": 27754,
+        "graphNodes": 99,
+        "graphSha256": "3613c81902c8e5326cb6ac291deb3be5e42e0b82f8841fcdc03fca2f0d0d642f",
+        "graphStrings": 109,
+        "graphUtf16Units": 291,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "407a000000000000",
+          "svgBytes": 24853,
+          "svgSha256": "f6a9ac0c183550e62c53181252222401f56b9be509a32a947f7bba1bbf5b4928",
+          "type": "sankey",
+          "widthBits": "4083400000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+            "strings": 68
+          },
+          "unique": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+            "strings": 821
+          }
+        }
+      }
+    },
+    {
+      "id": "gantt/medium",
+      "units": 48,
+      "sourceSha256": "5e15788ce4ee74b56b1f8c9ccdbd6569f3211b54a428ca6d4f0ea32fc4e485f1",
+      "output": {
+        "type": "gantt",
+        "widthBits": "4089000000000000",
+        "heightBits": "4097140000000000",
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "svgBytes": 12574
+      },
+      "native": {
+        "graphBinaryBytes": 17187,
+        "graphJsonBytes": 82916,
+        "graphNodes": 254,
+        "graphSha256": "8af0117957fb6a4cb95c2f8d66129c7c46be864dc7ad181bf1ff0e44ffa401e1",
+        "graphStrings": 280,
+        "graphUtf16Units": 2104,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "4097140000000000",
+          "svgBytes": 12574,
+          "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+            "strings": 68
+          },
+          "unique": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+            "strings": 821
+          }
+        }
+      }
+    },
+    {
+      "id": "railroad/medium",
+      "units": 15,
+      "sourceSha256": "368f387f0b24c8d1f198738179c4d03e6ac744ca578a5c5ad03ebdba67804963",
+      "output": {
+        "type": "railroad",
+        "widthBits": "4078400000000000",
+        "heightBits": "40a1400000000000",
+        "svgSha256": "3d395b112a50a03e8838b204ce4fa4510c31faf1cb83ffb1665ebf5aacaaee54",
+        "svgBytes": 27258
+      },
+      "native": {
+        "graphBinaryBytes": 6249,
+        "graphJsonBytes": 31027,
+        "graphNodes": 168,
+        "graphSha256": "c82d618fb2c520b2d7f4f928016d4d2650fdf0a75d54e987e217abc769aa6319",
+        "graphStrings": 69,
+        "graphUtf16Units": 367,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40a1400000000000",
+          "svgBytes": 27258,
+          "svgSha256": "3d395b112a50a03e8838b204ce4fa4510c31faf1cb83ffb1665ebf5aacaaee54",
+          "type": "railroad",
+          "widthBits": "4078400000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 16,
+            "properties": 259,
+            "sha256": "a92bc9c0cd4ec0cb7a19b4f04cbed32198808e71447971faac6a2c6e20624f0f",
+            "strings": 35
+          },
+          "unique": {
+            "nodes": 16,
+            "properties": 259,
+            "sha256": "aaec1d58a336ccb3ac2441b523df0f6de9a25f24db1e8fd018060b9fca69b9eb",
+            "strings": 260
+          }
+        }
+      }
+    },
+    {
+      "id": "flowchart/large",
+      "units": 200,
+      "sourceSha256": "98e63c8c7589e05375c15a786827e79a207ffa960d1138c7873dee8abbeec042",
+      "output": {
+        "type": "flowchart",
+        "widthBits": "4060200000000000",
+        "heightBits": "40d2b80000000000",
+        "svgSha256": "9b097740e50f249ff18a4ca622f650360e0bbd495f2fe7ca00f406e3044cfb01",
+        "svgBytes": 90501
+      },
+      "native": {
+        "graphBinaryBytes": 70476,
+        "graphJsonBytes": 330737,
+        "graphNodes": 1209,
+        "graphSha256": "799044862db9b26ded474599335b397b747b45780606e7fafa9e79b21439ba1c",
+        "graphStrings": 1034,
+        "graphUtf16Units": 6888,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40d2b80000000000",
+          "svgBytes": 90501,
+          "svgSha256": "9b097740e50f249ff18a4ca622f650360e0bbd495f2fe7ca00f406e3044cfb01",
+          "type": "flowchart",
+          "widthBits": "4060200000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+            "strings": 220
+          },
+          "unique": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+            "strings": 3405
+          }
+        }
+      }
+    },
+    {
+      "id": "sequence/large",
+      "units": 200,
+      "sourceSha256": "665168f531e73c50aecb2eb8bbf290895604f50bb6e91cfbe786a3d62012dae0",
+      "output": {
+        "type": "sequence",
+        "widthBits": "406a400000000000",
+        "heightBits": "40bd6a0000000000",
+        "svgSha256": "606a97b7015c98c33bbb9bb38f2c8c138a67bf5bd6a6989bfe52aff1a4dd649d",
+        "svgBytes": 61165
+      },
+      "native": {
+        "graphBinaryBytes": 26883,
+        "graphJsonBytes": 130627,
+        "graphNodes": 214,
+        "graphSha256": "54202237f79e1f25a35cd8e0cd66c02bb597042500854c3783174c71a9f82bef",
+        "graphStrings": 434,
+        "graphUtf16Units": 2841,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40bd6a0000000000",
+          "svgBytes": 61165,
+          "svgSha256": "606a97b7015c98c33bbb9bb38f2c8c138a67bf5bd6a6989bfe52aff1a4dd649d",
+          "type": "sequence",
+          "widthBits": "406a400000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+            "strings": 220
+          },
+          "unique": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+            "strings": 3405
+          }
+        }
+      }
+    },
+    {
+      "id": "er/large",
+      "units": 200,
+      "sourceSha256": "4969b249e415d09f27b830d3e67b339add055118255d2d65c7d4cbe0bfc3a50d",
+      "output": {
+        "type": "er",
+        "widthBits": "4066600000000000",
+        "heightBits": "40e29de000000000",
+        "svgSha256": "b49418b80220f9ccabe764c7c2eecbb7735a48f23324b7ef09eccfd5b2d57590",
+        "svgBytes": 296039
+      },
+      "native": {
+        "graphBinaryBytes": 75268,
+        "graphJsonBytes": 382196,
+        "graphNodes": 1805,
+        "graphSha256": "734f15bf503274e159e06e615834da501d2839c3f403e5f9e1ea32e285c550e6",
+        "graphStrings": 637,
+        "graphUtf16Units": 4205,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40e29de000000000",
+          "svgBytes": 296039,
+          "svgSha256": "b49418b80220f9ccabe764c7c2eecbb7735a48f23324b7ef09eccfd5b2d57590",
+          "type": "er",
+          "widthBits": "4066600000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+            "strings": 220
+          },
+          "unique": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+            "strings": 3405
+          }
+        }
+      }
+    },
+    {
+      "id": "pie/large",
+      "units": 200,
+      "sourceSha256": "0c14fa64eaa629fb651c5f007b8328476b321ce53ba7419feab3e71ab3a3a994",
+      "output": {
+        "type": "pie",
+        "widthBits": "4078000000000000",
+        "heightBits": "40b4880000000000",
+        "svgSha256": "1bda4d22d8a21e9ff0c2bf48b2d677aeb518c9e0f81ec60e5ce4f07027547829",
+        "svgBytes": 41981
+      },
+      "native": {
+        "graphBinaryBytes": 7219,
+        "graphJsonBytes": 22052,
+        "graphNodes": 2,
+        "graphSha256": "578c96fff237f8b172b0fd3937a86f88528af9e52e4b71acc96a6dbd1effb4cc",
+        "graphStrings": 208,
+        "graphUtf16Units": 1743,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40b4880000000000",
+          "svgBytes": 41981,
+          "svgSha256": "1bda4d22d8a21e9ff0c2bf48b2d677aeb518c9e0f81ec60e5ce4f07027547829",
+          "type": "pie",
+          "widthBits": "4078000000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+            "strings": 220
+          },
+          "unique": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+            "strings": 3405
+          }
+        }
+      }
+    },
+    {
+      "id": "sankey/large",
+      "units": 200,
+      "sourceSha256": "4e2cd5fa88548ad1649e77ae1d9eba11ec975e08f3091143b2a72399c9a42852",
+      "output": {
+        "type": "sankey",
+        "widthBits": "4083400000000000",
+        "heightBits": "407a000000000000",
+        "svgSha256": "57633ffee48452e0df1fe9bacd17a093bd85ece6059991c48e842cf5768a0f61",
+        "svgBytes": 102559
+      },
+      "native": {
+        "graphBinaryBytes": 23838,
+        "graphJsonBytes": 116143,
+        "graphNodes": 403,
+        "graphSha256": "8e500b00dbb65d35299f7edfdaeb6eb81a36476e456ba68386b46760f2c62a17",
+        "graphStrings": 413,
+        "graphUtf16Units": 1251,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "407a000000000000",
+          "svgBytes": 102559,
+          "svgSha256": "57633ffee48452e0df1fe9bacd17a093bd85ece6059991c48e842cf5768a0f61",
+          "type": "sankey",
+          "widthBits": "4083400000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+            "strings": 220
+          },
+          "unique": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+            "strings": 3405
+          }
+        }
+      }
+    },
+    {
+      "id": "gantt/large",
+      "units": 200,
+      "sourceSha256": "1b44e7d9f858100864304e01163c081d9b86efab39b4677585fe6cfdd0b2a6aa",
+      "output": {
+        "type": "gantt",
+        "widthBits": "4089000000000000",
+        "heightBits": "40b7950000000000",
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "svgBytes": 48636
+      },
+      "native": {
+        "graphBinaryBytes": 65563,
+        "graphJsonBytes": 330532,
+        "graphNodes": 1014,
+        "graphSha256": "fd4870d9497f6c583a0828572d707438bb2279d1a95d4c3affee7cf539c819f8",
+        "graphStrings": 888,
+        "graphUtf16Units": 7064,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40b7950000000000",
+          "svgBytes": 48636,
+          "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+            "strings": 220
+          },
+          "unique": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+            "strings": 3405
+          }
+        }
+      }
+    },
+    {
+      "id": "railroad/large",
+      "units": 60,
+      "sourceSha256": "6551d00c3bcfe67834b31127dd18f26e9e0dd6f90e2521ad95cefc5e3f7ae39c",
+      "output": {
+        "type": "railroad",
+        "widthBits": "4078400000000000",
+        "heightBits": "40c1520000000000",
+        "svgSha256": "49b86183c15428a1e239981e1ff04a0189f7e83b91b07833bfcd1dba8e86abc2",
+        "svgBytes": 107448
+      },
+      "native": {
+        "graphBinaryBytes": 23574,
+        "graphJsonBytes": 121172,
+        "graphNodes": 663,
+        "graphSha256": "87c33019222d342edfade4d3bbc100067e5da79bb151db2bc89782f19b5f213a",
+        "graphStrings": 204,
+        "graphUtf16Units": 1087,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40c1520000000000",
+          "svgBytes": 107448,
+          "svgSha256": "49b86183c15428a1e239981e1ff04a0189f7e83b91b07833bfcd1dba8e86abc2",
+          "type": "railroad",
+          "widthBits": "4078400000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 61,
+            "properties": 1024,
+            "sha256": "bfca3e5ff0d7c5314582095a523031d324fce9566bcf7bf542a642a9ebf3f4b5",
+            "strings": 80
+          },
+          "unique": {
+            "nodes": 61,
+            "properties": 1024,
+            "sha256": "8d4e2189907ed7d5c3570093afb9e599abebab4dd208783351959070f94d5f74",
+            "strings": 1025
+          }
+        }
+      }
+    }
+  ],
+  "mutations": [
+    {
+      "case": "gantt/small",
+      "graphSha256": "309ad71c31ff5d35bad750f1340a7fcd4d1db457d793ccd3dfcec564925daa31",
+      "mutation": "duplicate-utf16-id",
+      "nodes": 73,
+      "operation": {
+        "output": {
+          "heightBits": "4071500000000000",
+          "svgBytes": 3407,
+          "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 27
+      },
+      "strings": 101
+    },
+    {
+      "case": "gantt/small",
+      "graphSha256": "55ec6487b115c11cc712bedf27b6878f4d41f04a6554edf0175c4e8c6df40762",
+      "mutation": "deleted-recreated",
+      "nodes": 73,
+      "operation": {
+        "output": {
+          "heightBits": "4071500000000000",
+          "svgBytes": 3407,
+          "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 27
+      },
+      "strings": 101
+    },
+    {
+      "case": "gantt/small",
+      "graphSha256": "690fd16ae3b83963f93cf7a8275478904163509418bb6b2ea722b31b41f01e5b",
+      "mutation": "readonly",
+      "nodes": 57,
+      "operation": {
+        "error": "JavaScript { name: TypeError, message: JsString([67, 97, 110, 110, 111, 116, 32, 97, 115, 115, 105, 103, 110, 32, 116, 111, 32, 114, 101, 97, 100, 32, 111, 110, 108, 121, 32, 112, 114, 111, 112, 101, 114, 116, 121, 32, 39, 112, 114, 111, 99, 101, 115, 115, 101, 100, 39, 32, 111, 102, 32, 111, 98, 106, 101, 99, 116, 32, 39, 35, 60, 79, 98, 106, 101, 99, 116, 62, 39]) }"
+      },
+      "recovery": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 27
+      },
+      "strings": 101
+    },
+    {
+      "case": "gantt/small",
+      "graphSha256": "f43ae8151534f47448cf8639e2842eb3cef1ee949761d9963dd747e8e5bf9056",
+      "mutation": "first-intern",
+      "nodes": 73,
+      "operation": {
+        "output": {
+          "heightBits": "4071500000000000",
+          "svgBytes": 3407,
+          "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 27
+      },
+      "strings": 101
+    },
+    {
+      "case": "gantt/medium",
+      "graphSha256": "359f3ea078a9b2e78ca8b96f91c20126e4b1680e3d76365374716c95cca07f3f",
+      "mutation": "duplicate-utf16-id",
+      "nodes": 353,
+      "operation": {
+        "output": {
+          "heightBits": "4097140000000000",
+          "svgBytes": 12574,
+          "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 147
+      },
+      "strings": 281
+    },
+    {
+      "case": "gantt/medium",
+      "graphSha256": "c49c242d3993227beab15a37c1a91a29a0a1f194b65c56c523c111b1006165c2",
+      "mutation": "deleted-recreated",
+      "nodes": 353,
+      "operation": {
+        "output": {
+          "heightBits": "4097140000000000",
+          "svgBytes": 12574,
+          "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 147
+      },
+      "strings": 281
+    },
+    {
+      "case": "gantt/medium",
+      "graphSha256": "c63acd9ebc17b7ef1eb2a3a414d53c2ca43328d8220615d0037b0e1a1c68e757",
+      "mutation": "readonly",
+      "nodes": 257,
+      "operation": {
+        "error": "JavaScript { name: TypeError, message: JsString([67, 97, 110, 110, 111, 116, 32, 97, 115, 115, 105, 103, 110, 32, 116, 111, 32, 114, 101, 97, 100, 32, 111, 110, 108, 121, 32, 112, 114, 111, 112, 101, 114, 116, 121, 32, 39, 112, 114, 111, 99, 101, 115, 115, 101, 100, 39, 32, 111, 102, 32, 111, 98, 106, 101, 99, 116, 32, 39, 35, 60, 79, 98, 106, 101, 99, 116, 62, 39]) }"
+      },
+      "recovery": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 147
+      },
+      "strings": 281
+    },
+    {
+      "case": "gantt/medium",
+      "graphSha256": "66cfb0f27b4c331223dc767f197ce75dc87770f36bb3496d47b4e1ad4ec080d8",
+      "mutation": "first-intern",
+      "nodes": 353,
+      "operation": {
+        "output": {
+          "heightBits": "4097140000000000",
+          "svgBytes": 12574,
+          "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 147
+      },
+      "strings": 281
+    },
+    {
+      "case": "gantt/large",
+      "graphSha256": "86f07eff6eda82c3374a093ad3c2e7e111f1158db22462151dcffeb2517da42f",
+      "mutation": "duplicate-utf16-id",
+      "nodes": 1417,
+      "operation": {
+        "output": {
+          "heightBits": "40b7950000000000",
+          "svgBytes": 48636,
+          "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 603
+      },
+      "strings": 889
+    },
+    {
+      "case": "gantt/large",
+      "graphSha256": "2fb37097ab85f85e4ff9ecc77b962befdff0f03a99921334a6c824fe2547fc2f",
+      "mutation": "deleted-recreated",
+      "nodes": 1417,
+      "operation": {
+        "output": {
+          "heightBits": "40b7950000000000",
+          "svgBytes": 48636,
+          "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 603
+      },
+      "strings": 889
+    },
+    {
+      "case": "gantt/large",
+      "graphSha256": "8fa384db96730725a1b9da3b86a92a8552795c54859e67607596a98fec0a0a5e",
+      "mutation": "readonly",
+      "nodes": 1017,
+      "operation": {
+        "error": "JavaScript { name: TypeError, message: JsString([67, 97, 110, 110, 111, 116, 32, 97, 115, 115, 105, 103, 110, 32, 116, 111, 32, 114, 101, 97, 100, 32, 111, 110, 108, 121, 32, 112, 114, 111, 112, 101, 114, 116, 121, 32, 39, 112, 114, 111, 99, 101, 115, 115, 101, 100, 39, 32, 111, 102, 32, 111, 98, 106, 101, 99, 116, 32, 39, 35, 60, 79, 98, 106, 101, 99, 116, 62, 39]) }"
+      },
+      "recovery": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 603
+      },
+      "strings": 889
+    },
+    {
+      "case": "gantt/large",
+      "graphSha256": "67c4ab748b15723ae895d0b9bec86c39651a6058a8783bd0515b1277e6d5d2ef",
+      "mutation": "first-intern",
+      "nodes": 1417,
+      "operation": {
+        "output": {
+          "heightBits": "40b7950000000000",
+          "svgBytes": 48636,
+          "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 603
+      },
+      "strings": 889
+    }
+  ],
+  "deltas": [
+    {
+      "group": "allocationRows",
+      "case": "flowchart/small",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 1061,
+        "after": 1061,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 425,
+        "after": 425,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 106854,
+        "after": 106854,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 106854,
+        "after": 106854,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 36488,
+        "after": 36488,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "flowchart/small",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 909,
+        "after": 909,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 188,
+        "after": 188,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 111611,
+        "after": 111611,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 111611,
+        "after": 111611,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 35808,
+        "after": 35808,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "flowchart/small",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 1137,
+        "after": 1137,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 188,
+        "after": 188,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 138019,
+        "after": 138019,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 138019,
+        "after": 138019,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 35808,
+        "after": 35808,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "flowchart/small",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 114,
+        "after": 114,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 13204,
+        "after": 13204,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 13204,
+        "after": 13204,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 11512,
+        "after": 11512,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "flowchart/small",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 195,
+        "after": 195,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 141,
+        "after": 141,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 12816,
+        "after": 12816,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 12816,
+        "after": 12816,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 7086,
+        "after": 7086,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "flowchart/small",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 311,
+        "after": 311,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 144,
+        "after": 144,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 40042,
+        "after": 40042,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 40042,
+        "after": 40042,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 23328,
+        "after": 23328,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/small",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 654,
+        "after": 654,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 218,
+        "after": 218,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 61449,
+        "after": 61449,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 61449,
+        "after": 61449,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 18848,
+        "after": 18848,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/small",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 413,
+        "after": 413,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 115,
+        "after": 115,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 77038,
+        "after": 77038,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 77038,
+        "after": 77038,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 24379,
+        "after": 24379,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/small",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 579,
+        "after": 579,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 115,
+        "after": 115,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 94074,
+        "after": 94074,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 94074,
+        "after": 94074,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 24379,
+        "after": 24379,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/small",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 83,
+        "after": 83,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 8518,
+        "after": 8518,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 8518,
+        "after": 8518,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 6826,
+        "after": 6826,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/small",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 195,
+        "after": 195,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 141,
+        "after": 141,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 12816,
+        "after": 12816,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 12816,
+        "after": 12816,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 7086,
+        "after": 7086,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/small",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 311,
+        "after": 311,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 144,
+        "after": 144,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 40042,
+        "after": 40042,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 40042,
+        "after": 40042,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 23328,
+        "after": 23328,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/small",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 1116,
+        "after": 1116,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 309,
+        "after": 309,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 94696,
+        "after": 94696,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 94696,
+        "after": 94696,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 30468,
+        "after": 30468,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/small",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 2000,
+        "after": 2000,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 458,
+        "after": 458,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 283418,
+        "after": 283418,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 283418,
+        "after": 283418,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 108917,
+        "after": 108917,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/small",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 2290,
+        "after": 2290,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 458,
+        "after": 458,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 311710,
+        "after": 311710,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 311710,
+        "after": 311710,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 108917,
+        "after": 108917,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/small",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 145,
+        "after": 145,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 14146,
+        "after": 14146,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 14146,
+        "after": 14146,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 12258,
+        "after": 12258,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/small",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 195,
+        "after": 195,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 141,
+        "after": 141,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 12816,
+        "after": 12816,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 12816,
+        "after": 12816,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 7086,
+        "after": 7086,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/small",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 311,
+        "after": 311,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 144,
+        "after": 144,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 40042,
+        "after": 40042,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 40042,
+        "after": 40042,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 23328,
+        "after": 23328,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/small",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 60,
+        "after": 60,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 27,
+        "after": 27,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 9006,
+        "after": 9006,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 9006,
+        "after": 9006,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 3442,
+        "after": 3442,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/small",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 375,
+        "after": 375,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 103,
+        "after": 103,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 56079,
+        "after": 56079,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 56079,
+        "after": 56079,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 20574,
+        "after": 20574,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/small",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 415,
+        "after": 415,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 103,
+        "after": 103,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 58307,
+        "after": 58307,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 58307,
+        "after": 58307,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 20574,
+        "after": 20574,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/small",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 20,
+        "after": 20,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 1114,
+        "after": 1114,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 1114,
+        "after": 1114,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 1114,
+        "after": 1114,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/small",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 195,
+        "after": 195,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 141,
+        "after": 141,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 12816,
+        "after": 12816,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 12816,
+        "after": 12816,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 7086,
+        "after": 7086,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/small",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 311,
+        "after": 311,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 144,
+        "after": 144,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 40042,
+        "after": 40042,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 40042,
+        "after": 40042,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 23328,
+        "after": 23328,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/small",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 267,
+        "after": 267,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 51,
+        "after": 51,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 23511,
+        "after": 23511,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 23511,
+        "after": 23511,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 9474,
+        "after": 9474,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/small",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 458,
+        "after": 458,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 131,
+        "after": 131,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 53194,
+        "after": 53194,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 53194,
+        "after": 53194,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 22458,
+        "after": 22458,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/small",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 582,
+        "after": 582,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 131,
+        "after": 131,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 61830,
+        "after": 61830,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 61830,
+        "after": 61830,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 22458,
+        "after": 22458,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/small",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 62,
+        "after": 62,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 4318,
+        "after": 4318,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 4318,
+        "after": 4318,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 3974,
+        "after": 3974,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/small",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 195,
+        "after": 195,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 141,
+        "after": 141,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 12816,
+        "after": 12816,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 12816,
+        "after": 12816,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 7086,
+        "after": 7086,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/small",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 311,
+        "after": 311,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 144,
+        "after": 144,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 40042,
+        "after": 40042,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 40042,
+        "after": 40042,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 23328,
+        "after": 23328,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/small",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 761,
+        "after": 761,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 316,
+        "after": 316,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 110214,
+        "after": 110214,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 110214,
+        "after": 110214,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 37650,
+        "after": 37650,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/small",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 1434,
+        "after": 1312,
+        "change": -122,
+        "percent": -8.507670850767084
+      },
+      "reallocations": {
+        "before": 713,
+        "after": 613,
+        "change": -100,
+        "percent": -14.025245441795231
+      },
+      "requestedBytes": {
+        "before": 118078,
+        "after": 114828,
+        "change": -3250,
+        "percent": -2.752417893257
+      },
+      "freedBytes": {
+        "before": 114302,
+        "after": 111052,
+        "change": -3250,
+        "percent": -2.843344823362671
+      },
+      "liveBytesDelta": {
+        "before": 3776,
+        "after": 3776,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 41654,
+        "after": 41654,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/small",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 1785,
+        "after": 1663,
+        "change": -122,
+        "percent": -6.834733893557423
+      },
+      "reallocations": {
+        "before": 713,
+        "after": 613,
+        "change": -100,
+        "percent": -14.025245441795231
+      },
+      "requestedBytes": {
+        "before": 169966,
+        "after": 166716,
+        "change": -3250,
+        "percent": -1.9121471353094148
+      },
+      "freedBytes": {
+        "before": 166190,
+        "after": 162940,
+        "change": -3250,
+        "percent": -1.95559299596847
+      },
+      "liveBytesDelta": {
+        "before": 3776,
+        "after": 3776,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 41654,
+        "after": 41654,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/small",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 175,
+        "after": 175,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 25328,
+        "after": 25328,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 25328,
+        "after": 25328,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 14124,
+        "after": 14124,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/small",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 195,
+        "after": 195,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 141,
+        "after": 141,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 12816,
+        "after": 12816,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 12816,
+        "after": 12816,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 7086,
+        "after": 7086,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/small",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 311,
+        "after": 311,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 144,
+        "after": 144,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 40042,
+        "after": 40042,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 40042,
+        "after": 40042,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 23328,
+        "after": 23328,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/small",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 458,
+        "after": 458,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 139,
+        "after": 139,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 48976,
+        "after": 48976,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 48976,
+        "after": 48976,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 16028,
+        "after": 16028,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/small",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 613,
+        "after": 613,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 166,
+        "after": 166,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 114226,
+        "after": 114226,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 114226,
+        "after": 114226,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 30266,
+        "after": 30266,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/small",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 787,
+        "after": 787,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 166,
+        "after": 166,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 127562,
+        "after": 127562,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 127562,
+        "after": 127562,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 30266,
+        "after": 30266,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/small",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 87,
+        "after": 87,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 6668,
+        "after": 6668,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 6668,
+        "after": 6668,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 5912,
+        "after": 5912,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/small",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 95,
+        "after": 95,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 57,
+        "after": 57,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 7065,
+        "after": 7065,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 7065,
+        "after": 7065,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 4189,
+        "after": 4189,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/small",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 129,
+        "after": 129,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 58,
+        "after": 58,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 11207,
+        "after": 11207,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 11207,
+        "after": 11207,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 7027,
+        "after": 7027,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "flowchart/medium",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 5961,
+        "after": 5961,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 2310,
+        "after": 2310,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 665327,
+        "after": 665327,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 665327,
+        "after": 665327,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 207462,
+        "after": 207462,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "flowchart/medium",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 4840,
+        "after": 4840,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 1049,
+        "after": 1049,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 805610,
+        "after": 805610,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 805610,
+        "after": 805610,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 224608,
+        "after": 224608,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "flowchart/medium",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 5628,
+        "after": 5628,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 1049,
+        "after": 1049,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 917390,
+        "after": 917390,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 917390,
+        "after": 917390,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 224608,
+        "after": 224608,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "flowchart/medium",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 394,
+        "after": 394,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 55890,
+        "after": 55890,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 55890,
+        "after": 55890,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 54198,
+        "after": 54198,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "flowchart/medium",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 997,
+        "after": 997,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 790,
+        "after": 790,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 64522,
+        "after": 64522,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 64522,
+        "after": 64522,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 33584,
+        "after": 33584,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "flowchart/medium",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 1753,
+        "after": 1753,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 1021,
+        "after": 1021,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 186308,
+        "after": 186308,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 186308,
+        "after": 186308,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 112222,
+        "after": 112222,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/medium",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 2820,
+        "after": 2820,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 757,
+        "after": 757,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 285121,
+        "after": 285121,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 285121,
+        "after": 285121,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 68980,
+        "after": 68980,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/medium",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 1582,
+        "after": 1582,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 378,
+        "after": 378,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 257764,
+        "after": 257764,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 257764,
+        "after": 257764,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 79560,
+        "after": 79560,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/medium",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 1988,
+        "after": 1988,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 378,
+        "after": 378,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 302304,
+        "after": 302304,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 302304,
+        "after": 302304,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 79560,
+        "after": 79560,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/medium",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 203,
+        "after": 203,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 22270,
+        "after": 22270,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 22270,
+        "after": 22270,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 20578,
+        "after": 20578,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/medium",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 997,
+        "after": 997,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 790,
+        "after": 790,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 64522,
+        "after": 64522,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 64522,
+        "after": 64522,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 33584,
+        "after": 33584,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/medium",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 1753,
+        "after": 1753,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 1021,
+        "after": 1021,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 186308,
+        "after": 186308,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 186308,
+        "after": 186308,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 112222,
+        "after": 112222,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/medium",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 6359,
+        "after": 6359,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 1773,
+        "after": 1773,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 469486,
+        "after": 469486,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 469486,
+        "after": 469486,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 164589,
+        "after": 164589,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/medium",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 11723,
+        "after": 11723,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 3129,
+        "after": 3129,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 1852233,
+        "after": 1852233,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 1852233,
+        "after": 1852233,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 653035,
+        "after": 653035,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/medium",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 12813,
+        "after": 12813,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 3129,
+        "after": 3129,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 1980009,
+        "after": 1980009,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 1980009,
+        "after": 1980009,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 653035,
+        "after": 653035,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/medium",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 545,
+        "after": 545,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 63888,
+        "after": 63888,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 63888,
+        "after": 63888,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 62000,
+        "after": 62000,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/medium",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 997,
+        "after": 997,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 790,
+        "after": 790,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 64522,
+        "after": 64522,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 64522,
+        "after": 64522,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 33584,
+        "after": 33584,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/medium",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 1753,
+        "after": 1753,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 1021,
+        "after": 1021,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 186308,
+        "after": 186308,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 186308,
+        "after": 186308,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 112222,
+        "after": 112222,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/medium",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 181,
+        "after": 181,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 77,
+        "after": 77,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 37466,
+        "after": 37466,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 37466,
+        "after": 37466,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 13328,
+        "after": 13328,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/medium",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 1801,
+        "after": 1801,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 445,
+        "after": 445,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 270301,
+        "after": 270301,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 270301,
+        "after": 270301,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 93270,
+        "after": 93270,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/medium",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 1921,
+        "after": 1921,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 445,
+        "after": 445,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 278281,
+        "after": 278281,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 278281,
+        "after": 278281,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 93270,
+        "after": 93270,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/medium",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 60,
+        "after": 60,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 3990,
+        "after": 3990,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 3990,
+        "after": 3990,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 3990,
+        "after": 3990,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/medium",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 997,
+        "after": 997,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 790,
+        "after": 790,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 64522,
+        "after": 64522,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 64522,
+        "after": 64522,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 33584,
+        "after": 33584,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/medium",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 1753,
+        "after": 1753,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 1021,
+        "after": 1021,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 186308,
+        "after": 186308,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 186308,
+        "after": 186308,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 112222,
+        "after": 112222,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/medium",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 1281,
+        "after": 1281,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 224,
+        "after": 224,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 115592,
+        "after": 115592,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 115592,
+        "after": 115592,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 39439,
+        "after": 39439,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/medium",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 2788,
+        "after": 2788,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 745,
+        "after": 745,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 306579,
+        "after": 306579,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 306579,
+        "after": 306579,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 125122,
+        "after": 125122,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/medium",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 3232,
+        "after": 3232,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 745,
+        "after": 745,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 344799,
+        "after": 344799,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 344799,
+        "after": 344799,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 125122,
+        "after": 125122,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/medium",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 222,
+        "after": 222,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 19110,
+        "after": 19110,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 19110,
+        "after": 19110,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 18766,
+        "after": 18766,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/medium",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 997,
+        "after": 997,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 790,
+        "after": 790,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 64522,
+        "after": 64522,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 64522,
+        "after": 64522,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 33584,
+        "after": 33584,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/medium",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 1753,
+        "after": 1753,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 1021,
+        "after": 1021,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 186308,
+        "after": 186308,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 186308,
+        "after": 186308,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 112222,
+        "after": 112222,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/medium",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 3471,
+        "after": 3471,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 1539,
+        "after": 1539,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 499645,
+        "after": 499645,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 499645,
+        "after": 499645,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 169236,
+        "after": 169236,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/medium",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 6421,
+        "after": 5619,
+        "change": -802,
+        "percent": -12.490266313658308
+      },
+      "reallocations": {
+        "before": 3391,
+        "after": 2731,
+        "change": -660,
+        "percent": -19.463285166617517
+      },
+      "requestedBytes": {
+        "before": 572767,
+        "after": 551357,
+        "change": -21410,
+        "percent": -3.737994681956188
+      },
+      "freedBytes": {
+        "before": 558239,
+        "after": 536829,
+        "change": -21410,
+        "percent": -3.835274855393479
+      },
+      "liveBytesDelta": {
+        "before": 14528,
+        "after": 14528,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 184421,
+        "after": 184421,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/medium",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 7292,
+        "after": 6490,
+        "change": -802,
+        "percent": -10.9983543609435
+      },
+      "reallocations": {
+        "before": 3391,
+        "after": 2731,
+        "change": -660,
+        "percent": -19.463285166617517
+      },
+      "requestedBytes": {
+        "before": 708623,
+        "after": 687213,
+        "change": -21410,
+        "percent": -3.021352679774718
+      },
+      "freedBytes": {
+        "before": 694095,
+        "after": 672685,
+        "change": -21410,
+        "percent": -3.084592166778323
+      },
+      "liveBytesDelta": {
+        "before": 14528,
+        "after": 14528,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 184421,
+        "after": 184421,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/medium",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 435,
+        "after": 435,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 65072,
+        "after": 65072,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 65072,
+        "after": 65072,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 53868,
+        "after": 53868,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/medium",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 997,
+        "after": 997,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 790,
+        "after": 790,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 64522,
+        "after": 64522,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 64522,
+        "after": 64522,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 33584,
+        "after": 33584,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/medium",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 1753,
+        "after": 1753,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 1021,
+        "after": 1021,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 186308,
+        "after": 186308,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 186308,
+        "after": 186308,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 112222,
+        "after": 112222,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/medium",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 1932,
+        "after": 1932,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 567,
+        "after": 567,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 200873,
+        "after": 200873,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 200873,
+        "after": 200873,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 58331,
+        "after": 58331,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/medium",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 2977,
+        "after": 2977,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 866,
+        "after": 866,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 567210,
+        "after": 567210,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 567210,
+        "after": 567210,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 136128,
+        "after": 136128,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/medium",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 3487,
+        "after": 3487,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 866,
+        "after": 866,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 613486,
+        "after": 613486,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 613486,
+        "after": 613486,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 136128,
+        "after": 136128,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/medium",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 255,
+        "after": 255,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 23138,
+        "after": 23138,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 23138,
+        "after": 23138,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 22382,
+        "after": 22382,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/medium",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 336,
+        "after": 336,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 256,
+        "after": 256,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 22964,
+        "after": 22964,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 22964,
+        "after": 22964,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 12192,
+        "after": 12192,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/medium",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 564,
+        "after": 564,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 289,
+        "after": 289,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 78498,
+        "after": 78498,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 78498,
+        "after": 78498,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 45416,
+        "after": 45416,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "flowchart/large",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 24521,
+        "after": 24521,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 9532,
+        "after": 9532,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 2723274,
+        "after": 2723274,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 2723274,
+        "after": 2723274,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 838864,
+        "after": 838864,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "flowchart/large",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 19744,
+        "after": 19744,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 4005,
+        "after": 4005,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 3572045,
+        "after": 3572045,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 3572045,
+        "after": 3572045,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 916892,
+        "after": 916892,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "flowchart/large",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 22660,
+        "after": 22660,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 4005,
+        "after": 4005,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 4011285,
+        "after": 4011285,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 4011285,
+        "after": 4011285,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 916892,
+        "after": 916892,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "flowchart/large",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 1458,
+        "after": 1458,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 219620,
+        "after": 219620,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 219620,
+        "after": 219620,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 217928,
+        "after": 217928,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "flowchart/large",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 4038,
+        "after": 4038,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 3229,
+        "after": 3229,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 235150,
+        "after": 235150,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 235150,
+        "after": 235150,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 119253,
+        "after": 119253,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "flowchart/large",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 7227,
+        "after": 7227,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 5373,
+        "after": 5373,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 797680,
+        "after": 797680,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 797680,
+        "after": 797680,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 479591,
+        "after": 479591,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/large",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 11033,
+        "after": 11033,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 2747,
+        "after": 2747,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 1059685,
+        "after": 1059685,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 1059685,
+        "after": 1059685,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 232180,
+        "after": 232180,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/large",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 6845,
+        "after": 6845,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 1370,
+        "after": 1370,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 1005808,
+        "after": 1005808,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 1005808,
+        "after": 1005808,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 312322,
+        "after": 312322,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/large",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 8163,
+        "after": 8163,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 1370,
+        "after": 1370,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 1155724,
+        "after": 1155724,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 1155724,
+        "after": 1155724,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 312322,
+        "after": 312322,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/large",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 659,
+        "after": 659,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 74958,
+        "after": 74958,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 74958,
+        "after": 74958,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 73266,
+        "after": 73266,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/large",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 4038,
+        "after": 4038,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 3229,
+        "after": 3229,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 235150,
+        "after": 235150,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 235150,
+        "after": 235150,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 119253,
+        "after": 119253,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sequence/large",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 7227,
+        "after": 7227,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 5373,
+        "after": 5373,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 797680,
+        "after": 797680,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 797680,
+        "after": 797680,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 479591,
+        "after": 479591,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/large",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 26275,
+        "after": 26275,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 7263,
+        "after": 7263,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 1923848,
+        "after": 1923848,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 1923848,
+        "after": 1923848,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 673651,
+        "after": 673651,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/large",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 48661,
+        "after": 48661,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 13210,
+        "after": 13210,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 8769970,
+        "after": 8769970,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 8769970,
+        "after": 8769970,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 2715464,
+        "after": 2715464,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/large",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 52791,
+        "after": 52791,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 13210,
+        "after": 13210,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 9277518,
+        "after": 9277518,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 9277518,
+        "after": 9277518,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 2715464,
+        "after": 2715464,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/large",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 2065,
+        "after": 2065,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 253774,
+        "after": 253774,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 253774,
+        "after": 253774,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 251886,
+        "after": 251886,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/large",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 4038,
+        "after": 4038,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 3229,
+        "after": 3229,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 235150,
+        "after": 235150,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 235150,
+        "after": 235150,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 119253,
+        "after": 119253,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "er/large",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 7227,
+        "after": 7227,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 5373,
+        "after": 5373,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 797680,
+        "after": 797680,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 797680,
+        "after": 797680,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 479591,
+        "after": 479591,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/large",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 639,
+        "after": 639,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 437,
+        "after": 437,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 156602,
+        "after": 156602,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 156602,
+        "after": 156602,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 55380,
+        "after": 55380,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/large",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 3641,
+        "after": 3641,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 440,
+        "after": 440,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 636603,
+        "after": 636603,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 636603,
+        "after": 636603,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 229887,
+        "after": 229887,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/large",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 4065,
+        "after": 4065,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 440,
+        "after": 440,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 666871,
+        "after": 666871,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 666871,
+        "after": 666871,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 229887,
+        "after": 229887,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/large",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 212,
+        "after": 212,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 15134,
+        "after": 15134,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 15134,
+        "after": 15134,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 15134,
+        "after": 15134,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/large",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 4038,
+        "after": 4038,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 3229,
+        "after": 3229,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 235150,
+        "after": 235150,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 235150,
+        "after": 235150,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 119253,
+        "after": 119253,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "pie/large",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 7227,
+        "after": 7227,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 5373,
+        "after": 5373,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 797680,
+        "after": 797680,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 797680,
+        "after": 797680,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 479591,
+        "after": 479591,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/large",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 5095,
+        "after": 5095,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 842,
+        "after": 842,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 470671,
+        "after": 470671,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 470671,
+        "after": 470671,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 160426,
+        "after": 160426,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/large",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 11624,
+        "after": 11624,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 3051,
+        "after": 3051,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 1278173,
+        "after": 1278173,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 1278173,
+        "after": 1278173,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 514254,
+        "after": 514254,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/large",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 13284,
+        "after": 13284,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 3051,
+        "after": 3051,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 1429673,
+        "after": 1429673,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 1429673,
+        "after": 1429673,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 514254,
+        "after": 514254,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/large",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 830,
+        "after": 830,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 75750,
+        "after": 75750,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 75750,
+        "after": 75750,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 75406,
+        "after": 75406,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/large",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 4038,
+        "after": 4038,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 3229,
+        "after": 3229,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 235150,
+        "after": 235150,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 235150,
+        "after": 235150,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 119253,
+        "after": 119253,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "sankey/large",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 7227,
+        "after": 7227,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 5373,
+        "after": 5373,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 797680,
+        "after": 797680,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 797680,
+        "after": 797680,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 479591,
+        "after": 479591,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/large",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 13664,
+        "after": 13664,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 6115,
+        "after": 6115,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 1862228,
+        "after": 1862228,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 1862228,
+        "after": 1862228,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 606032,
+        "after": 606032,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/large",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 25426,
+        "after": 22040,
+        "change": -3386,
+        "percent": -13.317077007787304
+      },
+      "reallocations": {
+        "before": 13574,
+        "after": 10786,
+        "change": -2788,
+        "percent": -20.539266244290555
+      },
+      "requestedBytes": {
+        "before": 2232225,
+        "after": 2141807,
+        "change": -90418,
+        "percent": -4.050577338753934
+      },
+      "freedBytes": {
+        "before": 2174689,
+        "after": 2084271,
+        "change": -90418,
+        "percent": -4.157743934879884
+      },
+      "liveBytesDelta": {
+        "before": 57536,
+        "after": 57536,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 693163,
+        "after": 693163,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/large",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 28121,
+        "after": 24735,
+        "change": -3386,
+        "percent": -12.040823583798584
+      },
+      "reallocations": {
+        "before": 13574,
+        "after": 10786,
+        "change": -2788,
+        "percent": -20.539266244290555
+      },
+      "requestedBytes": {
+        "before": 2682193,
+        "after": 2591775,
+        "change": -90418,
+        "percent": -3.3710474973277464
+      },
+      "freedBytes": {
+        "before": 2624657,
+        "after": 2534239,
+        "change": -90418,
+        "percent": -3.444945377624581
+      },
+      "liveBytesDelta": {
+        "before": 57536,
+        "after": 57536,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 693163,
+        "after": 693163,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/large",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 1347,
+        "after": 1347,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 213616,
+        "after": 213616,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 213616,
+        "after": 213616,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 202412,
+        "after": 202412,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/large",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 4038,
+        "after": 4038,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 3229,
+        "after": 3229,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 235150,
+        "after": 235150,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 235150,
+        "after": 235150,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 119253,
+        "after": 119253,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "gantt/large",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 7227,
+        "after": 7227,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 5373,
+        "after": 5373,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 797680,
+        "after": 797680,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 797680,
+        "after": 797680,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 479591,
+        "after": 479591,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/large",
+      "stage": "parse-public",
+      "history": 1,
+      "allocations": {
+        "before": 7429,
+        "after": 7429,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 2118,
+        "after": 2118,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 771907,
+        "after": 771907,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 771907,
+        "after": 771907,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 221222,
+        "after": 221222,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/large",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 11842,
+        "after": 11842,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 3658,
+        "after": 3658,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 2617104,
+        "after": 2617104,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 2617104,
+        "after": 2617104,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 540750,
+        "after": 540750,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/large",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 13612,
+        "after": 13612,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 3658,
+        "after": 3658,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 2787220,
+        "after": 2787220,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 2787220,
+        "after": 2787220,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 540750,
+        "after": 540750,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/large",
+      "stage": "graph-snapshot",
+      "history": 1,
+      "allocations": {
+        "before": 885,
+        "after": 885,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "requestedBytes": {
+        "before": 85058,
+        "after": 85058,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 85058,
+        "after": 85058,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 84302,
+        "after": 84302,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/large",
+      "stage": "property-repeated",
+      "history": 1,
+      "allocations": {
+        "before": 1237,
+        "after": 1237,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 982,
+        "after": 982,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 73906,
+        "after": 73906,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 73906,
+        "after": 73906,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 38192,
+        "after": 38192,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "allocationRows",
+      "case": "railroad/large",
+      "stage": "property-unique",
+      "history": 1,
+      "allocations": {
+        "before": 2186,
+        "after": 2186,
+        "change": 0,
+        "percent": 0
+      },
+      "reallocations": {
+        "before": 1286,
+        "after": 1286,
+        "change": 0,
+        "percent": 0
+      },
+      "requestedBytes": {
+        "before": 317956,
+        "after": 317956,
+        "change": 0,
+        "percent": 0
+      },
+      "freedBytes": {
+        "before": 317956,
+        "after": 317956,
+        "change": 0,
+        "percent": 0
+      },
+      "liveBytesDelta": {
+        "before": 0,
+        "after": 0,
+        "change": 0,
+        "percent": null
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 185504,
+        "after": 185504,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/small",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 1434,
+        "after": 1312,
+        "change": -122,
+        "percent": -8.507670850767084
+      },
+      "reallocations": {
+        "before": 713,
+        "after": 613,
+        "change": -100,
+        "percent": -14.025245441795231
+      },
+      "requestedBytes": {
+        "before": 118078,
+        "after": 114828,
+        "change": -3250,
+        "percent": -2.752417893257
+      },
+      "freedBytes": {
+        "before": 114302,
+        "after": 111052,
+        "change": -3250,
+        "percent": -2.843344823362671
+      },
+      "liveBytesDelta": {
+        "before": 3776,
+        "after": 3776,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 41654,
+        "after": 41654,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/small",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 1785,
+        "after": 1663,
+        "change": -122,
+        "percent": -6.834733893557423
+      },
+      "reallocations": {
+        "before": 713,
+        "after": 613,
+        "change": -100,
+        "percent": -14.025245441795231
+      },
+      "requestedBytes": {
+        "before": 169966,
+        "after": 166716,
+        "change": -3250,
+        "percent": -1.9121471353094148
+      },
+      "freedBytes": {
+        "before": 166190,
+        "after": 162940,
+        "change": -3250,
+        "percent": -1.95559299596847
+      },
+      "liveBytesDelta": {
+        "before": 3776,
+        "after": 3776,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 41654,
+        "after": 41654,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/small",
+      "stage": "render-mutable-core",
+      "history": 16,
+      "allocations": {
+        "before": 1434,
+        "after": 1312,
+        "change": -122,
+        "percent": -8.507670850767084
+      },
+      "reallocations": {
+        "before": 712,
+        "after": 612,
+        "change": -100,
+        "percent": -14.04494382022472
+      },
+      "requestedBytes": {
+        "before": 110910,
+        "after": 107660,
+        "change": -3250,
+        "percent": -2.930303849968443
+      },
+      "freedBytes": {
+        "before": 110718,
+        "after": 107468,
+        "change": -3250,
+        "percent": -2.935385393522282
+      },
+      "liveBytesDelta": {
+        "before": 192,
+        "after": 192,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 38070,
+        "after": 38070,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/small",
+      "stage": "render-mutable-publish",
+      "history": 16,
+      "allocations": {
+        "before": 1815,
+        "after": 1693,
+        "change": -122,
+        "percent": -6.721763085399449
+      },
+      "reallocations": {
+        "before": 712,
+        "after": 612,
+        "change": -100,
+        "percent": -14.04494382022472
+      },
+      "requestedBytes": {
+        "before": 199758,
+        "after": 196508,
+        "change": -3250,
+        "percent": -1.6269686320447743
+      },
+      "freedBytes": {
+        "before": 199566,
+        "after": 196316,
+        "change": -3250,
+        "percent": -1.6285339186033694
+      },
+      "liveBytesDelta": {
+        "before": 192,
+        "after": 192,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 40830,
+        "after": 40830,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/small",
+      "stage": "render-mutable-core",
+      "history": 128,
+      "allocations": {
+        "before": 1434,
+        "after": 1312,
+        "change": -122,
+        "percent": -8.507670850767084
+      },
+      "reallocations": {
+        "before": 712,
+        "after": 612,
+        "change": -100,
+        "percent": -14.04494382022472
+      },
+      "requestedBytes": {
+        "before": 110910,
+        "after": 107660,
+        "change": -3250,
+        "percent": -2.930303849968443
+      },
+      "freedBytes": {
+        "before": 110718,
+        "after": 107468,
+        "change": -3250,
+        "percent": -2.935385393522282
+      },
+      "liveBytesDelta": {
+        "before": 192,
+        "after": 192,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 38070,
+        "after": 38070,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/small",
+      "stage": "render-mutable-publish",
+      "history": 128,
+      "allocations": {
+        "before": 2039,
+        "after": 1917,
+        "change": -122,
+        "percent": -5.983325159391859
+      },
+      "reallocations": {
+        "before": 712,
+        "after": 612,
+        "change": -100,
+        "percent": -14.04494382022472
+      },
+      "requestedBytes": {
+        "before": 475726,
+        "after": 472476,
+        "change": -3250,
+        "percent": -0.6831663604680005
+      },
+      "freedBytes": {
+        "before": 475534,
+        "after": 472284,
+        "change": -3250,
+        "percent": -0.683442193407832
+      },
+      "liveBytesDelta": {
+        "before": 192,
+        "after": 192,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 178814,
+        "after": 178814,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/medium",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 6421,
+        "after": 5619,
+        "change": -802,
+        "percent": -12.490266313658308
+      },
+      "reallocations": {
+        "before": 3391,
+        "after": 2731,
+        "change": -660,
+        "percent": -19.463285166617517
+      },
+      "requestedBytes": {
+        "before": 572767,
+        "after": 551357,
+        "change": -21410,
+        "percent": -3.737994681956188
+      },
+      "freedBytes": {
+        "before": 558239,
+        "after": 536829,
+        "change": -21410,
+        "percent": -3.835274855393479
+      },
+      "liveBytesDelta": {
+        "before": 14528,
+        "after": 14528,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 184421,
+        "after": 184421,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/medium",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 7292,
+        "after": 6490,
+        "change": -802,
+        "percent": -10.9983543609435
+      },
+      "reallocations": {
+        "before": 3391,
+        "after": 2731,
+        "change": -660,
+        "percent": -19.463285166617517
+      },
+      "requestedBytes": {
+        "before": 708623,
+        "after": 687213,
+        "change": -21410,
+        "percent": -3.021352679774718
+      },
+      "freedBytes": {
+        "before": 694095,
+        "after": 672685,
+        "change": -21410,
+        "percent": -3.084592166778323
+      },
+      "liveBytesDelta": {
+        "before": 14528,
+        "after": 14528,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 184421,
+        "after": 184421,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/medium",
+      "stage": "render-mutable-core",
+      "history": 16,
+      "allocations": {
+        "before": 6421,
+        "after": 5619,
+        "change": -802,
+        "percent": -12.490266313658308
+      },
+      "reallocations": {
+        "before": 3390,
+        "after": 2730,
+        "change": -660,
+        "percent": -19.469026548672566
+      },
+      "requestedBytes": {
+        "before": 544095,
+        "after": 522685,
+        "change": -21410,
+        "percent": -3.934974590834321
+      },
+      "freedBytes": {
+        "before": 543903,
+        "after": 522493,
+        "change": -21410,
+        "percent": -3.9363636530778465
+      },
+      "liveBytesDelta": {
+        "before": 192,
+        "after": 192,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 170085,
+        "after": 170085,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/medium",
+      "stage": "render-mutable-publish",
+      "history": 16,
+      "allocations": {
+        "before": 7322,
+        "after": 6520,
+        "change": -802,
+        "percent": -10.953291450423382
+      },
+      "reallocations": {
+        "before": 3390,
+        "after": 2730,
+        "change": -660,
+        "percent": -19.469026548672566
+      },
+      "requestedBytes": {
+        "before": 851311,
+        "after": 829901,
+        "change": -21410,
+        "percent": -2.514944597215354
+      },
+      "freedBytes": {
+        "before": 851119,
+        "after": 829709,
+        "change": -21410,
+        "percent": -2.5155119319390122
+      },
+      "liveBytesDelta": {
+        "before": 192,
+        "after": 192,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 170588,
+        "after": 170588,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/medium",
+      "stage": "render-mutable-core",
+      "history": 128,
+      "allocations": {
+        "before": 6421,
+        "after": 5619,
+        "change": -802,
+        "percent": -12.490266313658308
+      },
+      "reallocations": {
+        "before": 3390,
+        "after": 2730,
+        "change": -660,
+        "percent": -19.469026548672566
+      },
+      "requestedBytes": {
+        "before": 544095,
+        "after": 522685,
+        "change": -21410,
+        "percent": -3.934974590834321
+      },
+      "freedBytes": {
+        "before": 543903,
+        "after": 522493,
+        "change": -21410,
+        "percent": -3.9363636530778465
+      },
+      "liveBytesDelta": {
+        "before": 192,
+        "after": 192,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 170085,
+        "after": 170085,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/medium",
+      "stage": "render-mutable-publish",
+      "history": 128,
+      "allocations": {
+        "before": 7546,
+        "after": 6744,
+        "change": -802,
+        "percent": -10.62814736284124
+      },
+      "reallocations": {
+        "before": 3390,
+        "after": 2730,
+        "change": -660,
+        "percent": -19.469026548672566
+      },
+      "requestedBytes": {
+        "before": 2130799,
+        "after": 2109389,
+        "change": -21410,
+        "percent": -1.0047874060387676
+      },
+      "freedBytes": {
+        "before": 2130607,
+        "after": 2109197,
+        "change": -21410,
+        "percent": -1.0048779526210136
+      },
+      "liveBytesDelta": {
+        "before": 192,
+        "after": 192,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 810332,
+        "after": 810332,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/large",
+      "stage": "render-mutable-core",
+      "history": 1,
+      "allocations": {
+        "before": 25426,
+        "after": 22040,
+        "change": -3386,
+        "percent": -13.317077007787304
+      },
+      "reallocations": {
+        "before": 13574,
+        "after": 10786,
+        "change": -2788,
+        "percent": -20.539266244290555
+      },
+      "requestedBytes": {
+        "before": 2232225,
+        "after": 2141807,
+        "change": -90418,
+        "percent": -4.050577338753934
+      },
+      "freedBytes": {
+        "before": 2174689,
+        "after": 2084271,
+        "change": -90418,
+        "percent": -4.157743934879884
+      },
+      "liveBytesDelta": {
+        "before": 57536,
+        "after": 57536,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 693163,
+        "after": 693163,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/large",
+      "stage": "render-mutable-publish",
+      "history": 1,
+      "allocations": {
+        "before": 28121,
+        "after": 24735,
+        "change": -3386,
+        "percent": -12.040823583798584
+      },
+      "reallocations": {
+        "before": 13574,
+        "after": 10786,
+        "change": -2788,
+        "percent": -20.539266244290555
+      },
+      "requestedBytes": {
+        "before": 2682193,
+        "after": 2591775,
+        "change": -90418,
+        "percent": -3.3710474973277464
+      },
+      "freedBytes": {
+        "before": 2624657,
+        "after": 2534239,
+        "change": -90418,
+        "percent": -3.444945377624581
+      },
+      "liveBytesDelta": {
+        "before": 57536,
+        "after": 57536,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 693163,
+        "after": 693163,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/large",
+      "stage": "render-mutable-core",
+      "history": 16,
+      "allocations": {
+        "before": 25426,
+        "after": 22040,
+        "change": -3386,
+        "percent": -13.317077007787304
+      },
+      "reallocations": {
+        "before": 13573,
+        "after": 10785,
+        "change": -2788,
+        "percent": -20.540779488690784
+      },
+      "requestedBytes": {
+        "before": 2117537,
+        "after": 2027119,
+        "change": -90418,
+        "percent": -4.269960808240895
+      },
+      "freedBytes": {
+        "before": 2117345,
+        "after": 2026927,
+        "change": -90418,
+        "percent": -4.270348006583717
+      },
+      "liveBytesDelta": {
+        "before": 192,
+        "after": 192,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 635819,
+        "after": 635819,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/large",
+      "stage": "render-mutable-publish",
+      "history": 16,
+      "allocations": {
+        "before": 28151,
+        "after": 24765,
+        "change": -3386,
+        "percent": -12.027991900820574
+      },
+      "reallocations": {
+        "before": 13573,
+        "after": 10785,
+        "change": -2788,
+        "percent": -20.540779488690784
+      },
+      "requestedBytes": {
+        "before": 3249585,
+        "after": 3159167,
+        "change": -90418,
+        "percent": -2.7824476048480036
+      },
+      "freedBytes": {
+        "before": 3249393,
+        "after": 3158975,
+        "change": -90418,
+        "percent": -2.7826120139976913
+      },
+      "liveBytesDelta": {
+        "before": 192,
+        "after": 192,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 663640,
+        "after": 663640,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/large",
+      "stage": "render-mutable-core",
+      "history": 128,
+      "allocations": {
+        "before": 25426,
+        "after": 22040,
+        "change": -3386,
+        "percent": -13.317077007787304
+      },
+      "reallocations": {
+        "before": 13573,
+        "after": 10785,
+        "change": -2788,
+        "percent": -20.540779488690784
+      },
+      "requestedBytes": {
+        "before": 2117537,
+        "after": 2027119,
+        "change": -90418,
+        "percent": -4.269960808240895
+      },
+      "freedBytes": {
+        "before": 2117345,
+        "after": 2026927,
+        "change": -90418,
+        "percent": -4.270348006583717
+      },
+      "liveBytesDelta": {
+        "before": 192,
+        "after": 192,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 635819,
+        "after": 635819,
+        "change": 0,
+        "percent": 0
+      }
+    },
+    {
+      "group": "historyRows",
+      "case": "gantt/large",
+      "stage": "render-mutable-publish",
+      "history": 128,
+      "allocations": {
+        "before": 28375,
+        "after": 24989,
+        "change": -3386,
+        "percent": -11.933039647577093
+      },
+      "reallocations": {
+        "before": 13573,
+        "after": 10785,
+        "change": -2788,
+        "percent": -20.540779488690784
+      },
+      "requestedBytes": {
+        "before": 8342449,
+        "after": 8252031,
+        "change": -90418,
+        "percent": -1.0838304195806292
+      },
+      "freedBytes": {
+        "before": 8342257,
+        "after": 8251839,
+        "change": -90418,
+        "percent": -1.0838553643216697
+      },
+      "liveBytesDelta": {
+        "before": 192,
+        "after": 192,
+        "change": 0,
+        "percent": 0
+      },
+      "peakAdditionalRequestedBytes": {
+        "before": 3210072,
+        "after": 3210072,
+        "change": 0,
+        "percent": 0
+      }
+    }
+  ],
+  "platform": {
+    "os": "darwin",
+    "arch": "arm64",
+    "cpu": "Apple M1 Pro",
+    "node": "v25.9.0"
+  },
+  "replay": {
+    "prepareOnlyPassed": true,
+    "baselineSourceDigestMatched": true,
+    "candidateSourceDigestMatched": true
+  },
+  "candidateStorage": {
+    "positiveIdSlots": 16,
+    "declaredFieldBytes": 64,
+    "heapCache": false,
+    "graphWriterInlineBytes": 120
+  },
+  "integration": {
+    "status": "passed",
+    "profile": "release; optimized; LTO",
+    "targets": {
+      "gantt_compat": {
+        "passed": 2,
+        "failed": 0,
+        "ignored": 0,
+        "filtered": 0
+      },
+      "public_gantt": {
+        "passed": 7,
+        "failed": 0,
+        "ignored": 0,
+        "filtered": 0
+      }
+    },
+    "historicalFixtureCases": 18994,
+    "historicalFixtureSha256": "6dfa9aca46f951bc04b70d9dffd92b85cff520bc34e18fd10147b335b8449ae7",
+    "filtersExplicitlyUnset": [
+      "GANTT_FILTER",
+      "GANTT_SKIP_STRESS"
+    ],
+    "logSha256": "7b87e753bc03d4ab195e7e19f562af5b46723f11c1fca61aeb4f4240a06bc5cf",
+    "warning": "rust-objcopy could not load libLLVM for optional debug stripping; build/test commands exited0 and all9 integrations passed.",
+    "rawLogSha256": "59a4725a01f01cb3f94bd13b42a0fbc8f5ac1a3a4564c2d5478fbb277c2be0a5",
+    "logNormalization": "Trailing horizontal whitespace and blank EOF lines removed; diagnostic text unchanged."
+  }
+}

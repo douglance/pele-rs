@@ -1,0 +1,59 @@
+diff --git a/crates/pele/src/compat/diagrams/gantt/public_model.rs b/crates/pele/src/compat/diagrams/gantt/public_model.rs
+index a5bd1f8..8a5f3d7 100644
+--- a/crates/pele/src/compat/diagrams/gantt/public_model.rs
++++ b/crates/pele/src/compat/diagrams/gantt/public_model.rs
+@@ -82,6 +82,8 @@ struct Context<'a> {
+     g: &'a mut ModelGraph,
+     strings: HashMap<JsString, u32>,
+     canonical: Vec<u32>,
++    // Operation-local positive IDs only. Unknown names retain the original path.
++    field_ids: [u32; 16],
+     maps: HashMap<u32, HashMap<Key, usize>>,
+     properties: HashMap<u32, HashMap<u32, usize>>,
+     sets: HashMap<u32, HashSet<Key>>,
+@@ -117,6 +119,7 @@ impl<'a> Context<'a> {
+             g,
+             strings,
+             canonical,
++            field_ids: [u32::MAX; 16],
+             maps: HashMap::new(),
+             properties: HashMap::new(),
+             sets: HashMap::new(),
+@@ -189,8 +192,35 @@ impl<'a> Context<'a> {
+     }
+     fn own(&mut self, id: u32, key: &str) -> Result<Option<Atom>, PublicError> {
+         self.tick(1)?;
+-        let Some(key) = self.strings.get(&JsString::from(key)).copied() else {
+-            return Ok(None);
++        let slot = match key {
++            "id" => Some(0),
++            "task" => Some(1),
++            "section" => Some(2),
++            "startTime" => Some(3),
++            "endTime" => Some(4),
++            "renderEndTime" => Some(5),
++            "manualEndTime" => Some(6),
++            "processed" => Some(7),
++            "active" => Some(8),
++            "done" => Some(9),
++            "crit" => Some(10),
++            "milestone" => Some(11),
++            "vert" => Some(12),
++            "classes" => Some(13),
++            "raw" => Some(14),
++            "order" => Some(15),
++            _ => None,
++        };
++        let key = if let Some(id) = slot.map(|n| self.field_ids[n]).filter(|id| *id != u32::MAX) {
++            id
++        } else {
++            let Some(id) = self.strings.get(&JsString::from(key)).copied() else {
++                return Ok(None);
++            };
++            if let Some(slot) = slot {
++                self.field_ids[slot] = id;
++            }
++            id
+         };
+         self.property_index(id)?;
+         Ok(self.properties[&id]

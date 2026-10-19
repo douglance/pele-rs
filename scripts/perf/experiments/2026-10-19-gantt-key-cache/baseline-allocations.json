@@ -1,0 +1,4828 @@
+{
+  "harnessSha256": "f3969f03e6c55b33b2f355b8a5c3fbaa9a6ce42081f067816f06476d502c5fff",
+  "casesSha256": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+  "schemaVersion": 1,
+  "mode": "allocation-only",
+  "baselineCommit": "32e845d4b0e63476dcaba8ebe4dc8730bdc7fdd0",
+  "upstream": "458322a5b8abb1ae57ddf127c32017ab9fb14a92",
+  "oracleSha256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "buildManifest": {
+    "schemaVersion": 1,
+    "mode": "allocation-build-only",
+    "sourceInputSha256": "e523e2be797bab6d5e25c0bb890c2f6f2c5eb451889d68087da3a5ad7aa23a96",
+    "revision": "32e845d4b0e63476dcaba8ebe4dc8730bdc7fdd0",
+    "binaries": {
+      "pele-perf-alloc": "91adc3a74cd99d42d987eccf6c14526a4e31dda1f5bb878bf8b8a04d305039d9"
+    },
+    "rustc": "rustc 1.98.1 (48a229cea 2026-09-01)"
+  },
+  "elapsedRows": 0,
+  "cases": [
+    {
+      "id": "flowchart/small",
+      "units": 8,
+      "sourceSha256": "647d1649fff45083426d711811675be3bb058a9178bd1c469b5940aeb0bb783b",
+      "output": {
+        "type": "flowchart",
+        "widthBits": "405b800000000000",
+        "heightBits": "4087000000000000",
+        "svgSha256": "9aa81d216d0f8804a49140d117b98e29f93eb16942f5829e426da1fd5000b4de",
+        "svgBytes": 4116
+      },
+      "native": {
+        "graphBinaryBytes": 3452,
+        "graphJsonBytes": 14545,
+        "graphNodes": 57,
+        "graphSha256": "d8fb80050cfb5a6b1fabc7fe91d8672e9d7ce6b824b7e334922430dbb72abf41",
+        "graphStrings": 74,
+        "graphUtf16Units": 448,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "4087000000000000",
+          "svgBytes": 4116,
+          "svgSha256": "9aa81d216d0f8804a49140d117b98e29f93eb16942f5829e426da1fd5000b4de",
+          "type": "flowchart",
+          "widthBits": "405b800000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+            "strings": 28
+          },
+          "unique": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+            "strings": 141
+          }
+        }
+      }
+    },
+    {
+      "id": "sequence/small",
+      "units": 8,
+      "sourceSha256": "761e97cb09258622eb0e4b26b51a78b927bfecc75f05dad9ec97b7a982bc6bc6",
+      "output": {
+        "type": "sequence",
+        "widthBits": "4068200000000000",
+        "heightBits": "407aa00000000000",
+        "svgSha256": "81dfb69796084be2b9dbdd8d80368e2fa969c9c37689f5d2f1f878701768999a",
+        "svgBytes": 4404
+      },
+      "native": {
+        "graphBinaryBytes": 2107,
+        "graphJsonBytes": 8654,
+        "graphNodes": 22,
+        "graphSha256": "d636ba61f06535683fe6995f5b91c09d23565a155fa68a1da7a73a972319a93e",
+        "graphStrings": 50,
+        "graphUtf16Units": 341,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "407aa00000000000",
+          "svgBytes": 4404,
+          "svgSha256": "81dfb69796084be2b9dbdd8d80368e2fa969c9c37689f5d2f1f878701768999a",
+          "type": "sequence",
+          "widthBits": "4068200000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+            "strings": 28
+          },
+          "unique": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+            "strings": 141
+          }
+        }
+      }
+    },
+    {
+      "id": "er/small",
+      "units": 8,
+      "sourceSha256": "5a6e7a2ba89f903cdb22547387e4f04df621bae730a0a6a172bcfa1a0345790d",
+      "output": {
+        "type": "er",
+        "widthBits": "4066600000000000",
+        "heightBits": "4096bc0000000000",
+        "svgSha256": "475a8c17cfb501bbaf7e41062c1cd9166faa8cca151f75a0ad9f93432d0d3984",
+        "svgBytes": 11874
+      },
+      "native": {
+        "graphBinaryBytes": 3640,
+        "graphJsonBytes": 16285,
+        "graphNodes": 77,
+        "graphSha256": "020d5f34dd9c2cae38354ea0f33cc46e620f425af07ea1c4be56af43b3eab481",
+        "graphStrings": 61,
+        "graphUtf16Units": 359,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "4096bc0000000000",
+          "svgBytes": 11874,
+          "svgSha256": "475a8c17cfb501bbaf7e41062c1cd9166faa8cca151f75a0ad9f93432d0d3984",
+          "type": "er",
+          "widthBits": "4066600000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+            "strings": 28
+          },
+          "unique": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+            "strings": 141
+          }
+        }
+      }
+    },
+    {
+      "id": "pie/small",
+      "units": 8,
+      "sourceSha256": "148212294e69607b7cae24468114ec57c3fdd59971156137746d83b1e4272f2b",
+      "output": {
+        "type": "pie",
+        "widthBits": "407a700000000000",
+        "heightBits": "4076000000000000",
+        "svgSha256": "cd8cefb8884714ae9eff91326c65ddb3f579ebfc6fcd587acb28feef7c7d9706",
+        "svgBytes": 4131
+      },
+      "native": {
+        "graphBinaryBytes": 495,
+        "graphJsonBytes": 1490,
+        "graphNodes": 2,
+        "graphSha256": "d38e3303d8a97b9fa8ca73a21c77c755ef24e03ceb11d7238245019e61cb6f23",
+        "graphStrings": 16,
+        "graphUtf16Units": 109,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "4076000000000000",
+          "svgBytes": 4131,
+          "svgSha256": "cd8cefb8884714ae9eff91326c65ddb3f579ebfc6fcd587acb28feef7c7d9706",
+          "type": "pie",
+          "widthBits": "407a700000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+            "strings": 28
+          },
+          "unique": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+            "strings": 141
+          }
+        }
+      }
+    },
+    {
+      "id": "sankey/small",
+      "units": 8,
+      "sourceSha256": "e0bac64249ac2903390cfcffd9822508c74e6cdff134aa0dfff7b6c88c65786e",
+      "output": {
+        "type": "sankey",
+        "widthBits": "4083400000000000",
+        "heightBits": "407a000000000000",
+        "svgSha256": "4c8372081ec9f54f9450ac6f28ceb0cdb744fcecc346d86f18b504a03200c491",
+        "svgBytes": 4589
+      },
+      "native": {
+        "graphBinaryBytes": 1174,
+        "graphJsonBytes": 5076,
+        "graphNodes": 19,
+        "graphSha256": "8f74921e2206b5f8962bcb37f2fbf5bc743ca818f5a7a3ab2a84615c0676839e",
+        "graphStrings": 29,
+        "graphUtf16Units": 95,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "407a000000000000",
+          "svgBytes": 4589,
+          "svgSha256": "4c8372081ec9f54f9450ac6f28ceb0cdb744fcecc346d86f18b504a03200c491",
+          "type": "sankey",
+          "widthBits": "4083400000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+            "strings": 28
+          },
+          "unique": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+            "strings": 141
+          }
+        }
+      }
+    },
+    {
+      "id": "gantt/small",
+      "units": 8,
+      "sourceSha256": "e95d857b2d21277ff82edeab27a83c843a3012c9ab06f2c55b30c0b96c0fd531",
+      "output": {
+        "type": "gantt",
+        "widthBits": "4089000000000000",
+        "heightBits": "4071500000000000",
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "svgBytes": 3407
+      },
+      "native": {
+        "graphBinaryBytes": 4203,
+        "graphJsonBytes": 17538,
+        "graphNodes": 54,
+        "graphSha256": "9fb7022860984ebdc1c14d1ca1f0150d6576f8fca8532b3cf8dfe404cd75e50e",
+        "graphStrings": 100,
+        "graphUtf16Units": 712,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "4071500000000000",
+          "svgBytes": 3407,
+          "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "e5721927f3ccc806f61927f2c98557fa470b1883e7fde2373743167180609975",
+            "strings": 28
+          },
+          "unique": {
+            "nodes": 9,
+            "properties": 140,
+            "sha256": "62fb67fc22f40f67cefd0785d4bac5e6801d9ff8403c0f0e81bc139661c83705",
+            "strings": 141
+          }
+        }
+      }
+    },
+    {
+      "id": "railroad/small",
+      "units": 3,
+      "sourceSha256": "c81c9badf39b8e955da47fa8a7ed38e4bd3f24876a26eededc54d55a94374816",
+      "output": {
+        "type": "railroad",
+        "widthBits": "4077c00000000000",
+        "heightBits": "407b000000000000",
+        "svgSha256": "96e9d750a58266724dd06599c282c56bec8baf3524e8e07af66b72dabf1b083a",
+        "svgBytes": 6036
+      },
+      "native": {
+        "graphBinaryBytes": 1671,
+        "graphJsonBytes": 7150,
+        "graphNodes": 36,
+        "graphSha256": "2ecb075ba354ffe6e9399a1466baf72e20f7b7498f7c86e8a2195dc937394038",
+        "graphStrings": 33,
+        "graphUtf16Units": 196,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "407b000000000000",
+          "svgBytes": 6036,
+          "svgSha256": "96e9d750a58266724dd06599c282c56bec8baf3524e8e07af66b72dabf1b083a",
+          "type": "railroad",
+          "widthBits": "4077c00000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 4,
+            "properties": 55,
+            "sha256": "3366a045752643d0c3a10496783695f2605a12ad4d88dfd945eb7b1c54547110",
+            "strings": 23
+          },
+          "unique": {
+            "nodes": 4,
+            "properties": 55,
+            "sha256": "5ac6d4f31e16711a87e396123c54345a1abee81a61b0ceb551374db0c186c50e",
+            "strings": 56
+          }
+        }
+      }
+    },
+    {
+      "id": "flowchart/medium",
+      "units": 48,
+      "sourceSha256": "d3ffdd90a8476c76234d30bf49cb41c7faaeb437c67ec4b5d92dd1e75dd2c5ca",
+      "output": {
+        "type": "flowchart",
+        "widthBits": "405e000000000000",
+        "heightBits": "40b1e00000000000",
+        "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+        "svgBytes": 21889
+      },
+      "native": {
+        "graphBinaryBytes": 17098,
+        "graphJsonBytes": 79779,
+        "graphNodes": 297,
+        "graphSha256": "5ba84ab112c45a16c833a8397c817b0b3ed74944375a40041224488cbe7bbd9c",
+        "graphStrings": 274,
+        "graphUtf16Units": 1631,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40b1e00000000000",
+          "svgBytes": 21889,
+          "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+          "type": "flowchart",
+          "widthBits": "405e000000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+            "strings": 68
+          },
+          "unique": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+            "strings": 821
+          }
+        }
+      }
+    },
+    {
+      "id": "sequence/medium",
+      "units": 48,
+      "sourceSha256": "ff4d80b120bdba34c800984585ea064e45cb46ce19ea198c35ab0e7a5064cd1c",
+      "output": {
+        "type": "sequence",
+        "widthBits": "4069400000000000",
+        "heightBits": "409dc80000000000",
+        "svgSha256": "656d674a53bf2a97bb9429486711300be4d97c6694f14dee62a939f80d54444a",
+        "svgBytes": 15759
+      },
+      "native": {
+        "graphBinaryBytes": 7179,
+        "graphJsonBytes": 33848,
+        "graphNodes": 62,
+        "graphSha256": "0991e675be7002702370f76bb218c4357a5f1fa68dd810754839776642b05569",
+        "graphStrings": 130,
+        "graphUtf16Units": 817,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "409dc80000000000",
+          "svgBytes": 15759,
+          "svgSha256": "656d674a53bf2a97bb9429486711300be4d97c6694f14dee62a939f80d54444a",
+          "type": "sequence",
+          "widthBits": "4069400000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+            "strings": 68
+          },
+          "unique": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+            "strings": 821
+          }
+        }
+      }
+    },
+    {
+      "id": "er/medium",
+      "units": 48,
+      "sourceSha256": "51f222a39995ad6774e0fc6094dd5b8902d32febcd97d3a67b282f8c7851b748",
+      "output": {
+        "type": "er",
+        "widthBits": "4066600000000000",
+        "heightBits": "40c1c38000000000",
+        "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+        "svgBytes": 70404
+      },
+      "native": {
+        "graphBinaryBytes": 18382,
+        "graphJsonBytes": 92001,
+        "graphNodes": 437,
+        "graphSha256": "b8ec01a15071df3a58038246a7b5b74adcc34b5aaaf19a465e153858d89156a9",
+        "graphStrings": 181,
+        "graphUtf16Units": 1070,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40c1c38000000000",
+          "svgBytes": 70404,
+          "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+          "type": "er",
+          "widthBits": "4066600000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+            "strings": 68
+          },
+          "unique": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+            "strings": 821
+          }
+        }
+      }
+    },
+    {
+      "id": "pie/medium",
+      "units": 48,
+      "sourceSha256": "71db10120ad41f8031b3d4f5eac266754e1eba7680ac530e2c5a00f3938e8954",
+      "output": {
+        "type": "pie",
+        "widthBits": "407b000000000000",
+        "heightBits": "4094600000000000",
+        "svgSha256": "36f57bc6717ac42cc50f971a0f87d18027d58a863ef0cfc9b6841634a8f0c72a",
+        "svgBytes": 17134
+      },
+      "native": {
+        "graphBinaryBytes": 1851,
+        "graphJsonBytes": 5684,
+        "graphNodes": 2,
+        "graphSha256": "cdb98e84e9c36ddea2f5217874343808379dfc4140150283b34ad0e7b61b3565",
+        "graphStrings": 56,
+        "graphUtf16Units": 427,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "4094600000000000",
+          "svgBytes": 17134,
+          "svgSha256": "36f57bc6717ac42cc50f971a0f87d18027d58a863ef0cfc9b6841634a8f0c72a",
+          "type": "pie",
+          "widthBits": "407b000000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+            "strings": 68
+          },
+          "unique": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+            "strings": 821
+          }
+        }
+      }
+    },
+    {
+      "id": "sankey/medium",
+      "units": 48,
+      "sourceSha256": "6543cd2e087fca2b0c5636630c6b73381f1298dea196e4379c6056f33a1ebd7c",
+      "output": {
+        "type": "sankey",
+        "widthBits": "4083400000000000",
+        "heightBits": "407a000000000000",
+        "svgSha256": "f6a9ac0c183550e62c53181252222401f56b9be509a32a947f7bba1bbf5b4928",
+        "svgBytes": 24853
+      },
+      "native": {
+        "graphBinaryBytes": 5806,
+        "graphJsonBytes": 27754,
+        "graphNodes": 99,
+        "graphSha256": "3613c81902c8e5326cb6ac291deb3be5e42e0b82f8841fcdc03fca2f0d0d642f",
+        "graphStrings": 109,
+        "graphUtf16Units": 291,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "407a000000000000",
+          "svgBytes": 24853,
+          "svgSha256": "f6a9ac0c183550e62c53181252222401f56b9be509a32a947f7bba1bbf5b4928",
+          "type": "sankey",
+          "widthBits": "4083400000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+            "strings": 68
+          },
+          "unique": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+            "strings": 821
+          }
+        }
+      }
+    },
+    {
+      "id": "gantt/medium",
+      "units": 48,
+      "sourceSha256": "5e15788ce4ee74b56b1f8c9ccdbd6569f3211b54a428ca6d4f0ea32fc4e485f1",
+      "output": {
+        "type": "gantt",
+        "widthBits": "4089000000000000",
+        "heightBits": "4097140000000000",
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "svgBytes": 12574
+      },
+      "native": {
+        "graphBinaryBytes": 17187,
+        "graphJsonBytes": 82916,
+        "graphNodes": 254,
+        "graphSha256": "8af0117957fb6a4cb95c2f8d66129c7c46be864dc7ad181bf1ff0e44ffa401e1",
+        "graphStrings": 280,
+        "graphUtf16Units": 2104,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "4097140000000000",
+          "svgBytes": 12574,
+          "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "454801bd38d58ee7f160de3ac73f32604f8b05499e979e830209a671aa1bc287",
+            "strings": 68
+          },
+          "unique": {
+            "nodes": 49,
+            "properties": 820,
+            "sha256": "b2b0080d3a3af3a8cef88277fc2e9b8ffacce04734d2d4e620bb001d62015082",
+            "strings": 821
+          }
+        }
+      }
+    },
+    {
+      "id": "railroad/medium",
+      "units": 15,
+      "sourceSha256": "368f387f0b24c8d1f198738179c4d03e6ac744ca578a5c5ad03ebdba67804963",
+      "output": {
+        "type": "railroad",
+        "widthBits": "4078400000000000",
+        "heightBits": "40a1400000000000",
+        "svgSha256": "3d395b112a50a03e8838b204ce4fa4510c31faf1cb83ffb1665ebf5aacaaee54",
+        "svgBytes": 27258
+      },
+      "native": {
+        "graphBinaryBytes": 6249,
+        "graphJsonBytes": 31027,
+        "graphNodes": 168,
+        "graphSha256": "c82d618fb2c520b2d7f4f928016d4d2650fdf0a75d54e987e217abc769aa6319",
+        "graphStrings": 69,
+        "graphUtf16Units": 367,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40a1400000000000",
+          "svgBytes": 27258,
+          "svgSha256": "3d395b112a50a03e8838b204ce4fa4510c31faf1cb83ffb1665ebf5aacaaee54",
+          "type": "railroad",
+          "widthBits": "4078400000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 16,
+            "properties": 259,
+            "sha256": "a92bc9c0cd4ec0cb7a19b4f04cbed32198808e71447971faac6a2c6e20624f0f",
+            "strings": 35
+          },
+          "unique": {
+            "nodes": 16,
+            "properties": 259,
+            "sha256": "aaec1d58a336ccb3ac2441b523df0f6de9a25f24db1e8fd018060b9fca69b9eb",
+            "strings": 260
+          }
+        }
+      }
+    },
+    {
+      "id": "flowchart/large",
+      "units": 200,
+      "sourceSha256": "98e63c8c7589e05375c15a786827e79a207ffa960d1138c7873dee8abbeec042",
+      "output": {
+        "type": "flowchart",
+        "widthBits": "4060200000000000",
+        "heightBits": "40d2b80000000000",
+        "svgSha256": "9b097740e50f249ff18a4ca622f650360e0bbd495f2fe7ca00f406e3044cfb01",
+        "svgBytes": 90501
+      },
+      "native": {
+        "graphBinaryBytes": 70476,
+        "graphJsonBytes": 330737,
+        "graphNodes": 1209,
+        "graphSha256": "799044862db9b26ded474599335b397b747b45780606e7fafa9e79b21439ba1c",
+        "graphStrings": 1034,
+        "graphUtf16Units": 6888,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40d2b80000000000",
+          "svgBytes": 90501,
+          "svgSha256": "9b097740e50f249ff18a4ca622f650360e0bbd495f2fe7ca00f406e3044cfb01",
+          "type": "flowchart",
+          "widthBits": "4060200000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+            "strings": 220
+          },
+          "unique": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+            "strings": 3405
+          }
+        }
+      }
+    },
+    {
+      "id": "sequence/large",
+      "units": 200,
+      "sourceSha256": "665168f531e73c50aecb2eb8bbf290895604f50bb6e91cfbe786a3d62012dae0",
+      "output": {
+        "type": "sequence",
+        "widthBits": "406a400000000000",
+        "heightBits": "40bd6a0000000000",
+        "svgSha256": "606a97b7015c98c33bbb9bb38f2c8c138a67bf5bd6a6989bfe52aff1a4dd649d",
+        "svgBytes": 61165
+      },
+      "native": {
+        "graphBinaryBytes": 26883,
+        "graphJsonBytes": 130627,
+        "graphNodes": 214,
+        "graphSha256": "54202237f79e1f25a35cd8e0cd66c02bb597042500854c3783174c71a9f82bef",
+        "graphStrings": 434,
+        "graphUtf16Units": 2841,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40bd6a0000000000",
+          "svgBytes": 61165,
+          "svgSha256": "606a97b7015c98c33bbb9bb38f2c8c138a67bf5bd6a6989bfe52aff1a4dd649d",
+          "type": "sequence",
+          "widthBits": "406a400000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+            "strings": 220
+          },
+          "unique": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+            "strings": 3405
+          }
+        }
+      }
+    },
+    {
+      "id": "er/large",
+      "units": 200,
+      "sourceSha256": "4969b249e415d09f27b830d3e67b339add055118255d2d65c7d4cbe0bfc3a50d",
+      "output": {
+        "type": "er",
+        "widthBits": "4066600000000000",
+        "heightBits": "40e29de000000000",
+        "svgSha256": "b49418b80220f9ccabe764c7c2eecbb7735a48f23324b7ef09eccfd5b2d57590",
+        "svgBytes": 296039
+      },
+      "native": {
+        "graphBinaryBytes": 75268,
+        "graphJsonBytes": 382196,
+        "graphNodes": 1805,
+        "graphSha256": "734f15bf503274e159e06e615834da501d2839c3f403e5f9e1ea32e285c550e6",
+        "graphStrings": 637,
+        "graphUtf16Units": 4205,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40e29de000000000",
+          "svgBytes": 296039,
+          "svgSha256": "b49418b80220f9ccabe764c7c2eecbb7735a48f23324b7ef09eccfd5b2d57590",
+          "type": "er",
+          "widthBits": "4066600000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+            "strings": 220
+          },
+          "unique": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+            "strings": 3405
+          }
+        }
+      }
+    },
+    {
+      "id": "pie/large",
+      "units": 200,
+      "sourceSha256": "0c14fa64eaa629fb651c5f007b8328476b321ce53ba7419feab3e71ab3a3a994",
+      "output": {
+        "type": "pie",
+        "widthBits": "4078000000000000",
+        "heightBits": "40b4880000000000",
+        "svgSha256": "1bda4d22d8a21e9ff0c2bf48b2d677aeb518c9e0f81ec60e5ce4f07027547829",
+        "svgBytes": 41981
+      },
+      "native": {
+        "graphBinaryBytes": 7219,
+        "graphJsonBytes": 22052,
+        "graphNodes": 2,
+        "graphSha256": "578c96fff237f8b172b0fd3937a86f88528af9e52e4b71acc96a6dbd1effb4cc",
+        "graphStrings": 208,
+        "graphUtf16Units": 1743,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40b4880000000000",
+          "svgBytes": 41981,
+          "svgSha256": "1bda4d22d8a21e9ff0c2bf48b2d677aeb518c9e0f81ec60e5ce4f07027547829",
+          "type": "pie",
+          "widthBits": "4078000000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+            "strings": 220
+          },
+          "unique": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+            "strings": 3405
+          }
+        }
+      }
+    },
+    {
+      "id": "sankey/large",
+      "units": 200,
+      "sourceSha256": "4e2cd5fa88548ad1649e77ae1d9eba11ec975e08f3091143b2a72399c9a42852",
+      "output": {
+        "type": "sankey",
+        "widthBits": "4083400000000000",
+        "heightBits": "407a000000000000",
+        "svgSha256": "57633ffee48452e0df1fe9bacd17a093bd85ece6059991c48e842cf5768a0f61",
+        "svgBytes": 102559
+      },
+      "native": {
+        "graphBinaryBytes": 23838,
+        "graphJsonBytes": 116143,
+        "graphNodes": 403,
+        "graphSha256": "8e500b00dbb65d35299f7edfdaeb6eb81a36476e456ba68386b46760f2c62a17",
+        "graphStrings": 413,
+        "graphUtf16Units": 1251,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "407a000000000000",
+          "svgBytes": 102559,
+          "svgSha256": "57633ffee48452e0df1fe9bacd17a093bd85ece6059991c48e842cf5768a0f61",
+          "type": "sankey",
+          "widthBits": "4083400000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+            "strings": 220
+          },
+          "unique": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+            "strings": 3405
+          }
+        }
+      }
+    },
+    {
+      "id": "gantt/large",
+      "units": 200,
+      "sourceSha256": "1b44e7d9f858100864304e01163c081d9b86efab39b4677585fe6cfdd0b2a6aa",
+      "output": {
+        "type": "gantt",
+        "widthBits": "4089000000000000",
+        "heightBits": "40b7950000000000",
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "svgBytes": 48636
+      },
+      "native": {
+        "graphBinaryBytes": 65563,
+        "graphJsonBytes": 330532,
+        "graphNodes": 1014,
+        "graphSha256": "fd4870d9497f6c583a0828572d707438bb2279d1a95d4c3affee7cf539c819f8",
+        "graphStrings": 888,
+        "graphUtf16Units": 7064,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40b7950000000000",
+          "svgBytes": 48636,
+          "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "de6a80f1b27573630ff3e5011ebb0c70df835a1dd9740ea49cc03b09d9f289b5",
+            "strings": 220
+          },
+          "unique": {
+            "nodes": 201,
+            "properties": 3404,
+            "sha256": "106d998783113bca6f660df2ce4fdd845f8c93974ee778d8f48c7d3aa84a4191",
+            "strings": 3405
+          }
+        }
+      }
+    },
+    {
+      "id": "railroad/large",
+      "units": 60,
+      "sourceSha256": "6551d00c3bcfe67834b31127dd18f26e9e0dd6f90e2521ad95cefc5e3f7ae39c",
+      "output": {
+        "type": "railroad",
+        "widthBits": "4078400000000000",
+        "heightBits": "40c1520000000000",
+        "svgSha256": "49b86183c15428a1e239981e1ff04a0189f7e83b91b07833bfcd1dba8e86abc2",
+        "svgBytes": 107448
+      },
+      "native": {
+        "graphBinaryBytes": 23574,
+        "graphJsonBytes": 121172,
+        "graphNodes": 663,
+        "graphSha256": "87c33019222d342edfade4d3bbc100067e5da79bb151db2bc89782f19b5f213a",
+        "graphStrings": 204,
+        "graphUtf16Units": 1087,
+        "graphWriterBytes": 120,
+        "output": {
+          "heightBits": "40c1520000000000",
+          "svgBytes": 107448,
+          "svgSha256": "49b86183c15428a1e239981e1ff04a0189f7e83b91b07833bfcd1dba8e86abc2",
+          "type": "railroad",
+          "widthBits": "4078400000000000"
+        },
+        "propertyGraphs": {
+          "repeated": {
+            "nodes": 61,
+            "properties": 1024,
+            "sha256": "bfca3e5ff0d7c5314582095a523031d324fce9566bcf7bf542a642a9ebf3f4b5",
+            "strings": 80
+          },
+          "unique": {
+            "nodes": 61,
+            "properties": 1024,
+            "sha256": "8d4e2189907ed7d5c3570093afb9e599abebab4dd208783351959070f94d5f74",
+            "strings": 1025
+          }
+        }
+      }
+    }
+  ],
+  "allocationRows": [
+    {
+      "case": "flowchart/small",
+      "stage": "parse-public",
+      "afterGraphSha256": "d8fb80050cfb5a6b1fabc7fe91d8672e9d7ce6b824b7e334922430dbb72abf41",
+      "afterNodes": 57,
+      "allocation": {
+        "allocations": 1061,
+        "checksum": 9,
+        "freedBytes": 106854,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 36488,
+        "reallocations": 425,
+        "requestedBytes": 106854
+      },
+      "beforeGraphSha256": "d8fb80050cfb5a6b1fabc7fe91d8672e9d7ce6b824b7e334922430dbb72abf41",
+      "beforeNodes": 57,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4087000000000000",
+        "svgBytes": 4116,
+        "svgSha256": "9aa81d216d0f8804a49140d117b98e29f93eb16942f5829e426da1fd5000b4de",
+        "type": "flowchart",
+        "widthBits": "405b800000000000"
+      }
+    },
+    {
+      "case": "flowchart/small",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "d8fb80050cfb5a6b1fabc7fe91d8672e9d7ce6b824b7e334922430dbb72abf41",
+      "afterNodes": 57,
+      "allocation": {
+        "allocations": 909,
+        "checksum": 62065232364703760,
+        "freedBytes": 111611,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 35808,
+        "reallocations": 188,
+        "requestedBytes": 111611
+      },
+      "beforeGraphSha256": "d8fb80050cfb5a6b1fabc7fe91d8672e9d7ce6b824b7e334922430dbb72abf41",
+      "beforeNodes": 57,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4087000000000000",
+        "svgBytes": 4116,
+        "svgSha256": "9aa81d216d0f8804a49140d117b98e29f93eb16942f5829e426da1fd5000b4de",
+        "type": "flowchart",
+        "widthBits": "405b800000000000"
+      }
+    },
+    {
+      "case": "flowchart/small",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "d8fb80050cfb5a6b1fabc7fe91d8672e9d7ce6b824b7e334922430dbb72abf41",
+      "afterNodes": 57,
+      "allocation": {
+        "allocations": 1137,
+        "checksum": 62065232364703790,
+        "freedBytes": 138019,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 35808,
+        "reallocations": 188,
+        "requestedBytes": 138019
+      },
+      "beforeGraphSha256": "d8fb80050cfb5a6b1fabc7fe91d8672e9d7ce6b824b7e334922430dbb72abf41",
+      "beforeNodes": 57,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4087000000000000",
+        "svgBytes": 4116,
+        "svgSha256": "9aa81d216d0f8804a49140d117b98e29f93eb16942f5829e426da1fd5000b4de",
+        "type": "flowchart",
+        "widthBits": "405b800000000000"
+      }
+    },
+    {
+      "case": "flowchart/small",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "d8fb80050cfb5a6b1fabc7fe91d8672e9d7ce6b824b7e334922430dbb72abf41",
+      "afterNodes": 57,
+      "allocation": {
+        "allocations": 114,
+        "checksum": 57,
+        "freedBytes": 13204,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 11512,
+        "reallocations": 0,
+        "requestedBytes": 13204
+      },
+      "beforeGraphSha256": "d8fb80050cfb5a6b1fabc7fe91d8672e9d7ce6b824b7e334922430dbb72abf41",
+      "beforeNodes": 57,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4087000000000000",
+        "svgBytes": 4116,
+        "svgSha256": "9aa81d216d0f8804a49140d117b98e29f93eb16942f5829e426da1fd5000b4de",
+        "type": "flowchart",
+        "widthBits": "405b800000000000"
+      }
+    },
+    {
+      "case": "flowchart/small",
+      "stage": "property-repeated",
+      "afterGraphSha256": "d8fb80050cfb5a6b1fabc7fe91d8672e9d7ce6b824b7e334922430dbb72abf41",
+      "afterNodes": 57,
+      "allocation": {
+        "allocations": 195,
+        "checksum": 9,
+        "freedBytes": 12816,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 7086,
+        "reallocations": 141,
+        "requestedBytes": 12816
+      },
+      "beforeGraphSha256": "d8fb80050cfb5a6b1fabc7fe91d8672e9d7ce6b824b7e334922430dbb72abf41",
+      "beforeNodes": 57,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4087000000000000",
+        "svgBytes": 4116,
+        "svgSha256": "9aa81d216d0f8804a49140d117b98e29f93eb16942f5829e426da1fd5000b4de",
+        "type": "flowchart",
+        "widthBits": "405b800000000000"
+      }
+    },
+    {
+      "case": "flowchart/small",
+      "stage": "property-unique",
+      "afterGraphSha256": "d8fb80050cfb5a6b1fabc7fe91d8672e9d7ce6b824b7e334922430dbb72abf41",
+      "afterNodes": 57,
+      "allocation": {
+        "allocations": 311,
+        "checksum": 9,
+        "freedBytes": 40042,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 23328,
+        "reallocations": 144,
+        "requestedBytes": 40042
+      },
+      "beforeGraphSha256": "d8fb80050cfb5a6b1fabc7fe91d8672e9d7ce6b824b7e334922430dbb72abf41",
+      "beforeNodes": 57,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4087000000000000",
+        "svgBytes": 4116,
+        "svgSha256": "9aa81d216d0f8804a49140d117b98e29f93eb16942f5829e426da1fd5000b4de",
+        "type": "flowchart",
+        "widthBits": "405b800000000000"
+      }
+    },
+    {
+      "case": "sequence/small",
+      "stage": "parse-public",
+      "afterGraphSha256": "d636ba61f06535683fe6995f5b91c09d23565a155fa68a1da7a73a972319a93e",
+      "afterNodes": 22,
+      "allocation": {
+        "allocations": 654,
+        "checksum": 8,
+        "freedBytes": 61449,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 18848,
+        "reallocations": 218,
+        "requestedBytes": 61449
+      },
+      "beforeGraphSha256": "d636ba61f06535683fe6995f5b91c09d23565a155fa68a1da7a73a972319a93e",
+      "beforeNodes": 22,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407aa00000000000",
+        "svgBytes": 4404,
+        "svgSha256": "81dfb69796084be2b9dbdd8d80368e2fa969c9c37689f5d2f1f878701768999a",
+        "type": "sequence",
+        "widthBits": "4068200000000000"
+      }
+    },
+    {
+      "case": "sequence/small",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "d636ba61f06535683fe6995f5b91c09d23565a155fa68a1da7a73a972319a93e",
+      "afterNodes": 22,
+      "allocation": {
+        "allocations": 413,
+        "checksum": 5207287069151540,
+        "freedBytes": 77038,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 24379,
+        "reallocations": 115,
+        "requestedBytes": 77038
+      },
+      "beforeGraphSha256": "d636ba61f06535683fe6995f5b91c09d23565a155fa68a1da7a73a972319a93e",
+      "beforeNodes": 22,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407aa00000000000",
+        "svgBytes": 4404,
+        "svgSha256": "81dfb69796084be2b9dbdd8d80368e2fa969c9c37689f5d2f1f878701768999a",
+        "type": "sequence",
+        "widthBits": "4068200000000000"
+      }
+    },
+    {
+      "case": "sequence/small",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "d636ba61f06535683fe6995f5b91c09d23565a155fa68a1da7a73a972319a93e",
+      "afterNodes": 22,
+      "allocation": {
+        "allocations": 579,
+        "checksum": 5207287069151522,
+        "freedBytes": 94074,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 24379,
+        "reallocations": 115,
+        "requestedBytes": 94074
+      },
+      "beforeGraphSha256": "d636ba61f06535683fe6995f5b91c09d23565a155fa68a1da7a73a972319a93e",
+      "beforeNodes": 22,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407aa00000000000",
+        "svgBytes": 4404,
+        "svgSha256": "81dfb69796084be2b9dbdd8d80368e2fa969c9c37689f5d2f1f878701768999a",
+        "type": "sequence",
+        "widthBits": "4068200000000000"
+      }
+    },
+    {
+      "case": "sequence/small",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "d636ba61f06535683fe6995f5b91c09d23565a155fa68a1da7a73a972319a93e",
+      "afterNodes": 22,
+      "allocation": {
+        "allocations": 83,
+        "checksum": 22,
+        "freedBytes": 8518,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 6826,
+        "reallocations": 0,
+        "requestedBytes": 8518
+      },
+      "beforeGraphSha256": "d636ba61f06535683fe6995f5b91c09d23565a155fa68a1da7a73a972319a93e",
+      "beforeNodes": 22,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407aa00000000000",
+        "svgBytes": 4404,
+        "svgSha256": "81dfb69796084be2b9dbdd8d80368e2fa969c9c37689f5d2f1f878701768999a",
+        "type": "sequence",
+        "widthBits": "4068200000000000"
+      }
+    },
+    {
+      "case": "sequence/small",
+      "stage": "property-repeated",
+      "afterGraphSha256": "d636ba61f06535683fe6995f5b91c09d23565a155fa68a1da7a73a972319a93e",
+      "afterNodes": 22,
+      "allocation": {
+        "allocations": 195,
+        "checksum": 9,
+        "freedBytes": 12816,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 7086,
+        "reallocations": 141,
+        "requestedBytes": 12816
+      },
+      "beforeGraphSha256": "d636ba61f06535683fe6995f5b91c09d23565a155fa68a1da7a73a972319a93e",
+      "beforeNodes": 22,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407aa00000000000",
+        "svgBytes": 4404,
+        "svgSha256": "81dfb69796084be2b9dbdd8d80368e2fa969c9c37689f5d2f1f878701768999a",
+        "type": "sequence",
+        "widthBits": "4068200000000000"
+      }
+    },
+    {
+      "case": "sequence/small",
+      "stage": "property-unique",
+      "afterGraphSha256": "d636ba61f06535683fe6995f5b91c09d23565a155fa68a1da7a73a972319a93e",
+      "afterNodes": 22,
+      "allocation": {
+        "allocations": 311,
+        "checksum": 9,
+        "freedBytes": 40042,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 23328,
+        "reallocations": 144,
+        "requestedBytes": 40042
+      },
+      "beforeGraphSha256": "d636ba61f06535683fe6995f5b91c09d23565a155fa68a1da7a73a972319a93e",
+      "beforeNodes": 22,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407aa00000000000",
+        "svgBytes": 4404,
+        "svgSha256": "81dfb69796084be2b9dbdd8d80368e2fa969c9c37689f5d2f1f878701768999a",
+        "type": "sequence",
+        "widthBits": "4068200000000000"
+      }
+    },
+    {
+      "case": "er/small",
+      "stage": "parse-public",
+      "afterGraphSha256": "020d5f34dd9c2cae38354ea0f33cc46e620f425af07ea1c4be56af43b3eab481",
+      "afterNodes": 77,
+      "allocation": {
+        "allocations": 1116,
+        "checksum": 2,
+        "freedBytes": 94696,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 30468,
+        "reallocations": 309,
+        "requestedBytes": 94696
+      },
+      "beforeGraphSha256": "020d5f34dd9c2cae38354ea0f33cc46e620f425af07ea1c4be56af43b3eab481",
+      "beforeNodes": 77,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4096bc0000000000",
+        "svgBytes": 11874,
+        "svgSha256": "475a8c17cfb501bbaf7e41062c1cd9166faa8cca151f75a0ad9f93432d0d3984",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "er/small",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "020d5f34dd9c2cae38354ea0f33cc46e620f425af07ea1c4be56af43b3eab481",
+      "afterNodes": 77,
+      "allocation": {
+        "allocations": 2000,
+        "checksum": 67795886968680030,
+        "freedBytes": 283418,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 108917,
+        "reallocations": 458,
+        "requestedBytes": 283418
+      },
+      "beforeGraphSha256": "020d5f34dd9c2cae38354ea0f33cc46e620f425af07ea1c4be56af43b3eab481",
+      "beforeNodes": 77,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4096bc0000000000",
+        "svgBytes": 11874,
+        "svgSha256": "475a8c17cfb501bbaf7e41062c1cd9166faa8cca151f75a0ad9f93432d0d3984",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "er/small",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "020d5f34dd9c2cae38354ea0f33cc46e620f425af07ea1c4be56af43b3eab481",
+      "afterNodes": 77,
+      "allocation": {
+        "allocations": 2290,
+        "checksum": 67795886968679980,
+        "freedBytes": 311710,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 108917,
+        "reallocations": 458,
+        "requestedBytes": 311710
+      },
+      "beforeGraphSha256": "020d5f34dd9c2cae38354ea0f33cc46e620f425af07ea1c4be56af43b3eab481",
+      "beforeNodes": 77,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4096bc0000000000",
+        "svgBytes": 11874,
+        "svgSha256": "475a8c17cfb501bbaf7e41062c1cd9166faa8cca151f75a0ad9f93432d0d3984",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "er/small",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "020d5f34dd9c2cae38354ea0f33cc46e620f425af07ea1c4be56af43b3eab481",
+      "afterNodes": 77,
+      "allocation": {
+        "allocations": 145,
+        "checksum": 77,
+        "freedBytes": 14146,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 12258,
+        "reallocations": 0,
+        "requestedBytes": 14146
+      },
+      "beforeGraphSha256": "020d5f34dd9c2cae38354ea0f33cc46e620f425af07ea1c4be56af43b3eab481",
+      "beforeNodes": 77,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4096bc0000000000",
+        "svgBytes": 11874,
+        "svgSha256": "475a8c17cfb501bbaf7e41062c1cd9166faa8cca151f75a0ad9f93432d0d3984",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "er/small",
+      "stage": "property-repeated",
+      "afterGraphSha256": "020d5f34dd9c2cae38354ea0f33cc46e620f425af07ea1c4be56af43b3eab481",
+      "afterNodes": 77,
+      "allocation": {
+        "allocations": 195,
+        "checksum": 9,
+        "freedBytes": 12816,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 7086,
+        "reallocations": 141,
+        "requestedBytes": 12816
+      },
+      "beforeGraphSha256": "020d5f34dd9c2cae38354ea0f33cc46e620f425af07ea1c4be56af43b3eab481",
+      "beforeNodes": 77,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4096bc0000000000",
+        "svgBytes": 11874,
+        "svgSha256": "475a8c17cfb501bbaf7e41062c1cd9166faa8cca151f75a0ad9f93432d0d3984",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "er/small",
+      "stage": "property-unique",
+      "afterGraphSha256": "020d5f34dd9c2cae38354ea0f33cc46e620f425af07ea1c4be56af43b3eab481",
+      "afterNodes": 77,
+      "allocation": {
+        "allocations": 311,
+        "checksum": 9,
+        "freedBytes": 40042,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 23328,
+        "reallocations": 144,
+        "requestedBytes": 40042
+      },
+      "beforeGraphSha256": "020d5f34dd9c2cae38354ea0f33cc46e620f425af07ea1c4be56af43b3eab481",
+      "beforeNodes": 77,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4096bc0000000000",
+        "svgBytes": 11874,
+        "svgSha256": "475a8c17cfb501bbaf7e41062c1cd9166faa8cca151f75a0ad9f93432d0d3984",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "pie/small",
+      "stage": "parse-public",
+      "afterGraphSha256": "d38e3303d8a97b9fa8ca73a21c77c755ef24e03ceb11d7238245019e61cb6f23",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 60,
+        "checksum": 3,
+        "freedBytes": 9006,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 3442,
+        "reallocations": 27,
+        "requestedBytes": 9006
+      },
+      "beforeGraphSha256": "d38e3303d8a97b9fa8ca73a21c77c755ef24e03ceb11d7238245019e61cb6f23",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4076000000000000",
+        "svgBytes": 4131,
+        "svgSha256": "cd8cefb8884714ae9eff91326c65ddb3f579ebfc6fcd587acb28feef7c7d9706",
+        "type": "pie",
+        "widthBits": "407a700000000000"
+      }
+    },
+    {
+      "case": "pie/small",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "d38e3303d8a97b9fa8ca73a21c77c755ef24e03ceb11d7238245019e61cb6f23",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 375,
+        "checksum": 3500845022842915,
+        "freedBytes": 56079,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 20574,
+        "reallocations": 103,
+        "requestedBytes": 56079
+      },
+      "beforeGraphSha256": "d38e3303d8a97b9fa8ca73a21c77c755ef24e03ceb11d7238245019e61cb6f23",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4076000000000000",
+        "svgBytes": 4131,
+        "svgSha256": "cd8cefb8884714ae9eff91326c65ddb3f579ebfc6fcd587acb28feef7c7d9706",
+        "type": "pie",
+        "widthBits": "407a700000000000"
+      }
+    },
+    {
+      "case": "pie/small",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "d38e3303d8a97b9fa8ca73a21c77c755ef24e03ceb11d7238245019e61cb6f23",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 415,
+        "checksum": 3500845022842913,
+        "freedBytes": 58307,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 20574,
+        "reallocations": 103,
+        "requestedBytes": 58307
+      },
+      "beforeGraphSha256": "d38e3303d8a97b9fa8ca73a21c77c755ef24e03ceb11d7238245019e61cb6f23",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4076000000000000",
+        "svgBytes": 4131,
+        "svgSha256": "cd8cefb8884714ae9eff91326c65ddb3f579ebfc6fcd587acb28feef7c7d9706",
+        "type": "pie",
+        "widthBits": "407a700000000000"
+      }
+    },
+    {
+      "case": "pie/small",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "d38e3303d8a97b9fa8ca73a21c77c755ef24e03ceb11d7238245019e61cb6f23",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 20,
+        "checksum": 2,
+        "freedBytes": 1114,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 1114,
+        "reallocations": 0,
+        "requestedBytes": 1114
+      },
+      "beforeGraphSha256": "d38e3303d8a97b9fa8ca73a21c77c755ef24e03ceb11d7238245019e61cb6f23",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4076000000000000",
+        "svgBytes": 4131,
+        "svgSha256": "cd8cefb8884714ae9eff91326c65ddb3f579ebfc6fcd587acb28feef7c7d9706",
+        "type": "pie",
+        "widthBits": "407a700000000000"
+      }
+    },
+    {
+      "case": "pie/small",
+      "stage": "property-repeated",
+      "afterGraphSha256": "d38e3303d8a97b9fa8ca73a21c77c755ef24e03ceb11d7238245019e61cb6f23",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 195,
+        "checksum": 9,
+        "freedBytes": 12816,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 7086,
+        "reallocations": 141,
+        "requestedBytes": 12816
+      },
+      "beforeGraphSha256": "d38e3303d8a97b9fa8ca73a21c77c755ef24e03ceb11d7238245019e61cb6f23",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4076000000000000",
+        "svgBytes": 4131,
+        "svgSha256": "cd8cefb8884714ae9eff91326c65ddb3f579ebfc6fcd587acb28feef7c7d9706",
+        "type": "pie",
+        "widthBits": "407a700000000000"
+      }
+    },
+    {
+      "case": "pie/small",
+      "stage": "property-unique",
+      "afterGraphSha256": "d38e3303d8a97b9fa8ca73a21c77c755ef24e03ceb11d7238245019e61cb6f23",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 311,
+        "checksum": 9,
+        "freedBytes": 40042,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 23328,
+        "reallocations": 144,
+        "requestedBytes": 40042
+      },
+      "beforeGraphSha256": "d38e3303d8a97b9fa8ca73a21c77c755ef24e03ceb11d7238245019e61cb6f23",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4076000000000000",
+        "svgBytes": 4131,
+        "svgSha256": "cd8cefb8884714ae9eff91326c65ddb3f579ebfc6fcd587acb28feef7c7d9706",
+        "type": "pie",
+        "widthBits": "407a700000000000"
+      }
+    },
+    {
+      "case": "sankey/small",
+      "stage": "parse-public",
+      "afterGraphSha256": "8f74921e2206b5f8962bcb37f2fbf5bc743ca818f5a7a3ab2a84615c0676839e",
+      "afterNodes": 19,
+      "allocation": {
+        "allocations": 267,
+        "checksum": 6,
+        "freedBytes": 23511,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 9474,
+        "reallocations": 51,
+        "requestedBytes": 23511
+      },
+      "beforeGraphSha256": "8f74921e2206b5f8962bcb37f2fbf5bc743ca818f5a7a3ab2a84615c0676839e",
+      "beforeNodes": 19,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 4589,
+        "svgSha256": "4c8372081ec9f54f9450ac6f28ceb0cdb744fcecc346d86f18b504a03200c491",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "sankey/small",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "8f74921e2206b5f8962bcb37f2fbf5bc743ca818f5a7a3ab2a84615c0676839e",
+      "afterNodes": 19,
+      "allocation": {
+        "allocations": 458,
+        "checksum": 70157637945135600,
+        "freedBytes": 53194,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 22458,
+        "reallocations": 131,
+        "requestedBytes": 53194
+      },
+      "beforeGraphSha256": "8f74921e2206b5f8962bcb37f2fbf5bc743ca818f5a7a3ab2a84615c0676839e",
+      "beforeNodes": 19,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 4589,
+        "svgSha256": "4c8372081ec9f54f9450ac6f28ceb0cdb744fcecc346d86f18b504a03200c491",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "sankey/small",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "8f74921e2206b5f8962bcb37f2fbf5bc743ca818f5a7a3ab2a84615c0676839e",
+      "afterNodes": 19,
+      "allocation": {
+        "allocations": 582,
+        "checksum": 70157637945135620,
+        "freedBytes": 61830,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 22458,
+        "reallocations": 131,
+        "requestedBytes": 61830
+      },
+      "beforeGraphSha256": "8f74921e2206b5f8962bcb37f2fbf5bc743ca818f5a7a3ab2a84615c0676839e",
+      "beforeNodes": 19,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 4589,
+        "svgSha256": "4c8372081ec9f54f9450ac6f28ceb0cdb744fcecc346d86f18b504a03200c491",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "sankey/small",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "8f74921e2206b5f8962bcb37f2fbf5bc743ca818f5a7a3ab2a84615c0676839e",
+      "afterNodes": 19,
+      "allocation": {
+        "allocations": 62,
+        "checksum": 19,
+        "freedBytes": 4318,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 3974,
+        "reallocations": 0,
+        "requestedBytes": 4318
+      },
+      "beforeGraphSha256": "8f74921e2206b5f8962bcb37f2fbf5bc743ca818f5a7a3ab2a84615c0676839e",
+      "beforeNodes": 19,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 4589,
+        "svgSha256": "4c8372081ec9f54f9450ac6f28ceb0cdb744fcecc346d86f18b504a03200c491",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "sankey/small",
+      "stage": "property-repeated",
+      "afterGraphSha256": "8f74921e2206b5f8962bcb37f2fbf5bc743ca818f5a7a3ab2a84615c0676839e",
+      "afterNodes": 19,
+      "allocation": {
+        "allocations": 195,
+        "checksum": 9,
+        "freedBytes": 12816,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 7086,
+        "reallocations": 141,
+        "requestedBytes": 12816
+      },
+      "beforeGraphSha256": "8f74921e2206b5f8962bcb37f2fbf5bc743ca818f5a7a3ab2a84615c0676839e",
+      "beforeNodes": 19,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 4589,
+        "svgSha256": "4c8372081ec9f54f9450ac6f28ceb0cdb744fcecc346d86f18b504a03200c491",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "sankey/small",
+      "stage": "property-unique",
+      "afterGraphSha256": "8f74921e2206b5f8962bcb37f2fbf5bc743ca818f5a7a3ab2a84615c0676839e",
+      "afterNodes": 19,
+      "allocation": {
+        "allocations": 311,
+        "checksum": 9,
+        "freedBytes": 40042,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 23328,
+        "reallocations": 144,
+        "requestedBytes": 40042
+      },
+      "beforeGraphSha256": "8f74921e2206b5f8962bcb37f2fbf5bc743ca818f5a7a3ab2a84615c0676839e",
+      "beforeNodes": 19,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 4589,
+        "svgSha256": "4c8372081ec9f54f9450ac6f28ceb0cdb744fcecc346d86f18b504a03200c491",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "gantt/small",
+      "stage": "parse-public",
+      "afterGraphSha256": "9fb7022860984ebdc1c14d1ca1f0150d6576f8fca8532b3cf8dfe404cd75e50e",
+      "afterNodes": 54,
+      "allocation": {
+        "allocations": 761,
+        "checksum": 5,
+        "freedBytes": 110214,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 37650,
+        "reallocations": 316,
+        "requestedBytes": 110214
+      },
+      "beforeGraphSha256": "9fb7022860984ebdc1c14d1ca1f0150d6576f8fca8532b3cf8dfe404cd75e50e",
+      "beforeNodes": 54,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/small",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "d74555deae8f6bdade4d352f9c29f159db1478632d2ebbbaed6ecf3be64d79ff",
+      "afterNodes": 73,
+      "allocation": {
+        "allocations": 1434,
+        "checksum": 69893755154468180,
+        "freedBytes": 114302,
+        "liveBytesDelta": 3776,
+        "peakAdditionalRequestedBytes": 41654,
+        "reallocations": 713,
+        "requestedBytes": 118078
+      },
+      "beforeGraphSha256": "9fb7022860984ebdc1c14d1ca1f0150d6576f8fca8532b3cf8dfe404cd75e50e",
+      "beforeNodes": 54,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/small",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "d74555deae8f6bdade4d352f9c29f159db1478632d2ebbbaed6ecf3be64d79ff",
+      "afterNodes": 73,
+      "allocation": {
+        "allocations": 1785,
+        "checksum": 69893755154468104,
+        "freedBytes": 166190,
+        "liveBytesDelta": 3776,
+        "peakAdditionalRequestedBytes": 41654,
+        "reallocations": 713,
+        "requestedBytes": 169966
+      },
+      "beforeGraphSha256": "9fb7022860984ebdc1c14d1ca1f0150d6576f8fca8532b3cf8dfe404cd75e50e",
+      "beforeNodes": 54,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/small",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "9fb7022860984ebdc1c14d1ca1f0150d6576f8fca8532b3cf8dfe404cd75e50e",
+      "afterNodes": 54,
+      "allocation": {
+        "allocations": 175,
+        "checksum": 54,
+        "freedBytes": 25328,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 14124,
+        "reallocations": 0,
+        "requestedBytes": 25328
+      },
+      "beforeGraphSha256": "9fb7022860984ebdc1c14d1ca1f0150d6576f8fca8532b3cf8dfe404cd75e50e",
+      "beforeNodes": 54,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/small",
+      "stage": "property-repeated",
+      "afterGraphSha256": "9fb7022860984ebdc1c14d1ca1f0150d6576f8fca8532b3cf8dfe404cd75e50e",
+      "afterNodes": 54,
+      "allocation": {
+        "allocations": 195,
+        "checksum": 9,
+        "freedBytes": 12816,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 7086,
+        "reallocations": 141,
+        "requestedBytes": 12816
+      },
+      "beforeGraphSha256": "9fb7022860984ebdc1c14d1ca1f0150d6576f8fca8532b3cf8dfe404cd75e50e",
+      "beforeNodes": 54,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/small",
+      "stage": "property-unique",
+      "afterGraphSha256": "9fb7022860984ebdc1c14d1ca1f0150d6576f8fca8532b3cf8dfe404cd75e50e",
+      "afterNodes": 54,
+      "allocation": {
+        "allocations": 311,
+        "checksum": 9,
+        "freedBytes": 40042,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 23328,
+        "reallocations": 144,
+        "requestedBytes": 40042
+      },
+      "beforeGraphSha256": "9fb7022860984ebdc1c14d1ca1f0150d6576f8fca8532b3cf8dfe404cd75e50e",
+      "beforeNodes": 54,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "railroad/small",
+      "stage": "parse-public",
+      "afterGraphSha256": "2ecb075ba354ffe6e9399a1466baf72e20f7b7498f7c86e8a2195dc937394038",
+      "afterNodes": 36,
+      "allocation": {
+        "allocations": 458,
+        "checksum": 8,
+        "freedBytes": 48976,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 16028,
+        "reallocations": 139,
+        "requestedBytes": 48976
+      },
+      "beforeGraphSha256": "2ecb075ba354ffe6e9399a1466baf72e20f7b7498f7c86e8a2195dc937394038",
+      "beforeNodes": 36,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407b000000000000",
+        "svgBytes": 6036,
+        "svgSha256": "96e9d750a58266724dd06599c282c56bec8baf3524e8e07af66b72dabf1b083a",
+        "type": "railroad",
+        "widthBits": "4077c00000000000"
+      }
+    },
+    {
+      "case": "railroad/small",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "2ecb075ba354ffe6e9399a1466baf72e20f7b7498f7c86e8a2195dc937394038",
+      "afterNodes": 36,
+      "allocation": {
+        "allocations": 613,
+        "checksum": 3588805953066900,
+        "freedBytes": 114226,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 30266,
+        "reallocations": 166,
+        "requestedBytes": 114226
+      },
+      "beforeGraphSha256": "2ecb075ba354ffe6e9399a1466baf72e20f7b7498f7c86e8a2195dc937394038",
+      "beforeNodes": 36,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407b000000000000",
+        "svgBytes": 6036,
+        "svgSha256": "96e9d750a58266724dd06599c282c56bec8baf3524e8e07af66b72dabf1b083a",
+        "type": "railroad",
+        "widthBits": "4077c00000000000"
+      }
+    },
+    {
+      "case": "railroad/small",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "2ecb075ba354ffe6e9399a1466baf72e20f7b7498f7c86e8a2195dc937394038",
+      "afterNodes": 36,
+      "allocation": {
+        "allocations": 787,
+        "checksum": 3588805953066928,
+        "freedBytes": 127562,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 30266,
+        "reallocations": 166,
+        "requestedBytes": 127562
+      },
+      "beforeGraphSha256": "2ecb075ba354ffe6e9399a1466baf72e20f7b7498f7c86e8a2195dc937394038",
+      "beforeNodes": 36,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407b000000000000",
+        "svgBytes": 6036,
+        "svgSha256": "96e9d750a58266724dd06599c282c56bec8baf3524e8e07af66b72dabf1b083a",
+        "type": "railroad",
+        "widthBits": "4077c00000000000"
+      }
+    },
+    {
+      "case": "railroad/small",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "2ecb075ba354ffe6e9399a1466baf72e20f7b7498f7c86e8a2195dc937394038",
+      "afterNodes": 36,
+      "allocation": {
+        "allocations": 87,
+        "checksum": 36,
+        "freedBytes": 6668,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 5912,
+        "reallocations": 0,
+        "requestedBytes": 6668
+      },
+      "beforeGraphSha256": "2ecb075ba354ffe6e9399a1466baf72e20f7b7498f7c86e8a2195dc937394038",
+      "beforeNodes": 36,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407b000000000000",
+        "svgBytes": 6036,
+        "svgSha256": "96e9d750a58266724dd06599c282c56bec8baf3524e8e07af66b72dabf1b083a",
+        "type": "railroad",
+        "widthBits": "4077c00000000000"
+      }
+    },
+    {
+      "case": "railroad/small",
+      "stage": "property-repeated",
+      "afterGraphSha256": "2ecb075ba354ffe6e9399a1466baf72e20f7b7498f7c86e8a2195dc937394038",
+      "afterNodes": 36,
+      "allocation": {
+        "allocations": 95,
+        "checksum": 4,
+        "freedBytes": 7065,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 4189,
+        "reallocations": 57,
+        "requestedBytes": 7065
+      },
+      "beforeGraphSha256": "2ecb075ba354ffe6e9399a1466baf72e20f7b7498f7c86e8a2195dc937394038",
+      "beforeNodes": 36,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407b000000000000",
+        "svgBytes": 6036,
+        "svgSha256": "96e9d750a58266724dd06599c282c56bec8baf3524e8e07af66b72dabf1b083a",
+        "type": "railroad",
+        "widthBits": "4077c00000000000"
+      }
+    },
+    {
+      "case": "railroad/small",
+      "stage": "property-unique",
+      "afterGraphSha256": "2ecb075ba354ffe6e9399a1466baf72e20f7b7498f7c86e8a2195dc937394038",
+      "afterNodes": 36,
+      "allocation": {
+        "allocations": 129,
+        "checksum": 4,
+        "freedBytes": 11207,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 7027,
+        "reallocations": 58,
+        "requestedBytes": 11207
+      },
+      "beforeGraphSha256": "2ecb075ba354ffe6e9399a1466baf72e20f7b7498f7c86e8a2195dc937394038",
+      "beforeNodes": 36,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407b000000000000",
+        "svgBytes": 6036,
+        "svgSha256": "96e9d750a58266724dd06599c282c56bec8baf3524e8e07af66b72dabf1b083a",
+        "type": "railroad",
+        "widthBits": "4077c00000000000"
+      }
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "parse-public",
+      "afterGraphSha256": "5ba84ab112c45a16c833a8397c817b0b3ed74944375a40041224488cbe7bbd9c",
+      "afterNodes": 297,
+      "allocation": {
+        "allocations": 5961,
+        "checksum": 9,
+        "freedBytes": 665327,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 207462,
+        "reallocations": 2310,
+        "requestedBytes": 665327
+      },
+      "beforeGraphSha256": "5ba84ab112c45a16c833a8397c817b0b3ed74944375a40041224488cbe7bbd9c",
+      "beforeNodes": 297,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b1e00000000000",
+        "svgBytes": 21889,
+        "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+        "type": "flowchart",
+        "widthBits": "405e000000000000"
+      }
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "5ba84ab112c45a16c833a8397c817b0b3ed74944375a40041224488cbe7bbd9c",
+      "afterNodes": 297,
+      "allocation": {
+        "allocations": 4840,
+        "checksum": 67518810038490500,
+        "freedBytes": 805610,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 224608,
+        "reallocations": 1049,
+        "requestedBytes": 805610
+      },
+      "beforeGraphSha256": "5ba84ab112c45a16c833a8397c817b0b3ed74944375a40041224488cbe7bbd9c",
+      "beforeNodes": 297,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b1e00000000000",
+        "svgBytes": 21889,
+        "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+        "type": "flowchart",
+        "widthBits": "405e000000000000"
+      }
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "5ba84ab112c45a16c833a8397c817b0b3ed74944375a40041224488cbe7bbd9c",
+      "afterNodes": 297,
+      "allocation": {
+        "allocations": 5628,
+        "checksum": 67518810038490280,
+        "freedBytes": 917390,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 224608,
+        "reallocations": 1049,
+        "requestedBytes": 917390
+      },
+      "beforeGraphSha256": "5ba84ab112c45a16c833a8397c817b0b3ed74944375a40041224488cbe7bbd9c",
+      "beforeNodes": 297,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b1e00000000000",
+        "svgBytes": 21889,
+        "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+        "type": "flowchart",
+        "widthBits": "405e000000000000"
+      }
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "5ba84ab112c45a16c833a8397c817b0b3ed74944375a40041224488cbe7bbd9c",
+      "afterNodes": 297,
+      "allocation": {
+        "allocations": 394,
+        "checksum": 297,
+        "freedBytes": 55890,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 54198,
+        "reallocations": 0,
+        "requestedBytes": 55890
+      },
+      "beforeGraphSha256": "5ba84ab112c45a16c833a8397c817b0b3ed74944375a40041224488cbe7bbd9c",
+      "beforeNodes": 297,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b1e00000000000",
+        "svgBytes": 21889,
+        "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+        "type": "flowchart",
+        "widthBits": "405e000000000000"
+      }
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "property-repeated",
+      "afterGraphSha256": "5ba84ab112c45a16c833a8397c817b0b3ed74944375a40041224488cbe7bbd9c",
+      "afterNodes": 297,
+      "allocation": {
+        "allocations": 997,
+        "checksum": 49,
+        "freedBytes": 64522,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 33584,
+        "reallocations": 790,
+        "requestedBytes": 64522
+      },
+      "beforeGraphSha256": "5ba84ab112c45a16c833a8397c817b0b3ed74944375a40041224488cbe7bbd9c",
+      "beforeNodes": 297,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b1e00000000000",
+        "svgBytes": 21889,
+        "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+        "type": "flowchart",
+        "widthBits": "405e000000000000"
+      }
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "property-unique",
+      "afterGraphSha256": "5ba84ab112c45a16c833a8397c817b0b3ed74944375a40041224488cbe7bbd9c",
+      "afterNodes": 297,
+      "allocation": {
+        "allocations": 1753,
+        "checksum": 49,
+        "freedBytes": 186308,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 112222,
+        "reallocations": 1021,
+        "requestedBytes": 186308
+      },
+      "beforeGraphSha256": "5ba84ab112c45a16c833a8397c817b0b3ed74944375a40041224488cbe7bbd9c",
+      "beforeNodes": 297,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b1e00000000000",
+        "svgBytes": 21889,
+        "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+        "type": "flowchart",
+        "widthBits": "405e000000000000"
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "parse-public",
+      "afterGraphSha256": "0991e675be7002702370f76bb218c4357a5f1fa68dd810754839776642b05569",
+      "afterNodes": 62,
+      "allocation": {
+        "allocations": 2820,
+        "checksum": 8,
+        "freedBytes": 285121,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 68980,
+        "reallocations": 757,
+        "requestedBytes": 285121
+      },
+      "beforeGraphSha256": "0991e675be7002702370f76bb218c4357a5f1fa68dd810754839776642b05569",
+      "beforeNodes": 62,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "409dc80000000000",
+        "svgBytes": 15759,
+        "svgSha256": "656d674a53bf2a97bb9429486711300be4d97c6694f14dee62a939f80d54444a",
+        "type": "sequence",
+        "widthBits": "4069400000000000"
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "0991e675be7002702370f76bb218c4357a5f1fa68dd810754839776642b05569",
+      "afterNodes": 62,
+      "allocation": {
+        "allocations": 1582,
+        "checksum": 68829427898793360,
+        "freedBytes": 257764,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 79560,
+        "reallocations": 378,
+        "requestedBytes": 257764
+      },
+      "beforeGraphSha256": "0991e675be7002702370f76bb218c4357a5f1fa68dd810754839776642b05569",
+      "beforeNodes": 62,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "409dc80000000000",
+        "svgBytes": 15759,
+        "svgSha256": "656d674a53bf2a97bb9429486711300be4d97c6694f14dee62a939f80d54444a",
+        "type": "sequence",
+        "widthBits": "4069400000000000"
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "0991e675be7002702370f76bb218c4357a5f1fa68dd810754839776642b05569",
+      "afterNodes": 62,
+      "allocation": {
+        "allocations": 1988,
+        "checksum": 68829427898793390,
+        "freedBytes": 302304,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 79560,
+        "reallocations": 378,
+        "requestedBytes": 302304
+      },
+      "beforeGraphSha256": "0991e675be7002702370f76bb218c4357a5f1fa68dd810754839776642b05569",
+      "beforeNodes": 62,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "409dc80000000000",
+        "svgBytes": 15759,
+        "svgSha256": "656d674a53bf2a97bb9429486711300be4d97c6694f14dee62a939f80d54444a",
+        "type": "sequence",
+        "widthBits": "4069400000000000"
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "0991e675be7002702370f76bb218c4357a5f1fa68dd810754839776642b05569",
+      "afterNodes": 62,
+      "allocation": {
+        "allocations": 203,
+        "checksum": 62,
+        "freedBytes": 22270,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 20578,
+        "reallocations": 0,
+        "requestedBytes": 22270
+      },
+      "beforeGraphSha256": "0991e675be7002702370f76bb218c4357a5f1fa68dd810754839776642b05569",
+      "beforeNodes": 62,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "409dc80000000000",
+        "svgBytes": 15759,
+        "svgSha256": "656d674a53bf2a97bb9429486711300be4d97c6694f14dee62a939f80d54444a",
+        "type": "sequence",
+        "widthBits": "4069400000000000"
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "property-repeated",
+      "afterGraphSha256": "0991e675be7002702370f76bb218c4357a5f1fa68dd810754839776642b05569",
+      "afterNodes": 62,
+      "allocation": {
+        "allocations": 997,
+        "checksum": 49,
+        "freedBytes": 64522,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 33584,
+        "reallocations": 790,
+        "requestedBytes": 64522
+      },
+      "beforeGraphSha256": "0991e675be7002702370f76bb218c4357a5f1fa68dd810754839776642b05569",
+      "beforeNodes": 62,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "409dc80000000000",
+        "svgBytes": 15759,
+        "svgSha256": "656d674a53bf2a97bb9429486711300be4d97c6694f14dee62a939f80d54444a",
+        "type": "sequence",
+        "widthBits": "4069400000000000"
+      }
+    },
+    {
+      "case": "sequence/medium",
+      "stage": "property-unique",
+      "afterGraphSha256": "0991e675be7002702370f76bb218c4357a5f1fa68dd810754839776642b05569",
+      "afterNodes": 62,
+      "allocation": {
+        "allocations": 1753,
+        "checksum": 49,
+        "freedBytes": 186308,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 112222,
+        "reallocations": 1021,
+        "requestedBytes": 186308
+      },
+      "beforeGraphSha256": "0991e675be7002702370f76bb218c4357a5f1fa68dd810754839776642b05569",
+      "beforeNodes": 62,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "409dc80000000000",
+        "svgBytes": 15759,
+        "svgSha256": "656d674a53bf2a97bb9429486711300be4d97c6694f14dee62a939f80d54444a",
+        "type": "sequence",
+        "widthBits": "4069400000000000"
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "parse-public",
+      "afterGraphSha256": "b8ec01a15071df3a58038246a7b5b74adcc34b5aaaf19a465e153858d89156a9",
+      "afterNodes": 437,
+      "allocation": {
+        "allocations": 6359,
+        "checksum": 2,
+        "freedBytes": 469486,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 164589,
+        "reallocations": 1773,
+        "requestedBytes": 469486
+      },
+      "beforeGraphSha256": "b8ec01a15071df3a58038246a7b5b74adcc34b5aaaf19a465e153858d89156a9",
+      "beforeNodes": 437,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40c1c38000000000",
+        "svgBytes": 70404,
+        "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "b8ec01a15071df3a58038246a7b5b74adcc34b5aaaf19a465e153858d89156a9",
+      "afterNodes": 437,
+      "allocation": {
+        "allocations": 11723,
+        "checksum": 47186091261891330,
+        "freedBytes": 1852233,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 653035,
+        "reallocations": 3129,
+        "requestedBytes": 1852233
+      },
+      "beforeGraphSha256": "b8ec01a15071df3a58038246a7b5b74adcc34b5aaaf19a465e153858d89156a9",
+      "beforeNodes": 437,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40c1c38000000000",
+        "svgBytes": 70404,
+        "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "b8ec01a15071df3a58038246a7b5b74adcc34b5aaaf19a465e153858d89156a9",
+      "afterNodes": 437,
+      "allocation": {
+        "allocations": 12813,
+        "checksum": 47186091261891250,
+        "freedBytes": 1980009,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 653035,
+        "reallocations": 3129,
+        "requestedBytes": 1980009
+      },
+      "beforeGraphSha256": "b8ec01a15071df3a58038246a7b5b74adcc34b5aaaf19a465e153858d89156a9",
+      "beforeNodes": 437,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40c1c38000000000",
+        "svgBytes": 70404,
+        "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "b8ec01a15071df3a58038246a7b5b74adcc34b5aaaf19a465e153858d89156a9",
+      "afterNodes": 437,
+      "allocation": {
+        "allocations": 545,
+        "checksum": 437,
+        "freedBytes": 63888,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 62000,
+        "reallocations": 0,
+        "requestedBytes": 63888
+      },
+      "beforeGraphSha256": "b8ec01a15071df3a58038246a7b5b74adcc34b5aaaf19a465e153858d89156a9",
+      "beforeNodes": 437,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40c1c38000000000",
+        "svgBytes": 70404,
+        "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "property-repeated",
+      "afterGraphSha256": "b8ec01a15071df3a58038246a7b5b74adcc34b5aaaf19a465e153858d89156a9",
+      "afterNodes": 437,
+      "allocation": {
+        "allocations": 997,
+        "checksum": 49,
+        "freedBytes": 64522,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 33584,
+        "reallocations": 790,
+        "requestedBytes": 64522
+      },
+      "beforeGraphSha256": "b8ec01a15071df3a58038246a7b5b74adcc34b5aaaf19a465e153858d89156a9",
+      "beforeNodes": 437,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40c1c38000000000",
+        "svgBytes": 70404,
+        "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "er/medium",
+      "stage": "property-unique",
+      "afterGraphSha256": "b8ec01a15071df3a58038246a7b5b74adcc34b5aaaf19a465e153858d89156a9",
+      "afterNodes": 437,
+      "allocation": {
+        "allocations": 1753,
+        "checksum": 49,
+        "freedBytes": 186308,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 112222,
+        "reallocations": 1021,
+        "requestedBytes": 186308
+      },
+      "beforeGraphSha256": "b8ec01a15071df3a58038246a7b5b74adcc34b5aaaf19a465e153858d89156a9",
+      "beforeNodes": 437,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40c1c38000000000",
+        "svgBytes": 70404,
+        "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "pie/medium",
+      "stage": "parse-public",
+      "afterGraphSha256": "cdb98e84e9c36ddea2f5217874343808379dfc4140150283b34ad0e7b61b3565",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 181,
+        "checksum": 3,
+        "freedBytes": 37466,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 13328,
+        "reallocations": 77,
+        "requestedBytes": 37466
+      },
+      "beforeGraphSha256": "cdb98e84e9c36ddea2f5217874343808379dfc4140150283b34ad0e7b61b3565",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4094600000000000",
+        "svgBytes": 17134,
+        "svgSha256": "36f57bc6717ac42cc50f971a0f87d18027d58a863ef0cfc9b6841634a8f0c72a",
+        "type": "pie",
+        "widthBits": "407b000000000000"
+      }
+    },
+    {
+      "case": "pie/medium",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "cdb98e84e9c36ddea2f5217874343808379dfc4140150283b34ad0e7b61b3565",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 1801,
+        "checksum": 67378072550130420,
+        "freedBytes": 270301,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 93270,
+        "reallocations": 445,
+        "requestedBytes": 270301
+      },
+      "beforeGraphSha256": "cdb98e84e9c36ddea2f5217874343808379dfc4140150283b34ad0e7b61b3565",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4094600000000000",
+        "svgBytes": 17134,
+        "svgSha256": "36f57bc6717ac42cc50f971a0f87d18027d58a863ef0cfc9b6841634a8f0c72a",
+        "type": "pie",
+        "widthBits": "407b000000000000"
+      }
+    },
+    {
+      "case": "pie/medium",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "cdb98e84e9c36ddea2f5217874343808379dfc4140150283b34ad0e7b61b3565",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 1921,
+        "checksum": 67378072550130420,
+        "freedBytes": 278281,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 93270,
+        "reallocations": 445,
+        "requestedBytes": 278281
+      },
+      "beforeGraphSha256": "cdb98e84e9c36ddea2f5217874343808379dfc4140150283b34ad0e7b61b3565",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4094600000000000",
+        "svgBytes": 17134,
+        "svgSha256": "36f57bc6717ac42cc50f971a0f87d18027d58a863ef0cfc9b6841634a8f0c72a",
+        "type": "pie",
+        "widthBits": "407b000000000000"
+      }
+    },
+    {
+      "case": "pie/medium",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "cdb98e84e9c36ddea2f5217874343808379dfc4140150283b34ad0e7b61b3565",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 60,
+        "checksum": 2,
+        "freedBytes": 3990,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 3990,
+        "reallocations": 0,
+        "requestedBytes": 3990
+      },
+      "beforeGraphSha256": "cdb98e84e9c36ddea2f5217874343808379dfc4140150283b34ad0e7b61b3565",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4094600000000000",
+        "svgBytes": 17134,
+        "svgSha256": "36f57bc6717ac42cc50f971a0f87d18027d58a863ef0cfc9b6841634a8f0c72a",
+        "type": "pie",
+        "widthBits": "407b000000000000"
+      }
+    },
+    {
+      "case": "pie/medium",
+      "stage": "property-repeated",
+      "afterGraphSha256": "cdb98e84e9c36ddea2f5217874343808379dfc4140150283b34ad0e7b61b3565",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 997,
+        "checksum": 49,
+        "freedBytes": 64522,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 33584,
+        "reallocations": 790,
+        "requestedBytes": 64522
+      },
+      "beforeGraphSha256": "cdb98e84e9c36ddea2f5217874343808379dfc4140150283b34ad0e7b61b3565",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4094600000000000",
+        "svgBytes": 17134,
+        "svgSha256": "36f57bc6717ac42cc50f971a0f87d18027d58a863ef0cfc9b6841634a8f0c72a",
+        "type": "pie",
+        "widthBits": "407b000000000000"
+      }
+    },
+    {
+      "case": "pie/medium",
+      "stage": "property-unique",
+      "afterGraphSha256": "cdb98e84e9c36ddea2f5217874343808379dfc4140150283b34ad0e7b61b3565",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 1753,
+        "checksum": 49,
+        "freedBytes": 186308,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 112222,
+        "reallocations": 1021,
+        "requestedBytes": 186308
+      },
+      "beforeGraphSha256": "cdb98e84e9c36ddea2f5217874343808379dfc4140150283b34ad0e7b61b3565",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4094600000000000",
+        "svgBytes": 17134,
+        "svgSha256": "36f57bc6717ac42cc50f971a0f87d18027d58a863ef0cfc9b6841634a8f0c72a",
+        "type": "pie",
+        "widthBits": "407b000000000000"
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "parse-public",
+      "afterGraphSha256": "3613c81902c8e5326cb6ac291deb3be5e42e0b82f8841fcdc03fca2f0d0d642f",
+      "afterNodes": 99,
+      "allocation": {
+        "allocations": 1281,
+        "checksum": 6,
+        "freedBytes": 115592,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 39439,
+        "reallocations": 224,
+        "requestedBytes": 115592
+      },
+      "beforeGraphSha256": "3613c81902c8e5326cb6ac291deb3be5e42e0b82f8841fcdc03fca2f0d0d642f",
+      "beforeNodes": 99,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 24853,
+        "svgSha256": "f6a9ac0c183550e62c53181252222401f56b9be509a32a947f7bba1bbf5b4928",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "3613c81902c8e5326cb6ac291deb3be5e42e0b82f8841fcdc03fca2f0d0d642f",
+      "afterNodes": 99,
+      "allocation": {
+        "allocations": 2788,
+        "checksum": 70157637945155864,
+        "freedBytes": 306579,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 125122,
+        "reallocations": 745,
+        "requestedBytes": 306579
+      },
+      "beforeGraphSha256": "3613c81902c8e5326cb6ac291deb3be5e42e0b82f8841fcdc03fca2f0d0d642f",
+      "beforeNodes": 99,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 24853,
+        "svgSha256": "f6a9ac0c183550e62c53181252222401f56b9be509a32a947f7bba1bbf5b4928",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "3613c81902c8e5326cb6ac291deb3be5e42e0b82f8841fcdc03fca2f0d0d642f",
+      "afterNodes": 99,
+      "allocation": {
+        "allocations": 3232,
+        "checksum": 70157637945155960,
+        "freedBytes": 344799,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 125122,
+        "reallocations": 745,
+        "requestedBytes": 344799
+      },
+      "beforeGraphSha256": "3613c81902c8e5326cb6ac291deb3be5e42e0b82f8841fcdc03fca2f0d0d642f",
+      "beforeNodes": 99,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 24853,
+        "svgSha256": "f6a9ac0c183550e62c53181252222401f56b9be509a32a947f7bba1bbf5b4928",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "3613c81902c8e5326cb6ac291deb3be5e42e0b82f8841fcdc03fca2f0d0d642f",
+      "afterNodes": 99,
+      "allocation": {
+        "allocations": 222,
+        "checksum": 99,
+        "freedBytes": 19110,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 18766,
+        "reallocations": 0,
+        "requestedBytes": 19110
+      },
+      "beforeGraphSha256": "3613c81902c8e5326cb6ac291deb3be5e42e0b82f8841fcdc03fca2f0d0d642f",
+      "beforeNodes": 99,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 24853,
+        "svgSha256": "f6a9ac0c183550e62c53181252222401f56b9be509a32a947f7bba1bbf5b4928",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "property-repeated",
+      "afterGraphSha256": "3613c81902c8e5326cb6ac291deb3be5e42e0b82f8841fcdc03fca2f0d0d642f",
+      "afterNodes": 99,
+      "allocation": {
+        "allocations": 997,
+        "checksum": 49,
+        "freedBytes": 64522,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 33584,
+        "reallocations": 790,
+        "requestedBytes": 64522
+      },
+      "beforeGraphSha256": "3613c81902c8e5326cb6ac291deb3be5e42e0b82f8841fcdc03fca2f0d0d642f",
+      "beforeNodes": 99,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 24853,
+        "svgSha256": "f6a9ac0c183550e62c53181252222401f56b9be509a32a947f7bba1bbf5b4928",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "sankey/medium",
+      "stage": "property-unique",
+      "afterGraphSha256": "3613c81902c8e5326cb6ac291deb3be5e42e0b82f8841fcdc03fca2f0d0d642f",
+      "afterNodes": 99,
+      "allocation": {
+        "allocations": 1753,
+        "checksum": 49,
+        "freedBytes": 186308,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 112222,
+        "reallocations": 1021,
+        "requestedBytes": 186308
+      },
+      "beforeGraphSha256": "3613c81902c8e5326cb6ac291deb3be5e42e0b82f8841fcdc03fca2f0d0d642f",
+      "beforeNodes": 99,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 24853,
+        "svgSha256": "f6a9ac0c183550e62c53181252222401f56b9be509a32a947f7bba1bbf5b4928",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parse-public",
+      "afterGraphSha256": "8af0117957fb6a4cb95c2f8d66129c7c46be864dc7ad181bf1ff0e44ffa401e1",
+      "afterNodes": 254,
+      "allocation": {
+        "allocations": 3471,
+        "checksum": 5,
+        "freedBytes": 499645,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 169236,
+        "reallocations": 1539,
+        "requestedBytes": 499645
+      },
+      "beforeGraphSha256": "8af0117957fb6a4cb95c2f8d66129c7c46be864dc7ad181bf1ff0e44ffa401e1",
+      "beforeNodes": 254,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "44698de99a735c4368cd1cb7e1495474ad0eba4bbbcacfa29cc80343e36643ef",
+      "afterNodes": 353,
+      "allocation": {
+        "allocations": 6421,
+        "checksum": 8466239533887774,
+        "freedBytes": 558239,
+        "liveBytesDelta": 14528,
+        "peakAdditionalRequestedBytes": 184421,
+        "reallocations": 3391,
+        "requestedBytes": 572767
+      },
+      "beforeGraphSha256": "8af0117957fb6a4cb95c2f8d66129c7c46be864dc7ad181bf1ff0e44ffa401e1",
+      "beforeNodes": 254,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "44698de99a735c4368cd1cb7e1495474ad0eba4bbbcacfa29cc80343e36643ef",
+      "afterNodes": 353,
+      "allocation": {
+        "allocations": 7292,
+        "checksum": 8466239533887615,
+        "freedBytes": 694095,
+        "liveBytesDelta": 14528,
+        "peakAdditionalRequestedBytes": 184421,
+        "reallocations": 3391,
+        "requestedBytes": 708623
+      },
+      "beforeGraphSha256": "8af0117957fb6a4cb95c2f8d66129c7c46be864dc7ad181bf1ff0e44ffa401e1",
+      "beforeNodes": 254,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "8af0117957fb6a4cb95c2f8d66129c7c46be864dc7ad181bf1ff0e44ffa401e1",
+      "afterNodes": 254,
+      "allocation": {
+        "allocations": 435,
+        "checksum": 254,
+        "freedBytes": 65072,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 53868,
+        "reallocations": 0,
+        "requestedBytes": 65072
+      },
+      "beforeGraphSha256": "8af0117957fb6a4cb95c2f8d66129c7c46be864dc7ad181bf1ff0e44ffa401e1",
+      "beforeNodes": 254,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "property-repeated",
+      "afterGraphSha256": "8af0117957fb6a4cb95c2f8d66129c7c46be864dc7ad181bf1ff0e44ffa401e1",
+      "afterNodes": 254,
+      "allocation": {
+        "allocations": 997,
+        "checksum": 49,
+        "freedBytes": 64522,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 33584,
+        "reallocations": 790,
+        "requestedBytes": 64522
+      },
+      "beforeGraphSha256": "8af0117957fb6a4cb95c2f8d66129c7c46be864dc7ad181bf1ff0e44ffa401e1",
+      "beforeNodes": 254,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "property-unique",
+      "afterGraphSha256": "8af0117957fb6a4cb95c2f8d66129c7c46be864dc7ad181bf1ff0e44ffa401e1",
+      "afterNodes": 254,
+      "allocation": {
+        "allocations": 1753,
+        "checksum": 49,
+        "freedBytes": 186308,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 112222,
+        "reallocations": 1021,
+        "requestedBytes": 186308
+      },
+      "beforeGraphSha256": "8af0117957fb6a4cb95c2f8d66129c7c46be864dc7ad181bf1ff0e44ffa401e1",
+      "beforeNodes": 254,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "railroad/medium",
+      "stage": "parse-public",
+      "afterGraphSha256": "c82d618fb2c520b2d7f4f928016d4d2650fdf0a75d54e987e217abc769aa6319",
+      "afterNodes": 168,
+      "allocation": {
+        "allocations": 1932,
+        "checksum": 8,
+        "freedBytes": 200873,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 58331,
+        "reallocations": 567,
+        "requestedBytes": 200873
+      },
+      "beforeGraphSha256": "c82d618fb2c520b2d7f4f928016d4d2650fdf0a75d54e987e217abc769aa6319",
+      "beforeNodes": 168,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40a1400000000000",
+        "svgBytes": 27258,
+        "svgSha256": "3d395b112a50a03e8838b204ce4fa4510c31faf1cb83ffb1665ebf5aacaaee54",
+        "type": "railroad",
+        "widthBits": "4078400000000000"
+      }
+    },
+    {
+      "case": "railroad/medium",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "c82d618fb2c520b2d7f4f928016d4d2650fdf0a75d54e987e217abc769aa6319",
+      "afterNodes": 168,
+      "allocation": {
+        "allocations": 2977,
+        "checksum": 61080069946239610,
+        "freedBytes": 567210,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 136128,
+        "reallocations": 866,
+        "requestedBytes": 567210
+      },
+      "beforeGraphSha256": "c82d618fb2c520b2d7f4f928016d4d2650fdf0a75d54e987e217abc769aa6319",
+      "beforeNodes": 168,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40a1400000000000",
+        "svgBytes": 27258,
+        "svgSha256": "3d395b112a50a03e8838b204ce4fa4510c31faf1cb83ffb1665ebf5aacaaee54",
+        "type": "railroad",
+        "widthBits": "4078400000000000"
+      }
+    },
+    {
+      "case": "railroad/medium",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "c82d618fb2c520b2d7f4f928016d4d2650fdf0a75d54e987e217abc769aa6319",
+      "afterNodes": 168,
+      "allocation": {
+        "allocations": 3487,
+        "checksum": 61080069946239700,
+        "freedBytes": 613486,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 136128,
+        "reallocations": 866,
+        "requestedBytes": 613486
+      },
+      "beforeGraphSha256": "c82d618fb2c520b2d7f4f928016d4d2650fdf0a75d54e987e217abc769aa6319",
+      "beforeNodes": 168,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40a1400000000000",
+        "svgBytes": 27258,
+        "svgSha256": "3d395b112a50a03e8838b204ce4fa4510c31faf1cb83ffb1665ebf5aacaaee54",
+        "type": "railroad",
+        "widthBits": "4078400000000000"
+      }
+    },
+    {
+      "case": "railroad/medium",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "c82d618fb2c520b2d7f4f928016d4d2650fdf0a75d54e987e217abc769aa6319",
+      "afterNodes": 168,
+      "allocation": {
+        "allocations": 255,
+        "checksum": 168,
+        "freedBytes": 23138,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 22382,
+        "reallocations": 0,
+        "requestedBytes": 23138
+      },
+      "beforeGraphSha256": "c82d618fb2c520b2d7f4f928016d4d2650fdf0a75d54e987e217abc769aa6319",
+      "beforeNodes": 168,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40a1400000000000",
+        "svgBytes": 27258,
+        "svgSha256": "3d395b112a50a03e8838b204ce4fa4510c31faf1cb83ffb1665ebf5aacaaee54",
+        "type": "railroad",
+        "widthBits": "4078400000000000"
+      }
+    },
+    {
+      "case": "railroad/medium",
+      "stage": "property-repeated",
+      "afterGraphSha256": "c82d618fb2c520b2d7f4f928016d4d2650fdf0a75d54e987e217abc769aa6319",
+      "afterNodes": 168,
+      "allocation": {
+        "allocations": 336,
+        "checksum": 16,
+        "freedBytes": 22964,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 12192,
+        "reallocations": 256,
+        "requestedBytes": 22964
+      },
+      "beforeGraphSha256": "c82d618fb2c520b2d7f4f928016d4d2650fdf0a75d54e987e217abc769aa6319",
+      "beforeNodes": 168,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40a1400000000000",
+        "svgBytes": 27258,
+        "svgSha256": "3d395b112a50a03e8838b204ce4fa4510c31faf1cb83ffb1665ebf5aacaaee54",
+        "type": "railroad",
+        "widthBits": "4078400000000000"
+      }
+    },
+    {
+      "case": "railroad/medium",
+      "stage": "property-unique",
+      "afterGraphSha256": "c82d618fb2c520b2d7f4f928016d4d2650fdf0a75d54e987e217abc769aa6319",
+      "afterNodes": 168,
+      "allocation": {
+        "allocations": 564,
+        "checksum": 16,
+        "freedBytes": 78498,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 45416,
+        "reallocations": 289,
+        "requestedBytes": 78498
+      },
+      "beforeGraphSha256": "c82d618fb2c520b2d7f4f928016d4d2650fdf0a75d54e987e217abc769aa6319",
+      "beforeNodes": 168,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40a1400000000000",
+        "svgBytes": 27258,
+        "svgSha256": "3d395b112a50a03e8838b204ce4fa4510c31faf1cb83ffb1665ebf5aacaaee54",
+        "type": "railroad",
+        "widthBits": "4078400000000000"
+      }
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "parse-public",
+      "afterGraphSha256": "799044862db9b26ded474599335b397b747b45780606e7fafa9e79b21439ba1c",
+      "afterNodes": 1209,
+      "allocation": {
+        "allocations": 24521,
+        "checksum": 9,
+        "freedBytes": 2723274,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 838864,
+        "reallocations": 9532,
+        "requestedBytes": 2723274
+      },
+      "beforeGraphSha256": "799044862db9b26ded474599335b397b747b45780606e7fafa9e79b21439ba1c",
+      "beforeNodes": 1209,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40d2b80000000000",
+        "svgBytes": 90501,
+        "svgSha256": "9b097740e50f249ff18a4ca622f650360e0bbd495f2fe7ca00f406e3044cfb01",
+        "type": "flowchart",
+        "widthBits": "4060200000000000"
+      }
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "799044862db9b26ded474599335b397b747b45780606e7fafa9e79b21439ba1c",
+      "afterNodes": 1209,
+      "allocation": {
+        "allocations": 19744,
+        "checksum": 50269671622009224,
+        "freedBytes": 3572045,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 916892,
+        "reallocations": 4005,
+        "requestedBytes": 3572045
+      },
+      "beforeGraphSha256": "799044862db9b26ded474599335b397b747b45780606e7fafa9e79b21439ba1c",
+      "beforeNodes": 1209,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40d2b80000000000",
+        "svgBytes": 90501,
+        "svgSha256": "9b097740e50f249ff18a4ca622f650360e0bbd495f2fe7ca00f406e3044cfb01",
+        "type": "flowchart",
+        "widthBits": "4060200000000000"
+      }
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "799044862db9b26ded474599335b397b747b45780606e7fafa9e79b21439ba1c",
+      "afterNodes": 1209,
+      "allocation": {
+        "allocations": 22660,
+        "checksum": 50269671622010180,
+        "freedBytes": 4011285,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 916892,
+        "reallocations": 4005,
+        "requestedBytes": 4011285
+      },
+      "beforeGraphSha256": "799044862db9b26ded474599335b397b747b45780606e7fafa9e79b21439ba1c",
+      "beforeNodes": 1209,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40d2b80000000000",
+        "svgBytes": 90501,
+        "svgSha256": "9b097740e50f249ff18a4ca622f650360e0bbd495f2fe7ca00f406e3044cfb01",
+        "type": "flowchart",
+        "widthBits": "4060200000000000"
+      }
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "799044862db9b26ded474599335b397b747b45780606e7fafa9e79b21439ba1c",
+      "afterNodes": 1209,
+      "allocation": {
+        "allocations": 1458,
+        "checksum": 1209,
+        "freedBytes": 219620,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 217928,
+        "reallocations": 0,
+        "requestedBytes": 219620
+      },
+      "beforeGraphSha256": "799044862db9b26ded474599335b397b747b45780606e7fafa9e79b21439ba1c",
+      "beforeNodes": 1209,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40d2b80000000000",
+        "svgBytes": 90501,
+        "svgSha256": "9b097740e50f249ff18a4ca622f650360e0bbd495f2fe7ca00f406e3044cfb01",
+        "type": "flowchart",
+        "widthBits": "4060200000000000"
+      }
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "property-repeated",
+      "afterGraphSha256": "799044862db9b26ded474599335b397b747b45780606e7fafa9e79b21439ba1c",
+      "afterNodes": 1209,
+      "allocation": {
+        "allocations": 4038,
+        "checksum": 201,
+        "freedBytes": 235150,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 119253,
+        "reallocations": 3229,
+        "requestedBytes": 235150
+      },
+      "beforeGraphSha256": "799044862db9b26ded474599335b397b747b45780606e7fafa9e79b21439ba1c",
+      "beforeNodes": 1209,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40d2b80000000000",
+        "svgBytes": 90501,
+        "svgSha256": "9b097740e50f249ff18a4ca622f650360e0bbd495f2fe7ca00f406e3044cfb01",
+        "type": "flowchart",
+        "widthBits": "4060200000000000"
+      }
+    },
+    {
+      "case": "flowchart/large",
+      "stage": "property-unique",
+      "afterGraphSha256": "799044862db9b26ded474599335b397b747b45780606e7fafa9e79b21439ba1c",
+      "afterNodes": 1209,
+      "allocation": {
+        "allocations": 7227,
+        "checksum": 201,
+        "freedBytes": 797680,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 479591,
+        "reallocations": 5373,
+        "requestedBytes": 797680
+      },
+      "beforeGraphSha256": "799044862db9b26ded474599335b397b747b45780606e7fafa9e79b21439ba1c",
+      "beforeNodes": 1209,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40d2b80000000000",
+        "svgBytes": 90501,
+        "svgSha256": "9b097740e50f249ff18a4ca622f650360e0bbd495f2fe7ca00f406e3044cfb01",
+        "type": "flowchart",
+        "widthBits": "4060200000000000"
+      }
+    },
+    {
+      "case": "sequence/large",
+      "stage": "parse-public",
+      "afterGraphSha256": "54202237f79e1f25a35cd8e0cd66c02bb597042500854c3783174c71a9f82bef",
+      "afterNodes": 214,
+      "allocation": {
+        "allocations": 11033,
+        "checksum": 8,
+        "freedBytes": 1059685,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 232180,
+        "reallocations": 2747,
+        "requestedBytes": 1059685
+      },
+      "beforeGraphSha256": "54202237f79e1f25a35cd8e0cd66c02bb597042500854c3783174c71a9f82bef",
+      "beforeNodes": 214,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40bd6a0000000000",
+        "svgBytes": 61165,
+        "svgSha256": "606a97b7015c98c33bbb9bb38f2c8c138a67bf5bd6a6989bfe52aff1a4dd649d",
+        "type": "sequence",
+        "widthBits": "406a400000000000"
+      }
+    },
+    {
+      "case": "sequence/large",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "54202237f79e1f25a35cd8e0cd66c02bb597042500854c3783174c71a9f82bef",
+      "afterNodes": 214,
+      "allocation": {
+        "allocations": 6845,
+        "checksum": 60563299481218800,
+        "freedBytes": 1005808,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 312322,
+        "reallocations": 1370,
+        "requestedBytes": 1005808
+      },
+      "beforeGraphSha256": "54202237f79e1f25a35cd8e0cd66c02bb597042500854c3783174c71a9f82bef",
+      "beforeNodes": 214,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40bd6a0000000000",
+        "svgBytes": 61165,
+        "svgSha256": "606a97b7015c98c33bbb9bb38f2c8c138a67bf5bd6a6989bfe52aff1a4dd649d",
+        "type": "sequence",
+        "widthBits": "406a400000000000"
+      }
+    },
+    {
+      "case": "sequence/large",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "54202237f79e1f25a35cd8e0cd66c02bb597042500854c3783174c71a9f82bef",
+      "afterNodes": 214,
+      "allocation": {
+        "allocations": 8163,
+        "checksum": 60563299481218616,
+        "freedBytes": 1155724,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 312322,
+        "reallocations": 1370,
+        "requestedBytes": 1155724
+      },
+      "beforeGraphSha256": "54202237f79e1f25a35cd8e0cd66c02bb597042500854c3783174c71a9f82bef",
+      "beforeNodes": 214,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40bd6a0000000000",
+        "svgBytes": 61165,
+        "svgSha256": "606a97b7015c98c33bbb9bb38f2c8c138a67bf5bd6a6989bfe52aff1a4dd649d",
+        "type": "sequence",
+        "widthBits": "406a400000000000"
+      }
+    },
+    {
+      "case": "sequence/large",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "54202237f79e1f25a35cd8e0cd66c02bb597042500854c3783174c71a9f82bef",
+      "afterNodes": 214,
+      "allocation": {
+        "allocations": 659,
+        "checksum": 214,
+        "freedBytes": 74958,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 73266,
+        "reallocations": 0,
+        "requestedBytes": 74958
+      },
+      "beforeGraphSha256": "54202237f79e1f25a35cd8e0cd66c02bb597042500854c3783174c71a9f82bef",
+      "beforeNodes": 214,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40bd6a0000000000",
+        "svgBytes": 61165,
+        "svgSha256": "606a97b7015c98c33bbb9bb38f2c8c138a67bf5bd6a6989bfe52aff1a4dd649d",
+        "type": "sequence",
+        "widthBits": "406a400000000000"
+      }
+    },
+    {
+      "case": "sequence/large",
+      "stage": "property-repeated",
+      "afterGraphSha256": "54202237f79e1f25a35cd8e0cd66c02bb597042500854c3783174c71a9f82bef",
+      "afterNodes": 214,
+      "allocation": {
+        "allocations": 4038,
+        "checksum": 201,
+        "freedBytes": 235150,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 119253,
+        "reallocations": 3229,
+        "requestedBytes": 235150
+      },
+      "beforeGraphSha256": "54202237f79e1f25a35cd8e0cd66c02bb597042500854c3783174c71a9f82bef",
+      "beforeNodes": 214,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40bd6a0000000000",
+        "svgBytes": 61165,
+        "svgSha256": "606a97b7015c98c33bbb9bb38f2c8c138a67bf5bd6a6989bfe52aff1a4dd649d",
+        "type": "sequence",
+        "widthBits": "406a400000000000"
+      }
+    },
+    {
+      "case": "sequence/large",
+      "stage": "property-unique",
+      "afterGraphSha256": "54202237f79e1f25a35cd8e0cd66c02bb597042500854c3783174c71a9f82bef",
+      "afterNodes": 214,
+      "allocation": {
+        "allocations": 7227,
+        "checksum": 201,
+        "freedBytes": 797680,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 479591,
+        "reallocations": 5373,
+        "requestedBytes": 797680
+      },
+      "beforeGraphSha256": "54202237f79e1f25a35cd8e0cd66c02bb597042500854c3783174c71a9f82bef",
+      "beforeNodes": 214,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40bd6a0000000000",
+        "svgBytes": 61165,
+        "svgSha256": "606a97b7015c98c33bbb9bb38f2c8c138a67bf5bd6a6989bfe52aff1a4dd649d",
+        "type": "sequence",
+        "widthBits": "406a400000000000"
+      }
+    },
+    {
+      "case": "er/large",
+      "stage": "parse-public",
+      "afterGraphSha256": "734f15bf503274e159e06e615834da501d2839c3f403e5f9e1ea32e285c550e6",
+      "afterNodes": 1805,
+      "allocation": {
+        "allocations": 26275,
+        "checksum": 2,
+        "freedBytes": 1923848,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 673651,
+        "reallocations": 7263,
+        "requestedBytes": 1923848
+      },
+      "beforeGraphSha256": "734f15bf503274e159e06e615834da501d2839c3f403e5f9e1ea32e285c550e6",
+      "beforeNodes": 1805,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40e29de000000000",
+        "svgBytes": 296039,
+        "svgSha256": "b49418b80220f9ccabe764c7c2eecbb7735a48f23324b7ef09eccfd5b2d57590",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "er/large",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "734f15bf503274e159e06e615834da501d2839c3f403e5f9e1ea32e285c550e6",
+      "afterNodes": 1805,
+      "allocation": {
+        "allocations": 48661,
+        "checksum": 37433835440604264,
+        "freedBytes": 8769970,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 2715464,
+        "reallocations": 13210,
+        "requestedBytes": 8769970
+      },
+      "beforeGraphSha256": "734f15bf503274e159e06e615834da501d2839c3f403e5f9e1ea32e285c550e6",
+      "beforeNodes": 1805,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40e29de000000000",
+        "svgBytes": 296039,
+        "svgSha256": "b49418b80220f9ccabe764c7c2eecbb7735a48f23324b7ef09eccfd5b2d57590",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "er/large",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "734f15bf503274e159e06e615834da501d2839c3f403e5f9e1ea32e285c550e6",
+      "afterNodes": 1805,
+      "allocation": {
+        "allocations": 52791,
+        "checksum": 37433835440604010,
+        "freedBytes": 9277518,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 2715464,
+        "reallocations": 13210,
+        "requestedBytes": 9277518
+      },
+      "beforeGraphSha256": "734f15bf503274e159e06e615834da501d2839c3f403e5f9e1ea32e285c550e6",
+      "beforeNodes": 1805,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40e29de000000000",
+        "svgBytes": 296039,
+        "svgSha256": "b49418b80220f9ccabe764c7c2eecbb7735a48f23324b7ef09eccfd5b2d57590",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "er/large",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "734f15bf503274e159e06e615834da501d2839c3f403e5f9e1ea32e285c550e6",
+      "afterNodes": 1805,
+      "allocation": {
+        "allocations": 2065,
+        "checksum": 1805,
+        "freedBytes": 253774,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 251886,
+        "reallocations": 0,
+        "requestedBytes": 253774
+      },
+      "beforeGraphSha256": "734f15bf503274e159e06e615834da501d2839c3f403e5f9e1ea32e285c550e6",
+      "beforeNodes": 1805,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40e29de000000000",
+        "svgBytes": 296039,
+        "svgSha256": "b49418b80220f9ccabe764c7c2eecbb7735a48f23324b7ef09eccfd5b2d57590",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "er/large",
+      "stage": "property-repeated",
+      "afterGraphSha256": "734f15bf503274e159e06e615834da501d2839c3f403e5f9e1ea32e285c550e6",
+      "afterNodes": 1805,
+      "allocation": {
+        "allocations": 4038,
+        "checksum": 201,
+        "freedBytes": 235150,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 119253,
+        "reallocations": 3229,
+        "requestedBytes": 235150
+      },
+      "beforeGraphSha256": "734f15bf503274e159e06e615834da501d2839c3f403e5f9e1ea32e285c550e6",
+      "beforeNodes": 1805,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40e29de000000000",
+        "svgBytes": 296039,
+        "svgSha256": "b49418b80220f9ccabe764c7c2eecbb7735a48f23324b7ef09eccfd5b2d57590",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "er/large",
+      "stage": "property-unique",
+      "afterGraphSha256": "734f15bf503274e159e06e615834da501d2839c3f403e5f9e1ea32e285c550e6",
+      "afterNodes": 1805,
+      "allocation": {
+        "allocations": 7227,
+        "checksum": 201,
+        "freedBytes": 797680,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 479591,
+        "reallocations": 5373,
+        "requestedBytes": 797680
+      },
+      "beforeGraphSha256": "734f15bf503274e159e06e615834da501d2839c3f403e5f9e1ea32e285c550e6",
+      "beforeNodes": 1805,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40e29de000000000",
+        "svgBytes": 296039,
+        "svgSha256": "b49418b80220f9ccabe764c7c2eecbb7735a48f23324b7ef09eccfd5b2d57590",
+        "type": "er",
+        "widthBits": "4066600000000000"
+      }
+    },
+    {
+      "case": "pie/large",
+      "stage": "parse-public",
+      "afterGraphSha256": "578c96fff237f8b172b0fd3937a86f88528af9e52e4b71acc96a6dbd1effb4cc",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 639,
+        "checksum": 3,
+        "freedBytes": 156602,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 55380,
+        "reallocations": 437,
+        "requestedBytes": 156602
+      },
+      "beforeGraphSha256": "578c96fff237f8b172b0fd3937a86f88528af9e52e4b71acc96a6dbd1effb4cc",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b4880000000000",
+        "svgBytes": 41981,
+        "svgSha256": "1bda4d22d8a21e9ff0c2bf48b2d677aeb518c9e0f81ec60e5ce4f07027547829",
+        "type": "pie",
+        "widthBits": "4078000000000000"
+      }
+    },
+    {
+      "case": "pie/large",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "578c96fff237f8b172b0fd3937a86f88528af9e52e4b71acc96a6dbd1effb4cc",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 3641,
+        "checksum": 57570428830393340,
+        "freedBytes": 636603,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 229887,
+        "reallocations": 440,
+        "requestedBytes": 636603
+      },
+      "beforeGraphSha256": "578c96fff237f8b172b0fd3937a86f88528af9e52e4b71acc96a6dbd1effb4cc",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b4880000000000",
+        "svgBytes": 41981,
+        "svgSha256": "1bda4d22d8a21e9ff0c2bf48b2d677aeb518c9e0f81ec60e5ce4f07027547829",
+        "type": "pie",
+        "widthBits": "4078000000000000"
+      }
+    },
+    {
+      "case": "pie/large",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "578c96fff237f8b172b0fd3937a86f88528af9e52e4b71acc96a6dbd1effb4cc",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 4065,
+        "checksum": 57570428830393340,
+        "freedBytes": 666871,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 229887,
+        "reallocations": 440,
+        "requestedBytes": 666871
+      },
+      "beforeGraphSha256": "578c96fff237f8b172b0fd3937a86f88528af9e52e4b71acc96a6dbd1effb4cc",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b4880000000000",
+        "svgBytes": 41981,
+        "svgSha256": "1bda4d22d8a21e9ff0c2bf48b2d677aeb518c9e0f81ec60e5ce4f07027547829",
+        "type": "pie",
+        "widthBits": "4078000000000000"
+      }
+    },
+    {
+      "case": "pie/large",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "578c96fff237f8b172b0fd3937a86f88528af9e52e4b71acc96a6dbd1effb4cc",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 212,
+        "checksum": 2,
+        "freedBytes": 15134,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 15134,
+        "reallocations": 0,
+        "requestedBytes": 15134
+      },
+      "beforeGraphSha256": "578c96fff237f8b172b0fd3937a86f88528af9e52e4b71acc96a6dbd1effb4cc",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b4880000000000",
+        "svgBytes": 41981,
+        "svgSha256": "1bda4d22d8a21e9ff0c2bf48b2d677aeb518c9e0f81ec60e5ce4f07027547829",
+        "type": "pie",
+        "widthBits": "4078000000000000"
+      }
+    },
+    {
+      "case": "pie/large",
+      "stage": "property-repeated",
+      "afterGraphSha256": "578c96fff237f8b172b0fd3937a86f88528af9e52e4b71acc96a6dbd1effb4cc",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 4038,
+        "checksum": 201,
+        "freedBytes": 235150,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 119253,
+        "reallocations": 3229,
+        "requestedBytes": 235150
+      },
+      "beforeGraphSha256": "578c96fff237f8b172b0fd3937a86f88528af9e52e4b71acc96a6dbd1effb4cc",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b4880000000000",
+        "svgBytes": 41981,
+        "svgSha256": "1bda4d22d8a21e9ff0c2bf48b2d677aeb518c9e0f81ec60e5ce4f07027547829",
+        "type": "pie",
+        "widthBits": "4078000000000000"
+      }
+    },
+    {
+      "case": "pie/large",
+      "stage": "property-unique",
+      "afterGraphSha256": "578c96fff237f8b172b0fd3937a86f88528af9e52e4b71acc96a6dbd1effb4cc",
+      "afterNodes": 2,
+      "allocation": {
+        "allocations": 7227,
+        "checksum": 201,
+        "freedBytes": 797680,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 479591,
+        "reallocations": 5373,
+        "requestedBytes": 797680
+      },
+      "beforeGraphSha256": "578c96fff237f8b172b0fd3937a86f88528af9e52e4b71acc96a6dbd1effb4cc",
+      "beforeNodes": 2,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b4880000000000",
+        "svgBytes": 41981,
+        "svgSha256": "1bda4d22d8a21e9ff0c2bf48b2d677aeb518c9e0f81ec60e5ce4f07027547829",
+        "type": "pie",
+        "widthBits": "4078000000000000"
+      }
+    },
+    {
+      "case": "sankey/large",
+      "stage": "parse-public",
+      "afterGraphSha256": "8e500b00dbb65d35299f7edfdaeb6eb81a36476e456ba68386b46760f2c62a17",
+      "afterNodes": 403,
+      "allocation": {
+        "allocations": 5095,
+        "checksum": 6,
+        "freedBytes": 470671,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 160426,
+        "reallocations": 842,
+        "requestedBytes": 470671
+      },
+      "beforeGraphSha256": "8e500b00dbb65d35299f7edfdaeb6eb81a36476e456ba68386b46760f2c62a17",
+      "beforeNodes": 403,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 102559,
+        "svgSha256": "57633ffee48452e0df1fe9bacd17a093bd85ece6059991c48e842cf5768a0f61",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "sankey/large",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "8e500b00dbb65d35299f7edfdaeb6eb81a36476e456ba68386b46760f2c62a17",
+      "afterNodes": 403,
+      "allocation": {
+        "allocations": 11624,
+        "checksum": 70157637945233570,
+        "freedBytes": 1278173,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 514254,
+        "reallocations": 3051,
+        "requestedBytes": 1278173
+      },
+      "beforeGraphSha256": "8e500b00dbb65d35299f7edfdaeb6eb81a36476e456ba68386b46760f2c62a17",
+      "beforeNodes": 403,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 102559,
+        "svgSha256": "57633ffee48452e0df1fe9bacd17a093bd85ece6059991c48e842cf5768a0f61",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "sankey/large",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "8e500b00dbb65d35299f7edfdaeb6eb81a36476e456ba68386b46760f2c62a17",
+      "afterNodes": 403,
+      "allocation": {
+        "allocations": 13284,
+        "checksum": 70157637945233680,
+        "freedBytes": 1429673,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 514254,
+        "reallocations": 3051,
+        "requestedBytes": 1429673
+      },
+      "beforeGraphSha256": "8e500b00dbb65d35299f7edfdaeb6eb81a36476e456ba68386b46760f2c62a17",
+      "beforeNodes": 403,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 102559,
+        "svgSha256": "57633ffee48452e0df1fe9bacd17a093bd85ece6059991c48e842cf5768a0f61",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "sankey/large",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "8e500b00dbb65d35299f7edfdaeb6eb81a36476e456ba68386b46760f2c62a17",
+      "afterNodes": 403,
+      "allocation": {
+        "allocations": 830,
+        "checksum": 403,
+        "freedBytes": 75750,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 75406,
+        "reallocations": 0,
+        "requestedBytes": 75750
+      },
+      "beforeGraphSha256": "8e500b00dbb65d35299f7edfdaeb6eb81a36476e456ba68386b46760f2c62a17",
+      "beforeNodes": 403,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 102559,
+        "svgSha256": "57633ffee48452e0df1fe9bacd17a093bd85ece6059991c48e842cf5768a0f61",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "sankey/large",
+      "stage": "property-repeated",
+      "afterGraphSha256": "8e500b00dbb65d35299f7edfdaeb6eb81a36476e456ba68386b46760f2c62a17",
+      "afterNodes": 403,
+      "allocation": {
+        "allocations": 4038,
+        "checksum": 201,
+        "freedBytes": 235150,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 119253,
+        "reallocations": 3229,
+        "requestedBytes": 235150
+      },
+      "beforeGraphSha256": "8e500b00dbb65d35299f7edfdaeb6eb81a36476e456ba68386b46760f2c62a17",
+      "beforeNodes": 403,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 102559,
+        "svgSha256": "57633ffee48452e0df1fe9bacd17a093bd85ece6059991c48e842cf5768a0f61",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "sankey/large",
+      "stage": "property-unique",
+      "afterGraphSha256": "8e500b00dbb65d35299f7edfdaeb6eb81a36476e456ba68386b46760f2c62a17",
+      "afterNodes": 403,
+      "allocation": {
+        "allocations": 7227,
+        "checksum": 201,
+        "freedBytes": 797680,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 479591,
+        "reallocations": 5373,
+        "requestedBytes": 797680
+      },
+      "beforeGraphSha256": "8e500b00dbb65d35299f7edfdaeb6eb81a36476e456ba68386b46760f2c62a17",
+      "beforeNodes": 403,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "407a000000000000",
+        "svgBytes": 102559,
+        "svgSha256": "57633ffee48452e0df1fe9bacd17a093bd85ece6059991c48e842cf5768a0f61",
+        "type": "sankey",
+        "widthBits": "4083400000000000"
+      }
+    },
+    {
+      "case": "gantt/large",
+      "stage": "parse-public",
+      "afterGraphSha256": "fd4870d9497f6c583a0828572d707438bb2279d1a95d4c3affee7cf539c819f8",
+      "afterNodes": 1014,
+      "allocation": {
+        "allocations": 13664,
+        "checksum": 5,
+        "freedBytes": 1862228,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 606032,
+        "reallocations": 6115,
+        "requestedBytes": 1862228
+      },
+      "beforeGraphSha256": "fd4870d9497f6c583a0828572d707438bb2279d1a95d4c3affee7cf539c819f8",
+      "beforeNodes": 1014,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/large",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "c596b10753ce25e1e791bff96748cd47ab318c0a817f25b467df3293f8a4c042",
+      "afterNodes": 1417,
+      "allocation": {
+        "allocations": 25426,
+        "checksum": 17615275788647932,
+        "freedBytes": 2174689,
+        "liveBytesDelta": 57536,
+        "peakAdditionalRequestedBytes": 693163,
+        "reallocations": 13574,
+        "requestedBytes": 2232225
+      },
+      "beforeGraphSha256": "fd4870d9497f6c583a0828572d707438bb2279d1a95d4c3affee7cf539c819f8",
+      "beforeNodes": 1014,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/large",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "c596b10753ce25e1e791bff96748cd47ab318c0a817f25b467df3293f8a4c042",
+      "afterNodes": 1417,
+      "allocation": {
+        "allocations": 28121,
+        "checksum": 17615275788646516,
+        "freedBytes": 2624657,
+        "liveBytesDelta": 57536,
+        "peakAdditionalRequestedBytes": 693163,
+        "reallocations": 13574,
+        "requestedBytes": 2682193
+      },
+      "beforeGraphSha256": "fd4870d9497f6c583a0828572d707438bb2279d1a95d4c3affee7cf539c819f8",
+      "beforeNodes": 1014,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/large",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "fd4870d9497f6c583a0828572d707438bb2279d1a95d4c3affee7cf539c819f8",
+      "afterNodes": 1014,
+      "allocation": {
+        "allocations": 1347,
+        "checksum": 1014,
+        "freedBytes": 213616,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 202412,
+        "reallocations": 0,
+        "requestedBytes": 213616
+      },
+      "beforeGraphSha256": "fd4870d9497f6c583a0828572d707438bb2279d1a95d4c3affee7cf539c819f8",
+      "beforeNodes": 1014,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/large",
+      "stage": "property-repeated",
+      "afterGraphSha256": "fd4870d9497f6c583a0828572d707438bb2279d1a95d4c3affee7cf539c819f8",
+      "afterNodes": 1014,
+      "allocation": {
+        "allocations": 4038,
+        "checksum": 201,
+        "freedBytes": 235150,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 119253,
+        "reallocations": 3229,
+        "requestedBytes": 235150
+      },
+      "beforeGraphSha256": "fd4870d9497f6c583a0828572d707438bb2279d1a95d4c3affee7cf539c819f8",
+      "beforeNodes": 1014,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/large",
+      "stage": "property-unique",
+      "afterGraphSha256": "fd4870d9497f6c583a0828572d707438bb2279d1a95d4c3affee7cf539c819f8",
+      "afterNodes": 1014,
+      "allocation": {
+        "allocations": 7227,
+        "checksum": 201,
+        "freedBytes": 797680,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 479591,
+        "reallocations": 5373,
+        "requestedBytes": 797680
+      },
+      "beforeGraphSha256": "fd4870d9497f6c583a0828572d707438bb2279d1a95d4c3affee7cf539c819f8",
+      "beforeNodes": 1014,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "railroad/large",
+      "stage": "parse-public",
+      "afterGraphSha256": "87c33019222d342edfade4d3bbc100067e5da79bb151db2bc89782f19b5f213a",
+      "afterNodes": 663,
+      "allocation": {
+        "allocations": 7429,
+        "checksum": 8,
+        "freedBytes": 771907,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 221222,
+        "reallocations": 2118,
+        "requestedBytes": 771907
+      },
+      "beforeGraphSha256": "87c33019222d342edfade4d3bbc100067e5da79bb151db2bc89782f19b5f213a",
+      "beforeNodes": 663,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40c1520000000000",
+        "svgBytes": 107448,
+        "svgSha256": "49b86183c15428a1e239981e1ff04a0189f7e83b91b07833bfcd1dba8e86abc2",
+        "type": "railroad",
+        "widthBits": "4078400000000000"
+      }
+    },
+    {
+      "case": "railroad/large",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "87c33019222d342edfade4d3bbc100067e5da79bb151db2bc89782f19b5f213a",
+      "afterNodes": 663,
+      "allocation": {
+        "allocations": 11842,
+        "checksum": 52092661900878776,
+        "freedBytes": 2617104,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 540750,
+        "reallocations": 3658,
+        "requestedBytes": 2617104
+      },
+      "beforeGraphSha256": "87c33019222d342edfade4d3bbc100067e5da79bb151db2bc89782f19b5f213a",
+      "beforeNodes": 663,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40c1520000000000",
+        "svgBytes": 107448,
+        "svgSha256": "49b86183c15428a1e239981e1ff04a0189f7e83b91b07833bfcd1dba8e86abc2",
+        "type": "railroad",
+        "widthBits": "4078400000000000"
+      }
+    },
+    {
+      "case": "railroad/large",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "87c33019222d342edfade4d3bbc100067e5da79bb151db2bc89782f19b5f213a",
+      "afterNodes": 663,
+      "allocation": {
+        "allocations": 13612,
+        "checksum": 52092661900878130,
+        "freedBytes": 2787220,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 540750,
+        "reallocations": 3658,
+        "requestedBytes": 2787220
+      },
+      "beforeGraphSha256": "87c33019222d342edfade4d3bbc100067e5da79bb151db2bc89782f19b5f213a",
+      "beforeNodes": 663,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40c1520000000000",
+        "svgBytes": 107448,
+        "svgSha256": "49b86183c15428a1e239981e1ff04a0189f7e83b91b07833bfcd1dba8e86abc2",
+        "type": "railroad",
+        "widthBits": "4078400000000000"
+      }
+    },
+    {
+      "case": "railroad/large",
+      "stage": "graph-snapshot",
+      "afterGraphSha256": "87c33019222d342edfade4d3bbc100067e5da79bb151db2bc89782f19b5f213a",
+      "afterNodes": 663,
+      "allocation": {
+        "allocations": 885,
+        "checksum": 663,
+        "freedBytes": 85058,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 84302,
+        "reallocations": 0,
+        "requestedBytes": 85058
+      },
+      "beforeGraphSha256": "87c33019222d342edfade4d3bbc100067e5da79bb151db2bc89782f19b5f213a",
+      "beforeNodes": 663,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40c1520000000000",
+        "svgBytes": 107448,
+        "svgSha256": "49b86183c15428a1e239981e1ff04a0189f7e83b91b07833bfcd1dba8e86abc2",
+        "type": "railroad",
+        "widthBits": "4078400000000000"
+      }
+    },
+    {
+      "case": "railroad/large",
+      "stage": "property-repeated",
+      "afterGraphSha256": "87c33019222d342edfade4d3bbc100067e5da79bb151db2bc89782f19b5f213a",
+      "afterNodes": 663,
+      "allocation": {
+        "allocations": 1237,
+        "checksum": 61,
+        "freedBytes": 73906,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 38192,
+        "reallocations": 982,
+        "requestedBytes": 73906
+      },
+      "beforeGraphSha256": "87c33019222d342edfade4d3bbc100067e5da79bb151db2bc89782f19b5f213a",
+      "beforeNodes": 663,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40c1520000000000",
+        "svgBytes": 107448,
+        "svgSha256": "49b86183c15428a1e239981e1ff04a0189f7e83b91b07833bfcd1dba8e86abc2",
+        "type": "railroad",
+        "widthBits": "4078400000000000"
+      }
+    },
+    {
+      "case": "railroad/large",
+      "stage": "property-unique",
+      "afterGraphSha256": "87c33019222d342edfade4d3bbc100067e5da79bb151db2bc89782f19b5f213a",
+      "afterNodes": 663,
+      "allocation": {
+        "allocations": 2186,
+        "checksum": 61,
+        "freedBytes": 317956,
+        "liveBytesDelta": 0,
+        "peakAdditionalRequestedBytes": 185504,
+        "reallocations": 1286,
+        "requestedBytes": 317956
+      },
+      "beforeGraphSha256": "87c33019222d342edfade4d3bbc100067e5da79bb151db2bc89782f19b5f213a",
+      "beforeNodes": 663,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40c1520000000000",
+        "svgBytes": 107448,
+        "svgSha256": "49b86183c15428a1e239981e1ff04a0189f7e83b91b07833bfcd1dba8e86abc2",
+        "type": "railroad",
+        "widthBits": "4078400000000000"
+      }
+    }
+  ],
+  "historyRows": [
+    {
+      "case": "gantt/small",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "d74555deae8f6bdade4d352f9c29f159db1478632d2ebbbaed6ecf3be64d79ff",
+      "afterNodes": 73,
+      "allocation": {
+        "allocations": 1434,
+        "checksum": 69893755154468180,
+        "freedBytes": 114302,
+        "liveBytesDelta": 3776,
+        "peakAdditionalRequestedBytes": 41654,
+        "reallocations": 713,
+        "requestedBytes": 118078
+      },
+      "beforeGraphSha256": "9fb7022860984ebdc1c14d1ca1f0150d6576f8fca8532b3cf8dfe404cd75e50e",
+      "beforeNodes": 54,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/small",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "d74555deae8f6bdade4d352f9c29f159db1478632d2ebbbaed6ecf3be64d79ff",
+      "afterNodes": 73,
+      "allocation": {
+        "allocations": 1785,
+        "checksum": 69893755154468104,
+        "freedBytes": 166190,
+        "liveBytesDelta": 3776,
+        "peakAdditionalRequestedBytes": 41654,
+        "reallocations": 713,
+        "requestedBytes": 169966
+      },
+      "beforeGraphSha256": "9fb7022860984ebdc1c14d1ca1f0150d6576f8fca8532b3cf8dfe404cd75e50e",
+      "beforeNodes": 54,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/small",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "102cad894151d9acfe7e9ebfe15ee611a075f3aa20ff55be3125bdc8085487cc",
+      "afterNodes": 358,
+      "allocation": {
+        "allocations": 1434,
+        "checksum": 69893755154468180,
+        "freedBytes": 110718,
+        "liveBytesDelta": 192,
+        "peakAdditionalRequestedBytes": 38070,
+        "reallocations": 712,
+        "requestedBytes": 110910
+      },
+      "beforeGraphSha256": "5c641b6ea01ef26b8ab4b0549858f76fb876b73cf6b4b7bb72b680f6856f2cc7",
+      "beforeNodes": 339,
+      "history": 16,
+      "postOutput": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/small",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "102cad894151d9acfe7e9ebfe15ee611a075f3aa20ff55be3125bdc8085487cc",
+      "afterNodes": 358,
+      "allocation": {
+        "allocations": 1815,
+        "checksum": 69893755154467880,
+        "freedBytes": 199566,
+        "liveBytesDelta": 192,
+        "peakAdditionalRequestedBytes": 40830,
+        "reallocations": 712,
+        "requestedBytes": 199758
+      },
+      "beforeGraphSha256": "5c641b6ea01ef26b8ab4b0549858f76fb876b73cf6b4b7bb72b680f6856f2cc7",
+      "beforeNodes": 339,
+      "history": 16,
+      "postOutput": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/small",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "520c97b82306e2045bac47fae813e790ef430d96fdbfffa09a464234954cd30e",
+      "afterNodes": 2486,
+      "allocation": {
+        "allocations": 1434,
+        "checksum": 69893755154468180,
+        "freedBytes": 110718,
+        "liveBytesDelta": 192,
+        "peakAdditionalRequestedBytes": 38070,
+        "reallocations": 712,
+        "requestedBytes": 110910
+      },
+      "beforeGraphSha256": "a40ff49a7dc7b54948c7fdbcebec66c10148090dfe307ad35932b54d4431cc94",
+      "beforeNodes": 2467,
+      "history": 128,
+      "postOutput": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/small",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "520c97b82306e2045bac47fae813e790ef430d96fdbfffa09a464234954cd30e",
+      "afterNodes": 2486,
+      "allocation": {
+        "allocations": 2039,
+        "checksum": 69893755154466040,
+        "freedBytes": 475534,
+        "liveBytesDelta": 192,
+        "peakAdditionalRequestedBytes": 178814,
+        "reallocations": 712,
+        "requestedBytes": 475726
+      },
+      "beforeGraphSha256": "a40ff49a7dc7b54948c7fdbcebec66c10148090dfe307ad35932b54d4431cc94",
+      "beforeNodes": 2467,
+      "history": 128,
+      "postOutput": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "44698de99a735c4368cd1cb7e1495474ad0eba4bbbcacfa29cc80343e36643ef",
+      "afterNodes": 353,
+      "allocation": {
+        "allocations": 6421,
+        "checksum": 8466239533887774,
+        "freedBytes": 558239,
+        "liveBytesDelta": 14528,
+        "peakAdditionalRequestedBytes": 184421,
+        "reallocations": 3391,
+        "requestedBytes": 572767
+      },
+      "beforeGraphSha256": "8af0117957fb6a4cb95c2f8d66129c7c46be864dc7ad181bf1ff0e44ffa401e1",
+      "beforeNodes": 254,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "44698de99a735c4368cd1cb7e1495474ad0eba4bbbcacfa29cc80343e36643ef",
+      "afterNodes": 353,
+      "allocation": {
+        "allocations": 7292,
+        "checksum": 8466239533887615,
+        "freedBytes": 694095,
+        "liveBytesDelta": 14528,
+        "peakAdditionalRequestedBytes": 184421,
+        "reallocations": 3391,
+        "requestedBytes": 708623
+      },
+      "beforeGraphSha256": "8af0117957fb6a4cb95c2f8d66129c7c46be864dc7ad181bf1ff0e44ffa401e1",
+      "beforeNodes": 254,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "c2a519fd19cc589a5b46e3fc74acb261ed30e30149a70dfe0a86cd75ec41e9cb",
+      "afterNodes": 1838,
+      "allocation": {
+        "allocations": 6421,
+        "checksum": 8466239533887774,
+        "freedBytes": 543903,
+        "liveBytesDelta": 192,
+        "peakAdditionalRequestedBytes": 170085,
+        "reallocations": 3390,
+        "requestedBytes": 544095
+      },
+      "beforeGraphSha256": "73dcd43ff7ec3ba8e27959761cf2127083d2e8c0f3d5c7db48790d821342da75",
+      "beforeNodes": 1739,
+      "history": 16,
+      "postOutput": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "c2a519fd19cc589a5b46e3fc74acb261ed30e30149a70dfe0a86cd75ec41e9cb",
+      "afterNodes": 1838,
+      "allocation": {
+        "allocations": 7322,
+        "checksum": 8466239533889072,
+        "freedBytes": 851119,
+        "liveBytesDelta": 192,
+        "peakAdditionalRequestedBytes": 170588,
+        "reallocations": 3390,
+        "requestedBytes": 851311
+      },
+      "beforeGraphSha256": "73dcd43ff7ec3ba8e27959761cf2127083d2e8c0f3d5c7db48790d821342da75",
+      "beforeNodes": 1739,
+      "history": 16,
+      "postOutput": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "ae0687284954cd1c40b90f40b05879160012daa203078f77e7dc3e91a476ce7c",
+      "afterNodes": 12926,
+      "allocation": {
+        "allocations": 6421,
+        "checksum": 8466239533887774,
+        "freedBytes": 543903,
+        "liveBytesDelta": 192,
+        "peakAdditionalRequestedBytes": 170085,
+        "reallocations": 3390,
+        "requestedBytes": 544095
+      },
+      "beforeGraphSha256": "3a19105d50b0a8fb591c7febf3443e1d603ef080f2da1f1e8d54cb5089e5d1dc",
+      "beforeNodes": 12827,
+      "history": 128,
+      "postOutput": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "ae0687284954cd1c40b90f40b05879160012daa203078f77e7dc3e91a476ce7c",
+      "afterNodes": 12926,
+      "allocation": {
+        "allocations": 7546,
+        "checksum": 8466239533876064,
+        "freedBytes": 2130607,
+        "liveBytesDelta": 192,
+        "peakAdditionalRequestedBytes": 810332,
+        "reallocations": 3390,
+        "requestedBytes": 2130799
+      },
+      "beforeGraphSha256": "3a19105d50b0a8fb591c7febf3443e1d603ef080f2da1f1e8d54cb5089e5d1dc",
+      "beforeNodes": 12827,
+      "history": 128,
+      "postOutput": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/large",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "c596b10753ce25e1e791bff96748cd47ab318c0a817f25b467df3293f8a4c042",
+      "afterNodes": 1417,
+      "allocation": {
+        "allocations": 25426,
+        "checksum": 17615275788647932,
+        "freedBytes": 2174689,
+        "liveBytesDelta": 57536,
+        "peakAdditionalRequestedBytes": 693163,
+        "reallocations": 13574,
+        "requestedBytes": 2232225
+      },
+      "beforeGraphSha256": "fd4870d9497f6c583a0828572d707438bb2279d1a95d4c3affee7cf539c819f8",
+      "beforeNodes": 1014,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/large",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "c596b10753ce25e1e791bff96748cd47ab318c0a817f25b467df3293f8a4c042",
+      "afterNodes": 1417,
+      "allocation": {
+        "allocations": 28121,
+        "checksum": 17615275788646516,
+        "freedBytes": 2624657,
+        "liveBytesDelta": 57536,
+        "peakAdditionalRequestedBytes": 693163,
+        "reallocations": 13574,
+        "requestedBytes": 2682193
+      },
+      "beforeGraphSha256": "fd4870d9497f6c583a0828572d707438bb2279d1a95d4c3affee7cf539c819f8",
+      "beforeNodes": 1014,
+      "history": 1,
+      "postOutput": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/large",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "201b4b8e95b74dfbcdadcbe73976ee27d94688292b44e196310bde0e0fa0d52d",
+      "afterNodes": 7462,
+      "allocation": {
+        "allocations": 25426,
+        "checksum": 17615275788647932,
+        "freedBytes": 2117345,
+        "liveBytesDelta": 192,
+        "peakAdditionalRequestedBytes": 635819,
+        "reallocations": 13573,
+        "requestedBytes": 2117537
+      },
+      "beforeGraphSha256": "a7e45e2c29f991068589aacd8fe69597e9caed150b9b679f1378da1267f853a2",
+      "beforeNodes": 7059,
+      "history": 16,
+      "postOutput": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/large",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "201b4b8e95b74dfbcdadcbe73976ee27d94688292b44e196310bde0e0fa0d52d",
+      "afterNodes": 7462,
+      "allocation": {
+        "allocations": 28151,
+        "checksum": 17615275788640474,
+        "freedBytes": 3249393,
+        "liveBytesDelta": 192,
+        "peakAdditionalRequestedBytes": 663640,
+        "reallocations": 13573,
+        "requestedBytes": 3249585
+      },
+      "beforeGraphSha256": "a7e45e2c29f991068589aacd8fe69597e9caed150b9b679f1378da1267f853a2",
+      "beforeNodes": 7059,
+      "history": 16,
+      "postOutput": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/large",
+      "stage": "render-mutable-core",
+      "afterGraphSha256": "4c35b79144638ca741c53146bf31ee88c4e4180aa3376801f3bb37432c5329e8",
+      "afterNodes": 52598,
+      "allocation": {
+        "allocations": 25426,
+        "checksum": 17615275788647932,
+        "freedBytes": 2117345,
+        "liveBytesDelta": 192,
+        "peakAdditionalRequestedBytes": 635819,
+        "reallocations": 13573,
+        "requestedBytes": 2117537
+      },
+      "beforeGraphSha256": "f1dde68bc9d3d8a3738aab8f72f68635ab4d6e5cedcaabca200781bd7278c953",
+      "beforeNodes": 52195,
+      "history": 128,
+      "postOutput": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    },
+    {
+      "case": "gantt/large",
+      "stage": "render-mutable-publish",
+      "afterGraphSha256": "4c35b79144638ca741c53146bf31ee88c4e4180aa3376801f3bb37432c5329e8",
+      "afterNodes": 52598,
+      "allocation": {
+        "allocations": 28375,
+        "checksum": 17615275788628106,
+        "freedBytes": 8342257,
+        "liveBytesDelta": 192,
+        "peakAdditionalRequestedBytes": 3210072,
+        "reallocations": 13573,
+        "requestedBytes": 8342449
+      },
+      "beforeGraphSha256": "f1dde68bc9d3d8a3738aab8f72f68635ab4d6e5cedcaabca200781bd7278c953",
+      "beforeNodes": 52195,
+      "history": 128,
+      "postOutput": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      }
+    }
+  ],
+  "mutationRows": [
+    {
+      "case": "gantt/small",
+      "graphSha256": "309ad71c31ff5d35bad750f1340a7fcd4d1db457d793ccd3dfcec564925daa31",
+      "mutation": "duplicate-utf16-id",
+      "nodes": 73,
+      "operation": {
+        "output": {
+          "heightBits": "4071500000000000",
+          "svgBytes": 3407,
+          "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 27
+      },
+      "strings": 101
+    },
+    {
+      "case": "gantt/small",
+      "graphSha256": "55ec6487b115c11cc712bedf27b6878f4d41f04a6554edf0175c4e8c6df40762",
+      "mutation": "deleted-recreated",
+      "nodes": 73,
+      "operation": {
+        "output": {
+          "heightBits": "4071500000000000",
+          "svgBytes": 3407,
+          "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 27
+      },
+      "strings": 101
+    },
+    {
+      "case": "gantt/small",
+      "graphSha256": "690fd16ae3b83963f93cf7a8275478904163509418bb6b2ea722b31b41f01e5b",
+      "mutation": "readonly",
+      "nodes": 57,
+      "operation": {
+        "error": "JavaScript { name: TypeError, message: JsString([67, 97, 110, 110, 111, 116, 32, 97, 115, 115, 105, 103, 110, 32, 116, 111, 32, 114, 101, 97, 100, 32, 111, 110, 108, 121, 32, 112, 114, 111, 112, 101, 114, 116, 121, 32, 39, 112, 114, 111, 99, 101, 115, 115, 101, 100, 39, 32, 111, 102, 32, 111, 98, 106, 101, 99, 116, 32, 39, 35, 60, 79, 98, 106, 101, 99, 116, 62, 39]) }"
+      },
+      "recovery": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 27
+      },
+      "strings": 101
+    },
+    {
+      "case": "gantt/small",
+      "graphSha256": "f43ae8151534f47448cf8639e2842eb3cef1ee949761d9963dd747e8e5bf9056",
+      "mutation": "first-intern",
+      "nodes": 73,
+      "operation": {
+        "output": {
+          "heightBits": "4071500000000000",
+          "svgBytes": 3407,
+          "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "4071500000000000",
+        "svgBytes": 3407,
+        "svgSha256": "50e0646fae8d77542cda0b791e16736d575843043cea9e8d9001fba022cb5411",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 27
+      },
+      "strings": 101
+    },
+    {
+      "case": "gantt/medium",
+      "graphSha256": "359f3ea078a9b2e78ca8b96f91c20126e4b1680e3d76365374716c95cca07f3f",
+      "mutation": "duplicate-utf16-id",
+      "nodes": 353,
+      "operation": {
+        "output": {
+          "heightBits": "4097140000000000",
+          "svgBytes": 12574,
+          "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 147
+      },
+      "strings": 281
+    },
+    {
+      "case": "gantt/medium",
+      "graphSha256": "c49c242d3993227beab15a37c1a91a29a0a1f194b65c56c523c111b1006165c2",
+      "mutation": "deleted-recreated",
+      "nodes": 353,
+      "operation": {
+        "output": {
+          "heightBits": "4097140000000000",
+          "svgBytes": 12574,
+          "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 147
+      },
+      "strings": 281
+    },
+    {
+      "case": "gantt/medium",
+      "graphSha256": "c63acd9ebc17b7ef1eb2a3a414d53c2ca43328d8220615d0037b0e1a1c68e757",
+      "mutation": "readonly",
+      "nodes": 257,
+      "operation": {
+        "error": "JavaScript { name: TypeError, message: JsString([67, 97, 110, 110, 111, 116, 32, 97, 115, 115, 105, 103, 110, 32, 116, 111, 32, 114, 101, 97, 100, 32, 111, 110, 108, 121, 32, 112, 114, 111, 112, 101, 114, 116, 121, 32, 39, 112, 114, 111, 99, 101, 115, 115, 101, 100, 39, 32, 111, 102, 32, 111, 98, 106, 101, 99, 116, 32, 39, 35, 60, 79, 98, 106, 101, 99, 116, 62, 39]) }"
+      },
+      "recovery": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 147
+      },
+      "strings": 281
+    },
+    {
+      "case": "gantt/medium",
+      "graphSha256": "66cfb0f27b4c331223dc767f197ce75dc87770f36bb3496d47b4e1ad4ec080d8",
+      "mutation": "first-intern",
+      "nodes": 353,
+      "operation": {
+        "output": {
+          "heightBits": "4097140000000000",
+          "svgBytes": 12574,
+          "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "4097140000000000",
+        "svgBytes": 12574,
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 147
+      },
+      "strings": 281
+    },
+    {
+      "case": "gantt/large",
+      "graphSha256": "86f07eff6eda82c3374a093ad3c2e7e111f1158db22462151dcffeb2517da42f",
+      "mutation": "duplicate-utf16-id",
+      "nodes": 1417,
+      "operation": {
+        "output": {
+          "heightBits": "40b7950000000000",
+          "svgBytes": 48636,
+          "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 603
+      },
+      "strings": 889
+    },
+    {
+      "case": "gantt/large",
+      "graphSha256": "2fb37097ab85f85e4ff9ecc77b962befdff0f03a99921334a6c824fe2547fc2f",
+      "mutation": "deleted-recreated",
+      "nodes": 1417,
+      "operation": {
+        "output": {
+          "heightBits": "40b7950000000000",
+          "svgBytes": 48636,
+          "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 603
+      },
+      "strings": 889
+    },
+    {
+      "case": "gantt/large",
+      "graphSha256": "8fa384db96730725a1b9da3b86a92a8552795c54859e67607596a98fec0a0a5e",
+      "mutation": "readonly",
+      "nodes": 1017,
+      "operation": {
+        "error": "JavaScript { name: TypeError, message: JsString([67, 97, 110, 110, 111, 116, 32, 97, 115, 115, 105, 103, 110, 32, 116, 111, 32, 114, 101, 97, 100, 32, 111, 110, 108, 121, 32, 112, 114, 111, 112, 101, 114, 116, 121, 32, 39, 112, 114, 111, 99, 101, 115, 115, 101, 100, 39, 32, 111, 102, 32, 111, 98, 106, 101, 99, 116, 32, 39, 35, 60, 79, 98, 106, 101, 99, 116, 62, 39]) }"
+      },
+      "recovery": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 603
+      },
+      "strings": 889
+    },
+    {
+      "case": "gantt/large",
+      "graphSha256": "67c4ab748b15723ae895d0b9bec86c39651a6058a8783bd0515b1277e6d5d2ef",
+      "mutation": "first-intern",
+      "nodes": 1417,
+      "operation": {
+        "output": {
+          "heightBits": "40b7950000000000",
+          "svgBytes": 48636,
+          "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+          "type": "gantt",
+          "widthBits": "4089000000000000"
+        }
+      },
+      "recovery": {
+        "heightBits": "40b7950000000000",
+        "svgBytes": 48636,
+        "svgSha256": "910268617a49efe5703317e4a3fc7a4da5a48049415cf718053cecdc563bcb7b",
+        "type": "gantt",
+        "widthBits": "4089000000000000"
+      },
+      "revision": 3,
+      "root": {
+        "kind": "ref",
+        "value": 603
+      },
+      "strings": 889
+    }
+  ]
+}

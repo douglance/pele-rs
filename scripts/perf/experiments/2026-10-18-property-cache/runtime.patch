@@ -1,0 +1,43 @@
+diff --git a/crates/pele/src/compat/public/graph.rs b/crates/pele/src/compat/public/graph.rs
+index 85b29fa..bae1abc 100644
+--- a/crates/pele/src/compat/public/graph.rs
++++ b/crates/pele/src/compat/public/graph.rs
+@@ -280,6 +280,9 @@ impl ModelGraph {
+ pub struct GraphWriter {
+     graph: ModelGraph,
+     strings: HashMap<JsString, u32>,
++    // Positive property-name cache; raw UTF16 string interning remains canonical.
++    // Bounded for arbitrary unique/long consumer keys.
++    property_keys: HashMap<String, u32>,
+ }
+ impl Default for GraphWriter {
+     fn default() -> Self {
+@@ -291,6 +294,7 @@ impl Default for GraphWriter {
+                 nodes: vec![],
+             },
+             strings: HashMap::new(),
++            property_keys: HashMap::new(),
+         }
+     }
+ }
+@@ -311,8 +315,19 @@ impl GraphWriter {
+         id
+     }
+     pub fn property(&mut self, key: &str, value: Atom) -> Property {
++        let id = if key.len() > 64 {
++            self.string(key)
++        } else if let Some(id) = self.property_keys.get(key) {
++            *id
++        } else {
++            let id = self.string(key);
++            if self.property_keys.len() < 64 {
++                self.property_keys.insert(key.to_owned(), id);
++            }
++            id
++        };
+         Property {
+-            key: self.string(key),
++            key: id,
+             value,
+             flags: 7,
+         }

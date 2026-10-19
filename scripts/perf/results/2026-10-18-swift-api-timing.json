@@ -1,0 +1,2581 @@
+{
+  "schemaVersion": 1,
+  "mode": "local-swift-api-timing",
+  "startedAt": "2026-10-18T18:24:59.459Z",
+  "revision": "9259e358e284b32d188e29e241d52b8e53f7b163",
+  "worktree": [
+    "M bindings/web/full.d.ts",
+    " M bindings/web/graph-binary.js",
+    " M bindings/web/graph.js",
+    "?? scripts/perf/swift/"
+  ],
+  "buildManifest": {
+    "schemaVersion": 1,
+    "builtAt": "2026-10-18T18:24:20.649Z",
+    "revision": "9259e358e284b32d188e29e241d52b8e53f7b163",
+    "root": "/Users/vijaysingh/unlocalhosted/pele-rs",
+    "sourceInputSha256": "7c626c255d6a38f623175b944beeb3150eb598a89aeb7683a3010ea02114a12e",
+    "inputHashes": {
+      "root/Cargo.lock": "1fd27999705a39eaa84a9718c5b1e64219a8f08dc7e3503565f389e7eb49fe05",
+      "root/Cargo.toml": "6631ddcecdf24d3e798e86bad219255833d767f4ec10b9c637a136dc26b57d85",
+      "root/Package.swift": "8710289f69c4b65a97073030a5e742e71d5c49e6190b76f99c788a9601e94ca9",
+      "root/bindings/swift/Sources/Pele/CalendarResources.swift": "7635064ea2b0623dd98d485864ff455dea23d4a0572f451d3b2ff80d5524cee9",
+      "root/bindings/swift/Sources/Pele/Engine.swift": "71a99fa49cf903f41bf67a142ca87e10abdd8ea0acfc8540d9e44ab5ef9d7a40",
+      "root/bindings/swift/Sources/Pele/HostResources.swift": "ce7305857500e5e5150e46e68d1fa62f2db5bbf2e143124038587662dac8e35f",
+      "root/bindings/swift/Sources/Pele/MutableDocument.swift": "764e9ec082bf43113914ed7f5cac44600b3a5ef031f632660d7ea71545a8ed5f",
+      "root/bindings/swift/Sources/Pele/Pele.swift": "bdab64d9e0ba3e31c80032e4d7301c46158ecbb829fa193b7f30623619ec8784",
+      "root/bindings/swift/Sources/Pele/PublicBinary.swift": "ddbe63bc13bf879313a1ef2481ffa2469ea28dfa4e51e1b5bdc7764278e1a808",
+      "root/bindings/swift/Sources/Pele/PublicGraph.swift": "c9d582d57d364384f5ea67c6ea71f42f4f1ceb11215f89a29873f77bb1fd6520",
+      "root/bindings/swift/Sources/Pele/PublicMethods.swift": "78c1943cc9e3b66047e6eebd861f819f86da1343ddc64c550c7adc514ac417db",
+      "root/bindings/swift/Sources/Pele/SourceInspection.swift": "5638cd2c18dc849e90b25bdc2c4aeb75c361210038ae3d7f2f9f8b2bade3572e",
+      "root/crates/pele-ffi/Cargo.toml": "cbf9bdcddb46ae2e165c9addde5a7e8dd94791df54eebfe81af3464a883e36bb",
+      "root/crates/pele-ffi/src/calendar.rs": "bcb1c5c01ed5c012db2c794d9fd05fe6869d5beaea8db3356e660a48824e18a1",
+      "root/crates/pele-ffi/src/lib.rs": "37de7508fbd6346ff4ae16ed2d4d2435d0afad5626ee7d4daf42aa0db2ae9d54",
+      "root/crates/pele-ffi/src/public.rs": "6c166f559d4130bdeb4767242b483dac7e368b2e907645c0c9633ea5791c5662",
+      "root/crates/pele/Cargo.toml": "9c07eb4e04d5124707cee24fcad4023736ea9c672d3db4dcf01d6ab0c31a809e",
+      "root/crates/pele/assets/MERMAID-LICENSE": "ec9fb67dcb25eccc416ed56e1aab819222c805a2a4bfe4cb19e7556bf2ffde80",
+      "root/crates/pele/assets/PELE-LICENSE": "311bccc30de6f7b9cbfb64232bb0c911ccb2191abe316550813ae25b2c7925b9",
+      "root/crates/pele/assets/fonts/NotoSans-Regular.ttf": "b85c38ecea8a7cfb39c24e395a4007474fa5a4fc864f6ee33309eb4948d232d5",
+      "root/crates/pele/assets/fonts/OFL.txt": "0dab92d0544f7b233403f14b84a663bdbfa746982eda629e7f4f9ffe1b036feb",
+      "root/crates/pele/assets/fonts/README.md": "418f588eef8e24fe667e769efc3cae79016ab95f96c8fa2024c20fd5ebe1e33f",
+      "root/crates/pele/assets/licenses/FDLIBM-LICENSE": "94434bf4c996be175dca291082adcb500157a77b257ab436010ec65035ca5ddc",
+      "root/crates/pele/assets/licenses/V8-LICENSE": "6ab33af8774a0f396ee3aeeb761e3229057682d6f9fa7f572e390c2cb3a6e509",
+      "root/crates/pele/src/compat/calendar.rs": "3a84fbcb5548f6e4edb2322d4fda8024522e279d8b6c6eda292ebfa04dfa7bb9",
+      "root/crates/pele/src/compat/calendar/date_parser.rs": "1c61d13dd9a64d69bbbc33428d88ba708d0191f78a2be0cd572928f2f404b60b",
+      "root/crates/pele/src/compat/diagrams/agentflow/graph.rs": "7931715c2985a187707aabdc4779f7450436892800d7973c81f8f996c0fa0f0e",
+      "root/crates/pele/src/compat/diagrams/agentflow/lexer.rs": "2397731da2ee0b174b7dee127c3d29cd5e516461150aeb99b1e84d95650e01b3",
+      "root/crates/pele/src/compat/diagrams/agentflow/mod.rs": "1e8216a1da7b4e6d7472205ec227d59f87ac9a6ce4c43600f33155042e8998b1",
+      "root/crates/pele/src/compat/diagrams/agentflow/model.rs": "8d2892f9005e2c28aa95f1cf4cbba1a0542de9d3809913cc581784494e4ceb56",
+      "root/crates/pele/src/compat/diagrams/agentflow/parser.rs": "0ef53a84e99cef6cf24cdb1912273efd09d73742c8592736fd2390712f9325fe",
+      "root/crates/pele/src/compat/diagrams/agentflow/public_model.rs": "f10255a06c62392bc1739475b0fc04b64bab2387341eb4afb959be0fbea5eef0",
+      "root/crates/pele/src/compat/diagrams/agentflow/render.rs": "55dcfe2f3a96c968dc7ec949b509b3fcb828a7cc7bde4f49bbb1af312e14464b",
+      "root/crates/pele/src/compat/diagrams/agentflow/shapes.rs": "3099aaffdc18bef99e45562b31338d840abc48cdd0d91770205b220a55523b2b",
+      "root/crates/pele/src/compat/diagrams/agentflow/tokens.rs": "c313678dde1ea0d9d2308b80c554542e827f054bed69bb4088e23aea9ece02b8",
+      "root/crates/pele/src/compat/diagrams/architecture/layout.rs": "68b49064a26a5a589d7693b7bb60c6522f8917b2f0f0455a46f6a2139a13693f",
+      "root/crates/pele/src/compat/diagrams/architecture/mod.rs": "5811d06a4efa72aff5ac781bb89462ce051739a3e529707d5fff21c514d8e5f3",
+      "root/crates/pele/src/compat/diagrams/architecture/model.rs": "d5fa13defe62ac8104274204ae233f7faff48320447847d3f75d49f10708c951",
+      "root/crates/pele/src/compat/diagrams/architecture/parser.rs": "589db246b16d5b59bc88d0b4ba778d0a50b67aaf50c5113f161c8400348a38e0",
+      "root/crates/pele/src/compat/diagrams/architecture/public_model.rs": "d2fb76f0f99d02621de585173ace184dbb07fbaf203f2728eab0ae912d83b307",
+      "root/crates/pele/src/compat/diagrams/architecture/render.rs": "ec4e47a4f145ff2b6c9e7e6a56f18ec92923df7c5fe3a85e7d6ee445df3d33fd",
+      "root/crates/pele/src/compat/diagrams/block/arrows.rs": "9cdbd8cf6626ed32af39c8bed118d65135763034e6ee63d9bdda5497c59e24b8",
+      "root/crates/pele/src/compat/diagrams/block/layout.rs": "946d7450685216ca7337bb79921ef20b65da136de1ed61bee107e3557b0bc168",
+      "root/crates/pele/src/compat/diagrams/block/lexer.rs": "2886854c3d7922c98661d2be0642ed4faceae91c03bd355b69afc75a9283b50b",
+      "root/crates/pele/src/compat/diagrams/block/mod.rs": "28c018089ee6a518cbdd37d60fe26e9519344be8c5ef2e6ff52f7fdbae36c23f",
+      "root/crates/pele/src/compat/diagrams/block/model.rs": "266d0ca10f27d51e71e125043788c4d84756fdc34e0b652496f5a650b7553014",
+      "root/crates/pele/src/compat/diagrams/block/parser.rs": "345520f1bb376340a269a4ad222408b4a04f4303bb9688cfb37af7f2a4cb8585",
+      "root/crates/pele/src/compat/diagrams/block/public_model.rs": "57eb62df6118d303b86aa91524b7f47113a58ff92dfa3f4cb5b205df738e6308",
+      "root/crates/pele/src/compat/diagrams/block/render.rs": "633c436b4a2a680f475b95e99f233ca9dbcdb43616e9601990e4d95cd799c6d1",
+      "root/crates/pele/src/compat/diagrams/block/route.rs": "0ed37871d518cda01d95d70790576ae658e0a11013b930f5b25978f3ed2b481e",
+      "root/crates/pele/src/compat/diagrams/block/tokens.rs": "5bc18a0c0aeae266e0b3698975c55bc036604203665203bff0d4ce06e95e860b",
+      "root/crates/pele/src/compat/diagrams/c4/layout.rs": "996d28371916696eb337bbe9c1dfa51c4d2938bcc99644f81a755b18cb8779f6",
+      "root/crates/pele/src/compat/diagrams/c4/lexer.rs": "7da970b0c3f024c105ce84fa3b84dda5ea7a84078d476142234a812ed09de424",
+      "root/crates/pele/src/compat/diagrams/c4/mod.rs": "ffaf01b5bd6645b7e2a1692ffa05278bca709ad5e35e07bd39641702c771bf36",
+      "root/crates/pele/src/compat/diagrams/c4/model.rs": "336a47ebe29079f66e964ca10371b854c5271d4f6cbc05f26ea4a25c2f509481",
+      "root/crates/pele/src/compat/diagrams/c4/parser.rs": "5697d0538a7857c983303cc6e4bcf7268c88582956d5a71119c8d2bd8d6458b4",
+      "root/crates/pele/src/compat/diagrams/c4/public_model.rs": "ee4884ef2a321b99543faa14075653c32568cf9641c1acf2db62577185e7fc11",
+      "root/crates/pele/src/compat/diagrams/c4/render.rs": "f0e7a7ade55dc8fe0237628c71497309eb7897e41535d469a6b8ca124e2ffe9e",
+      "root/crates/pele/src/compat/diagrams/c4/route.rs": "c825d8ae7dd86f31d791eb93978cd40942bfbc7895c9970bb991fb9b6296c72b",
+      "root/crates/pele/src/compat/diagrams/c4/tokens.rs": "6c1f125dd2dba817cc7ff99f4c5632337b6aadf30d8a1ee153a9a0645dd409ed",
+      "root/crates/pele/src/compat/diagrams/class_diagram/graph.rs": "5b35456b1b46b517c0fd3e994586bfc001c77ca8cf280464d95205b44bd11108",
+      "root/crates/pele/src/compat/diagrams/class_diagram/lexer.rs": "0f60950139dada31d18f90f61d7b25572f869e044c858ae95fc034f34e1b063d",
+      "root/crates/pele/src/compat/diagrams/class_diagram/markers.rs": "8faed0e22abbcebde6aad5e66b6a17b12233dcd9722a3db559bce43b99d62d1d",
+      "root/crates/pele/src/compat/diagrams/class_diagram/mod.rs": "efd05c51c75d7271974b1b69a753dd27fdee380c8eefe183c4070031bc0c7e7f",
+      "root/crates/pele/src/compat/diagrams/class_diagram/model.rs": "10a34160d115e1319723a6c85de67baad88f0b483ee78c030f973e95ef507189",
+      "root/crates/pele/src/compat/diagrams/class_diagram/parser.rs": "28e2994e5efb104d41c0dc7d3bdefd6ebec1c3a676af2549d48f5ffe24d61314",
+      "root/crates/pele/src/compat/diagrams/class_diagram/public_model.rs": "b720dc0de271ca252f133a09a0c56ec9615bec3a8958e1c4f05a42025eafad7c",
+      "root/crates/pele/src/compat/diagrams/class_diagram/render.rs": "41a3fd2753a2e3a9aafd9631dc84d9255436a2940710c2b35fbd40764ea3b4bc",
+      "root/crates/pele/src/compat/diagrams/class_diagram/tokens.rs": "aa36aa1638628ff771ed264c3856395c77829e24f0d71772f62ec3931bfafefd",
+      "root/crates/pele/src/compat/diagrams/common.rs": "151337b6e47270f54b3eee563c12b105a61521944d1dd0cdc146704adb72e5a4",
+      "root/crates/pele/src/compat/diagrams/common/generics.rs": "cce550a1ed20b755f2cf0677e815cbce8646da0d023800dd1b1f8833fb3c66fa",
+      "root/crates/pele/src/compat/diagrams/common/icon.rs": "f8c21cb23557d4fb58180cd51df88dddf7b24e09f05742e75012e9515884f2cf",
+      "root/crates/pele/src/compat/diagrams/common/json_graph.rs": "fb7b6322bf60fbcc9e20ae9521658dcf51a6ea03bd5f730ed2e9309ebe2d3a55",
+      "root/crates/pele/src/compat/diagrams/common/langium.rs": "7d29469570ecd11344e226f4d321e742c46e5edc043658b8be842a1c15f4c447",
+      "root/crates/pele/src/compat/diagrams/common/literal_label.rs": "58aeaae92c2ee6e47424ccfa573b235113fef553243d25e306a069acfea48427",
+      "root/crates/pele/src/compat/diagrams/common/outline.rs": "8baf2021d60dde242af578a6709fd142be0b2e7ab4424fbe71d6b22a85db0d7c",
+      "root/crates/pele/src/compat/diagrams/common/plain_label.rs": "1cdd9429534bb41700bb37763e48fdddf5b385ce02024aefe8b10ef273ac729e",
+      "root/crates/pele/src/compat/diagrams/cynefin/boundaries.rs": "d652f733b51cee6f9615eb8670ff926fbfac167e94a07eed3d35b8c7eafec9a0",
+      "root/crates/pele/src/compat/diagrams/cynefin/mod.rs": "01511ec4031fe00bf9a9db3bad3f4abf8a2e264d2e50c3f8975d4451c02560a2",
+      "root/crates/pele/src/compat/diagrams/cynefin/model.rs": "67acee177c95753dc3429f85d455451117a61aa6e521e10531b2fac3cbbdd0ab",
+      "root/crates/pele/src/compat/diagrams/cynefin/parser.rs": "79038c7c9250b531b70432a74047255dbf51c1b83265c162f01787beb53c65ee",
+      "root/crates/pele/src/compat/diagrams/cynefin/public_model.rs": "6e4a1fa8c7c794861fa33fb5d7c13013073f95d2b631e41f25c6103647a6f7f9",
+      "root/crates/pele/src/compat/diagrams/cynefin/render.rs": "9241d09dcda4d87ddda88ce9cedf7560a04e9228c9d16eafb9ba0ba16b200634",
+      "root/crates/pele/src/compat/diagrams/er/graph.rs": "b4107c46d6a8b1c6d0e2bab3b64551b6bfc8a7dc01d3afa4240b98126e5f0546",
+      "root/crates/pele/src/compat/diagrams/er/lexer.rs": "fd0b5d6930bd4f9376eecb472377c71771125492eec0d1fe26b7c23e45fb2791",
+      "root/crates/pele/src/compat/diagrams/er/markers.rs": "a0d0b3f8925140942efe9f3a4da8cd58a73cdee33fd0219f391b042a6f94782d",
+      "root/crates/pele/src/compat/diagrams/er/mod.rs": "2fa40b3b9dd542939bb4ac92f31928565038cba3d14f0be962fa55c213b312e1",
+      "root/crates/pele/src/compat/diagrams/er/model.rs": "5a5e225c1a355c828856e30c149ad101c0a840c5a769b17d5103f369cc4fcbb5",
+      "root/crates/pele/src/compat/diagrams/er/parser.rs": "3dda37805729c68fa08ad344aa0207b7e6528ea4a7010fa70ddaaea42dd7f23c",
+      "root/crates/pele/src/compat/diagrams/er/public_model.rs": "ec6bfee1d5fb87f602c76c4a2c2ea08071e5b13dac69bd4e39423f8ea52f83ed",
+      "root/crates/pele/src/compat/diagrams/er/render.rs": "3d57f532bd521f32be42b4ed6364d5c3b28d1018c5c7b1903d4c55434b6b5426",
+      "root/crates/pele/src/compat/diagrams/er/tokens.rs": "631182cd7f7cc66ce95ebf94f6e8195b24e541866cdc1a790418d59e5698c5ab",
+      "root/crates/pele/src/compat/diagrams/event_modeling/mod.rs": "ada9f6698e8d0042ada18dc13a7b57be74459844848d1a8ba4193f2093195587",
+      "root/crates/pele/src/compat/diagrams/event_modeling/model.rs": "0e8232a6671c581738ac74362c472663e9b0e1a735d4812380251ed2c32fed55",
+      "root/crates/pele/src/compat/diagrams/event_modeling/parser.rs": "90868e20e6e6c8ca93a12c262e9e1a25f12d35d84fa149f958b21c8c199ab3eb",
+      "root/crates/pele/src/compat/diagrams/event_modeling/public_model.rs": "5560414fc0b4edff9b578589164992ee338b7d15a9bf5628bc74e2e07dc74724",
+      "root/crates/pele/src/compat/diagrams/event_modeling/render.rs": "08c90abfa19fd9d30c30b601ce7729227f1061719a4e73d29851bde23c6d850b",
+      "root/crates/pele/src/compat/diagrams/flowchart/graph.rs": "8023bf9bf357c05ccb9328e7afe0dadd6f111be96e092868f9637e4b51a6ae2a",
+      "root/crates/pele/src/compat/diagrams/flowchart/lexer.rs": "3f8f1a7ccc2965e2f99e4e2851c4ef6a1baedb2714b26e56503f0270f826ba65",
+      "root/crates/pele/src/compat/diagrams/flowchart/mod.rs": "b17096609b8dec678f34443b523ad09ecdf3a2b308831c9eaced607ae5b22650",
+      "root/crates/pele/src/compat/diagrams/flowchart/model.rs": "f939b5c21dc5d16408b1ba852376925b981a9e654d9aa33cf75ef55ffa1632c4",
+      "root/crates/pele/src/compat/diagrams/flowchart/parser.rs": "3637ad7386821856eb2dcb9c73d1bff6c4f185596421650483323b02580026db",
+      "root/crates/pele/src/compat/diagrams/flowchart/public_model.rs": "1fb4abcabff8f2ecec49053f542701a21ac26ff6a74802f1123e596cddf1454f",
+      "root/crates/pele/src/compat/diagrams/flowchart/render.rs": "2f5704a8ca21476dfbc42ea94f0d47ffd7565814e1c05b2541e190f77231cdb3",
+      "root/crates/pele/src/compat/diagrams/flowchart/shapes.rs": "ff8dc7edffe055cf5feaca1991ea456c221392ae686a4d21ef1ca560b04205d6",
+      "root/crates/pele/src/compat/diagrams/flowchart/tokens.rs": "daacbe8c099cc2c0994975983977ee3222ec27f566b849ee050137353f6ee136",
+      "root/crates/pele/src/compat/diagrams/gantt/axis.rs": "58e39f6c8fa90cb738237de5cd882f7e2d25aacc3db8755e14a8677fbce9f89e",
+      "root/crates/pele/src/compat/diagrams/gantt/dates.rs": "4c7cb5478753fd23b0fed46d3468edf3511dc84a5e764c8ce72de7a85c544a1a",
+      "root/crates/pele/src/compat/diagrams/gantt/lexer.rs": "2a42f23c6038aac19d1f149bfcdbbd2194860b8b7f4a0ba927ce33ead8424d9d",
+      "root/crates/pele/src/compat/diagrams/gantt/mod.rs": "fb97858d1ceea03f4577f7a3f91781190ebc8d7cb3fb0246df451cb8033a62a7",
+      "root/crates/pele/src/compat/diagrams/gantt/model.rs": "9bb6f4867976eb8e380befeecebe9e1f2304837568c9f9c5d043363fc8f43474",
+      "root/crates/pele/src/compat/diagrams/gantt/parser.rs": "d75361df988037955aa4371d4cda42913f10ee7b20efbece8fccec7375596a83",
+      "root/crates/pele/src/compat/diagrams/gantt/public_model.rs": "e360bc4305990e24b18006eedf485a52d3d523162de3fc103acad996d72ccf12",
+      "root/crates/pele/src/compat/diagrams/gantt/render.rs": "fd7b9f62d2bad0f485c659cfd75b97aa9aee95f40c39fd356c5da1f4095d4646",
+      "root/crates/pele/src/compat/diagrams/gantt/scheduler.rs": "dbb04776d35999246779de3484da5cbd44b4073b4789104df2ae4ce22989cc1c",
+      "root/crates/pele/src/compat/diagrams/gantt/tokens.rs": "2bd3a3d4db6832b113bcd98daa355fedc6ab143ed0862a14eb971321439f4a55",
+      "root/crates/pele/src/compat/diagrams/git_graph/mod.rs": "d9d680f50c4bd87e8378dda13eaf8e748866c2edc84a3dfb4a70fe7dfef3c2c7",
+      "root/crates/pele/src/compat/diagrams/git_graph/model.rs": "ce9157024cdee94710ed44e4ce7a9dc8c67aecbad6cc63cf9b31eebf74faf118",
+      "root/crates/pele/src/compat/diagrams/git_graph/parser.rs": "769543092f1eb9dd94618cf58e227bb28a15290ba552adddff97e5eeb54d1841",
+      "root/crates/pele/src/compat/diagrams/git_graph/public_model.rs": "7adb2554e99f88e633dcd7b810e91218b39bb69f2eefb070885f3069af806357",
+      "root/crates/pele/src/compat/diagrams/git_graph/render.rs": "b40c5f0f058bfc61678c912f5585f0db757cf37dcb2721782059de8de0d7e22c",
+      "root/crates/pele/src/compat/diagrams/info/mod.rs": "4c1999431382ea533fc4ca6cc8ae6629be4c0bc2f30cf2bde0cbfa48f658cb46",
+      "root/crates/pele/src/compat/diagrams/info/parser.rs": "9e7b555e89897bf11981021c3eea1c57f55daca0fd5851a7fbf55ab3acd14eb2",
+      "root/crates/pele/src/compat/diagrams/info/public_model.rs": "07f9f48f3d4f0161ce1cfd086bf20aca625927873e1b47d00cb3b43ad8d9b3c4",
+      "root/crates/pele/src/compat/diagrams/info/render.rs": "6ff1213d0fa357fade9f428250cf8e05a78d03aeb1600586b276decbd7c4b82f",
+      "root/crates/pele/src/compat/diagrams/ishikawa/mod.rs": "1ee3970ca1af391b206888b28984a12478be856d7719e40abf840ad961bba2ab",
+      "root/crates/pele/src/compat/diagrams/ishikawa/model.rs": "641ba6eca6c43ea4745b616d7060ef66526b21b8666ce26cd98100c3f80e35e5",
+      "root/crates/pele/src/compat/diagrams/ishikawa/parser.rs": "cfad4a207c3572dc811bfe94ce6fab002bd0aa9ac135d63f440a45667cc0cb57",
+      "root/crates/pele/src/compat/diagrams/ishikawa/public_model.rs": "a3bb177d87675493c3a47c39bbfb9ff250defc91a8adb08b16b9df089110cb26",
+      "root/crates/pele/src/compat/diagrams/ishikawa/render.rs": "c5bee1ded72ee7fae02fa2178197f7465a916ffe8d2941fcc5dd57bf5254ade3",
+      "root/crates/pele/src/compat/diagrams/journey/mod.rs": "7de182bc9e6dafe590e8986efe46509b4ff32ab8d24a736a4ff5d7f9a7f2c2ad",
+      "root/crates/pele/src/compat/diagrams/journey/parser.rs": "1546e878ff5da55a6c0b31398dc4a661c246ad69c408c70f0fe22d929b9cc070",
+      "root/crates/pele/src/compat/diagrams/journey/public_model.rs": "5f03d01276714ac90902d1b69a135741d05388af038e59cf265241d2334e27e6",
+      "root/crates/pele/src/compat/diagrams/journey/render.rs": "b297961f9a0e1f456b9151802a799754ad52123c75e6a6e5f4f7ebd742762882",
+      "root/crates/pele/src/compat/diagrams/kanban/mod.rs": "3dc9096b635e9be1dfb4efeee319e40adf5b4f7ae18ae0c0e1e844cd07c17934",
+      "root/crates/pele/src/compat/diagrams/kanban/public_model.rs": "828559eafa1175df67c2e59438f20fea0fdcb465e94f0ec0898a81e9dfb9ad43",
+      "root/crates/pele/src/compat/diagrams/kanban/render.rs": "1fc2169140a041f631c3fe604c8e57579a632d4e0296af36ca2ab6ad09c888f0",
+      "root/crates/pele/src/compat/diagrams/mindmap/mod.rs": "e727f719f2bc60558c9cd1e7f1e13610b7c4e5fadd6323272ef7484c3ab7b57f",
+      "root/crates/pele/src/compat/diagrams/mindmap/public_model.rs": "96aace54e995d4be174e32fcd32350b4ba6fa152b7277ba77ec3b584075cc499",
+      "root/crates/pele/src/compat/diagrams/mindmap/render.rs": "353b2e3a981ee6411db0491094e8335c930824824dd6a54a15ac406493b18e1d",
+      "root/crates/pele/src/compat/diagrams/mod.rs": "74b2004fff8da4947316741e3eaf8610b103fd11808d77d72ea32005e53bfd07",
+      "root/crates/pele/src/compat/diagrams/packet/mod.rs": "2c269fb962192fedcfb3b9392b39edf95adcbf87e727b3b2383d611a8bede44d",
+      "root/crates/pele/src/compat/diagrams/packet/parser.rs": "97acbee72f4217888ec23b2fbb5f617f18c179b842d6578c989f74112802ca1f",
+      "root/crates/pele/src/compat/diagrams/packet/public_model.rs": "0b73e309201ff866a99512d17c3e7b0dca83a33f97c0527dad1950fd6a25f3cb",
+      "root/crates/pele/src/compat/diagrams/packet/render.rs": "a2249bea75249e0fae358550a13e0d5790705390a7e1dacd032447947e9d588c",
+      "root/crates/pele/src/compat/diagrams/pie/mod.rs": "dd2a6acbafc8a40ef124934b959fab0cccd42a723d4de7c9c97581d205fb2beb",
+      "root/crates/pele/src/compat/diagrams/pie/parser.rs": "f882ea733653ec60035984667f6f1909575d117be22dc6c15460b762b32fe318",
+      "root/crates/pele/src/compat/diagrams/pie/public_model.rs": "dfc736aacfe8ed739d17f0bb81bbdc00fee75fac200fa0bcc777df551e2c6b46",
+      "root/crates/pele/src/compat/diagrams/pie/render.rs": "08fbbb872789adb0f500dafc8b523c4de7d62e05d5740fba06bba8bf64331780",
+      "root/crates/pele/src/compat/diagrams/quadrant_chart/mod.rs": "7579d7a4be2fa56ebd63270343a614ed4c3e7a9f97e976e2be828b8848d80e3c",
+      "root/crates/pele/src/compat/diagrams/quadrant_chart/parser.rs": "28b8f4e56b0b691181b671f344c8ed0e476a9e18f013a202b61118183155e367",
+      "root/crates/pele/src/compat/diagrams/quadrant_chart/public_model.rs": "1af963f4c3a77adc2697086d7430032eacbbad572702c3c4f53e222fc1550138",
+      "root/crates/pele/src/compat/diagrams/quadrant_chart/render.rs": "a00184c46dbd0a08df5292deb638b70c7fc7785513961b57c42c0d9bcc60e49d",
+      "root/crates/pele/src/compat/diagrams/radar/mod.rs": "4aebbdf5257b5db1e5e20b441ab7b6553c9a378fc9e7fa9d980ebed2c8242a71",
+      "root/crates/pele/src/compat/diagrams/radar/parser.rs": "995e84fc8b6e271eff3272614408ed7d15e1c88f2a583d385236b5c027597239",
+      "root/crates/pele/src/compat/diagrams/radar/public_model.rs": "5203aad48e5c886e29da0aff1ba0398ac949caa8600868c7ed484e9cec1b2300",
+      "root/crates/pele/src/compat/diagrams/radar/render.rs": "7017b28a6181babfd89e23e5122235d3d02af7290be5107230a97f49ef61b709",
+      "root/crates/pele/src/compat/diagrams/railroad/lexer.rs": "61f3fe4db1628ef1c7cffb8168a689da1a90fd5f467e214f5a58b113bfa3750d",
+      "root/crates/pele/src/compat/diagrams/railroad/mod.rs": "e7afcbd4336c576a21e99a44617b094d3383fc5e5d3e9030402123938d9d8827",
+      "root/crates/pele/src/compat/diagrams/railroad/model.rs": "1003ef97fd3070918d5c5bd4863720f3caac3b8ab4beb2337d38eb54687fcdf2",
+      "root/crates/pele/src/compat/diagrams/railroad/parser.rs": "bed4455323b93e24d609c5f1cc6870c61b332a79419e3c01ac740c0ad226ab18",
+      "root/crates/pele/src/compat/diagrams/railroad/public_model.rs": "f4434e18e29ad7b8a1e244513ccbaa4dd7115e48cad4407491afebe0365c5210",
+      "root/crates/pele/src/compat/diagrams/railroad/render.rs": "eeebd645f03d1fe2ae501ced78c7fde7648c6d60d67c4071cc7c51659a21d770",
+      "root/crates/pele/src/compat/diagrams/requirement/lexer.rs": "461435199ac44205a48ae9dd1c315a92ad980b3d8ad37d877fbabf3f1913e89e",
+      "root/crates/pele/src/compat/diagrams/requirement/mod.rs": "5064dd7ed4856aa0d120b460437495ba0cf86d16fcd79ca13416e5fac893821f",
+      "root/crates/pele/src/compat/diagrams/requirement/model.rs": "4704eb81c2b7765a3b97a6009fb02cad58b40b6724b546beb91a8f267b10b12e",
+      "root/crates/pele/src/compat/diagrams/requirement/parser.rs": "40e3a16223c840e02690b51588b8de221d1f056f5226ac0ff4cd035afa406d4d",
+      "root/crates/pele/src/compat/diagrams/requirement/public_model.rs": "000773ba5c7763161c17b1cd23a4e81ae3428772604a150fde4504b22434eeb2",
+      "root/crates/pele/src/compat/diagrams/requirement/render.rs": "90f03da3b5f87f445fefb061556f94272070300bef1c8d4f975a9e6c831e8613",
+      "root/crates/pele/src/compat/diagrams/requirement/tokens.rs": "a3ae1cbc35439b7451315995c2c26818c5df976ee5e088398e735285fb3d3195",
+      "root/crates/pele/src/compat/diagrams/sankey/layout.rs": "716a5a8bb0f503ed09ff3e15e678581c5bbad9e2524c3238af64c47c9c0408ed",
+      "root/crates/pele/src/compat/diagrams/sankey/mod.rs": "7d560963fe1cecfa5fe7858ac74f63b95727420244e6887d536b596338d1f9a6",
+      "root/crates/pele/src/compat/diagrams/sankey/model.rs": "f56bb1abf38b1c9bb0cecd2073e4564147b22b32239a807ab217f468bb337f9e",
+      "root/crates/pele/src/compat/diagrams/sankey/parser.rs": "1c2edae797d52a3998a3757392a1f13fadbc4ca2a3803b1293cbff715566606b",
+      "root/crates/pele/src/compat/diagrams/sankey/public_model.rs": "58625e632acdd71123b50cf51e75498acd15f84411d5f44f3388b51b6c413225",
+      "root/crates/pele/src/compat/diagrams/sankey/render.rs": "bfb3dfb9259ba97fd00231c664c299e64940a894f5feb596b03257b131bbfd7f",
+      "root/crates/pele/src/compat/diagrams/sequence/actors.rs": "0d652185382e625853dbccccaca8b07234b85ca7798f5e40cdebdf77bd717b60",
+      "root/crates/pele/src/compat/diagrams/sequence/colors.rs": "53aabc30f62f49cdaea4cd0d8c246e390b1916d1e412cac10450944110f5b0b3",
+      "root/crates/pele/src/compat/diagrams/sequence/json.rs": "661ee6aa792b8aa5a9446b438a9fa56e1e20d713b6031bade1890c2946874587",
+      "root/crates/pele/src/compat/diagrams/sequence/kinds.rs": "0880c16451b7035b3adf81c4f307f29c09898bd97e203c4ede1aee6b80649b47",
+      "root/crates/pele/src/compat/diagrams/sequence/lexer.rs": "aaee34642c6a0cc567e756fca3ff63abaffa840bb35a63d28d4d8580a4f4f8a8",
+      "root/crates/pele/src/compat/diagrams/sequence/mod.rs": "cfc90f3737474b372f8a4c4dc0fbce493cd85a6fa8b0d1c8564de0f1b7de4cf6",
+      "root/crates/pele/src/compat/diagrams/sequence/model.rs": "9f5b3a02ef0dbb789779a3d5e14f203d9473cd21c04c954049b00871847b4d02",
+      "root/crates/pele/src/compat/diagrams/sequence/parser.rs": "395bd0f7bf90b3c7ec0122e0962473190a4e9b136b7c86527e72c72127fb4664",
+      "root/crates/pele/src/compat/diagrams/sequence/public_model.rs": "62c99e6213a59475c474bde93e1a24623783b5c287cb89aa87fd06bd9f1cea89",
+      "root/crates/pele/src/compat/diagrams/sequence/render.rs": "955e61a9944bb45ad306859a9bdab641122d86d4294c9112d4fbf4b3f8a83533",
+      "root/crates/pele/src/compat/diagrams/sequence/tokens.rs": "6d39aacde9f70d9a5f61062d7d5edc033502b92f2f2c6d0919c21a18686d8fd2",
+      "root/crates/pele/src/compat/diagrams/state/graph.rs": "e6bb1bab2ff13173fbbc1f39aea708da1c3817791cbd8369cc8c7738ddcb66f4",
+      "root/crates/pele/src/compat/diagrams/state/lexer.rs": "8954d26891aebcfe50c657137124e9a330d86bdf5d98702c0f9285c5af1574d1",
+      "root/crates/pele/src/compat/diagrams/state/mod.rs": "b8f766e4950c855f41976a4d63c05da95e79c30f7256cd1230322af19772871f",
+      "root/crates/pele/src/compat/diagrams/state/model.rs": "f6f813e96abf212eb8e0629db42339e6558869caa29d37eb2414194997f31abe",
+      "root/crates/pele/src/compat/diagrams/state/parser.rs": "54f0b343abe51a6ba3d4354d7a9f76982194abca83278b179aeeabce773cd2ff",
+      "root/crates/pele/src/compat/diagrams/state/public_model.rs": "90aeadbec8e478e12e2a2a2713a642c0bc300a1c7c5b65a3a649e8d51eeff047",
+      "root/crates/pele/src/compat/diagrams/state/render.rs": "4ca228e89f93911a0d7696d0e1d4e4fa73022d779ba8c2148e17e143bfe36df4",
+      "root/crates/pele/src/compat/diagrams/state/tokens.rs": "4891b3d9abc556170d3e9d05b1ef1c7c1ac6b7e7d611c8d75c7da757a6d8ce4e",
+      "root/crates/pele/src/compat/diagrams/swimlane/layout.rs": "632ddcbb2057f6002ece43c0e5b329f3a578d9a9348c1f369fcab23281868484",
+      "root/crates/pele/src/compat/diagrams/swimlane/mod.rs": "c7c64231913b8ee5a01ad4d4648f0780becdb62f8ade2efd2701f7a4a65594eb",
+      "root/crates/pele/src/compat/diagrams/swimlane/public_model.rs": "1a1502c5b80d8d39e0e80f40036cb04ecca0f5d372543ae62041b2836695cee8",
+      "root/crates/pele/src/compat/diagrams/timeline/mod.rs": "c8a765cf0fec2d876aa25b967a4814ca914748b62dec392e6aac487b7cd5a5a5",
+      "root/crates/pele/src/compat/diagrams/timeline/parser.rs": "892ef6e404d70f2938359eb3f2fa3b51576405d1f1f20b48a22babc3b9ddf969",
+      "root/crates/pele/src/compat/diagrams/timeline/public_model.rs": "30976c9e77991f5e869ceeca57ae7f40675eef970df6bc75a793159249d5b19f",
+      "root/crates/pele/src/compat/diagrams/timeline/render.rs": "3a0fc5905b946f9eeaa20cd6f6c431dd1d726eafe78ca8089d728d990915cb6a",
+      "root/crates/pele/src/compat/diagrams/tree_view/box_drawing.rs": "facbfea2920e89300f9e822f7a504330424be99f8081d550499b1d0ce4609415",
+      "root/crates/pele/src/compat/diagrams/tree_view/icons.rs": "8d4ebc6ac21108f3662798c3d210c2a70e634072a1fb8c982149053a63e0116b",
+      "root/crates/pele/src/compat/diagrams/tree_view/mod.rs": "2499e7bc38f6f8efc54d7d1bd39d115f8ffbbaf427ab92b7f415c601b023bb7c",
+      "root/crates/pele/src/compat/diagrams/tree_view/model.rs": "5ff4e493d59163652df894529010209aa08a0441b90f464c1f2996670bb78ff4",
+      "root/crates/pele/src/compat/diagrams/tree_view/parser.rs": "86e930869568250d082bcc29c206bb3856169cff0e0be61c65655eb4d74e4fe3",
+      "root/crates/pele/src/compat/diagrams/tree_view/public_model.rs": "5d542bd713f3c6026a8d8ff7c99bbc3dcc0759ba388ab6c857e0e9a38dc753d4",
+      "root/crates/pele/src/compat/diagrams/tree_view/render.rs": "024e602daec4310210d68ee26acf5aafba7d0b2b8205dceff6273dfb8707a9c1",
+      "root/crates/pele/src/compat/diagrams/treemap/format.rs": "389446e9fc98e9b92478f1857660a89a48bbaefa151a902b03f03ff7df039bdf",
+      "root/crates/pele/src/compat/diagrams/treemap/layout.rs": "a7fce315d5664fcf4d4bbb8da9c69d517f61d5814956d3eecb89e0d7327d5c2a",
+      "root/crates/pele/src/compat/diagrams/treemap/mod.rs": "2382c0bd30a52d0ef0f9427762362ed8114a337d0f45159c42abd9f796c820e1",
+      "root/crates/pele/src/compat/diagrams/treemap/model.rs": "c815fa9fcd69a4b612d3b6268e59d977ff9e2308831332da167ccf02e4c138d0",
+      "root/crates/pele/src/compat/diagrams/treemap/parser.rs": "fc21072689b24a12697621e7e829a3da70e857b4ffdf4ff5361a0fa912212ff1",
+      "root/crates/pele/src/compat/diagrams/treemap/public_model.rs": "6bd35e1095cb5f3ad1df2ab9945955fbeee321d554472254ce388144c73ab4b6",
+      "root/crates/pele/src/compat/diagrams/treemap/render.rs": "105bb887369916ace013758747f0d6c02ef5576a1ad1ad92b4e148d14c836d4a",
+      "root/crates/pele/src/compat/diagrams/usecase/db.rs": "401109e3e96007f493b2fa2123f07fede1c97296fe52e0128df7883cf7ec5c4b",
+      "root/crates/pele/src/compat/diagrams/usecase/graph.rs": "cf19f3e6d5ca6d03549cbd89d92a50b0ebc5bf695245bbc721bc60202b19fa89",
+      "root/crates/pele/src/compat/diagrams/usecase/json.rs": "bed0cd2fda7df40d1fda7be5ef837bf68bc7cf4ad8624eb306882bfcb3a1bc9e",
+      "root/crates/pele/src/compat/diagrams/usecase/lexer.rs": "fb5543aa5ba4cc26b0bd3a60834c2e6896b35deb488761476c1f3cf58187dff3",
+      "root/crates/pele/src/compat/diagrams/usecase/mod.rs": "11dfb4f24fac465e78b769a4908cde896a16ebecb2d05aa2a8affb6a576be7a1",
+      "root/crates/pele/src/compat/diagrams/usecase/model.rs": "4477f160f622c14c6fab89b1f594476267f4ff736792b6e49bfa02ecb0ad6a65",
+      "root/crates/pele/src/compat/diagrams/usecase/parser.rs": "a41940bff253d378b11474945ea742e18f25d1583b01899aac283e085b36affd",
+      "root/crates/pele/src/compat/diagrams/usecase/public_model.rs": "b837a4741411596383109caa187e52d492cc2354f9cc39f4f5f4a2067e55defb",
+      "root/crates/pele/src/compat/diagrams/usecase/render.rs": "bed73102a7701dd523b794b5fcb14bb382b6af6ae5887eace7b9872947d5430d",
+      "root/crates/pele/src/compat/diagrams/usecase/tokens.rs": "860b7d49dd4c10fcc0f315e3f702d2ba97bef342fcf2114391e90740d551fd8c",
+      "root/crates/pele/src/compat/diagrams/venn/layout.rs": "0239e5005f37556220a6cb032358c3e2c276efb58074700fc6e6a8ed7eab6aa1",
+      "root/crates/pele/src/compat/diagrams/venn/lexer.rs": "7856a58e13e16f697c821ea41a284dc79d28a5aa290ac2467e8911afc0f2bdf8",
+      "root/crates/pele/src/compat/diagrams/venn/math.rs": "106a5e23e9f713a48ef735f9dfd357cb59e2cd78b3f0847ff5e042412aad892b",
+      "root/crates/pele/src/compat/diagrams/venn/mod.rs": "0cfa13a1316872a559608233572f5b0206eb0112cf26e5c49b9001924b08f1bc",
+      "root/crates/pele/src/compat/diagrams/venn/model.rs": "15ae7f3a000948e0f312e001a54c11037151034ade37dd2a636dadde744547dd",
+      "root/crates/pele/src/compat/diagrams/venn/parser.rs": "045719487acdb2b541d26c799639fe3e0e4234893a47b77f86f12a2d860f5655",
+      "root/crates/pele/src/compat/diagrams/venn/public_model.rs": "cd52e2d0a4553f4119319807c4ac756bd9648e93107e12c7e968eef2d351c2ef",
+      "root/crates/pele/src/compat/diagrams/venn/render.rs": "16fc627551b9105def591a67f3573ae45d47d97461502cf7f717165729a24974",
+      "root/crates/pele/src/compat/diagrams/wardley/lexer.rs": "47ebcc09fff71905f2e579af172b9a6b86f262d3839d732b7553d41eac034d90",
+      "root/crates/pele/src/compat/diagrams/wardley/mod.rs": "9f283ba129d1c5bcbdafd98c021fdea9e27cda0ecb02a3ca745163464663d31d",
+      "root/crates/pele/src/compat/diagrams/wardley/model.rs": "9687ff4135ddb2214d25b1cefab58334af17c08bb4698c5b012f3b96a9a87c8a",
+      "root/crates/pele/src/compat/diagrams/wardley/parser.rs": "108f416236536bcf0212832b92a57a11442e91f1829e3c5c4b73d6aac20ac5a4",
+      "root/crates/pele/src/compat/diagrams/wardley/public_model.rs": "d0bc6d0ee2377208b4647d2110365dc41a9f12ff836010147d3cf4930ecb3e22",
+      "root/crates/pele/src/compat/diagrams/wardley/render.rs": "96b56b9ab92e3eae50b6d4634d35e33a9878090da7936073ae4be06b6912d4eb",
+      "root/crates/pele/src/compat/diagrams/xychart/lexer.rs": "43961c54cd68da5db6f434f5ff88bd0839e145447eb90eeae7c9b756f6e9d640",
+      "root/crates/pele/src/compat/diagrams/xychart/mod.rs": "30160a58d084280f502c7bb9fc3b84db32f0ebb5d479cadc18c1c357945b0ffe",
+      "root/crates/pele/src/compat/diagrams/xychart/model.rs": "e26c513e461e1fe29ad69f412416f0c134faf71bea427bd0daa958381d289ac4",
+      "root/crates/pele/src/compat/diagrams/xychart/parser.rs": "918cd12c4f91207bd91f501cf5f0f3ad090bfbf15a192e3abba06a65bd9ac2fe",
+      "root/crates/pele/src/compat/diagrams/xychart/public_model.rs": "21cbe74c6dadec43cee03bb991a8279e7da85545fc2b7c108fb93aaa0bf7e38a",
+      "root/crates/pele/src/compat/diagrams/xychart/render.rs": "510892ca54e4c4ed73c479cbe2a0e2abf063730a6fb31a9844d983ce2edb43e5",
+      "root/crates/pele/src/compat/diagrams/xychart/ticks.rs": "fe4b47727e405fbba7ebe4c89a9bd7d8b4ba3a566359810b26a4572ed6970665",
+      "root/crates/pele/src/compat/diagrams/xychart/tokens.rs": "36406b5aec3b27f3f908b6769472d8d8a26f02c8d51323ac71a75beb0ff74b7f",
+      "root/crates/pele/src/compat/engine.rs": "bdf620e4ddedf035b17d4befcaab21b5051b100ce5a48b97720167f6593de666",
+      "root/crates/pele/src/compat/error.rs": "a01315b8e3b7d999de0e11744ae95d46d6aa99d59c1cc45361c9fc7bbe39cf23",
+      "root/crates/pele/src/compat/id.rs": "257296d208bcbcb4e4adb6867f6322a93db6a9a330a1da8a837fe0cbac8c0041",
+      "root/crates/pele/src/compat/layout/compound.rs": "ac8d7f3035b31c5ade01a960eacf14dd5779e01d29daed1a4de50ff4921f1941",
+      "root/crates/pele/src/compat/layout/layered.rs": "9d1dc862093a22a0026c4a2b495f0493af0cc68bd172ed372976c31860e94480",
+      "root/crates/pele/src/compat/layout/mod.rs": "6843a71fbbd3f1841c21b6c000f4b9716adb719b28f2220f9b74f8b8f2fd48eb",
+      "root/crates/pele/src/compat/mod.rs": "17e0c6c7b60d192dae6c36914d52d9e3768aa2d3050a1852f76c26992dfe3a10",
+      "root/crates/pele/src/compat/module.rs": "57759c8049831b737940f62a417d50e93ceee438aab90c348c177b7b9317debe",
+      "root/crates/pele/src/compat/public/binary.rs": "e51e9c291a41aad102681d0d111733df7ce4dd256c266404788b6d39fd8b1803",
+      "root/crates/pele/src/compat/public/engine.rs": "8a6f344f459e999136db0385e54df09b0911e5dea0776a6e3772add0e2eb7578",
+      "root/crates/pele/src/compat/public/graph.rs": "fa7b62308afa04411d3d2f7374dac8663531a475fe5e2fbf60b0a25c9470d384",
+      "root/crates/pele/src/compat/public/mod.rs": "d44ecfe5ca1c2a9be0db5cd10d51f80a29d7a68b236a4c0c2f20a66b692e0aa9",
+      "root/crates/pele/src/compat/public/schema.rs": "ce2a8377f64d973223ff4f372a1c869e18bbdbbbd64081fd739cac8ab27013d8",
+      "root/crates/pele/src/compat/source/decode.rs": "f0129eb3636ff3a637153b76283cf30d0d4d51776723adc528729ef3d99a78d9",
+      "root/crates/pele/src/compat/source/detect.rs": "b09133191a1c323425b4f62de66027e7062fb6966b0bb91838d2a5659c2ebbd3",
+      "root/crates/pele/src/compat/source/entities.rs": "928230332a36cf2c257b082a2ed68adc30fe9b45431186ce2e3fffc28e8a6f7a",
+      "root/crates/pele/src/compat/source/mod.rs": "cca6b7587c1632577261c201ecddfa38d18f46f74e967fd941e6ae7e5da7b716",
+      "root/crates/pele/src/compat/source/preprocess.rs": "36e5280b2361e0fb0a33ab892d52f22e76e46d82cefba16cf6b8d3d904ca097d",
+      "root/crates/pele/src/compat/source/unicode.rs": "dc0476a179346d73e2c41a05aa1e98091cdce38896a732603b958b0c26bd6a5f",
+      "root/crates/pele/src/compat/source/url.rs": "6f52842386b0f574dd890e6a117df73ac3414b18526c04034359e9c774f8370f",
+      "root/crates/pele/src/compat/source/yaml.rs": "e931791e416b094904fbe960bee13b33d3379ac14e2d909b9abfbc893c4c2354",
+      "root/crates/pele/src/compat/svg/edges/cluster.rs": "a50c8ef9e7449459802b3204b0d13b15c74aea016ed0f6536ecaf7e75efdf077",
+      "root/crates/pele/src/compat/svg/edges/mod.rs": "ea1c97b2c37adc334ff065abd649903efbf9665b5c8a30888d7d4d83ffedcfcf",
+      "root/crates/pele/src/compat/svg/edges/theme.rs": "04b66456fc71c47f02ce25d2bfa8c17d1f5e652ee234eca1083a6a155693bb6f",
+      "root/crates/pele/src/compat/svg/mod.rs": "1b1197959681d44b020793d9ee48eb46b8c76e63f53dfb4ec794d50c565062da",
+      "root/crates/pele/src/compat/svg/native.rs": "a2c58d8eaea45d45cca3cbfc902e7270c6f7b20a4c68e43a3c00ed41a4432176",
+      "root/crates/pele/src/compat/svg/shapes/draw.rs": "59b6505e690aedca076a10b62181ca602ea7ca8505b8dbd7052a5e1ad7ebf131",
+      "root/crates/pele/src/compat/svg/shapes/mod.rs": "ba8b363792a397fc6d61db6a1aad7453ce340d74b7b1a4fd143d6be4c09c8b23",
+      "root/crates/pele/src/compat/svg/title.rs": "0e5daba1024e2e75136d08e07ee54fd71a13d8d964304d48c13f85faec6b9eea",
+      "root/crates/pele/src/compat/text/metrics.rs": "c3395d37efeaed46bafebade7b1320c77143571e9b1c6aec6c42fa691ef5196d",
+      "root/crates/pele/src/compat/text/mod.rs": "60f884e0b73eaa8b6e3a4ecb3c2d6d047bcb5384dd37de1e31f8592050261031",
+      "root/crates/pele/src/compat/value.rs": "38ff128846d860f2ea3252bedbb14ae475df95dbbc11b388a2b4c36fc4d2d334",
+      "root/crates/pele/src/contract.rs": "f1327912e14cd726a8df55ce0c83ebd72e7978fdf790fee15a56e5d1a16dbb2e",
+      "root/crates/pele/src/error.rs": "25f0071ac1c760c8457ee5a9be9047b1068e551555714a3eaf9332988817ab20",
+      "root/crates/pele/src/layout.rs": "6f09532f1cb7d61685183b17d9fd228ada2541dcbae8ef02865920277e288611",
+      "root/crates/pele/src/lib.rs": "7e5805bf873a4d2ae5aa7735a0dd3831dbee4b2a6efc559334ae661380e32e5c",
+      "root/crates/pele/src/model.rs": "31cc8cd46e5a80082daf5984681522a309e0f509d203099bd2409c4e09b16fa8",
+      "root/crates/pele/src/parser.rs": "21349d58acc21ad96323a9a5e58f026675751e37643fe16bf7a2f73113e17ce8",
+      "root/crates/pele/src/svg.rs": "412efd361da4a2d6655e449222d83eafccf118c91d13ad25b446f385fcbb70dd",
+      "root/crates/pele/src/text.rs": "9c4bfaeac59e863b123c92f9c595341d3f370701eca948051cf242ba9275311b",
+      "root/include/module.modulemap": "1223133150a02208f0398c3f5343e7339262ff3861feb0d1aa0a053f8bca923e",
+      "root/include/pele.h": "623cffc9d191b4e43623acd484e2c4a8647a996c0f2d5ab5148a69241047a344",
+      "root/rust-toolchain.toml": "285f52b2ffc4216dd148af7430782c22cc85d70313e3b77ea1d9f59c41c2bb4b",
+      "root/scripts/build-native.sh": "9b3e9cb20174a51f2c6f82405df3078d8c09497c6a8fc8582669666d292e6523",
+      "root/scripts/env.sh": "2b3ac007a7080a3853fdc3637246d294ac2decd679eaad7c19a6ce397b54c4b5",
+      "root/scripts/perf/cases.mjs": "b16a28135adb4206a10af40f12b3a1508c2648e6dc1be3b1a4cff5a62f537a58",
+      "root/third_party/MERMAID-LICENSE": "ec9fb67dcb25eccc416ed56e1aab819222c805a2a4bfe4cb19e7556bf2ffde80",
+      "root/third_party/PELE-LICENSE": "311bccc30de6f7b9cbfb64232bb0c911ccb2191abe316550813ae25b2c7925b9",
+      "root/third_party/fdlibm/LICENSE": "94434bf4c996be175dca291082adcb500157a77b257ab436010ec65035ca5ddc",
+      "root/third_party/v8/LICENSE": "6ab33af8774a0f396ee3aeeb761e3229057682d6f9fa7f572e390c2cb3a6e509",
+      "root/third_party/v8/date-parse.js": "2505d3bb53c2d415a21c89b703fe36b55e5ec3e5f2337d145649f60317e8085c",
+      "consumer/Package.swift": "72360245a94f632c275c5ca0798e78acf71fd8a59736181c9a64f4e91335da27",
+      "consumer/Sources/PeleSwiftPerf/main.swift": "0260ebd8b52207589d3b232e06914341e83429f59f511639d1725948ed01de84",
+      "consumer/build.mjs": "fca7a56bd6b3acab2bf5d82ef82faac792e5411fbc9205f40b23f5fb1ebae4e5",
+      "consumer/run.mjs": "1398692ab5fb874ce9ea4f299a9c278551675b599e0dbb75a64d11baec34eba4",
+      "consumer/README.md": "a7114e9fd057177be1cfcb2953a89d3446c2da8153e5ee6b571ad1c1eed26321",
+      "CPele/FDLIBM-LICENSE": "94434bf4c996be175dca291082adcb500157a77b257ab436010ec65035ca5ddc",
+      "CPele/FONT-OFL.txt": "0dab92d0544f7b233403f14b84a663bdbfa746982eda629e7f4f9ffe1b036feb",
+      "CPele/Info.plist": "aa71d274ec18386fb8152c57a522d385413c645170f14a38b5e4bb5db8a68ad7",
+      "CPele/LICENSE": "aef3cf2da463965b588dcbcca390b560b64f6a0a2ab088b74a2a9e554c2a76fd",
+      "CPele/MERMAID-LICENSE": "ec9fb67dcb25eccc416ed56e1aab819222c805a2a4bfe4cb19e7556bf2ffde80",
+      "CPele/PELE-LICENSE": "311bccc30de6f7b9cbfb64232bb0c911ccb2191abe316550813ae25b2c7925b9",
+      "CPele/V8-LICENSE": "6ab33af8774a0f396ee3aeeb761e3229057682d6f9fa7f572e390c2cb3a6e509",
+      "CPele/macos-arm64_x86_64/Headers/module.modulemap": "1223133150a02208f0398c3f5343e7339262ff3861feb0d1aa0a053f8bca923e",
+      "CPele/macos-arm64_x86_64/Headers/pele.h": "623cffc9d191b4e43623acd484e2c4a8647a996c0f2d5ab5148a69241047a344",
+      "CPele/macos-arm64_x86_64/libpele_ffi.a": "1a7f5b670b6d0ccdc57c605bf6014aecb6fd95984cbf8c59fe4268184210833f"
+    },
+    "binary": "/Users/vijaysingh/unlocalhosted/pele-rs/scripts/perf/swift/.build/out/Products/Release/PeleSwiftPerf",
+    "binarySha256": "b79b1f846644ad9e00bd18c652a1dd23a9ca43a19910198b10c9b7d3d809fe35",
+    "nativeArchive": "/Users/vijaysingh/unlocalhosted/pele-rs/bindings/swift/Artifacts/CPele.xcframework/macos-arm64_x86_64/libpele_ffi.a",
+    "nativeHostArchiveSha256": "f8c8f8bb4939bb815813add7990c2ab1d3bcc6bfa0af7cb91c81f8934783e621",
+    "nativeSourceFreshness": "cargo build --locked --release -p pele-ffi --target aarch64-apple-darwin; host slice equals target/aarch64-apple-darwin/release/libpele_ffi.a",
+    "rustTarget": "aarch64-apple-darwin",
+    "swift": "Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)\nTarget: arm64-apple-macosx26.0",
+    "sdk": "27.0",
+    "architecture": "arm64"
+  },
+  "oracleRevision": "458322a5b8abb1ae57ddf127c32017ab9fb14a92",
+  "oracleSha256": "d1ebc1889f3069d7759fe5db34c4ad4b4823285edbee2b537d0ef3d505a76d8d",
+  "node": "v25.9.0",
+  "platform": "darwin",
+  "arch": "arm64",
+  "cpu": "Apple M1 Pro",
+  "logicalCPUs": 8,
+  "totalMemory": 17179869184,
+  "settings": {
+    "trials": 7,
+    "targetBatchMs": 12,
+    "warmupMs": 100,
+    "fixedClock": 1704067200000,
+    "timeZone": "UTC",
+    "resources": "UTF16 length × size × (bold?.71:.6)",
+    "stages": [
+      "parseMutable",
+      "snapshot",
+      "apply",
+      "render",
+      "lifetime"
+    ],
+    "selectedCases": [
+      "flowchart/medium",
+      "er/medium",
+      "gantt/medium"
+    ],
+    "freshRetainedStatePerBatch": true,
+    "ownership": "Per-operation autorelease pool drain is inside the API timer; retained document setup/warm render and verification are outside"
+  },
+  "scope": {
+    "apiCosts": "Actual Swift APIs include C FFI, binary graph crossings, intrinsic JSON encoding/decoding, native validation/import, fresh C registry on parse, and mutable publication on render.",
+    "lifetime": "parseMutable -> snapshot -> no-op apply -> render -> close, including owned values disposal",
+    "excluded": "Process/module startup, NDJSON control, output hashing/verification, AppKit/DOM decoding/painting and GPU work",
+    "comparisons": "No JS ratio, allocator comparison or subtraction from native component measurements",
+    "externalLoad": "Unrelated xctest processes are recorded, not stopped or used to block the run. Results describe a shared host, not a globally idle machine."
+  },
+  "systemBefore": {
+    "loadAverage": [
+      4.74609375,
+      4.5771484375,
+      6.99365234375
+    ],
+    "freeMemory": 288702464,
+    "processes": [
+      {
+        "pid": 410,
+        "cpuPercent": 34.1,
+        "name": "WindowServer"
+      },
+      {
+        "pid": 11483,
+        "cpuPercent": 34,
+        "name": "node"
+      },
+      {
+        "pid": 813,
+        "cpuPercent": 17.1,
+        "name": "Google Chrome Helper"
+      },
+      {
+        "pid": 68977,
+        "cpuPercent": 13.6,
+        "name": "Google Chrome Helper (Renderer)"
+      }
+    ]
+  },
+  "cases": [
+    {
+      "id": "flowchart/medium",
+      "family": "flowchart",
+      "scale": "medium",
+      "units": 48,
+      "source": "flowchart TB\nn0[Node 0]\nn1[Node 1]\nn2[Node 2]\nn3[Node 3]\nn4[Node 4]\nn5[Node 5]\nn6[Node 6]\nn7[Node 7]\nn8[Node 8]\nn9[Node 9]\nn10[Node 10]\nn11[Node 11]\nn12[Node 12]\nn13[Node 13]\nn14[Node 14]\nn15[Node 15]\nn16[Node 16]\nn17[Node 17]\nn18[Node 18]\nn19[Node 19]\nn20[Node 20]\nn21[Node 21]\nn22[Node 22]\nn23[Node 23]\nn24[Node 24]\nn25[Node 25]\nn26[Node 26]\nn27[Node 27]\nn28[Node 28]\nn29[Node 29]\nn30[Node 30]\nn31[Node 31]\nn32[Node 32]\nn33[Node 33]\nn34[Node 34]\nn35[Node 35]\nn36[Node 36]\nn37[Node 37]\nn38[Node 38]\nn39[Node 39]\nn40[Node 40]\nn41[Node 41]\nn42[Node 42]\nn43[Node 43]\nn44[Node 44]\nn45[Node 45]\nn46[Node 46]\nn47[Node 47]\nn0 --> n1\nn1 --> n2\nn2 --> n3\nn3 --> n4\nn4 --> n5\nn5 --> n6\nn6 --> n7\nn7 --> n8\nn8 --> n9\nn9 --> n10\nn10 --> n11\nn11 --> n12\nn12 --> n13\nn13 --> n14\nn14 --> n15\nn15 --> n16\nn16 --> n17\nn17 --> n18\nn18 --> n19\nn19 --> n20\nn20 --> n21\nn21 --> n22\nn22 --> n23\nn23 --> n24\nn24 --> n25\nn25 --> n26\nn26 --> n27\nn27 --> n28\nn28 --> n29\nn29 --> n30\nn30 --> n31\nn31 --> n32\nn32 --> n33\nn33 --> n34\nn34 --> n35\nn35 --> n36\nn36 --> n37\nn37 --> n38\nn38 --> n39\nn39 --> n40\nn40 --> n41\nn41 --> n42\nn42 --> n43\nn43 --> n44\nn44 --> n45\nn45 --> n46\nn46 --> n47",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSha256": "d3ffdd90a8476c76234d30bf49cb41c7faaeb437c67ec4b5d92dd1e75dd2c5ca",
+      "sourceBytes": 1161,
+      "output": {
+        "type": "flowchart",
+        "widthBits": "405e000000000000",
+        "heightBits": "40b1e00000000000",
+        "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+        "svgBytes": 21889
+      },
+      "prepared": {
+        "outputs": [
+          {
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889,
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000"
+          },
+          {
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889,
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000"
+          },
+          {
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889,
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000"
+          }
+        ],
+        "caseID": "flowchart/medium",
+        "arenaNodes": 297,
+        "arenaStrings": 277
+      }
+    },
+    {
+      "id": "er/medium",
+      "family": "er",
+      "scale": "medium",
+      "units": 48,
+      "source": "erDiagram\nE0 {\n int id PK\n string label\n}\nE1 {\n int id PK\n string label\n}\nE2 {\n int id PK\n string label\n}\nE3 {\n int id PK\n string label\n}\nE4 {\n int id PK\n string label\n}\nE5 {\n int id PK\n string label\n}\nE6 {\n int id PK\n string label\n}\nE7 {\n int id PK\n string label\n}\nE8 {\n int id PK\n string label\n}\nE9 {\n int id PK\n string label\n}\nE10 {\n int id PK\n string label\n}\nE11 {\n int id PK\n string label\n}\nE12 {\n int id PK\n string label\n}\nE13 {\n int id PK\n string label\n}\nE14 {\n int id PK\n string label\n}\nE15 {\n int id PK\n string label\n}\nE16 {\n int id PK\n string label\n}\nE17 {\n int id PK\n string label\n}\nE18 {\n int id PK\n string label\n}\nE19 {\n int id PK\n string label\n}\nE20 {\n int id PK\n string label\n}\nE21 {\n int id PK\n string label\n}\nE22 {\n int id PK\n string label\n}\nE23 {\n int id PK\n string label\n}\nE24 {\n int id PK\n string label\n}\nE25 {\n int id PK\n string label\n}\nE26 {\n int id PK\n string label\n}\nE27 {\n int id PK\n string label\n}\nE28 {\n int id PK\n string label\n}\nE29 {\n int id PK\n string label\n}\nE30 {\n int id PK\n string label\n}\nE31 {\n int id PK\n string label\n}\nE32 {\n int id PK\n string label\n}\nE33 {\n int id PK\n string label\n}\nE34 {\n int id PK\n string label\n}\nE35 {\n int id PK\n string label\n}\nE36 {\n int id PK\n string label\n}\nE37 {\n int id PK\n string label\n}\nE38 {\n int id PK\n string label\n}\nE39 {\n int id PK\n string label\n}\nE40 {\n int id PK\n string label\n}\nE41 {\n int id PK\n string label\n}\nE42 {\n int id PK\n string label\n}\nE43 {\n int id PK\n string label\n}\nE44 {\n int id PK\n string label\n}\nE45 {\n int id PK\n string label\n}\nE46 {\n int id PK\n string label\n}\nE47 {\n int id PK\n string label\n}\nE0 ||--o{ E1 : owns\nE1 ||--o{ E2 : owns\nE2 ||--o{ E3 : owns\nE3 ||--o{ E4 : owns\nE4 ||--o{ E5 : owns\nE5 ||--o{ E6 : owns\nE6 ||--o{ E7 : owns\nE7 ||--o{ E8 : owns\nE8 ||--o{ E9 : owns\nE9 ||--o{ E10 : owns\nE10 ||--o{ E11 : owns\nE11 ||--o{ E12 : owns\nE12 ||--o{ E13 : owns\nE13 ||--o{ E14 : owns\nE14 ||--o{ E15 : owns\nE15 ||--o{ E16 : owns\nE16 ||--o{ E17 : owns\nE17 ||--o{ E18 : owns\nE18 ||--o{ E19 : owns\nE19 ||--o{ E20 : owns\nE20 ||--o{ E21 : owns\nE21 ||--o{ E22 : owns\nE22 ||--o{ E23 : owns\nE23 ||--o{ E24 : owns\nE24 ||--o{ E25 : owns\nE25 ||--o{ E26 : owns\nE26 ||--o{ E27 : owns\nE27 ||--o{ E28 : owns\nE28 ||--o{ E29 : owns\nE29 ||--o{ E30 : owns\nE30 ||--o{ E31 : owns\nE31 ||--o{ E32 : owns\nE32 ||--o{ E33 : owns\nE33 ||--o{ E34 : owns\nE34 ||--o{ E35 : owns\nE35 ||--o{ E36 : owns\nE36 ||--o{ E37 : owns\nE37 ||--o{ E38 : owns\nE38 ||--o{ E39 : owns\nE39 ||--o{ E40 : owns\nE40 ||--o{ E41 : owns\nE41 ||--o{ E42 : owns\nE42 ||--o{ E43 : owns\nE43 ||--o{ E44 : owns\nE44 ||--o{ E45 : owns\nE45 ||--o{ E46 : owns\nE46 ||--o{ E47 : owns",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSha256": "51f222a39995ad6774e0fc6094dd5b8902d32febcd97d3a67b282f8c7851b748",
+      "sourceBytes": 2598,
+      "output": {
+        "type": "er",
+        "widthBits": "4066600000000000",
+        "heightBits": "40c1c38000000000",
+        "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+        "svgBytes": 70404
+      },
+      "prepared": {
+        "outputs": [
+          {
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404,
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000"
+          },
+          {
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404,
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000"
+          },
+          {
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404,
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000"
+          }
+        ],
+        "caseID": "er/medium",
+        "arenaNodes": 437,
+        "arenaStrings": 184
+      }
+    },
+    {
+      "id": "gantt/medium",
+      "family": "gantt",
+      "scale": "medium",
+      "units": 48,
+      "source": "gantt\ndateFormat YYYY-MM-DD\naxisFormat %Y-%m-%d\ntodayMarker off\nTask 0:t0,2024-01-01,1d\nTask 1:t1,2024-01-02,2d\nTask 2:t2,2024-01-03,3d\nTask 3:t3,2024-01-04,4d\nTask 4:t4,2024-01-05,1d\nTask 5:t5,2024-01-06,2d\nTask 6:t6,2024-01-07,3d\nTask 7:t7,2024-01-08,4d\nTask 8:t8,2024-01-09,1d\nTask 9:t9,2024-01-10,2d\nTask 10:t10,2024-01-11,3d\nTask 11:t11,2024-01-12,4d\nTask 12:t12,2024-01-13,1d\nTask 13:t13,2024-01-14,2d\nTask 14:t14,2024-01-15,3d\nTask 15:t15,2024-01-16,4d\nTask 16:t16,2024-01-17,1d\nTask 17:t17,2024-01-18,2d\nTask 18:t18,2024-01-19,3d\nTask 19:t19,2024-01-20,4d\nTask 20:t20,2024-01-21,1d\nTask 21:t21,2024-01-22,2d\nTask 22:t22,2024-01-23,3d\nTask 23:t23,2024-01-24,4d\nTask 24:t24,2024-01-25,1d\nTask 25:t25,2024-01-26,2d\nTask 26:t26,2024-01-27,3d\nTask 27:t27,2024-01-28,4d\nTask 28:t28,2024-01-01,1d\nTask 29:t29,2024-01-02,2d\nTask 30:t30,2024-01-03,3d\nTask 31:t31,2024-01-04,4d\nTask 32:t32,2024-01-05,1d\nTask 33:t33,2024-01-06,2d\nTask 34:t34,2024-01-07,3d\nTask 35:t35,2024-01-08,4d\nTask 36:t36,2024-01-09,1d\nTask 37:t37,2024-01-10,2d\nTask 38:t38,2024-01-11,3d\nTask 39:t39,2024-01-12,4d\nTask 40:t40,2024-01-13,1d\nTask 41:t41,2024-01-14,2d\nTask 42:t42,2024-01-15,3d\nTask 43:t43,2024-01-16,4d\nTask 44:t44,2024-01-17,1d\nTask 45:t45,2024-01-18,2d\nTask 46:t46,2024-01-19,3d\nTask 47:t47,2024-01-20,4d",
+      "options": {
+        "limit": 1000000,
+        "maxEdges": 10000,
+        "fontSize": 16,
+        "padding": 8,
+        "maxWidth": 800,
+        "now": 1704067200000
+      },
+      "resources": "fixed",
+      "sourceSha256": "5e15788ce4ee74b56b1f8c9ccdbd6569f3211b54a428ca6d4f0ea32fc4e485f1",
+      "sourceBytes": 1291,
+      "output": {
+        "type": "gantt",
+        "widthBits": "4089000000000000",
+        "heightBits": "4097140000000000",
+        "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+        "svgBytes": 12574
+      },
+      "prepared": {
+        "outputs": [
+          {
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000",
+            "widthBits": "4089000000000000"
+          },
+          {
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000",
+            "widthBits": "4089000000000000"
+          },
+          {
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000",
+            "widthBits": "4089000000000000"
+          }
+        ],
+        "caseID": "gantt/medium",
+        "arenaNodes": 353,
+        "arenaStrings": 283
+      }
+    }
+  ],
+  "rows": [
+    {
+      "case": "flowchart/medium",
+      "stage": "parseMutable",
+      "count": 32,
+      "warmup": {
+        "operations": 230,
+        "elapsedNs": 114641043
+      },
+      "medianMs": 0.49780990625,
+      "madMs": 0.004281250000000014,
+      "minMs": 0.49352865625,
+      "maxMs": 0.51191278125,
+      "sampleP95BatchMeanMs": 0.51191278125,
+      "samplesMs": [
+        0.49521225,
+        0.504921875,
+        0.511819,
+        0.49352865625,
+        0.49780990625,
+        0.49551821875,
+        0.51191278125
+      ],
+      "raw": [
+        {
+          "elapsedNs": 15846792,
+          "stage": "parseMutable",
+          "count": 32,
+          "checksum": "288",
+          "output": {
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889,
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000"
+          },
+          "caseID": "flowchart/medium"
+        },
+        {
+          "caseID": "flowchart/medium",
+          "checksum": "288",
+          "stage": "parseMutable",
+          "count": 32,
+          "elapsedNs": 16157500,
+          "output": {
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889,
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000"
+          }
+        },
+        {
+          "elapsedNs": 16378208,
+          "stage": "parseMutable",
+          "count": 32,
+          "checksum": "288",
+          "output": {
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889,
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000"
+          },
+          "caseID": "flowchart/medium"
+        },
+        {
+          "caseID": "flowchart/medium",
+          "checksum": "288",
+          "stage": "parseMutable",
+          "count": 32,
+          "elapsedNs": 15792917,
+          "output": {
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889,
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000"
+          }
+        },
+        {
+          "elapsedNs": 15929917,
+          "stage": "parseMutable",
+          "count": 32,
+          "checksum": "288",
+          "output": {
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889,
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000"
+          },
+          "caseID": "flowchart/medium"
+        },
+        {
+          "caseID": "flowchart/medium",
+          "checksum": "288",
+          "stage": "parseMutable",
+          "count": 32,
+          "elapsedNs": 15856583,
+          "output": {
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889,
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000"
+          }
+        },
+        {
+          "elapsedNs": 16381209,
+          "stage": "parseMutable",
+          "count": 32,
+          "checksum": "288",
+          "output": {
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889,
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000"
+          },
+          "caseID": "flowchart/medium"
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "snapshot",
+      "count": 128,
+      "warmup": {
+        "operations": 966,
+        "elapsedNs": 100293372
+      },
+      "medianMs": 0.10567578125,
+      "madMs": 0.0013059921875000075,
+      "minMs": 0.1039108046875,
+      "maxMs": 0.108097984375,
+      "sampleP95BatchMeanMs": 0.108097984375,
+      "samplesMs": [
+        0.108097984375,
+        0.10567578125,
+        0.1053997421875,
+        0.106857421875,
+        0.1039108046875,
+        0.1070419921875,
+        0.1043697890625
+      ],
+      "raw": [
+        {
+          "output": {
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "snapshot",
+          "count": 128,
+          "checksum": "73216",
+          "elapsedNs": 13836542
+        },
+        {
+          "output": {
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "type": "flowchart",
+            "svgBytes": 21889,
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669"
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "snapshot",
+          "count": 128,
+          "checksum": "73216",
+          "elapsedNs": 13526500
+        },
+        {
+          "output": {
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "snapshot",
+          "count": 128,
+          "checksum": "73216",
+          "elapsedNs": 13491167
+        },
+        {
+          "output": {
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "type": "flowchart",
+            "svgBytes": 21889,
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669"
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "snapshot",
+          "count": 128,
+          "checksum": "73216",
+          "elapsedNs": 13677750
+        },
+        {
+          "output": {
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "snapshot",
+          "count": 128,
+          "checksum": "73216",
+          "elapsedNs": 13300583
+        },
+        {
+          "output": {
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "type": "flowchart",
+            "svgBytes": 21889,
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669"
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "snapshot",
+          "count": 128,
+          "checksum": "73216",
+          "elapsedNs": 13701375
+        },
+        {
+          "output": {
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "snapshot",
+          "count": 128,
+          "checksum": "73216",
+          "elapsedNs": 13359333
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "apply",
+      "count": 64,
+      "warmup": {
+        "operations": 390,
+        "elapsedNs": 107254794
+      },
+      "medianMs": 0.275651703125,
+      "madMs": 0.0019218749999999618,
+      "minMs": 0.271143875,
+      "maxMs": 0.27894465625,
+      "sampleP95BatchMeanMs": 0.27894465625,
+      "samplesMs": [
+        0.273729828125,
+        0.2729049375,
+        0.275651703125,
+        0.27894465625,
+        0.276740234375,
+        0.271143875,
+        0.2757766875
+      ],
+      "raw": [
+        {
+          "output": {
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "apply",
+          "count": 64,
+          "checksum": "2144",
+          "elapsedNs": 17518709
+        },
+        {
+          "output": {
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "apply",
+          "count": 64,
+          "checksum": "2144",
+          "elapsedNs": 17465916
+        },
+        {
+          "output": {
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "apply",
+          "count": 64,
+          "checksum": "2144",
+          "elapsedNs": 17641709
+        },
+        {
+          "output": {
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "apply",
+          "count": 64,
+          "checksum": "2144",
+          "elapsedNs": 17852458
+        },
+        {
+          "output": {
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "apply",
+          "count": 64,
+          "checksum": "2144",
+          "elapsedNs": 17711375
+        },
+        {
+          "output": {
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "apply",
+          "count": 64,
+          "checksum": "2144",
+          "elapsedNs": 17353208
+        },
+        {
+          "output": {
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "apply",
+          "count": 64,
+          "checksum": "2144",
+          "elapsedNs": 17649708
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "render",
+      "count": 32,
+      "warmup": {
+        "operations": 166,
+        "elapsedNs": 103234124
+      },
+      "medianMs": 0.6339361875,
+      "madMs": 0.006335937500000055,
+      "minMs": 0.615421875,
+      "maxMs": 0.6528138125,
+      "sampleP95BatchMeanMs": 0.6528138125,
+      "samplesMs": [
+        0.62760025,
+        0.615421875,
+        0.63796221875,
+        0.6510859375,
+        0.6339361875,
+        0.63079296875,
+        0.6528138125
+      ],
+      "raw": [
+        {
+          "output": {
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "type": "flowchart",
+            "svgBytes": 21889,
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669"
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "render",
+          "count": 32,
+          "checksum": "2448832297383407648",
+          "elapsedNs": 20083208
+        },
+        {
+          "output": {
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "render",
+          "count": 32,
+          "checksum": "2448832297383407648",
+          "elapsedNs": 19693500
+        },
+        {
+          "output": {
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "type": "flowchart",
+            "svgBytes": 21889,
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669"
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "render",
+          "count": 32,
+          "checksum": "2448832297383407648",
+          "elapsedNs": 20414791
+        },
+        {
+          "output": {
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "render",
+          "count": 32,
+          "checksum": "2448832297383407648",
+          "elapsedNs": 20834750
+        },
+        {
+          "output": {
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "type": "flowchart",
+            "svgBytes": 21889,
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669"
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "render",
+          "count": 32,
+          "checksum": "2448832297383407648",
+          "elapsedNs": 20285958
+        },
+        {
+          "output": {
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "render",
+          "count": 32,
+          "checksum": "2448832297383407648",
+          "elapsedNs": 20185375
+        },
+        {
+          "output": {
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000",
+            "type": "flowchart",
+            "svgBytes": 21889,
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669"
+          },
+          "arenaAfter": 297,
+          "arenaBefore": 297,
+          "caseID": "flowchart/medium",
+          "stage": "render",
+          "count": 32,
+          "checksum": "2448832297383407648",
+          "elapsedNs": 20890042
+        }
+      ]
+    },
+    {
+      "case": "flowchart/medium",
+      "stage": "lifetime",
+      "count": 8,
+      "warmup": {
+        "operations": 70,
+        "elapsedNs": 107701626
+      },
+      "medianMs": 1.61271875,
+      "madMs": 0.029005249999999982,
+      "minMs": 1.557989625,
+      "maxMs": 1.679609375,
+      "sampleP95BatchMeanMs": 1.679609375,
+      "samplesMs": [
+        1.608213625,
+        1.579598875,
+        1.61271875,
+        1.641724,
+        1.557989625,
+        1.679609375,
+        1.623474
+      ],
+      "raw": [
+        {
+          "elapsedNs": 12865709,
+          "stage": "lifetime",
+          "count": 8,
+          "checksum": "612208074345854288",
+          "output": {
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889,
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000"
+          },
+          "caseID": "flowchart/medium"
+        },
+        {
+          "caseID": "flowchart/medium",
+          "checksum": "612208074345854288",
+          "stage": "lifetime",
+          "count": 8,
+          "elapsedNs": 12636791,
+          "output": {
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889,
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000"
+          }
+        },
+        {
+          "elapsedNs": 12901750,
+          "stage": "lifetime",
+          "count": 8,
+          "checksum": "612208074345854288",
+          "output": {
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889,
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000"
+          },
+          "caseID": "flowchart/medium"
+        },
+        {
+          "caseID": "flowchart/medium",
+          "checksum": "612208074345854288",
+          "stage": "lifetime",
+          "count": 8,
+          "elapsedNs": 13133792,
+          "output": {
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889,
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000"
+          }
+        },
+        {
+          "elapsedNs": 12463917,
+          "stage": "lifetime",
+          "count": 8,
+          "checksum": "612208074345854288",
+          "output": {
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889,
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000"
+          },
+          "caseID": "flowchart/medium"
+        },
+        {
+          "caseID": "flowchart/medium",
+          "checksum": "612208074345854288",
+          "stage": "lifetime",
+          "count": 8,
+          "elapsedNs": 13436875,
+          "output": {
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889,
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000"
+          }
+        },
+        {
+          "elapsedNs": 12987792,
+          "stage": "lifetime",
+          "count": 8,
+          "checksum": "612208074345854288",
+          "output": {
+            "svgSha256": "6ccaf11cd89d6ec3afe669885be028301741dbaef9cec4de808095ed1e6b0669",
+            "svgBytes": 21889,
+            "type": "flowchart",
+            "widthBits": "405e000000000000",
+            "heightBits": "40b1e00000000000"
+          },
+          "caseID": "flowchart/medium"
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "parseMutable",
+      "count": 32,
+      "warmup": {
+        "operations": 230,
+        "elapsedNs": 101026166
+      },
+      "medianMs": 0.442681,
+      "madMs": 0.0015546562500000083,
+      "minMs": 0.4394674375,
+      "maxMs": 0.45009634375,
+      "sampleP95BatchMeanMs": 0.45009634375,
+      "samplesMs": [
+        0.4420208125,
+        0.448759125,
+        0.4394674375,
+        0.442681,
+        0.45009634375,
+        0.44423565625,
+        0.4423984375
+      ],
+      "raw": [
+        {
+          "caseID": "er/medium",
+          "checksum": "64",
+          "stage": "parseMutable",
+          "count": 32,
+          "elapsedNs": 14144666,
+          "output": {
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404,
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000"
+          }
+        },
+        {
+          "caseID": "er/medium",
+          "checksum": "64",
+          "stage": "parseMutable",
+          "count": 32,
+          "elapsedNs": 14360292,
+          "output": {
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404,
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000"
+          }
+        },
+        {
+          "caseID": "er/medium",
+          "checksum": "64",
+          "stage": "parseMutable",
+          "count": 32,
+          "elapsedNs": 14062958,
+          "output": {
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404,
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000"
+          }
+        },
+        {
+          "caseID": "er/medium",
+          "checksum": "64",
+          "stage": "parseMutable",
+          "count": 32,
+          "elapsedNs": 14165792,
+          "output": {
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404,
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000"
+          }
+        },
+        {
+          "caseID": "er/medium",
+          "checksum": "64",
+          "stage": "parseMutable",
+          "count": 32,
+          "elapsedNs": 14403083,
+          "output": {
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404,
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000"
+          }
+        },
+        {
+          "caseID": "er/medium",
+          "checksum": "64",
+          "stage": "parseMutable",
+          "count": 32,
+          "elapsedNs": 14215541,
+          "output": {
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404,
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000"
+          }
+        },
+        {
+          "caseID": "er/medium",
+          "checksum": "64",
+          "stage": "parseMutable",
+          "count": 32,
+          "elapsedNs": 14156750,
+          "output": {
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404,
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000"
+          }
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "snapshot",
+      "count": 128,
+      "warmup": {
+        "operations": 806,
+        "elapsedNs": 101660707
+      },
+      "medianMs": 0.1272490234375,
+      "madMs": 0.0011139374999999951,
+      "minMs": 0.1252486953125,
+      "maxMs": 0.1283629609375,
+      "sampleP95BatchMeanMs": 0.1283629609375,
+      "samplesMs": [
+        0.1252486953125,
+        0.1283629609375,
+        0.1260231171875,
+        0.1257193984375,
+        0.12744303125,
+        0.128308265625,
+        0.1272490234375
+      ],
+      "raw": [
+        {
+          "caseID": "er/medium",
+          "elapsedNs": 16031833,
+          "stage": "snapshot",
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "checksum": "79232",
+          "count": 128,
+          "arenaAfter": 437,
+          "arenaBefore": 437
+        },
+        {
+          "caseID": "er/medium",
+          "elapsedNs": 16430459,
+          "stage": "snapshot",
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "checksum": "79232",
+          "count": 128,
+          "arenaAfter": 437,
+          "arenaBefore": 437
+        },
+        {
+          "caseID": "er/medium",
+          "elapsedNs": 16130959,
+          "stage": "snapshot",
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "checksum": "79232",
+          "count": 128,
+          "arenaAfter": 437,
+          "arenaBefore": 437
+        },
+        {
+          "caseID": "er/medium",
+          "elapsedNs": 16092083,
+          "stage": "snapshot",
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "checksum": "79232",
+          "count": 128,
+          "arenaAfter": 437,
+          "arenaBefore": 437
+        },
+        {
+          "caseID": "er/medium",
+          "elapsedNs": 16312708,
+          "stage": "snapshot",
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "checksum": "79232",
+          "count": 128,
+          "arenaAfter": 437,
+          "arenaBefore": 437
+        },
+        {
+          "caseID": "er/medium",
+          "elapsedNs": 16423458,
+          "stage": "snapshot",
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "checksum": "79232",
+          "count": 128,
+          "arenaAfter": 437,
+          "arenaBefore": 437
+        },
+        {
+          "caseID": "er/medium",
+          "elapsedNs": 16287875,
+          "stage": "snapshot",
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "checksum": "79232",
+          "count": 128,
+          "arenaAfter": 437,
+          "arenaBefore": 437
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "apply",
+      "count": 64,
+      "warmup": {
+        "operations": 294,
+        "elapsedNs": 100492790
+      },
+      "medianMs": 0.3185611875,
+      "madMs": 0.0021132812499999876,
+      "minMs": 0.312363921875,
+      "maxMs": 0.32067446875,
+      "sampleP95BatchMeanMs": 0.32067446875,
+      "samplesMs": [
+        0.32067446875,
+        0.319165375,
+        0.319244140625,
+        0.3185611875,
+        0.3137141875,
+        0.315471359375,
+        0.312363921875
+      ],
+      "raw": [
+        {
+          "caseID": "er/medium",
+          "elapsedNs": 20523166,
+          "stage": "apply",
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "checksum": "2144",
+          "count": 64,
+          "arenaAfter": 437,
+          "arenaBefore": 437
+        },
+        {
+          "caseID": "er/medium",
+          "elapsedNs": 20426584,
+          "stage": "apply",
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "checksum": "2144",
+          "count": 64,
+          "arenaAfter": 437,
+          "arenaBefore": 437
+        },
+        {
+          "caseID": "er/medium",
+          "elapsedNs": 20431625,
+          "stage": "apply",
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "checksum": "2144",
+          "count": 64,
+          "arenaAfter": 437,
+          "arenaBefore": 437
+        },
+        {
+          "caseID": "er/medium",
+          "elapsedNs": 20387916,
+          "stage": "apply",
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "checksum": "2144",
+          "count": 64,
+          "arenaAfter": 437,
+          "arenaBefore": 437
+        },
+        {
+          "caseID": "er/medium",
+          "elapsedNs": 20077708,
+          "stage": "apply",
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "checksum": "2144",
+          "count": 64,
+          "arenaAfter": 437,
+          "arenaBefore": 437
+        },
+        {
+          "caseID": "er/medium",
+          "elapsedNs": 20190167,
+          "stage": "apply",
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "checksum": "2144",
+          "count": 64,
+          "arenaAfter": 437,
+          "arenaBefore": 437
+        },
+        {
+          "caseID": "er/medium",
+          "elapsedNs": 19991291,
+          "stage": "apply",
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "checksum": "2144",
+          "count": 64,
+          "arenaAfter": 437,
+          "arenaBefore": 437
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "render",
+      "count": 8,
+      "warmup": {
+        "operations": 70,
+        "elapsedNs": 109304666
+      },
+      "medianMs": 1.5783385,
+      "madMs": 0.017562499999999925,
+      "minMs": 1.5445885,
+      "maxMs": 1.632203125,
+      "sampleP95BatchMeanMs": 1.632203125,
+      "samplesMs": [
+        1.5783385,
+        1.625333375,
+        1.56150525,
+        1.632203125,
+        1.56913025,
+        1.5445885,
+        1.595901
+      ],
+      "raw": [
+        {
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "arenaAfter": 437,
+          "arenaBefore": 437,
+          "caseID": "er/medium",
+          "stage": "render",
+          "count": 8,
+          "checksum": "666845006153685024",
+          "elapsedNs": 12626708
+        },
+        {
+          "caseID": "er/medium",
+          "elapsedNs": 13002667,
+          "stage": "render",
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "checksum": "666845006153685024",
+          "count": 8,
+          "arenaAfter": 437,
+          "arenaBefore": 437
+        },
+        {
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "arenaAfter": 437,
+          "arenaBefore": 437,
+          "caseID": "er/medium",
+          "stage": "render",
+          "count": 8,
+          "checksum": "666845006153685024",
+          "elapsedNs": 12492042
+        },
+        {
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "arenaAfter": 437,
+          "arenaBefore": 437,
+          "caseID": "er/medium",
+          "stage": "render",
+          "count": 8,
+          "checksum": "666845006153685024",
+          "elapsedNs": 13057625
+        },
+        {
+          "caseID": "er/medium",
+          "elapsedNs": 12553042,
+          "stage": "render",
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "checksum": "666845006153685024",
+          "count": 8,
+          "arenaAfter": 437,
+          "arenaBefore": 437
+        },
+        {
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "arenaAfter": 437,
+          "arenaBefore": 437,
+          "caseID": "er/medium",
+          "stage": "render",
+          "count": 8,
+          "checksum": "666845006153685024",
+          "elapsedNs": 12356708
+        },
+        {
+          "output": {
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000",
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404
+          },
+          "arenaAfter": 437,
+          "arenaBefore": 437,
+          "caseID": "er/medium",
+          "stage": "render",
+          "count": 8,
+          "checksum": "666845006153685024",
+          "elapsedNs": 12767208
+        }
+      ]
+    },
+    {
+      "case": "er/medium",
+      "stage": "lifetime",
+      "count": 8,
+      "warmup": {
+        "operations": 70,
+        "elapsedNs": 174746210
+      },
+      "medianMs": 2.532349,
+      "madMs": 0.015255124999999925,
+      "minMs": 2.497786375,
+      "maxMs": 2.6333645,
+      "sampleP95BatchMeanMs": 2.6333645,
+      "samplesMs": [
+        2.497786375,
+        2.547604125,
+        2.523026,
+        2.6333645,
+        2.532349,
+        2.525776125,
+        2.5773385
+      ],
+      "raw": [
+        {
+          "caseID": "er/medium",
+          "checksum": "666845006153688520",
+          "stage": "lifetime",
+          "count": 8,
+          "elapsedNs": 19982291,
+          "output": {
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404,
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000"
+          }
+        },
+        {
+          "caseID": "er/medium",
+          "checksum": "666845006153688520",
+          "stage": "lifetime",
+          "count": 8,
+          "elapsedNs": 20380833,
+          "output": {
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404,
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000"
+          }
+        },
+        {
+          "caseID": "er/medium",
+          "checksum": "666845006153688520",
+          "stage": "lifetime",
+          "count": 8,
+          "elapsedNs": 20184208,
+          "output": {
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404,
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000"
+          }
+        },
+        {
+          "caseID": "er/medium",
+          "checksum": "666845006153688520",
+          "stage": "lifetime",
+          "count": 8,
+          "elapsedNs": 21066916,
+          "output": {
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404,
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000"
+          }
+        },
+        {
+          "caseID": "er/medium",
+          "checksum": "666845006153688520",
+          "stage": "lifetime",
+          "count": 8,
+          "elapsedNs": 20258792,
+          "output": {
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404,
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000"
+          }
+        },
+        {
+          "caseID": "er/medium",
+          "checksum": "666845006153688520",
+          "stage": "lifetime",
+          "count": 8,
+          "elapsedNs": 20206209,
+          "output": {
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404,
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000"
+          }
+        },
+        {
+          "caseID": "er/medium",
+          "checksum": "666845006153688520",
+          "stage": "lifetime",
+          "count": 8,
+          "elapsedNs": 20618708,
+          "output": {
+            "svgSha256": "ee5bd2f8c457febf5b9fc55177b7ccb057ca2805a6318bdc114e27dd5f053597",
+            "svgBytes": 70404,
+            "type": "er",
+            "widthBits": "4066600000000000",
+            "heightBits": "40c1c38000000000"
+          }
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "parseMutable",
+      "count": 64,
+      "warmup": {
+        "operations": 294,
+        "elapsedNs": 108883373
+      },
+      "medianMs": 0.37000846875,
+      "madMs": 0.004319015624999978,
+      "minMs": 0.3655390625,
+      "maxMs": 1.009793625,
+      "sampleP95BatchMeanMs": 1.009793625,
+      "samplesMs": [
+        0.373497390625,
+        0.365689453125,
+        0.37000846875,
+        0.3655390625,
+        0.36958984375,
+        1.009793625,
+        0.380925125
+      ],
+      "raw": [
+        {
+          "stage": "parseMutable",
+          "count": 64,
+          "output": {
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000",
+            "widthBits": "4089000000000000"
+          },
+          "checksum": "320",
+          "caseID": "gantt/medium",
+          "elapsedNs": 23903833
+        },
+        {
+          "stage": "parseMutable",
+          "count": 64,
+          "output": {
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000",
+            "widthBits": "4089000000000000"
+          },
+          "checksum": "320",
+          "caseID": "gantt/medium",
+          "elapsedNs": 23404125
+        },
+        {
+          "stage": "parseMutable",
+          "count": 64,
+          "output": {
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000",
+            "widthBits": "4089000000000000"
+          },
+          "checksum": "320",
+          "caseID": "gantt/medium",
+          "elapsedNs": 23680542
+        },
+        {
+          "stage": "parseMutable",
+          "count": 64,
+          "output": {
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000",
+            "widthBits": "4089000000000000"
+          },
+          "checksum": "320",
+          "caseID": "gantt/medium",
+          "elapsedNs": 23394500
+        },
+        {
+          "stage": "parseMutable",
+          "count": 64,
+          "output": {
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000",
+            "widthBits": "4089000000000000"
+          },
+          "checksum": "320",
+          "caseID": "gantt/medium",
+          "elapsedNs": 23653750
+        },
+        {
+          "stage": "parseMutable",
+          "count": 64,
+          "output": {
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000",
+            "widthBits": "4089000000000000"
+          },
+          "checksum": "320",
+          "caseID": "gantt/medium",
+          "elapsedNs": 64626792
+        },
+        {
+          "stage": "parseMutable",
+          "count": 64,
+          "output": {
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000",
+            "widthBits": "4089000000000000"
+          },
+          "checksum": "320",
+          "caseID": "gantt/medium",
+          "elapsedNs": 24379208
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "snapshot",
+      "count": 128,
+      "warmup": {
+        "operations": 838,
+        "elapsedNs": 100728085
+      },
+      "medianMs": 0.1203743515625,
+      "madMs": 0.00048177343749999935,
+      "minMs": 0.11906478125,
+      "maxMs": 0.1210891953125,
+      "sampleP95BatchMeanMs": 0.1210891953125,
+      "samplesMs": [
+        0.119892578125,
+        0.11906478125,
+        0.1206865234375,
+        0.119944015625,
+        0.1203743515625,
+        0.1210061796875,
+        0.1210891953125
+      ],
+      "raw": [
+        {
+          "output": {
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "heightBits": "4097140000000000",
+            "svgBytes": 12574,
+            "widthBits": "4089000000000000",
+            "type": "gantt"
+          },
+          "arenaAfter": 254,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "snapshot",
+          "count": 128,
+          "checksum": "68480",
+          "elapsedNs": 15346250
+        },
+        {
+          "output": {
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "heightBits": "4097140000000000",
+            "svgBytes": 12574,
+            "widthBits": "4089000000000000",
+            "type": "gantt"
+          },
+          "arenaAfter": 254,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "snapshot",
+          "count": 128,
+          "checksum": "68480",
+          "elapsedNs": 15240292
+        },
+        {
+          "output": {
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "heightBits": "4097140000000000",
+            "svgBytes": 12574,
+            "widthBits": "4089000000000000",
+            "type": "gantt"
+          },
+          "arenaAfter": 254,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "snapshot",
+          "count": 128,
+          "checksum": "68480",
+          "elapsedNs": 15447875
+        },
+        {
+          "output": {
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "heightBits": "4097140000000000",
+            "svgBytes": 12574,
+            "widthBits": "4089000000000000",
+            "type": "gantt"
+          },
+          "arenaAfter": 254,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "snapshot",
+          "count": 128,
+          "checksum": "68480",
+          "elapsedNs": 15352834
+        },
+        {
+          "output": {
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "heightBits": "4097140000000000",
+            "svgBytes": 12574,
+            "widthBits": "4089000000000000",
+            "type": "gantt"
+          },
+          "arenaAfter": 254,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "snapshot",
+          "count": 128,
+          "checksum": "68480",
+          "elapsedNs": 15407917
+        },
+        {
+          "output": {
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "heightBits": "4097140000000000",
+            "svgBytes": 12574,
+            "widthBits": "4089000000000000",
+            "type": "gantt"
+          },
+          "arenaAfter": 254,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "snapshot",
+          "count": 128,
+          "checksum": "68480",
+          "elapsedNs": 15488791
+        },
+        {
+          "output": {
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "heightBits": "4097140000000000",
+            "svgBytes": 12574,
+            "widthBits": "4089000000000000",
+            "type": "gantt"
+          },
+          "arenaAfter": 254,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "snapshot",
+          "count": 128,
+          "checksum": "68480",
+          "elapsedNs": 15499417
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "apply",
+      "count": 64,
+      "warmup": {
+        "operations": 422,
+        "elapsedNs": 104284042
+      },
+      "medianMs": 0.246451171875,
+      "madMs": 0.0020234375000000027,
+      "minMs": 0.243150390625,
+      "maxMs": 0.252512359375,
+      "sampleP95BatchMeanMs": 0.252512359375,
+      "samplesMs": [
+        0.25148503125,
+        0.24756965625,
+        0.244427734375,
+        0.246451171875,
+        0.252512359375,
+        0.24540103125,
+        0.243150390625
+      ],
+      "raw": [
+        {
+          "output": {
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000"
+          },
+          "arenaAfter": 254,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "apply",
+          "count": 64,
+          "checksum": "2144",
+          "elapsedNs": 16095042
+        },
+        {
+          "output": {
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000"
+          },
+          "arenaAfter": 254,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "apply",
+          "count": 64,
+          "checksum": "2144",
+          "elapsedNs": 15844458
+        },
+        {
+          "output": {
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000"
+          },
+          "arenaAfter": 254,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "apply",
+          "count": 64,
+          "checksum": "2144",
+          "elapsedNs": 15643375
+        },
+        {
+          "output": {
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000"
+          },
+          "arenaAfter": 254,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "apply",
+          "count": 64,
+          "checksum": "2144",
+          "elapsedNs": 15772875
+        },
+        {
+          "output": {
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000"
+          },
+          "arenaAfter": 254,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "apply",
+          "count": 64,
+          "checksum": "2144",
+          "elapsedNs": 16160791
+        },
+        {
+          "output": {
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000"
+          },
+          "arenaAfter": 254,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "apply",
+          "count": 64,
+          "checksum": "2144",
+          "elapsedNs": 15705666
+        },
+        {
+          "output": {
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000"
+          },
+          "arenaAfter": 254,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "apply",
+          "count": 64,
+          "checksum": "2144",
+          "elapsedNs": 15561625
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "render",
+      "count": 16,
+      "warmup": {
+        "operations": 102,
+        "elapsedNs": 126355248
+      },
+      "medianMs": 1.1521796875,
+      "madMs": 0.006414062500000206,
+      "minMs": 1.113752625,
+      "maxMs": 1.171987,
+      "sampleP95BatchMeanMs": 1.171987,
+      "samplesMs": [
+        1.145765625,
+        1.113752625,
+        1.171987,
+        1.1521796875,
+        1.149862,
+        1.1587421875,
+        1.1570625
+      ],
+      "raw": [
+        {
+          "output": {
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000"
+          },
+          "arenaAfter": 1838,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "render",
+          "count": 16,
+          "checksum": "1297388536403792352",
+          "elapsedNs": 18332250
+        },
+        {
+          "output": {
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000"
+          },
+          "arenaAfter": 1838,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "render",
+          "count": 16,
+          "checksum": "1297388536403792352",
+          "elapsedNs": 17820042
+        },
+        {
+          "output": {
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000"
+          },
+          "arenaAfter": 1838,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "render",
+          "count": 16,
+          "checksum": "1297388536403792352",
+          "elapsedNs": 18751792
+        },
+        {
+          "output": {
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000"
+          },
+          "arenaAfter": 1838,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "render",
+          "count": 16,
+          "checksum": "1297388536403792352",
+          "elapsedNs": 18434875
+        },
+        {
+          "output": {
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000"
+          },
+          "arenaAfter": 1838,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "render",
+          "count": 16,
+          "checksum": "1297388536403792352",
+          "elapsedNs": 18397792
+        },
+        {
+          "output": {
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000"
+          },
+          "arenaAfter": 1838,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "render",
+          "count": 16,
+          "checksum": "1297388536403792352",
+          "elapsedNs": 18539875
+        },
+        {
+          "output": {
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673",
+            "svgBytes": 12574,
+            "type": "gantt",
+            "heightBits": "4097140000000000"
+          },
+          "arenaAfter": 1838,
+          "arenaBefore": 254,
+          "caseID": "gantt/medium",
+          "stage": "render",
+          "count": 16,
+          "checksum": "1297388536403792352",
+          "elapsedNs": 18513000
+        }
+      ]
+    },
+    {
+      "case": "gantt/medium",
+      "stage": "lifetime",
+      "count": 8,
+      "warmup": {
+        "operations": 70,
+        "elapsedNs": 128882959
+      },
+      "medianMs": 1.854453125,
+      "madMs": 0.00860937500000003,
+      "minMs": 1.83681775,
+      "maxMs": 1.880026125,
+      "sampleP95BatchMeanMs": 1.880026125,
+      "samplesMs": [
+        1.848885375,
+        1.8625,
+        1.872270875,
+        1.84584375,
+        1.880026125,
+        1.83681775,
+        1.854453125
+      ],
+      "raw": [
+        {
+          "elapsedNs": 14791083,
+          "output": {
+            "heightBits": "4097140000000000",
+            "type": "gantt",
+            "svgBytes": 12574,
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673"
+          },
+          "checksum": "648694268201897416",
+          "stage": "lifetime",
+          "count": 8,
+          "caseID": "gantt/medium"
+        },
+        {
+          "elapsedNs": 14900000,
+          "output": {
+            "heightBits": "4097140000000000",
+            "type": "gantt",
+            "svgBytes": 12574,
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673"
+          },
+          "checksum": "648694268201897416",
+          "stage": "lifetime",
+          "count": 8,
+          "caseID": "gantt/medium"
+        },
+        {
+          "elapsedNs": 14978167,
+          "output": {
+            "heightBits": "4097140000000000",
+            "type": "gantt",
+            "svgBytes": 12574,
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673"
+          },
+          "checksum": "648694268201897416",
+          "stage": "lifetime",
+          "count": 8,
+          "caseID": "gantt/medium"
+        },
+        {
+          "elapsedNs": 14766750,
+          "output": {
+            "heightBits": "4097140000000000",
+            "type": "gantt",
+            "svgBytes": 12574,
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673"
+          },
+          "checksum": "648694268201897416",
+          "stage": "lifetime",
+          "count": 8,
+          "caseID": "gantt/medium"
+        },
+        {
+          "elapsedNs": 15040209,
+          "output": {
+            "heightBits": "4097140000000000",
+            "type": "gantt",
+            "svgBytes": 12574,
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673"
+          },
+          "checksum": "648694268201897416",
+          "stage": "lifetime",
+          "count": 8,
+          "caseID": "gantt/medium"
+        },
+        {
+          "elapsedNs": 14694542,
+          "output": {
+            "heightBits": "4097140000000000",
+            "type": "gantt",
+            "svgBytes": 12574,
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673"
+          },
+          "checksum": "648694268201897416",
+          "stage": "lifetime",
+          "count": 8,
+          "caseID": "gantt/medium"
+        },
+        {
+          "elapsedNs": 14835625,
+          "output": {
+            "heightBits": "4097140000000000",
+            "type": "gantt",
+            "svgBytes": 12574,
+            "widthBits": "4089000000000000",
+            "svgSha256": "356199a1ddf5825d4dad48d829ab28ca52132054bad1ed70f9074ac26e561673"
+          },
+          "checksum": "648694268201897416",
+          "stage": "lifetime",
+          "count": 8,
+          "caseID": "gantt/medium"
+        }
+      ]
+    }
+  ],
+  "completedAt": "2026-10-18T18:25:09.315Z",
+  "systemAfter": {
+    "loadAverage": [
+      4.39697265625,
+      4.50830078125,
+      6.94091796875
+    ],
+    "freeMemory": 268402688,
+    "processes": [
+      {
+        "pid": 11540,
+        "cpuPercent": 33,
+        "name": "PeleSwiftPerf"
+      },
+      {
+        "pid": 410,
+        "cpuPercent": 26.1,
+        "name": "WindowServer"
+      },
+      {
+        "pid": 11483,
+        "cpuPercent": 25.1,
+        "name": "node"
+      },
+      {
+        "pid": 813,
+        "cpuPercent": 25,
+        "name": "Google Chrome Helper"
+      },
+      {
+        "pid": 68977,
+        "cpuPercent": 10.2,
+        "name": "Google Chrome Helper (Renderer)"
+      }
+    ]
+  }
+}

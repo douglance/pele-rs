@@ -1,0 +1,22 @@
+{
+  "compilerOptions": {
+    "strict": true,
+    "noEmit": true,
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "lib": [
+      "ES2022",
+      "DOM"
+    ],
+    "types": []
+  },
+  "files": [
+    "public-models.mts",
+    "public-remaining-er.mts",
+    "public-remaining-info.mts",
+    "public-registry-lazy.mts",
+    "diagram-entries.mts",
+    "public-foreign-providers.mts"
+  ]
+}

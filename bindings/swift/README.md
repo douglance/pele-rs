@@ -1,36 +1,107 @@
 # Swift
 
-macOS 14+, Swift 6+. The v0.1.0 GitHub release distributes a universal arm64/x86_64
-XCFramework. The repository root is the consumer Swift package; this directory
-also has a local development package with the native smoke example and corpus tests.
+The 0.2 Swift package exposes all 33 Pele-compatible diagram families through the
+Rust engine. macOS 14+, Swift 6+. The repository root is the consumer package;
+its checksum-pinned XCFramework contains arm64 and x86_64 native slices. The
+commands below target the v0.2.0 release; publication state is tracked in
+[release acceptance](../../docs/RELEASE_0_2.md).
 
 ```swift
 // In your application's Package.swift:
-.package(url: "https://github.com/vijayksingh/pele-rs.git", from: "0.1.0")
-// Add .product(name: "Pele", package: "pele-rs") to your target dependencies.
+.package(url: "https://github.com/vijayksingh/pele-rs.git", exact: "0.2.0")
+// Target dependency:
+.product(name: "Pele", package: "pele-rs")
 ```
+
+## Render and retain models
 
 ```swift
 import Pele
-let diagram = try Pele.render("flowchart LR; A[Hello] --> B{Ready?}")
-// diagram.svg, diagram.geometry.nodes, diagram.geometry.edges
+
+let engine = Pele.Engine()
+let document = try engine.parse("pie\n\"Swift\":2\n\"Web\":3")
+let drawing = try engine.render(document)
+// drawing.type, drawing.svg, drawing.width, drawing.height, drawing.links
 ```
 
-For macOS presentation, `NSImage(data: Data(diagram.svg.utf8))` supports the simple
-outlined SVG generated here. See `Sources/PeleSmoke/main.swift` for actual AppKit
-rasterization and painted-pixel verification. Rendering unrelated SVG is outside
-the library's contract. Geometry coordinates are pixels with a top-left origin.
+A `Document` owns its exact native handler, config and parsed model. It remains
+renderable after registry replacement. `parseMutable` supplies an editable owned
+graph, snapshots, revision-checked `apply`, schema-described `invoke`, and scoped
+`bindHostFunction` callbacks. Graph transport preserves aliases, cycles, UTF-16
+code units, IEEE number bits and partial state on errors. Close mutable documents
+when finished. See [mutable APIs](../../docs/MUTABLE_MODELS.md).
 
-Develop from source:
+`parsePrepared("pie", source: ...)` exposes the low-level family parser without
+core source preparation. `createPrepared("pie", graph: ...)` accepts a caller's
+model graph without parsing source. Each returns a separate `PreparedDocument`
+with snapshot/apply/schema/invoke/render/close ownership. All 33 families expose
+these entries; declared models retain upstream missing-helper failures rather
+than receiving invented parser state. See
+[native entries](../../docs/NATIVE_DIAGRAM_ENTRIES.md) and
+[construction](../../docs/DECLARED_MODEL_CONSTRUCTION.md).
+
+## Native presentation and resources
+
+`Pele.DiagramView`, `Pele.mount`, `Pele.Mounted` and `Pele.enableZoom` provide the
+AppKit lifecycle. Parsing and geometry execute in Rust; AppKit owns drawing,
+input, resource approval and accessibility controls.
+
+```swift
+@MainActor
+func show(in view: Pele.DiagramView) throws -> Pele.Mounted {
+    let mounted = try Pele.mount(view, source: "flowchart LR\nA[Swift] --> B[Rust]")
+    // Retain mounted for update(), invalidateResources() and destroy().
+    return mounted
+}
+```
+
+Mounts retain the last good drawing on failure, observe size/font changes, and
+support explicit updates after automatic observation is destroyed. Native zoom
+handles mouse, wheel, magnification, keyboard and controls without rerendering.
+Links use Rust-produced action regions with pointer/keyboard activation and
+accessibility actions. Native GUI verification covers these controls; it does
+not claim physical-trackpad or spoken VoiceOver testing.
+
+A mount owns `Pele.NativeResources` by default. It measures installed fonts through
+CoreText, keeps bounded font/image caches, and requires host approval and supplied
+PNG/JPEG bytes for image references. It does not load files or fetch URLs itself.
+Use `MountOptions.nativeResources` to share an explicit owner, or call
+`Engine.renderNative(_:nativeResources:)` directly on MainActor. Missing fonts or
+unapproved images fail explicitly. `invalidateResources()` clears the generation
+and redraws. Ordinary `HostResources` callbacks remain available for custom
+measurement, icons, clocks and calendars.
+
+`Pele.Registry.empty()` provides an owned selective registry with independent
+registration/loading and retained document lifetimes. Async mounting selects
+families before rendering; it does not download native code. `Pele.AsyncEngine`
+is an independent actor-owned rendering API. AppKit presentation runs on MainActor.
+
+## Build and verify from source
+
+Build the current SDK before resolving a local package dependency:
 
 ```sh
-scripts/build-native.sh                   # Host architecture
-scripts/build-native.sh --universal       # macOS arm64 + x86_64
-swift test --package-path bindings/swift
+scripts/build-native.sh                    # Host architecture
+scripts/build-native.sh --universal        # macOS arm64 + x86_64
+swift test --package-path bindings/swift --skip 'MountTests|ZoomTests|PresentationUITests|NativeResourceUITests'
+scripts/test-swift-ui.sh                   # Active macOS desktop required
 swift run --package-path bindings/swift pele-smoke "$PWD" "$PWD/dist/evidence"
 swift run --package-path tests/swift-consumer
 ```
 
-Native code contains the font and all graph logic. The Swift layer only encodes
-options, copies owned C results, frees them, and decodes typed values/errors.
-No Kamui, web view, runtime JavaScript, or installed fonts are required.
+The local artifact at `bindings/swift/Artifacts/CPele.xcframework` selects the
+source-built SDK. It must match the Swift sources and C header. Final acceptance
+passes 176 CLI features and 28 strict C executions across both architectures,
+all-33-family pixel/consumer checks on each, and 31 active AppKit features. See
+[verification evidence](../../docs/FULL_PARITY_PROGRESS.md) for exact scope,
+Rosetta discovery recovery and artifact boundaries.
+
+## Legacy API
+
+`Pele.render` remains the original v0.1 flowchart-subset API, returning outlined
+SVG and structured flowchart geometry with its bundled Noto Sans font. Its text
+contract differs from the full compatibility renderer and native installed-font
+adapter. The v0.1 downloaded SDK does not expose the 0.2 interfaces above.
+No Kamui dependency, web view or JavaScript diagram renderer is required. No iOS
+or Windows binary is included. Native transport/work budgets and documented
+compatibility boundaries remain active.
