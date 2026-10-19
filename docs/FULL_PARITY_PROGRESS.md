@@ -1,3 +1,40 @@
+# Current checkpoint — 2026-10-19, source candidate 0.2.0
+
+All 33 diagram families have native Rust renderers and mutable model codecs.
+The source candidate now exposes all 33 prepared/raw entries in web and Swift,
+explicit caller-graph constructors, native host-function bindings, native link
+interaction, and bounded native font/raster resources. This is not a published
+full-parity release.
+
+Latest completed slices:
+
+- Web live callbacks: 105 distinct browser/project checks passed across all three
+  engines; no failures/skips. Caller-built models extend that layer to 111 checks.
+- Swift prepared/construction layer: 16 integration features passed against a
+  matching isolated ARM SDK, including 99 raw-entry vectors and 67 caller-built
+  model vectors across every family. Four additional pinned AgentFlow diagnostic
+  cases were subsequently added to both Rust and Swift coverage.
+- Default mono-font adapter correction: six targeted browser checks passed.
+- Source-built external Swift consumer now checks all 33 families and C13/C14
+  APIs; explicit remote 0.2 enables those checks while legacy 0.1 stays compatible.
+- The consolidated Rust corpus executed all 87 targets: 376 tests passed and one
+  C4 legacy error-boundary assertion failed. The reproduced C4 defect is fixed;
+  the 14-test C4/construction batch and the explicit restored-builtin raw check
+  pass. The original complete-run failure is retained as evidence.
+
+Remaining release gates: ClassMember's ordinary live getDisplayDetails and
+parseClassifier replacements (implementation active); final combined native
+universal SDK, C/Swift and packed browser matrix; actual native GUI31 execution;
+matching published package/checksum consumption, current demo and release docs.
+The final GUI attempts stayed inactive and executed no assertions, so they are
+not counted as passes. Native release packaging was paused before Class changes
+rather than publishing the earlier SDK. No 0.2 tag or GitHub release exists yet.
+
+Earlier entries below are historical snapshots; their artifacts and counts do
+not establish the current release's status.
+
+---
+
 # Full-library port: development evidence
 
 Acceptance remains every row of `PELE_PARITY.md`: all 33 families and public APIs.
