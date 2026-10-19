@@ -21,7 +21,10 @@ cp dist/wasm/* bindings/web/pkg/
 cp third_party/v8/LICENSE bindings/web/V8-LICENSE
 cp third_party/fdlibm/LICENSE bindings/web/FDLIBM-LICENSE
 cp LICENSE bindings/web/LICENSE
-cp NOTICE bindings/web/NOTICE
+# NOTICE is already included by npm files; append dependency/runtime notices
+# without changing any executable JS/WASM bytes.
+cat NOTICE crates/pele/assets/RUST-DEPENDENCY-LICENSES.txt \
+  crates/pele/assets/RUST-STDLIB-LICENSES.txt > bindings/web/NOTICE
 cp third_party/PELE-LICENSE bindings/web/PELE-LICENSE
 cp third_party/MERMAID-LICENSE bindings/web/MERMAID-LICENSE
 cp crates/pele/assets/fonts/OFL.txt bindings/web/FONT-OFL.txt
