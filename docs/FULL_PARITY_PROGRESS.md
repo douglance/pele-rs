@@ -17,18 +17,23 @@ Latest completed slices:
 - Default mono-font adapter correction: six targeted browser checks passed.
 - Source-built external Swift consumer now checks all 33 families and C13/C14
   APIs; explicit remote 0.2 enables those checks while legacy 0.1 stays compatible.
-- The consolidated Rust corpus executed all 87 targets: 376 tests passed and one
-  C4 legacy error-boundary assertion failed. The reproduced C4 defect is fixed;
-  the 14-test C4/construction batch and the explicit restored-builtin raw check
-  pass. The original complete-run failure is retained as evidence.
+- Class live methods and nested captured originals are committed in `0c0c5a4`
+  and `fa07860`. The focused slice passed 17 Rust checks, seven Swift features,
+  strict linked C Class/Gantt integration and 30 browser checks.
+- The final consolidated Rust corpus at `0c0c5a4` passed all 88 integration
+  targets: 380 tests, zero failures, zero ignored, zero missing. Formatting and
+  immutable commit diff checks passed. Source hashes matched before/after.
+  Validation used release opt-level 3, LTO off, codegen-units 16, jobs 2 and two
+  test threads. The packaged SDK uses its separate normal release build.
+  The previous 87-target run's C4 failure remains historical evidence below;
+  both repaired C4 and new Class coverage pass in this complete final run.
 
-Remaining release gates: ClassMember's ordinary live getDisplayDetails and
-parseClassifier replacements (implementation active); final combined native
-universal SDK, C/Swift and packed browser matrix; actual native GUI31 execution;
-matching published package/checksum consumption, current demo and release docs.
+Remaining release gates: final combined native universal SDK, C/Swift and packed
+browser matrix; actual native GUI31 execution; matching published package/checksum
+consumption, current demo and release docs.
 The final GUI attempts stayed inactive and executed no assertions, so they are
-not counted as passes. Native release packaging was paused before Class changes
-rather than publishing the earlier SDK. No 0.2 tag or GitHub release exists yet.
+not counted as passes. Fresh universal native and packed WASM builds now include the Class changes;
+older SDK files are not counted as matching release proof. No 0.2 tag or GitHub release exists yet.
 
 Earlier entries below are historical snapshots; their artifacts and counts do
 not establish the current release's status.

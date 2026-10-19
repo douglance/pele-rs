@@ -39,6 +39,10 @@ required by the engine.
 
 These are independent feature slices, not one passing final release matrix:
 
+- The final consolidated Core run at `0c0c5a4` passes all 88 integration targets
+  and 380 tests with zero failures or ignored tests, superseding the earlier
+  failed complete run below. Source hashes match before and after execution.
+
 - The final Class slice passed 17 Rust features, seven Swift features, strict C
   Class/Gantt integration and 30 browser checks across all three engines.
   Commits `0c0c5a4` and `fa07860` contain the implementation and feature tests.
@@ -70,8 +74,10 @@ Older green matrices do not establish a later source revision's release status.
 - [x] Complete ClassMember `getDisplayDetails` / `parseClassifier` live-callable
   behavior, including captured originals, nested calls, partial errors and
   native/Swift/packed-browser coverage.
-- [ ] Freeze the final source; run the combined Rust integration corpus from
-  that revision and resolve every failure.
+- [x] Freeze final Core source and pass the combined Rust integration corpus: 88
+  targets, 380 tests, zero failures/ignored at `0c0c5a4`. Formatting, immutable
+  diff checks and unchanged source hashes also pass. The optimized validation
+  profile uses LTO off/codegen16; distribution uses its normal release profile.
 - [ ] Build one matching universal macOS arm64/x86_64 XCFramework, recording
   source, archive and header hashes.
 - [ ] Execute strict C integrations and Swift CLI features on arm64 and actual
