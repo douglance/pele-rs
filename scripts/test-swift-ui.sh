@@ -12,6 +12,7 @@ from pathlib import Path
 import selectors
 import shutil
 import signal
+import struct
 import subprocess
 import sys
 import tempfile
@@ -111,6 +112,58 @@ def command(arguments, name, timeout=600):
         raise RuntimeError(failure or name + " failed; see " + path.name)
     return path.read_text(errors="replace").strip()
 
+def copied_test_executable(source, destination):
+    """Normalize only the QA copy; SwiftPM source products remain untouched."""
+    info = destination / "Contents/Info.plist"
+    generated = not info.exists()
+    if not generated:
+        with info.open("rb") as stream:
+            name = plistlib.load(stream)["CFBundleExecutable"]
+        if not isinstance(name, str) or not name or Path(name).name != name or name in (".", ".."):
+            raise RuntimeError("Invalid test bundle executable name")
+        relative = Path("Contents/MacOS") / name
+    else:
+        # Swift 6 can emit a valid MH_BUNDLE and dSYM without an Info.plist.
+        # Identify the actual loadable bundle, never the dSYM's MH_DSYM file.
+        def is_bundle(path):
+            with path.open("rb") as stream:
+                header = stream.read(16)
+            endian = {b"\xce\xfa\xed\xfe": "<", b"\xcf\xfa\xed\xfe": "<",
+                      b"\xfe\xed\xfa\xce": ">", b"\xfe\xed\xfa\xcf": ">"}.get(header[:4])
+            return len(header) == 16 and endian is not None and struct.unpack_from(endian + "I", header, 12)[0] == 8
+        candidates = [path for path in destination.rglob("*")
+            if path.is_file() and not path.is_symlink() and os.access(path, os.X_OK) and is_bundle(path)]
+        if len(candidates) != 1:
+            raise RuntimeError("Cannot identify a single Mach-O XCTest bundle executable")
+        relative = candidates[0].relative_to(destination)
+        if relative.parent not in (Path("."), Path("Contents/MacOS")):
+            raise RuntimeError("Unsupported XCTest executable layout")
+        name = relative.name
+    original = source / relative
+    copied = destination / relative
+    if not original.is_file() or not copied.is_file() or not os.access(copied, os.X_OK):
+        raise RuntimeError("Test bundle executable is missing or not executable")
+    original_hash = digest(original)
+    if original_hash != digest(copied):
+        raise RuntimeError("Copied test bundle differs from the current build")
+    if generated:
+        target = destination / "Contents/MacOS" / name
+        target.parent.mkdir(parents=True, exist_ok=True)
+        if copied != target:
+            if target.exists():
+                raise RuntimeError("QA test executable destination is occupied")
+            copied.rename(target)
+            copied = target
+        info.write_bytes(plistlib.dumps({
+            "CFBundleIdentifier": "com.unlocalhosted.pele.native-ui-tests",
+            "CFBundleName": "PeleTests", "CFBundleExecutable": name,
+            "CFBundlePackageType": "BNDL", "CFBundleVersion": "1",
+            "CFBundleShortVersionString": "1", "LSMinimumSystemVersion": "14.0"}))
+    if digest(original) != original_hash or digest(copied) != original_hash:
+        raise RuntimeError("Test executable changed during QA bundle normalization")
+    return original, copied, {"generatedInfoPlist": generated, "sourceExecutable": str(relative),
+        "copiedExecutable": str(copied.relative_to(destination)), "sha256": original_hash}
+
 def owns_process(pid):
     if not executable or pid <= 1:
         return False
@@ -146,12 +199,7 @@ try:
     if before != inputs():
         raise RuntimeError("Swift source or native SDK changed during the UI build")
     shutil.copytree(candidates[0], run / "PeleTests.xctest")
-    with (run / "PeleTests.xctest/Contents/Info.plist").open("rb") as stream:
-        test_name = plistlib.load(stream)["CFBundleExecutable"]
-    original = candidates[0] / "Contents/MacOS" / test_name
-    copied = run / "PeleTests.xctest/Contents/MacOS" / test_name
-    if digest(original) != digest(copied):
-        raise RuntimeError("Copied test bundle differs from the current build")
+    original, copied, bundle_layout = copied_test_executable(candidates[0], run / "PeleTests.xctest")
     developer = Path(command(["/usr/bin/xcode-select", "-p"], "developer-path", timeout=10))
     framework = developer / "Platforms/MacOSX.platform/Developer/Library/Frameworks"
     library = developer / "Platforms/MacOSX.platform/Developer/usr/lib"
@@ -169,7 +217,7 @@ try:
     command(["/usr/bin/codesign", "--force", "--sign", "-", app], "host-sign", timeout=30)
     command(["/usr/bin/codesign", "--verify", "--deep", "--strict", app], "host-sign-verify", timeout=30)
     write_json(run / "provenance.json", {"revision": revision, "inputs": before, "scratch": str(scratch),
-        "testBundleSHA256": digest(copied), "hostSHA256": digest(executable), "host": "com.unlocalhosted.pele.native-ui-qa"})
+        "testBundleSHA256": digest(copied), "testBundleLayout": bundle_layout, "hostSHA256": digest(executable), "host": "com.unlocalhosted.pele.native-ui-qa"})
     command(["/usr/bin/open", "-n", app, "--args", run, Path.home()], "host-launch", timeout=30)
     deadline = time.monotonic() + args.timeout
     result_file = run / "result.json"
