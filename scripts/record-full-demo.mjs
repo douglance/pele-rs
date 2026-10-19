@@ -12,8 +12,9 @@ import {promisify} from 'node:util';
 import {join} from 'node:path';
 import {fileURLToPath} from 'node:url';
 
-assert(process.argv.includes('--release-verified'), 'Finish release verification first, then pass --release-verified.');
-assert.equal(process.argv.length, 3, 'Usage: node scripts/record-full-demo.mjs --release-verified');
+const recording = process.argv[2] === '--release-verified';
+assert(recording || process.argv[2] === '--verify-only', 'Use --verify-only to check the demo, or --release-verified after release gates pass.');
+assert.equal(process.argv.length, 3, 'Usage: node scripts/record-full-demo.mjs --verify-only | --release-verified');
 const execute = promisify(execFile);
 const root = fileURLToPath(new URL('..', import.meta.url));
 const url = new URL(process.env.PELE_DEMO_URL ?? 'http://127.0.0.1:5191/examples/web/full.html');
@@ -24,9 +25,11 @@ const manifest = JSON.parse(await readFile(join(root, 'dist/package-web/package/
 assert.equal(manifest.version, '0.2.0', 'Record the verified 0.2 package.');
 const archive = join(root, 'dist/release', `unlocalhosted-pele-rs-${manifest.version}.tgz`);
 const output = join(root, 'docs/images/full-demo.gif');
-try { await stat(output); throw new Error('full-demo.gif exists; preserve or move it before a new recording.'); }
-catch (error) { if (error.code !== 'ENOENT') throw error; }
-await execute('ffmpeg', ['-version'], {timeout: 5000, maxBuffer: 64 * 1024});
+if (recording) {
+  try { await stat(output); throw new Error('full-demo.gif exists; preserve or move it before a new recording.'); }
+  catch (error) { if (error.code !== 'ENOENT') throw error; }
+  await execute('ffmpeg', ['-version'], {timeout: 5000, maxBuffer: 64 * 1024});
+}
 
 async function artifacts() {
   const values = {
@@ -49,7 +52,7 @@ const before = await artifacts();
 await mkdir(join(root, 'dist'), {recursive: true});
 const frames = await mkdtemp(join(root, 'dist/full-demo-frames-'));
 const {stdout: revision} = await execute('git', ['-C', root, 'rev-parse', 'HEAD'], {timeout: 5000, maxBuffer: 4096});
-const proof = {version: manifest.version, revision: revision.trim(), url: String(url), artifacts: before, checks: [], frames: 0, succeeded: false};
+const proof = {version: manifest.version, revision: revision.trim(), mode: recording ? 'record' : 'verify-only', url: String(url), artifacts: before, checks: [], frames: 0, succeeded: false};
 const deadline = setTimeout(() => {
   console.error('Recording deadline exceeded; stopping owned browser.');
   const stop = setTimeout(() => process.exit(1), 3000);
@@ -89,6 +92,7 @@ try {
     return dimensions;
   };
   const hold = async seconds => {
+    if (!recording) return;
     assert(proof.frames + seconds * 6 <= 240, 'Frame budget exceeded.');
     for (let index = 0; index < seconds * 6; index++) {
       await page.screenshot({path: join(frames, `${String(proof.frames++).padStart(4, '0')}.png`), timeout: 10000});
@@ -173,6 +177,13 @@ try {
   await writeFile(join(frames, 'recording.json'), JSON.stringify(proof, null, 2) + '\n');
 }
 assert.deepEqual(await artifacts(), before, 'Package changed during recording.');
+if (!recording) {
+  proof.finishedAt = new Date().toISOString();
+  proof.succeeded = true;
+  await writeFile(join(frames, 'recording.json'), JSON.stringify(proof, null, 2) + '\n');
+  console.log(`Demo behavior verified without recording a GIF. Evidence: ${join(frames, 'recording.json')}`);
+  process.exit(0);
+}
 const temporaryGIF = join(frames, 'full-demo.gif');
 await execute('ffmpeg', ['-y', '-loglevel', 'error', '-framerate', '6', '-i', join(frames, '%04d.png'),
   '-filter_complex', 'fps=6,scale=1024:-1:flags=lanczos,split[a][b];[a]palettegen=max_colors=128[p];[b][p]paletteuse=dither=none',
