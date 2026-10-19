@@ -1165,11 +1165,26 @@ fn renderer_callbacks_are_explicit_and_retained_builtin_lookup_remains_callable(
     let properties = std::mem::take(g.nodes[r as usize].properties_mut());
     g.nodes[r as usize] = Node::Object { properties };
     d.apply(0, g).unwrap();
-    assert!(d
+    let missing_helper = d
         .render(&RenderOptions::default(), &mut MetricsResources)
-        .unwrap_err()
-        .message
-        .contains("getC4Shape render callbacks"));
+        .unwrap_err();
+    assert!(
+        missing_helper
+            .message
+            .contains("getC4Shape render callbacks"),
+        "Actual missing-helper error: {missing_helper:?}"
+    );
+    let raw_failure = d
+        .render_raw_operation(
+            d.revision(),
+            &Object::default(),
+            &RenderSettings::default(),
+            &mut MetricsResources,
+        )
+        .unwrap();
+    assert!(
+        matches!(raw_failure.result, Err(PublicError::JavaScript { name: JavaScriptErrorKind::TypeError, ref message }) if message.well_formed().as_deref() == Some("t.getC4Shape is not a function"))
+    );
     let mut g = d.snapshot().unwrap();
     set(&mut g, r, "getC4Shape", Atom::BuiltinFunction(15));
     d.apply(d.revision(), g).unwrap();
@@ -1178,6 +1193,19 @@ fn renderer_callbacks_are_explicit_and_retained_builtin_lookup_remains_callable(
         None,
         "01c214c51b6fc6942a6a06d26c9a9f5f5c2cead63fb786892ac2415c91165078",
     );
+    let raw_recovered = d
+        .render_raw_operation(
+            d.revision(),
+            &Object::default(),
+            &RenderSettings::default(),
+            &mut MetricsResources,
+        )
+        .unwrap();
+    assert!(
+        raw_recovered.result.is_ok(),
+        "Restored own builtin lookup must remain callable through raw rendering"
+    );
+
     let mut g = d.snapshot().unwrap();
     let rels = reference(field(&g, r, "rels"));
     set(&mut g, rels, "map", Atom::Number(1.));

@@ -2214,7 +2214,27 @@ impl PublicDiagramModule for C4 {
         o: &RenderSettings,
         r: &mut dyn RenderResources,
     ) -> Result<Rendered, PeleError> {
-        super::render::render(s.model.as_ref().map_err(Clone::clone)?, c, o, r)
+        let model = s.model.as_ref().map_err(Clone::clone)?;
+        if let Atom::Ref(root) = s.graph.root {
+            if matches!(s.graph.nodes[root as usize], Node::Object { .. })
+                && matches!(
+                    property(&s.graph, root, "getC4Shape"),
+                    None | Some(Atom::Undefined)
+                )
+                && model
+                    .rels
+                    .iter()
+                    .any(|rel| rel.from_attr.is_none() || rel.to_attr.is_none())
+            {
+                // Preserve the legacy PeleError-only API's explicit callback
+                // boundary. Raw operation rendering below retains the pinned
+                // TypeError at its actual post-layout call site instead.
+                return Err(invalid(
+                    "C4 missing or replaced getC4Shape render callbacks are not implemented",
+                ));
+            }
+        }
+        super::render::render(model, c, o, r)
     }
     fn render_public_operation(
         &self,
@@ -2223,7 +2243,9 @@ impl PublicDiagramModule for C4 {
         options: &RenderSettings,
         host: &mut dyn RenderResources,
     ) -> Result<Rendered, PublicError> {
-        if matches!(state.graph.root,Atom::Ref(id) if matches!(state.graph.nodes[id as usize],Node::Object{..}))
+        if matches!(state.graph.root, Atom::Ref(id)
+            if matches!(state.graph.nodes[id as usize], Node::Object { .. })
+                && matches!(property(&state.graph, id, "getC4Shape"), None | Some(Atom::Undefined)))
         {
             return super::render::render_plain(
                 state.model.as_ref().map_err(Clone::clone)?,
