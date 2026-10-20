@@ -1,0 +1,294 @@
+{
+  "nodes": [
+    {
+      "id": "g1f32entry",
+      "label": "symbol_nodes",
+      "detail": "entry",
+      "external": false
+    },
+    {
+      "id": "g1f32exit",
+      "label": "Exit symbol_nodes",
+      "detail": "exit",
+      "external": false
+    },
+    {
+      "id": "g1f32s0",
+      "label": "Ok",
+      "detail": "statement",
+      "external": false
+    },
+    {
+      "id": "g1f32s1",
+      "label": "len",
+      "detail": "statement",
+      "external": false
+    },
+    {
+      "id": "g1f32s10",
+      "label": "text",
+      "detail": "statement",
+      "external": false
+    },
+    {
+      "id": "g1f32s11",
+      "label": "let id = sid(number(s, \"id\")?);",
+      "detail": "statement",
+      "external": false
+    },
+    {
+      "id": "g1f32s12",
+      "label": "sid",
+      "detail": "statement",
+      "external": false
+    },
+    {
+      "id": "g1f32s13",
+      "label": "number(s, \"id\")?",
+      "detail": "try",
+      "external": false
+    },
+    {
+      "id": "g1f32s14",
+      "label": "number",
+      "detail": "statement",
+      "external": false
+    },
+    {
+      "id": "g1f32s15",
+      "label": "let sid = |id: u64| format!(\"g{g}n{id}\");",
+      "detail": "statement",
+      "external": false
+    },
+    {
+      "id": "g1f32s16",
+      "label": "let symbols = rows(input, \"nodes\")?;",
+      "detail": "statement",
+      "external": false
+    },
+    {
+      "id": "g1f32s17",
+      "label": "rows(input, \"nodes\")?",
+      "detail": "try",
+      "external": false
+    },
+    {
+      "id": "g1f32s18",
+      "label": "rows",
+      "detail": "statement",
+      "external": false
+    },
+    {
+      "id": "g1f32s2",
+      "label": "symbols",
+      "detail": "for",
+      "external": false
+    },
+    {
+      "id": "g1f32s3",
+      "label": "self.add(node(\n                id,\n                text(s, \"n\"),\n                text(s, \"k\"),\n                (text(s, \"f\"), text(s, \"p\")),\n                \"Symbols\",\n                None,\n                s.clone(),\n            ))?",
+      "detail": "try",
+      "external": false
+    },
+    {
+      "id": "g1f32s4",
+      "label": "add",
+      "detail": "statement",
+      "external": false
+    },
+    {
+      "id": "g1f32s5",
+      "label": "node",
+      "detail": "statement",
+      "external": false
+    },
+    {
+      "id": "g1f32s6",
+      "label": "clone",
+      "detail": "statement",
+      "external": false
+    },
+    {
+      "id": "g1f32s7",
+      "label": "text",
+      "detail": "statement",
+      "external": false
+    },
+    {
+      "id": "g1f32s8",
+      "label": "text",
+      "detail": "statement",
+      "external": false
+    },
+    {
+      "id": "g1f32s9",
+      "label": "text",
+      "detail": "statement",
+      "external": false
+    },
+    {
+      "id": "g1f33entry",
+      "label": "symbol_hierarchy",
+      "detail": "entry",
+      "external": false
+    },
+    {
+      "id": "g1f33exit",
+      "label": "Exit symbol_hierarchy",
+      "detail": "exit",
+      "external": false
+    },
+    {
+      "id": "g1f33s0",
+      "label": "Ok",
+      "detail": "statement",
+      "external": false
+    }
+  ],
+  "edges": [
+    {
+      "id": "g1f32entryedge",
+      "source": "g1f32entry",
+      "target": "g1f32s18",
+      "label": "entry"
+    },
+    {
+      "id": "g1f32link0",
+      "source": "g1f32s0",
+      "target": "g1f32exit",
+      "label": "next"
+    },
+    {
+      "id": "g1f32link1",
+      "source": "g1f32s1",
+      "target": "g1f32s0",
+      "label": "next"
+    },
+    {
+      "id": "g1f32link10",
+      "source": "g1f32s10",
+      "target": "g1f32s9",
+      "label": "next"
+    },
+    {
+      "id": "g1f32link11",
+      "source": "g1f32s11",
+      "target": "g1f32s10",
+      "label": "next"
+    },
+    {
+      "id": "g1f32link12",
+      "source": "g1f32s12",
+      "target": "g1f32s11",
+      "label": "next"
+    },
+    {
+      "id": "g1f32link13",
+      "source": "g1f32s13",
+      "target": "g1f32s12",
+      "label": "arm 0"
+    },
+    {
+      "id": "g1f32link14",
+      "source": "g1f32s13",
+      "target": "g1f32exit",
+      "label": "arm 1"
+    },
+    {
+      "id": "g1f32link15",
+      "source": "g1f32s14",
+      "target": "g1f32s13",
+      "label": "next"
+    },
+    {
+      "id": "g1f32link18",
+      "source": "g1f32s15",
+      "target": "g1f32s2",
+      "label": "next"
+    },
+    {
+      "id": "g1f32link19",
+      "source": "g1f32s16",
+      "target": "g1f32s15",
+      "label": "next"
+    },
+    {
+      "id": "g1f32link20",
+      "source": "g1f32s17",
+      "target": "g1f32s16",
+      "label": "arm 0"
+    },
+    {
+      "id": "g1f32link21",
+      "source": "g1f32s17",
+      "target": "g1f32exit",
+      "label": "arm 1"
+    },
+    {
+      "id": "g1f32link22",
+      "source": "g1f32s18",
+      "target": "g1f32s17",
+      "label": "next"
+    },
+    {
+      "id": "g1f32link16",
+      "source": "g1f32s2",
+      "target": "g1f32s14",
+      "label": "arm 0"
+    },
+    {
+      "id": "g1f32link17",
+      "source": "g1f32s2",
+      "target": "g1f32s1",
+      "label": "arm 1"
+    },
+    {
+      "id": "g1f32link2",
+      "source": "g1f32s3",
+      "target": "g1f32s2",
+      "label": "arm 0"
+    },
+    {
+      "id": "g1f32link3",
+      "source": "g1f32s3",
+      "target": "g1f32exit",
+      "label": "arm 1"
+    },
+    {
+      "id": "g1f32link4",
+      "source": "g1f32s4",
+      "target": "g1f32s3",
+      "label": "next"
+    },
+    {
+      "id": "g1f32link5",
+      "source": "g1f32s5",
+      "target": "g1f32s4",
+      "label": "next"
+    },
+    {
+      "id": "g1f32link6",
+      "source": "g1f32s6",
+      "target": "g1f32s5",
+      "label": "next"
+    },
+    {
+      "id": "g1f32link7",
+      "source": "g1f32s7",
+      "target": "g1f32s6",
+      "label": "next"
+    },
+    {
+      "id": "g1f32link8",
+      "source": "g1f32s8",
+      "target": "g1f32s7",
+      "label": "next"
+    },
+    {
+      "id": "g1f32link9",
+      "source": "g1f32s9",
+      "target": "g1f32s8",
+      "label": "next"
+    }
+  ]
+}

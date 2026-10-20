@@ -1,0 +1,60 @@
+{
+  "nodes": [
+    {
+      "id": "g1call383",
+      "label": "Call at line 43",
+      "detail": "call site",
+      "external": false
+    },
+    {
+      "id": "g1call384",
+      "label": "Call at line 45",
+      "detail": "call site",
+      "external": false
+    },
+    {
+      "id": "g1call385",
+      "label": "Call at line 46",
+      "detail": "call site",
+      "external": false
+    },
+    {
+      "id": "g1n448",
+      "label": "parse",
+      "detail": "method",
+      "external": true
+    },
+    {
+      "id": "g1n508",
+      "label": "extract_language_project",
+      "detail": "fn",
+      "external": true
+    },
+    {
+      "id": "g1n509",
+      "label": "assemble_language_graph",
+      "detail": "fn",
+      "external": true
+    }
+  ],
+  "edges": [
+    {
+      "id": "g1call383to",
+      "source": "g1call383",
+      "target": "g1n448",
+      "label": "calls"
+    },
+    {
+      "id": "g1call384to",
+      "source": "g1call384",
+      "target": "g1n508",
+      "label": "calls"
+    },
+    {
+      "id": "g1call385to",
+      "source": "g1call385",
+      "target": "g1n509",
+      "label": "calls"
+    }
+  ]
+}

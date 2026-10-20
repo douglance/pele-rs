@@ -1,0 +1,438 @@
+{
+  "nodes": [
+    {
+      "id": "g1call441",
+      "label": "Call at line 269",
+      "detail": "call site",
+      "external": true
+    },
+    {
+      "id": "g1call442",
+      "label": "Call at line 271",
+      "detail": "call site",
+      "external": true
+    },
+    {
+      "id": "g1call443",
+      "label": "Call at line 281",
+      "detail": "call site",
+      "external": true
+    },
+    {
+      "id": "g1call444",
+      "label": "Call at line 318",
+      "detail": "call site",
+      "external": true
+    },
+    {
+      "id": "g1call445",
+      "label": "Call at line 319",
+      "detail": "call site",
+      "external": true
+    },
+    {
+      "id": "g1call446",
+      "label": "Call at line 320",
+      "detail": "call site",
+      "external": true
+    },
+    {
+      "id": "g1call447",
+      "label": "Call at line 326",
+      "detail": "call site",
+      "external": true
+    },
+    {
+      "id": "g1call448",
+      "label": "Call at line 327",
+      "detail": "call site",
+      "external": true
+    },
+    {
+      "id": "g1call449",
+      "label": "Call at line 333",
+      "detail": "call site",
+      "external": true
+    },
+    {
+      "id": "g1call450",
+      "label": "Call at line 339",
+      "detail": "call site",
+      "external": true
+    },
+    {
+      "id": "g1n508",
+      "label": "extract_language_project",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n509",
+      "label": "assemble_language_graph",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n510",
+      "label": "selected_languages",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n511",
+      "label": "run_json_frontend",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n512",
+      "label": "rust_source_report",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n513",
+      "label": "rust_semantic_report",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n514",
+      "label": "merge_rust_graph",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n515",
+      "label": "rust_symbol_id",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n516",
+      "label": "rust_duplicate_source_paths",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n517",
+      "label": "rust_sources_for_graph",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n518",
+      "label": "rust_source_only_report",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n519",
+      "label": "discover_manifests",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n520",
+      "label": "walk",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n521",
+      "label": "prefix_file",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n522",
+      "label": "read_prefixed_excerpt",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n523",
+      "label": "excerpt",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n524",
+      "label": "rust_kind",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n525",
+      "label": "rust_visibility",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n526",
+      "label": "section_kind_name",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n527",
+      "label": "discover_files",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n528",
+      "label": "language_for_file",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n529",
+      "label": "probe_tools",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n530",
+      "label": "tool_specs",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n531",
+      "label": "ensure_required_tools",
+      "detail": "fn",
+      "external": false
+    },
+    {
+      "id": "g1n543",
+      "label": "add_unresolved_execution",
+      "detail": "fn",
+      "external": true
+    },
+    {
+      "id": "g1n544",
+      "label": "language_metadata",
+      "detail": "fn",
+      "external": true
+    },
+    {
+      "id": "g1n545",
+      "label": "map_kind",
+      "detail": "fn",
+      "external": true
+    },
+    {
+      "id": "g1n546",
+      "label": "map_section_kind",
+      "detail": "fn",
+      "external": true
+    },
+    {
+      "id": "g1n547",
+      "label": "map_visibility",
+      "detail": "fn",
+      "external": true
+    },
+    {
+      "id": "g1n548",
+      "label": "is_synchronous_execution_call",
+      "detail": "fn",
+      "external": true
+    },
+    {
+      "id": "g1n554",
+      "label": "now_marker",
+      "detail": "fn",
+      "external": true
+    },
+    {
+      "id": "g1n565",
+      "label": "node",
+      "detail": "method",
+      "external": true
+    },
+    {
+      "id": "g1n566",
+      "label": "edge",
+      "detail": "method",
+      "external": true
+    },
+    {
+      "id": "g1n567",
+      "label": "finish",
+      "detail": "method",
+      "external": true
+    },
+    {
+      "id": "g1n568",
+      "label": "is_project_callable",
+      "detail": "fn",
+      "external": true
+    },
+    {
+      "id": "g1n569",
+      "label": "entry_id",
+      "detail": "fn",
+      "external": true
+    },
+    {
+      "id": "g1n570",
+      "label": "exit_id",
+      "detail": "fn",
+      "external": true
+    },
+    {
+      "id": "g1n571",
+      "label": "section_id",
+      "detail": "fn",
+      "external": true
+    }
+  ],
+  "edges": [
+    {
+      "id": "g1e269",
+      "source": "g1n509",
+      "target": "g1n543",
+      "label": "call"
+    },
+    {
+      "id": "g1e270",
+      "source": "g1n509",
+      "target": "g1n544",
+      "label": "call"
+    },
+    {
+      "id": "g1e271",
+      "source": "g1n509",
+      "target": "g1n545",
+      "label": "call"
+    },
+    {
+      "id": "g1e272",
+      "source": "g1n509",
+      "target": "g1n546",
+      "label": "call"
+    },
+    {
+      "id": "g1e273",
+      "source": "g1n509",
+      "target": "g1n547",
+      "label": "call"
+    },
+    {
+      "id": "g1e274",
+      "source": "g1n509",
+      "target": "g1n548",
+      "label": "call"
+    },
+    {
+      "id": "g1e275",
+      "source": "g1n509",
+      "target": "g1n554",
+      "label": "call"
+    },
+    {
+      "id": "g1e276",
+      "source": "g1n509",
+      "target": "g1n565",
+      "label": "call"
+    },
+    {
+      "id": "g1e277",
+      "source": "g1n509",
+      "target": "g1n566",
+      "label": "call"
+    },
+    {
+      "id": "g1e278",
+      "source": "g1n509",
+      "target": "g1n567",
+      "label": "call"
+    },
+    {
+      "id": "g1e279",
+      "source": "g1n509",
+      "target": "g1n568",
+      "label": "call"
+    },
+    {
+      "id": "g1e280",
+      "source": "g1n509",
+      "target": "g1n569",
+      "label": "call"
+    },
+    {
+      "id": "g1e281",
+      "source": "g1n509",
+      "target": "g1n570",
+      "label": "call"
+    },
+    {
+      "id": "g1e282",
+      "source": "g1n509",
+      "target": "g1n571",
+      "label": "call"
+    },
+    {
+      "id": "g1call441from",
+      "source": "g1n509",
+      "target": "g1call441",
+      "label": "calls at"
+    },
+    {
+      "id": "g1call442from",
+      "source": "g1n509",
+      "target": "g1call442",
+      "label": "calls at"
+    },
+    {
+      "id": "g1call443from",
+      "source": "g1n509",
+      "target": "g1call443",
+      "label": "calls at"
+    },
+    {
+      "id": "g1call444from",
+      "source": "g1n509",
+      "target": "g1call444",
+      "label": "calls at"
+    },
+    {
+      "id": "g1call445from",
+      "source": "g1n509",
+      "target": "g1call445",
+      "label": "calls at"
+    },
+    {
+      "id": "g1call446from",
+      "source": "g1n509",
+      "target": "g1call446",
+      "label": "calls at"
+    },
+    {
+      "id": "g1call447from",
+      "source": "g1n509",
+      "target": "g1call447",
+      "label": "calls at"
+    },
+    {
+      "id": "g1call448from",
+      "source": "g1n509",
+      "target": "g1call448",
+      "label": "calls at"
+    },
+    {
+      "id": "g1call449from",
+      "source": "g1n509",
+      "target": "g1call449",
+      "label": "calls at"
+    },
+    {
+      "id": "g1call450from",
+      "source": "g1n509",
+      "target": "g1call450",
+      "label": "calls at"
+    }
+  ]
+}
